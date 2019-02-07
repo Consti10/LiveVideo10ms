@@ -1,5 +1,6 @@
 package constantin.lowlagvideo;
 
+
 public class DecodingInfo {
     public final float currentFPS;
     public final float currentKiloBitsPerSecond;

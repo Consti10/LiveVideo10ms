@@ -2,13 +2,13 @@ package constantin.lowlagvideo.External;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
 //Taken from https://github.com/google/grafika/blob/master/app/src/main/java/com/android/grafika/AspectFrameLayout.java
 //and modified slightly such that debugging is optional
 
+@SuppressWarnings("unused")
 public class AspectFrameLayout extends FrameLayout {
     private static final String TAG = "AFL";
 
@@ -86,6 +86,7 @@ public class AspectFrameLayout extends FrameLayout {
     }
 
 
+    @SuppressWarnings({"EmptyMethod", "unused"})
     private static void Debug(final String s){
         //Log.d(TAG,s);
     }

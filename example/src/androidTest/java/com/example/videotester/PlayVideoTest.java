@@ -2,19 +2,17 @@ package com.example.videotester;
 
 
 import android.content.Intent;
-import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import constantin.lowlagvideo.DecodingInfo;
 import videotester.MainActivity;
 import videotester.VideoActivity;
 
 @LargeTest
-@RunWith(AndroidJUnit4.class)
+
 public class PlayVideoTest {
     private static final int WAIT_TIME_LONG = 30*1000; //30 seconds
 
