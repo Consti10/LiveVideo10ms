@@ -1,1 +1,9 @@
-ninja: no work to do.
+[1/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/General/GroundRecorder.cpp.o
+[2/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/General/UDPReceiver.cpp.o
+[3/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRAW.cpp.o
+[4/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRTP.cpp.o
+[5/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o
+[6/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o
+[7/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/VideoNative/Video.cpp.o
+[8/9] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Decoder/SPSHelper.cpp.o
+[9/9] Linking CXX shared library ..\..\..\..\build\intermediates\cmake\debug\obj\arm64-v8a\libVideo.so
