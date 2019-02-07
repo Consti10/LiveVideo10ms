@@ -1,0 +1,3 @@
+C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/release/armeabi-v7a/CMakeFiles/Video.dir
+C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/release/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/release/armeabi-v7a/CMakeFiles/rebuild_cache.dir

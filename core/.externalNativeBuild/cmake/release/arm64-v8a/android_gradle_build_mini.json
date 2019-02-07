@@ -1,0 +1,16 @@
+{
+  "buildFiles": [
+    "C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\live_video_10ms_android\\core\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\live_video_10ms_android\\core\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target clean"
+  ],
+  "libraries": {
+    "Video-Release-arm64-v8a": {
+      "artifactName": "Video",
+      "buildCommand": "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\live_video_10ms_android\\core\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target Video",
+      "abi": "arm64-v8a",
+      "output": "C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\live_video_10ms_android\\core\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libVideo.so"
+    }
+  }
+}

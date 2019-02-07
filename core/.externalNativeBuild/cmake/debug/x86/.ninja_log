@@ -1,0 +1,17 @@
+# ninja log v5
+16	983	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRTP.cpp.o	37a113d471e28e5f
+1	1020	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRAW.cpp.o	eee01ab6da1724c8
+1020	1462	0	CMakeFiles/Video.dir/src/main/cpp/Video/SPSHelper.cpp.o	5a045461957b3277
+8	1566	0	CMakeFiles/Video.dir/src/main/cpp/General/UDPReceiver.cpp.o	7638142ce7676164
+5	1567	0	CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o	9b9228528f33f4bc
+11	1694	0	CMakeFiles/Video.dir/src/main/cpp/Video/LowLagDecoder.cpp.o	13db4ed11595391f
+14	1761	0	CMakeFiles/Video.dir/src/main/cpp/General/GroundRecorder.cpp.o	310b3ccc32bb512a
+985	3023	0	CMakeFiles/Video.dir/src/main/cpp/Video/Video.cpp.o	f12adcd05b6e2407
+3024	3268	0	../../../../build/intermediates/cmake/debug/obj/x86/libVideo.so	c240b03b977a649b
+6	2589	0	CMakeFiles/Video.dir/src/main/cpp/Video/Video.cpp.o	f12adcd05b6e2407
+2589	2843	0	../../../../build/intermediates/cmake/debug/obj/x86/libVideo.so	c240b03b977a649b
+16	775	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/SPSHelper.cpp.o	534a338e6b5b74f9
+13	1541	0	CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o	9b9228528f33f4bc
+7	1628	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o	524f082a0c1f988d
+20	2284	0	CMakeFiles/Video.dir/src/main/cpp/VideoNative/Video.cpp.o	a75470829cde4334
+2284	2728	0	../../../../build/intermediates/cmake/debug/obj/x86/libVideo.so	493b759e93b4c7d2

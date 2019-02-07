@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/b_startVideoActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Video Only"
+        tools:ignore="HardcodedText" />
+
+    <Spinner
+        android:id="@+id/s_videoFileSelector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="HardcodedText" />
+
+
+
+</android.support.v7.widget.LinearLayoutCompat>

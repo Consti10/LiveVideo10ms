@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string-array name="test_videos">
+
+        <item>Iceland (x264)</item>
+        <item>Rpi Camera</item>
+        <item>Recording 360</item>
+        <item>Other 2</item>
+    </string-array>
+
+</resources>

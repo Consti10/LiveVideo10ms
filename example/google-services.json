@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "648484085751",
+    "firebase_url": "https://videotester-41893.firebaseio.com",
+    "project_id": "videotester-41893",
+    "storage_bucket": "videotester-41893.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648484085751:android:1cfe94fb9d280118",
+        "android_client_info": {
+          "package_name": "constantin.cheetah.videotester"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "648484085751-k9k84a8evj5n30b9n0b1hsmevvepie8m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "constantin.cheetah.videotester",
+            "certificate_hash": "6593a39e4d2b42220359819015b1cb2627a65b85"
+          }
+        },
+        {
+          "client_id": "648484085751-d4v8reok2enas7nf3f4su9f1kf00b9ds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAijWXI-NFtt5vB7C-wHf-Kbp4L-S3A6rY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "648484085751-d4v8reok2enas7nf3f4su9f1kf00b9ds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

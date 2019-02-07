@@ -1,0 +1,10 @@
+# ninja log v5
+1	1280	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRAW.cpp.o	167b59bc9fa9bef8
+18	1654	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRTP.cpp.o	6438d4588d29e8fb
+1284	1815	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/SPSHelper.cpp.o	515947696a647f2e
+15	2061	0	CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o	3783c58b8683c2e4
+12	2296	0	CMakeFiles/Video.dir/src/main/cpp/General/UDPReceiver.cpp.o	dcb3cd7231b4d5dd
+9	2362	0	CMakeFiles/Video.dir/src/main/cpp/General/GroundRecorder.cpp.o	ea6752332468b469
+5	2849	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o	78516b179596b9b9
+1654	4950	0	CMakeFiles/Video.dir/src/main/cpp/VideoNative/Video.cpp.o	7d727a51adc04bd3
+4950	5306	0	../../../../build/intermediates/cmake/release/obj/armeabi-v7a/libVideo.so	324085ebde0282fe

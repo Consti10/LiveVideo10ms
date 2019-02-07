@@ -1,0 +1,83 @@
+
+{
+	"buildFiles" : 
+	[
+		"C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/CMakeLists.txt"
+	],
+	"cleanCommands" : 
+	[
+		"C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\live_video_10ms_android\\core\\.externalNativeBuild\\cmake\\debug\\armeabi-v7a --target clean"
+	],
+	"cppFileExtensions" : [ "cpp" ],
+	"libraries" : 
+	{
+		"Video-Debug-armeabi-v7a" : 
+		{
+			"abi" : "armeabi-v7a",
+			"artifactName" : "Video",
+			"buildCommand" : "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\live_video_10ms_android\\core\\.externalNativeBuild\\cmake\\debug\\armeabi-v7a --target Video",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/General/GroundRecorder.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/General/UDPReceiver.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/Parser/H264Parser.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/Parser/ParseRAW.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/Parser/ParseRTP.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/Decoder/LowLagDecoder.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/Decoder/SPSHelper.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  -DVideo_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  --sysroot C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++14 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/src/main/cpp/VideoNative/Video.cpp",
+					"workingDirectory" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				}
+			],
+			"output" : "C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/build/intermediates/cmake/debug/obj/armeabi-v7a/libVideo.so",
+			"toolchain" : "2207939819"
+		}
+	},
+	"toolchains" : 
+	{
+		"2207939819" : 
+		{
+			"cCompilerExecutable" : "C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+		}
+	}
+}
