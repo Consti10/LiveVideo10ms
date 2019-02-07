@@ -1,6 +1,6 @@
 package constantin.lowlagvideo;
 
-
+@SuppressWarnings("WeakerAccess")
 public class DecodingInfo {
     public final float currentFPS;
     public final float currentKiloBitsPerSecond;
