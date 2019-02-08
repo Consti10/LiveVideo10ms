@@ -5,13 +5,14 @@
 
 #include "ParseRAW.h"
 
-ParseRAW::ParseRAW(NALU_DATA_CALLBACK cb):IParser(cb){
+ParseRAW::ParseRAW(NALU_DATA_CALLBACK cb):cb(cb){
 }
 
 void ParseRAW::reset(){
     nalu_data_position=4;
     nalu_search_state=0;
 }
+
 
 void ParseRAW::parseData(const uint8_t* data,const int data_length){
     for (int i = 0; i < data_length; ++i) {

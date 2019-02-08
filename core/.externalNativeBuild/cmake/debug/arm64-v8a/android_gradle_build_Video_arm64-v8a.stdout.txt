@@ -1,1 +1,5 @@
-ninja: no work to do.
+[1/5] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRAW.cpp.o
+[2/5] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o
+[3/5] Building CXX object CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRTP.cpp.o
+[4/5] Building CXX object CMakeFiles/Video.dir/src/main/cpp/VideoNative/Video.cpp.o
+[5/5] Linking CXX shared library ..\..\..\..\build\intermediates\cmake\debug\obj\arm64-v8a\libVideo.so

@@ -36,6 +36,7 @@ public:
 private:
     void newNaluExtracted(const NALU& nalu);
     const NALU_DATA_CALLBACK onNewNALU;
+    uint8_t nalu_data[NALU_MAXLEN];
 
     std::chrono::steady_clock::time_point lastFrameLimitFPS=std::chrono::steady_clock::now();
 

@@ -38,11 +38,11 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     nNALUBytesFed.add(nalu.data_length);
     if(inputPipeClosed){
         //A feedD thread (e.g. file or udp) thread might still be running
-        //But since we want to feed the EOS now we mustn't feed any more data
+        //But since we want to feed the EOS now we mustn't feed any more non-eos data
         return;
     }
     if(nalu.data_length<=4){
-        //No data in NALU (e.g) at the beginning of a stream
+        //No data in NALU (e.g at the beginning of a stream)
         return;
     }
     if(decoder.configured){
@@ -68,6 +68,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
         //There is no CSD0/CSD1 data yet. We don't have enough information to initialize the decoder.
         return;
     }
+    //SW decoder seems to be broken in native
     if(decoder.SW){
         decoder.codec = AMediaCodec_createDecoderByType("OMX.google.h264.decoder");
     }else {
@@ -85,10 +86,12 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     AMediaFormat_setBuffer(decoder.format,"csd-0",&CSDO,(size_t)CSD0Length);
     AMediaFormat_setBuffer(decoder.format,"csd-1",&CSD1,(size_t)CSD1Length);
 
-
     AMediaCodec_configure(decoder.codec, decoder.format, decoder.window, nullptr, 0);
     if (decoder.codec== nullptr) {
         LOGD("Cannot configure decoder");
+        //set csdo and csd1 back to 0, maybe they were just faulty but we have better luck with the next ones
+        CSD0Length=0;
+        CSD1Length=0;
         return;
     }
     AMediaCodec_start(decoder.codec);
@@ -159,10 +162,10 @@ void LowLagDecoder::feedDecoder(const NALU& nalu,bool justEOS){
         size_t size;
         if (index >=0) {
             void* buf = AMediaCodec_getInputBuffer(decoder.codec,(size_t)index,&size);
-            if(nalu.data_length>size){
-                return;
-            }
             if(!justEOS){
+                if(nalu.data_length>size){
+                    return;
+                }
                 std::memcpy(buf, nalu.data,(size_t)nalu.data_length);
                 //this timestamp will be later used to calculate the decoding latency
                 const uint64_t presentationTimeUS=(uint64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();

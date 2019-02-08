@@ -9,7 +9,6 @@ public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, Video.IVide
 
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged videoParamsChanged;
-
     private FileVideoReceiver mFileVideoReceiver;
 
     public VideoPlayer(final IVideoParamsChanged iVideoParamsChanged){

@@ -7,15 +7,19 @@
 
 #include <cstdio>
 #include "../NALU/NALU.hpp"
-#include "IParser.h"
 
-class ParseRAW : public IParser{
+/*********************************************
+ ** Parses a stream of raw h264 NALUs
+**********************************************/
+
+class ParseRAW {
 public:
     ParseRAW(NALU_DATA_CALLBACK cb);
-    void parseData(const uint8_t* data,const int data_length)override;
-    void reset()override;
+    void parseData(const uint8_t* data,const int data_length);
+    void reset();
 private:
-//needed for raw
+    const NALU_DATA_CALLBACK cb;
+    uint8_t nalu_data[NALU_MAXLEN];
     int nalu_data_position=4;
     int nalu_search_state=0;
 };

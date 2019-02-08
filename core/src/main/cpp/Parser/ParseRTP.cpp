@@ -48,7 +48,7 @@ typedef struct fu_header {
 
 
 
-ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):IParser(cb){
+ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(cb){
 }
 
 void ParseRTP::reset(){
