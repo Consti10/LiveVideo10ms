@@ -10,7 +10,7 @@ the decoder with faulty NALUs, created by a lossy connection. (e.g. wifibroadcas
 
 The 2 most important factors for low latency are
 a) HW-accelerated decoding via the MediaCodec api
-b) Receiving,Parsing and decoding is done in cpp code (multi-threaded). This decouples it from the java runtime, which increases performance and makes latency more consistent ( garbage collection halts all threads, for example).
+b) Receiving,Parsing and decoding is done in cpp code (multi-threaded). This decouples it from the java runtime, which increases performance and makes latency more consistent ( garbage collection halts all java threads, for example).
 
 However, all native code needed for creating, starting and stopping the decoding process are exposed via the JNI, so you can use the lib
 without writing c/c++ code.
