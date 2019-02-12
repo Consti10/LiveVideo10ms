@@ -1,3 +1,0 @@
-C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/release/x86/CMakeFiles/Video.dir
-C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/release/x86/CMakeFiles/edit_cache.dir
-C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/live_video_10ms_android/core/.externalNativeBuild/cmake/release/x86/CMakeFiles/rebuild_cache.dir

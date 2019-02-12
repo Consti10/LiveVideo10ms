@@ -7,7 +7,7 @@ find_library( log-lib
 include_directories(src/main/cpp/Video)
 include_directories(src/main/cpp/General)
 set(VIDEO_PATH src/main/cpp)
-add_library( Video
+add_library( VideoNative
              SHARED
         ${VIDEO_PATH}/General/GroundRecorder.cpp
         ${VIDEO_PATH}/General/UDPReceiver.cpp
@@ -18,9 +18,9 @@ add_library( Video
 
         ${VIDEO_PATH}/Decoder/LowLagDecoder.cpp
         ${VIDEO_PATH}/Decoder/SPSHelper.cpp
-        ${VIDEO_PATH}/VideoNative/Video.cpp)
+        ${VIDEO_PATH}/VideoNative/VideoNative.cpp)
 
-target_link_libraries( Video
+target_link_libraries( VideoNative
                        ${log-lib}
                        log
                        android

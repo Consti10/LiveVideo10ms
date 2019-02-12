@@ -30,7 +30,7 @@ public class PlayVideoTest {
 
     private void testActivityWithVideoFile(final int whichFile){
         Intent i = new Intent();
-        i.putExtra(MainActivity.INNTENT_EXTRA_NAME, whichFile);
+        i.putExtra(MainActivity.INNTENT_EXTRA_VIDEO_MODE, whichFile);
         mActivityTestRule.launchActivity(i);
         try { Thread.sleep(WAIT_TIME_LONG); } catch (InterruptedException e) { e.printStackTrace(); }
 

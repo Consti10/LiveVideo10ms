@@ -3,49 +3,55 @@ package constantin.lowlagvideo;
 import android.content.Context;
 import android.view.Surface;
 
-import constantin.lowlagvideo.VideoNative.Video;
+import constantin.lowlagvideo.VideoNative.VideoNative;
 
-public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, Video.IVideoParamsChangedNative {
+public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative.IVideoParamsChangedNative {
 
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged videoParamsChanged;
     private FileVideoReceiver mFileVideoReceiver;
+    private enum MODE{
+        UDP,FILE
+    };
+    private MODE mCurrentMode;
 
     public VideoPlayer(final IVideoParamsChanged iVideoParamsChanged){
         videoParamsChanged=iVideoParamsChanged;
-        nativeVideoPlayer= Video.initialize(this);
+        nativeVideoPlayer= VideoNative.initialize(this);
     }
 
     public void prepare(Surface surface,String groundRecordingFile){
-        Video.nativeAddConsumers(nativeVideoPlayer,surface,groundRecordingFile);
+        VideoNative.nativeAddConsumers(nativeVideoPlayer,surface,groundRecordingFile);
     }
 
     public void release(){
-        Video.nativeRemoveConsumers(nativeVideoPlayer);
+        VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
     }
 
-
-    public void addAndStartUDPReceiver(int port, boolean useRTSP){
-        Video.nativeStartUDPReceiver(nativeVideoPlayer,port,useRTSP);
+    public void addAndStartReceiver(int port,boolean useRTP){
+        mCurrentMode =MODE.UDP;
+        VideoNative.nativeStartUDPReceiver(nativeVideoPlayer,port,useRTP);
     }
 
-    public void stopAndRemoveUDPReceiver(){
-        Video.nativeStopUDPReceiver(nativeVideoPlayer);
-    }
-
-    public void addAndStartFileReceiver(final Context context,final FileVideoReceiver.REC_MODE mode,final String filename){
+    public void addAndStartReceiver(final Context context,final FileVideoReceiver.REC_MODE mode,final String filename){
+        mCurrentMode =MODE.FILE;
         mFileVideoReceiver=new FileVideoReceiver(context,this,mode,filename);
         mFileVideoReceiver.startReceiving();
     }
 
-    public void stopAndRemoveFileReceiver(){
-        mFileVideoReceiver.stopReceivingAndWait();
-        mFileVideoReceiver=null;
+    public void stopAndRemoveReceiver(){
+        if(mCurrentMode ==MODE.UDP){
+            VideoNative.nativeStopUDPReceiver(nativeVideoPlayer);
+        }else{
+            mFileVideoReceiver.stopReceivingAndWait();
+            mFileVideoReceiver=null;
+        }
     }
+
 
     @Override
     public void onNewVideoData(byte[] buffer, int offset, int length) {
-        Video.nativePassNALUData(nativeVideoPlayer,buffer,offset,length);
+        VideoNative.nativePassNALUData(nativeVideoPlayer,buffer,offset,length);
     }
 
     @Override
@@ -67,7 +73,7 @@ public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, Video.IVide
     @Override
     protected void finalize() throws Throwable {
         try {
-            Video.finalize(nativeVideoPlayer);
+            VideoNative.finalize(nativeVideoPlayer);
         } finally {
             super.finalize();
         }

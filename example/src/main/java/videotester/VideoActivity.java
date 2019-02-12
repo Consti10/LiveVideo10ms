@@ -19,18 +19,22 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private Context mContext;
     private AspectFrameLayout mAspectFrameLayout;
     private VideoPlayer mVideoPlayer;
-    private int selected;
+
+    private int selectedMode;
+    private int selectedTestFile;
+
     private DecodingInfo mDecodingInfo;
 
-    private final String[] ASSETS_FILE_NAMES={"testVideo.h264","rpi.h264","Recording_360.h264","o2.h264"};
+    private static final String[] ASSETS_TEST_VIDEO_FILE_NAMES ={"testVideo.h264","rpi.h264","Recording_360.h264","o2.h264"};
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final Intent intent = getIntent();
-        selected = intent.getIntExtra(MainActivity.INNTENT_EXTRA_NAME, 0);
-        System.out.println("Selected:"+selected);
+        selectedMode=intent.getIntExtra(MainActivity.INNTENT_EXTRA_VIDEO_MODE,0);
+        selectedTestFile = intent.getIntExtra(MainActivity.INNTENT_EXTRA_VIDEO_TEST_FILE, 0);
+
         mContext=this;
         setContentView(R.layout.activity_video);
         //
@@ -43,7 +47,11 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     public void surfaceCreated(SurfaceHolder holder) {
         mVideoPlayer=new VideoPlayer(this);
         mVideoPlayer.prepare(holder.getSurface(),null);
-        mVideoPlayer.addAndStartFileReceiver(mContext, FileVideoReceiver.REC_MODE.ASSETS,ASSETS_FILE_NAMES[selected]);
+        if(selectedMode==0){
+            mVideoPlayer.addAndStartReceiver(mContext, FileVideoReceiver.REC_MODE.ASSETS, ASSETS_TEST_VIDEO_FILE_NAMES[selectedTestFile]);
+        }else{
+            mVideoPlayer.addAndStartReceiver(5600,true);
+        }
     }
 
     @Override
@@ -52,7 +60,7 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mVideoPlayer.stopAndRemoveFileReceiver();
+        mVideoPlayer.stopAndRemoveReceiver();
         mVideoPlayer.release();
         mVideoPlayer=null;
     }

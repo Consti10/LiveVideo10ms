@@ -180,8 +180,8 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 //Path to a program.
 CMAKE_STRIP:FILEPATH=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/i686-linux-android-strip.exe
 
-//The CMake toolchain file
-CMAKE_TOOLCHAIN_FILE:FILEPATH=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/build/cmake/android.toolchain.cmake
+//No help, variable specified on the command line.
+CMAKE_TOOLCHAIN_FILE:UNINITIALIZED=C:\Users\Constantin\AppData\Local\Android\Sdk\ndk-bundle\build\cmake\android.toolchain.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -194,6 +194,9 @@ Project_BINARY_DIR:STATIC=C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/L
 
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=C:/Users/Constantin/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/core
+
+//Dependencies for the target
+VideoNative_LIB_DEPENDS:STATIC=general;C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/i686-linux-android/21/liblog.so;general;log;general;android;general;mediandk;general;OpenMAXAL;
 
 //Dependencies for the target
 Video_LIB_DEPENDS:STATIC=general;C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/i686-linux-android/21/liblog.so;general;log;general;android;general;mediandk;general;OpenMAXAL;

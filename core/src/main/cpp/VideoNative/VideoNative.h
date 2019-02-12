@@ -11,9 +11,9 @@
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
 
-class Video{
+class VideoNative{
 public:
-    Video(JNIEnv * env,jobject videoParamsChangedI);
+    VideoNative(JNIEnv * env,jobject videoParamsChangedI);
 private:
     void onDecoderRatioChangedCallback(int videoW,int videoH);
     void onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInfo & info);

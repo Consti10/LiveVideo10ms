@@ -1,12 +1,10 @@
-/*************************************************************************
- * Glue for the Video Java class
- * ***********************************************************************/
-#include "Video.h"
+
+#include "VideoNative.h"
 #include "../General/CPUPriority.hpp"
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 
-#define TAG "Video"
+#define TAG "VideoNative"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 #define CPU_PRIORITY_UDPRECEIVER_VIDEO (-16)  //needs low latency and does not use the cpu that much
@@ -14,8 +12,8 @@
 
 
 
-Video::Video(JNIEnv* env, jobject obj) :
-    mParser{std::bind(&Video::onNewNALU, this, std::placeholders::_1)}{
+VideoNative::VideoNative(JNIEnv* env, jobject obj) :
+    mParser{std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1)}{
     //We need a reference to the JavaVM to attach the callback thread to it
     env->GetJavaVM(&callToJava.javaVirtualMachine);
     //Get the class that implements the IVideoParamsChanged, so that we can
@@ -28,7 +26,7 @@ Video::Video(JNIEnv* env, jobject obj) :
     callToJava.globalJavaObj = env->NewWeakGlobalRef(obj);
 }
 
-void Video::onNewNALU(const NALU& nalu){
+void VideoNative::onNewNALU(const NALU& nalu){
     if(mLowLagDecoder!=nullptr){
         mLowLagDecoder->interpretNALU(nalu);
     }
@@ -37,7 +35,7 @@ void Video::onNewNALU(const NALU& nalu){
     }
 }
 
-void Video::onDecoderRatioChangedCallback(const int videoW,const int videoH) {
+void VideoNative::onDecoderRatioChangedCallback(const int videoW,const int videoH) {
     //When this callback is invoked, no Java VM is attached to the thread
     JNIEnv* jniENV;
     callToJava.javaVirtualMachine->AttachCurrentThread(&jniENV, nullptr);
@@ -45,7 +43,7 @@ void Video::onDecoderRatioChangedCallback(const int videoW,const int videoH) {
     callToJava.javaVirtualMachine->DetachCurrentThread();
 }
 
-void Video::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInfo& info) {
+void VideoNative::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInfo& info) {
     //When this callback is invoked, no Java VM is attached to the thread
     JNIEnv* jniENV;
     callToJava.javaVirtualMachine->AttachCurrentThread(&jniENV, nullptr);
@@ -54,7 +52,7 @@ void Video::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInfo& inf
     callToJava.javaVirtualMachine->DetachCurrentThread();
 }
 
-void Video::onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const bool limitFPS=false){
+void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const bool limitFPS=false){
     mParser.limitFPS=limitFPS;
     if(isRTPData){
         mParser.parse_rtp_h264_stream(data,data_length);
@@ -63,7 +61,7 @@ void Video::onNewVideoData(const uint8_t* data,const int data_length,const bool 
     }
 }
 
-void Video::addConsumers(JNIEnv* env,jobject surface,jstring groundRecordingFileName) {
+void VideoNative::addConsumers(JNIEnv* env,jobject surface,jstring groundRecordingFileName) {
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
         mLowLagDecoder=new LowLagDecoder(window,CPU_PRIORITY_DECODER_OUTPUT);
@@ -80,7 +78,7 @@ void Video::addConsumers(JNIEnv* env,jobject surface,jstring groundRecordingFile
     mParser.reset();
 }
 
-void Video::removeConsumers(){
+void VideoNative::removeConsumers(){
     if(mLowLagDecoder!= nullptr){
         mLowLagDecoder->waitForShutdownAndDelete();
         delete(mLowLagDecoder);
@@ -99,7 +97,7 @@ void Video::removeConsumers(){
 }
 
 
-void Video::startNativeUDPReceiver(const int port,const bool useRTP) {
+void VideoNative::startNativeUDPReceiver(const int port,const bool useRTP) {
     mVideoReceiver=new UDPReceiver(port,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](uint8_t* data,int data_length) {
         if(useRTP){
             mParser.parse_rtp_h264_stream(data,data_length);
@@ -110,13 +108,13 @@ void Video::startNativeUDPReceiver(const int port,const bool useRTP) {
     mVideoReceiver->startReceiving();
 }
 
-void Video::stopNativeUDPReceiver() {
+void VideoNative::stopNativeUDPReceiver() {
     mVideoReceiver->stopReceiving();
     delete(mVideoReceiver);
     mVideoReceiver= nullptr;
 }
 
-std::string Video::getInfoString(){
+std::string VideoNative::getInfoString(){
     std::ostringstream ostringstream1;
     ostringstream1 << "Listening for video on port " << mVideoReceiver->getPort();
     ostringstream1 << "\nReceived: " << mVideoReceiver->getNReceivedBytes() << "B"
@@ -129,13 +127,13 @@ std::string Video::getInfoString(){
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
-      Java_constantin_lowlagvideo_VideoNative_Video_##method_name
+      Java_constantin_lowlagvideo_VideoNative_VideoNative_##method_name
 
-inline jlong jptr(Video *videoPlayerN) {
+inline jlong jptr(VideoNative *videoPlayerN) {
     return reinterpret_cast<intptr_t>(videoPlayerN);
 }
-inline Video *native(jlong ptr) {
-    return reinterpret_cast<Video *>(ptr);
+inline VideoNative *native(jlong ptr) {
+    return reinterpret_cast<VideoNative *>(ptr);
 }
 
 
@@ -143,12 +141,12 @@ extern "C"{
 
 JNI_METHOD(jlong, initialize)
 (JNIEnv * env,jclass jclass1,jobject obj) {
-    return jptr(new Video(env,obj));
+    return jptr(new VideoNative(env,obj));
 }
 
 JNI_METHOD(void, finalize)
 (JNIEnv * env, jclass jclass1,jlong videoPlayerN) {
-    Video* p=native(videoPlayerN);
+    VideoNative* p=native(videoPlayerN);
     delete (p);
 }
 
@@ -184,28 +182,28 @@ JNI_METHOD(void, nativeStopUDPReceiver)
 
 JNI_METHOD(jstring , getVideoInfoString)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    Video* p=native(testReceiverN);
+    VideoNative* p=native(testReceiverN);
     jstring ret = env->NewStringUTF(p->getInfoString().c_str());
     return ret;
 }
 
 JNI_METHOD(jboolean , anyVideoDataReceived)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    Video* p=native(testReceiverN);
+    VideoNative* p=native(testReceiverN);
     bool ret = (p->mVideoReceiver->getNReceivedBytes()  > 0);
     return (jboolean) ret;
 }
 
 JNI_METHOD(jboolean , receivingVideoButCannotParse)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    Video* p=native(testReceiverN);
+    VideoNative* p=native(testReceiverN);
     return (jboolean) (p->mVideoReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
 }
 
 
 JNI_METHOD(jboolean , anyVideoBytesParsedSinceLastCall)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    Video* p=native(testReceiverN);
+    VideoNative* p=native(testReceiverN);
     long nalusSinceLast = p->mParser.nParsedNALUs - p->nNALUsAtLastCall;
     p->nNALUsAtLastCall += nalusSinceLast;
     return (jboolean) (nalusSinceLast > 0);

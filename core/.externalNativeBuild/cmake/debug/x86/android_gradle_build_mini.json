@@ -6,11 +6,11 @@
     "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\core\\.externalNativeBuild\\cmake\\debug\\x86 --target clean"
   ],
   "libraries": {
-    "Video-Debug-x86": {
-      "artifactName": "Video",
-      "buildCommand": "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\core\\.externalNativeBuild\\cmake\\debug\\x86 --target Video",
+    "VideoNative-Debug-x86": {
+      "artifactName": "VideoNative",
+      "buildCommand": "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\core\\.externalNativeBuild\\cmake\\debug\\x86 --target VideoNative",
       "abi": "x86",
-      "output": "C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\core\\build\\intermediates\\cmake\\debug\\obj\\x86\\libVideo.so"
+      "output": "C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\core\\build\\intermediates\\cmake\\debug\\obj\\x86\\libVideoNative.so"
     }
   }
 }

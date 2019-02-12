@@ -2,9 +2,9 @@ package constantin.lowlagvideo.VideoNative;
 
 import android.view.Surface;
 
-public class Video {
+public class VideoNative {
     static {
-        System.loadLibrary("Video");
+        System.loadLibrary("VideoNative");
     }
     public static native  <T extends IVideoParamsChangedNative> long initialize(T t);
     public static native void finalize(long nativeVideoPlayer);

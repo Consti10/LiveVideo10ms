@@ -14,7 +14,7 @@
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__Video
+rule CXX_COMPILER__VideoNative
   depfile = $DEP_FILE
   deps = gcc
   command = C:\Users\Constantin\AppData\Local\Android\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $IN_ABS
@@ -24,7 +24,7 @@ rule CXX_COMPILER__Video
 #############################################
 # Rule for linking CXX shared library.
 
-rule CXX_SHARED_LIBRARY_LINKER__Video
+rule CXX_SHARED_LIBRARY_LINKER__VideoNative
   command = cmd.exe /C "$PRE_LINK && C:\Users\Constantin\AppData\Local\Android\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Constantin/AppData/Local/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking CXX shared library $TARGET_FILE
   restat = $RESTAT
