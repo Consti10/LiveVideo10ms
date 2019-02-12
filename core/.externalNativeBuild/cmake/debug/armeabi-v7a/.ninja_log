@@ -1,15 +1,10 @@
 # ninja log v5
-5	959	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRTP.cpp.o	d9de1ef5b761c09
-16	989	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRAW.cpp.o	272e248b7271da91
-961	1357	0	CMakeFiles/Video.dir/src/main/cpp/Video/SPSHelper.cpp.o	e367ef3158950cd2
-7	1429	0	CMakeFiles/Video.dir/src/main/cpp/General/UDPReceiver.cpp.o	2f084a1d4d953b58
-13	1501	0	CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o	b0f6dda434848b57
-2	1564	0	CMakeFiles/Video.dir/src/main/cpp/Video/LowLagDecoder.cpp.o	6d6bb0117efcc001
-10	1640	0	CMakeFiles/Video.dir/src/main/cpp/General/GroundRecorder.cpp.o	c8162541930474f6
-990	2935	0	CMakeFiles/Video.dir/src/main/cpp/Video/Video.cpp.o	b1e500f837e08be0
-2935	3357	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libVideo.so	734df354231fc4cc
-16	249	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/SPSHelper.cpp.o	568717a62f0cc487
-7	1063	0	CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o	b0f6dda434848b57
-11	1203	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o	170bb2ca2e3318a8
-14	1869	0	CMakeFiles/Video.dir/src/main/cpp/VideoNative/Video.cpp.o	f43db2f0fd3dfbbd
-1869	2286	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libVideo.so	28bfbc9735aff80e
+1	2864	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRAW.cpp.o	bc830528a9e0a179
+418	3438	0	CMakeFiles/Video.dir/src/main/cpp/Parser/ParseRTP.cpp.o	f5fae7faefa916ee
+817	3991	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o	b6d69f9c2732526a
+1297	3993	0	CMakeFiles/Video.dir/src/main/cpp/General/UDPReceiver.cpp.o	9bdfa439d4e778ba
+2866	4276	0	CMakeFiles/Video.dir/src/main/cpp/Decoder/SPSHelper.cpp.o	a60e819a7db3469f
+1739	4393	0	CMakeFiles/Video.dir/src/main/cpp/General/GroundRecorder.cpp.o	d29452dc7f1f6a6f
+2249	4662	0	CMakeFiles/Video.dir/src/main/cpp/Parser/H264Parser.cpp.o	a44504f9ec2fb3ed
+3438	6314	0	CMakeFiles/Video.dir/src/main/cpp/VideoNative/Video.cpp.o	a7effe78419afe0c
+6314	7194	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libVideo.so	28bfbc9735aff80e

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/LiveVideo10ms.iml" filepath="$PROJECT_DIR$/LiveVideo10ms.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/example/example.iml" filepath="$PROJECT_DIR$/example/example.iml" />
-      <module fileurl="file://$PROJECT_DIR$/live_video_10ms_android.iml" filepath="$PROJECT_DIR$/live_video_10ms_android.iml" />
     </modules>
   </component>
 </project>
