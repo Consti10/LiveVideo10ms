@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+
+    <string-array name="video_modes">
+        <item>Test file (assets)</item>
+        <item>Live video</item>
+    </string-array>
+
+
+    <string-array name="video_test_files">
+        <item>Iceland (x264)</item>
+        <item>Rpi Camera</item>
+        <item>Recording 360</item>
+        <item>Other 2</item>
+    </string-array>
+
+
+</resources>
