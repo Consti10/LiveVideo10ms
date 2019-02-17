@@ -13,7 +13,6 @@ void ParseRAW::reset(){
     nalu_search_state=0;
 }
 
-
 void ParseRAW::parseData(const uint8_t* data,const int data_length){
     for (int i = 0; i < data_length; ++i) {
         nalu_data[nalu_data_position++] = data[i];

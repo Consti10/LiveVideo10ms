@@ -21,14 +21,12 @@ allprojects {
         google()
         jcenter()
     }
-
     ext {
         minSdkVersion = 21
         compileSdkVersion = 28
         targetSdkVersion = 28
-        supportLibraryVersion = '1.1.0-alpha01'
+        supportLibraryVersion = '1.1.0-alpha02'
     }
-
 }
 
 task clean(type: Delete) {

@@ -6,7 +6,7 @@ android {
 
 
     defaultConfig {
-        applicationId "constantin.cheetah.videotester"
+        applicationId "constantin.video.example"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1

@@ -6,7 +6,7 @@ public class VideoNative {
     static {
         System.loadLibrary("VideoNative");
     }
-    public static native  <T extends IVideoParamsChangedNative> long initialize(T t);
+    public static native  <T extends NativeInterfaceVideoParamsChanged> long initialize(T t);
     public static native void finalize(long nativeVideoPlayer);
     //
     public static native void nativeAddConsumers(long nativeInstance, Surface surface, String filePathGroundRec);
@@ -24,7 +24,7 @@ public class VideoNative {
     public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
     public static native boolean receivingVideoButCannotParse(long nativeInstance);
 
-    public interface IVideoParamsChangedNative {
+    public interface NativeInterfaceVideoParamsChanged {
         @SuppressWarnings("unused")
         void onVideoRatioChanged(int videoW, int videoH);
         @SuppressWarnings("unused")

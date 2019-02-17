@@ -5,12 +5,12 @@ import android.view.Surface;
 
 import constantin.video.core.VideoNative.VideoNative;
 
-public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative.IVideoParamsChangedNative {
-
+public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative.NativeInterfaceVideoParamsChanged {
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged videoParamsChanged;
     private FileVideoReceiver mFileVideoReceiver;
-    private enum MODE{UDP,FILE};
+    private enum MODE{UDP,FILE}
+
     private MODE mCurrentMode;
 
     public VideoPlayer(final IVideoParamsChanged iVideoParamsChanged){
@@ -22,7 +22,7 @@ public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative
         VideoNative.nativeAddConsumers(nativeVideoPlayer,surface,groundRecordingFile);
     }
 
-    public void release(){
+    private void release(){
         VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
     }
 
@@ -37,13 +37,14 @@ public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative
         mFileVideoReceiver.startReceiving();
     }
 
-    public void stopAndRemoveReceiver(){
+    public void stopAndRemovePlayerReceiver(){
         if(mCurrentMode ==MODE.UDP){
             VideoNative.nativeStopUDPReceiver(nativeVideoPlayer);
         }else{
             mFileVideoReceiver.stopReceivingAndWait();
             mFileVideoReceiver=null;
         }
+        release();
     }
 
     public long getNativeInstance(){
