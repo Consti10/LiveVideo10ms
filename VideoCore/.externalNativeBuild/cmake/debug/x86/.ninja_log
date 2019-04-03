@@ -1,0 +1,19 @@
+# ninja log v5
+4	2654	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/ParseRAW.cpp.o	56ab18835e3e15c7
+406	3176	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/H264Parser.cpp.o	332dfa06f0218142
+812	3702	0	CMakeFiles/VideoNative.dir/src/main/cpp/General/GroundRecorder.cpp.o	609df7afd89a2b38
+1199	3703	0	CMakeFiles/VideoNative.dir/src/main/cpp/General/UDPReceiver.cpp.o	21ee708d7a59b9e3
+1611	3704	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/ParseRTP.cpp.o	35275b5d82cedf06
+2657	3886	0	CMakeFiles/VideoNative.dir/src/main/cpp/Decoder/SPSHelper.cpp.o	369f40b07f6771e2
+2106	4480	0	CMakeFiles/VideoNative.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o	6d802b2aa5d18b5a
+3177	5874	0	CMakeFiles/VideoNative.dir/src/main/cpp/VideoNative/VideoNative.cpp.o	641399683ae3e8cb
+5874	6649	0	../../../../build/intermediates/cmake/debug/obj/x86/libVideoNative.so	737c0a5032bc2857
+8	3265	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/ParseRTP.cpp.o	35275b5d82cedf06
+420	3980	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/ParseRAW.cpp.o	56ab18835e3e15c7
+836	4695	0	CMakeFiles/VideoNative.dir/src/main/cpp/General/GroundRecorder.cpp.o	609df7afd89a2b38
+2608	4701	0	CMakeFiles/VideoNative.dir/src/main/cpp/Decoder/SPSHelper.cpp.o	369f40b07f6771e2
+1465	4707	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/H264Parser.cpp.o	332dfa06f0218142
+1991	5147	0	CMakeFiles/VideoNative.dir/src/main/cpp/General/UDPReceiver.cpp.o	21ee708d7a59b9e3
+3265	6076	0	CMakeFiles/VideoNative.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o	6d802b2aa5d18b5a
+3980	7333	0	CMakeFiles/VideoNative.dir/src/main/cpp/VideoNative/VideoNative.cpp.o	641399683ae3e8cb
+7333	8129	0	../../../../build/intermediates/cmake/debug/obj/x86/libVideoNative.so	737c0a5032bc2857
