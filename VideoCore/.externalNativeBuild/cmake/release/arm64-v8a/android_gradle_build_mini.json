@@ -1,16 +1,16 @@
 {
   "buildFiles": [
-    "C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\CMakeLists.txt"
+    "C:\\Users\\Consti10\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target clean"
+    "C:\\Users\\Consti10\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Consti10\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target clean"
   ],
   "libraries": {
     "VideoNative-Release-arm64-v8a": {
       "artifactName": "VideoNative",
-      "buildCommand": "C:\\Users\\Constantin\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target VideoNative",
+      "buildCommand": "C:\\Users\\Consti10\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Consti10\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target VideoNative",
       "abi": "arm64-v8a",
-      "output": "C:\\Users\\Constantin\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libVideoNative.so"
+      "output": "C:\\Users\\Consti10\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libVideoNative.so"
     }
   }
 }

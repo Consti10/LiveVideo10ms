@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:648484085751:android:1cfe94fb9d280118",
         "android_client_info": {
-          "package_name": "constantin.cheetah.videotester"
+          "package_name": "constantin.video.example"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "648484085751-k9k84a8evj5n30b9n0b1hsmevvepie8m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "constantin.cheetah.videotester",
+            "package_name": "constantin.video.example",
             "certificate_hash": "6593a39e4d2b42220359819015b1cb2627a65b85"
           }
         },
