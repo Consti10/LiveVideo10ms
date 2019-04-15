@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="constantin.video.example">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- DANGEROUS (needs runtime request) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- DANGEROUS (needs runtime request) -->
+    <!-- open UDP ports -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Info about networks (EZ-WB connect via WIFI) -->
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-
+        <activity android:name=".AVideoSettings"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,11 +25,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".VideoActivity"
-            android:theme="@style/MyStyleFullscreen"/>
-
-
+        <activity
+            android:name=".VideoActivity"
+            android:theme="@style/MyStyleFullscreen" />
     </application>
 
 </manifest>

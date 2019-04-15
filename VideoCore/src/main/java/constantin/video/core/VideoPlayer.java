@@ -1,49 +1,38 @@
 package constantin.video.core;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Environment;
 import android.view.Surface;
+import java.io.File;
 
 import constantin.video.core.VideoNative.VideoNative;
 
-public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative.NativeInterfaceVideoParamsChanged {
+public class VideoPlayer implements VideoNative.NativeInterfaceVideoParamsChanged {
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged videoParamsChanged;
-    private FileVideoReceiver mFileVideoReceiver;
-    private enum MODE{UDP,FILE}
+    private final Context context;
 
-    private MODE mCurrentMode;
-
-    public VideoPlayer(final IVideoParamsChanged iVideoParamsChanged){
-        videoParamsChanged=iVideoParamsChanged;
-        nativeVideoPlayer= VideoNative.initialize(this);
+    public VideoPlayer(final Context context,final IVideoParamsChanged iVideoParamsChanged){
+        this.videoParamsChanged=iVideoParamsChanged;
+        this.context=context;
+        nativeVideoPlayer= VideoNative.initialize(this,context,getDirectoryToSaveDataTo());
     }
 
-    public void prepare(Surface surface,String groundRecordingFile){
-        VideoNative.nativeAddConsumers(nativeVideoPlayer,surface,groundRecordingFile);
+    public void prepare(Surface surface){
+        VideoNative.nativeAddConsumers(nativeVideoPlayer,surface);
     }
 
     private void release(){
         VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
     }
 
-    public void addAndStartReceiver(int port,boolean useRTP){
-        mCurrentMode =MODE.UDP;
-        VideoNative.nativeStartUDPReceiver(nativeVideoPlayer,port,useRTP);
-    }
-
-    public void addAndStartReceiver(final Context context,final FileVideoReceiver.REC_MODE mode,final String filename){
-        mCurrentMode =MODE.FILE;
-        mFileVideoReceiver=new FileVideoReceiver(context,this,mode,filename);
-        mFileVideoReceiver.startReceiving();
+    public void addAndStartReceiver(){
+        VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
     }
 
     public void stopAndRemovePlayerReceiver(){
-        if(mCurrentMode ==MODE.UDP){
-            VideoNative.nativeStopUDPReceiver(nativeVideoPlayer);
-        }else{
-            mFileVideoReceiver.stopReceivingAndWait();
-            mFileVideoReceiver=null;
-        }
+        VideoNative.nativeStopReceiver(nativeVideoPlayer);
         release();
     }
 
@@ -51,11 +40,6 @@ public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative
         return nativeVideoPlayer;
     }
 
-
-    @Override
-    public void onNewVideoData(byte[] buffer, int offset, int length) {
-        VideoNative.nativePassNALUData(nativeVideoPlayer,buffer,offset,length);
-    }
 
     @Override
     public void onVideoRatioChanged(int videoW, int videoH) {
@@ -82,6 +66,15 @@ public class VideoPlayer implements FileVideoReceiver.IVideoDataRaw, VideoNative
         }
     }
 
+    private static String getDirectoryToSaveDataTo(){
+        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/Video/";
+        File dir = new File(ret);
+        if (!dir.exists()) {
+            final boolean mkdirs = dir.mkdirs();
+            //System.out.println("mkdirs res"+mkdirs);
+        }
+        return ret;
+    }
 
 
 

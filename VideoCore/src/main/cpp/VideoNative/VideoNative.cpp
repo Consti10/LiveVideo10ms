@@ -1,8 +1,10 @@
 
 #include "VideoNative.h"
 #include "../General/CPUPriority.hpp"
+#include "../IDV.hpp"
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
+#include <android/asset_manager_jni.h>
 
 #define TAG "VideoNative"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
@@ -12,18 +14,20 @@
 
 
 
-VideoNative::VideoNative(JNIEnv* env, jobject obj) :
-    mParser{std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1)}{
+VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject context,const char* DIR) :
+    mParser{std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1)},
+    mSettingsN(env,context,"pref_video",true),
+    GROUND_RECORDING_DIRECTORY(DIR){
     //We need a reference to the JavaVM to attach the callback thread to it
     env->GetJavaVM(&callToJava.javaVirtualMachine);
     //Get the class that implements the IVideoParamsChanged, so that we can
     //get the function pointers to it's 2 callback functions
-    jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(obj);
+    jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(videoParamsChangedI);
     callToJava.onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onVideoRatioChanged", "(II)V");
     callToJava.onDecoderFPSChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(FFFFFII)V");
     //Store a global reference to it, so we can use it later
     //callToJava.globalJavaObj = env->NewGlobalRef(videoParamsChangedI); //also need a global javaObj
-    callToJava.globalJavaObj = env->NewWeakGlobalRef(obj);
+    callToJava.globalJavaObj = env->NewWeakGlobalRef(videoParamsChangedI);
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
@@ -61,7 +65,10 @@ void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const
     }
 }
 
-void VideoNative::addConsumers(JNIEnv* env,jobject surface,jstring groundRecordingFileName) {
+void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
+    //reset the parser so the statistics start again from 0
+    mParser.reset();
+    //add decoder if surface!=nullptr
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
         mLowLagDecoder=new LowLagDecoder(window,CPU_PRIORITY_DECODER_OUTPUT);
@@ -70,12 +77,14 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface,jstring groundRecordi
             this->onDecodingInfoChangedCallback(info);
         });
     }
-    if(groundRecordingFileName!=nullptr){
-         const char *str = env->GetStringUTFChars(groundRecordingFileName, 0);
-         mGroundRecorder=new GroundRecorder(str);
-          env->ReleaseStringUTFChars(groundRecordingFileName,str);
+    //Add Ground recorder if enabled
+    mSettingsN.replaceJNI(env);
+    const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
+    if(VS_GroundRecording){
+        const std::string groundRecordingFlename=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"h264");
+        //LOGD("Filename%s",groundRecordingFlename.c_str());
+         mGroundRecorder=new GroundRecorder(groundRecordingFlename);
     }
-    mParser.reset();
 }
 
 void VideoNative::removeConsumers(){
@@ -96,30 +105,63 @@ void VideoNative::removeConsumers(){
     }
 }
 
-
-void VideoNative::startNativeUDPReceiver(const int port,const bool useRTP) {
-    mVideoReceiver=new UDPReceiver(port,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](uint8_t* data,int data_length) {
-        if(useRTP){
-            mParser.parse_rtp_h264_stream(data,data_length);
-        }else{
-            mParser.parse_raw_h264_stream(data,data_length);
-        }
-    });
-    mVideoReceiver->startReceiving();
+void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
+    mSettingsN.replaceJNI(env);
+    const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
+    //LOGD("VS_SOURCE: %d",VS_SOURCE);
+    switch (VS_SOURCE){
+        case UDP:{
+            const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
+            const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
+            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](uint8_t* data,int data_length) {
+                onNewVideoData(data,data_length,useRTP,false);
+            });
+            mVideoReceiver->startReceiving();
+        }break;
+        case FILE:{
+            const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
+            mFileReceiver=new FileReader(filename,0,[this](uint8_t* data,int data_length) {
+                onNewVideoData(data,data_length,false,true);
+            },1024);
+            mFileReceiver->startReading();
+        }break;
+        case ASSETS:{
+            const std::string filename=mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264");
+            mFileReceiver=new FileReader(assetManager,filename,0,[this](uint8_t* data,int data_length) {
+                onNewVideoData(data,data_length,false,true);
+            },1024);
+            mFileReceiver->startReading();
+        }break;
+        case EXTERNAL:{
+            //Data is being received somewhere else and passed trough-init nothing.
+            LOGD("Started with SOURCE=EXTERNAL");
+        }break;
+    }
 }
 
-void VideoNative::stopNativeUDPReceiver() {
-    mVideoReceiver->stopReceiving();
-    delete(mVideoReceiver);
-    mVideoReceiver= nullptr;
+void VideoNative::stopReceiver() {
+    if(mVideoReceiver!=nullptr){
+        mVideoReceiver->stopReceiving();
+        delete(mVideoReceiver);
+        mVideoReceiver= nullptr;
+    }
+    if(mFileReceiver!=nullptr){
+        mFileReceiver->stopReading();
+        delete(mFileReceiver);
+        mFileReceiver= nullptr;
+    }
 }
 
 std::string VideoNative::getInfoString(){
     std::ostringstream ostringstream1;
-    ostringstream1 << "Listening for video on port " << mVideoReceiver->getPort();
-    ostringstream1 << "\nReceived: " << mVideoReceiver->getNReceivedBytes() << "B"
-                   << " | parsed frames: "
-                   << mParser.nParsedNALUs<<" | key frames: "<<mParser.nParsedKeyFrames;
+    if(mVideoReceiver!= nullptr){
+        ostringstream1 << "Listening for video on port " << mVideoReceiver->getPort();
+        ostringstream1 << "\nReceived: " << mVideoReceiver->getNReceivedBytes() << "B"
+                       << " | parsed frames: "
+                       << mParser.nParsedNALUs<<" | key frames: "<<mParser.nParsedKeyFrames;
+    }else{
+        ostringstream1<<"Not receiving from udp";
+    }
     return ostringstream1.str();
 }
 
@@ -140,8 +182,11 @@ inline VideoNative *native(jlong ptr) {
 extern "C"{
 
 JNI_METHOD(jlong, initialize)
-(JNIEnv * env,jclass jclass1,jobject obj) {
-    return jptr(new VideoNative(env,obj));
+(JNIEnv * env,jclass jclass1,jobject videoParamsChangedI,jobject context,jstring groundRecordingDirectory) {
+    const char *str = env->GetStringUTFChars(groundRecordingDirectory, nullptr);
+    auto* p=new VideoNative(env,videoParamsChangedI,context,str);
+    env->ReleaseStringUTFChars(groundRecordingDirectory,str);
+    return jptr(p);
 }
 
 JNI_METHOD(void, finalize)
@@ -151,8 +196,8 @@ JNI_METHOD(void, finalize)
 }
 
 JNI_METHOD(void, nativeAddConsumers)
-(JNIEnv * env, jclass unused,jlong videoPlayerN,jobject surface,jstring groundRecordingFileName) {
-    native(videoPlayerN)->addConsumers(env,surface,groundRecordingFileName);
+(JNIEnv * env, jclass unused,jlong videoPlayerN,jobject surface) {
+    native(videoPlayerN)->addConsumers(env,surface);
 }
 
 JNI_METHOD(void, nativeRemoveConsumers)
@@ -170,14 +215,15 @@ JNI_METHOD(void, nativePassNALUData)
     env->ReleaseByteArrayElements(b,arrayP,0);
 }
 
-JNI_METHOD(void, nativeStartUDPReceiver)
-(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jint port,jboolean jUseRTP){
-    native(videoPlayerN)->startNativeUDPReceiver((int)port,(bool) jUseRTP);
+JNI_METHOD(void, nativeStartReceiver)
+(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject assetManager){
+    AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
+    native(videoPlayerN)->startReceiver(env, mgr);
 }
 
-JNI_METHOD(void, nativeStopUDPReceiver)
+JNI_METHOD(void, nativeStopReceiver)
 (JNIEnv * env,jclass jclass1,jlong videoPlayerN){
-    native(videoPlayerN)->stopNativeUDPReceiver();
+    native(videoPlayerN)->stopReceiver();
 }
 
 JNI_METHOD(jstring , getVideoInfoString)
@@ -190,6 +236,9 @@ JNI_METHOD(jstring , getVideoInfoString)
 JNI_METHOD(jboolean , anyVideoDataReceived)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
+    if(p->mVideoReceiver== nullptr){
+        return (jboolean) false;
+    }
     bool ret = (p->mVideoReceiver->getNReceivedBytes()  > 0);
     return (jboolean) ret;
 }
@@ -197,6 +246,9 @@ JNI_METHOD(jboolean , anyVideoDataReceived)
 JNI_METHOD(jboolean , receivingVideoButCannotParse)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
+    if(p->mVideoReceiver== nullptr){
+        return (jboolean) false;
+    }
     return (jboolean) (p->mVideoReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
 }
 

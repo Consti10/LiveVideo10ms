@@ -10,7 +10,6 @@ import android.view.SurfaceView;
 
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.External.AspectFrameLayout;
-import constantin.video.core.FileVideoReceiver;
 import constantin.video.core.IVideoParamsChanged;
 import constantin.video.core.VideoPlayer;
 
@@ -21,20 +20,14 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private AspectFrameLayout mAspectFrameLayout;
     private VideoPlayer mVideoPlayer;
 
-    private int selectedMode;
-    private int selectedTestFile;
-
     private DecodingInfo mDecodingInfo;
 
-    private static final String[] ASSETS_TEST_VIDEO_FILE_NAMES ={"testVideo.h264","rpi.h264","Recording_360.h264","o2.h264"};
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final Intent intent = getIntent();
-        selectedMode=intent.getIntExtra(MainActivity.INNTENT_EXTRA_VIDEO_MODE,0);
-        selectedTestFile = intent.getIntExtra(MainActivity.INNTENT_EXTRA_VIDEO_TEST_FILE, 0);
         mContext=this;
         setContentView(R.layout.activity_video);
         //
@@ -45,13 +38,9 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mVideoPlayer=new VideoPlayer(this);
-        mVideoPlayer.prepare(holder.getSurface(),null);
-        if(selectedMode==0){
-            mVideoPlayer.addAndStartReceiver(mContext, FileVideoReceiver.REC_MODE.ASSETS, ASSETS_TEST_VIDEO_FILE_NAMES[selectedTestFile]);
-        }else{
-            mVideoPlayer.addAndStartReceiver(5600,true);
-        }
+        mVideoPlayer=new VideoPlayer(this,this);
+        mVideoPlayer.prepare(holder.getSurface());
+        mVideoPlayer.addAndStartReceiver();
     }
 
     @Override

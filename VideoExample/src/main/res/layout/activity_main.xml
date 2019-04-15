@@ -13,10 +13,11 @@
         android:text="Start Video Only"
         tools:ignore="HardcodedText" />
 
-    <Spinner
-        android:id="@+id/s_videoModeSelector"
+    <Button
+        android:id="@+id/b_startSettingsActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Settings"
         tools:ignore="HardcodedText" />
 
     <Spinner
@@ -26,5 +27,12 @@
         tools:ignore="HardcodedText" />
 
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_TestReceiverVideo"
+        android:textSize="20sp"
+        android:textColor="@color/colorPrimary"
+        android:text="Video:0" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

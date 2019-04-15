@@ -9,7 +9,6 @@ include_directories(src/main/cpp/General)
 set(VIDEO_PATH src/main/cpp)
 add_library( VideoNative
              SHARED
-        ${VIDEO_PATH}/General/GroundRecorder.cpp
         ${VIDEO_PATH}/General/UDPReceiver.cpp
 
         ${VIDEO_PATH}/Parser/H264Parser.cpp

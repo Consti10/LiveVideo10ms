@@ -3,11 +3,6 @@
 <resources>
 
 
-    <string-array name="video_modes">
-        <item>Test file (assets)</item>
-        <item>Live video</item>
-    </string-array>
-
 
     <string-array name="video_test_files">
         <item>Iceland (x264)</item>

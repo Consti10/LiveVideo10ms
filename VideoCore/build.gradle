@@ -10,7 +10,7 @@ android {
         versionName "1.0"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++14"
+                cppFlags "-std=c++17"
                 arguments "-DANDROID_STL=c++_static"
             }
         }
@@ -34,4 +34,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.mapzen.android:prefs-plus:1.0.0'
 }

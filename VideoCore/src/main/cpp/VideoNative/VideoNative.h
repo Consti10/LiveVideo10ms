@@ -7,13 +7,15 @@
 
 #include <jni.h>
 #include <UDPReceiver.h>
-#include <GroundRecorder.h>
+#include "../Helper/GroundRecorder.hpp"
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
+#include "../Helper/SettingsN.hpp"
+#include "../Helper/FileReader.hpp"
 
 class VideoNative{
 public:
-    VideoNative(JNIEnv * env,jobject videoParamsChangedI);
+    VideoNative(JNIEnv * env,jobject videoParamsChangedI,jobject context,const char* DIR);
 private:
     void onDecoderRatioChangedCallback(int videoW,int videoH);
     void onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInfo & info);
@@ -25,17 +27,21 @@ private:
         jmethodID onVideoRatioChangedJAVA=nullptr;
     }callToJava;
     ANativeWindow* window=nullptr;
+    SettingsN mSettingsN;
+    enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,EXTERNAL};
+    const std::string GROUND_RECORDING_DIRECTORY;
 public:
     void onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const bool limitFPS);
-    void addConsumers(JNIEnv* env,jobject surface,jstring groundRecordingFileName);
+    void addConsumers(JNIEnv* env,jobject surface);
     void removeConsumers();
-    void startNativeUDPReceiver(int port,bool useRTP);
-    void stopNativeUDPReceiver();
+    void startReceiver(JNIEnv *env, AAssetManager *assetManager);
+    void stopReceiver();
     std::string getInfoString();
 public:
     H264Parser mParser;
     LowLagDecoder* mLowLagDecoder= nullptr;
     UDPReceiver* mVideoReceiver= nullptr;
+    FileReader* mFileReceiver=nullptr;
     GroundRecorder* mGroundRecorder= nullptr;
     long nNALUsAtLastCall=0;
 };
