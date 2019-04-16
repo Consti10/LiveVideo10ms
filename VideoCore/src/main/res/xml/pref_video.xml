@@ -1,56 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Video settings"
+    android:summary="Select your video source and enable other features">
 
-    <PreferenceScreen
-        android:title="Video settings"
-        android:summary="Select your video source and enable other features">
+    <PreferenceCategory
+        android:title="Video stream source/protocol">
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/VS_PROTOCOL"
+            android:title="@string/VS_PROTOCOL"
+            android:summary="Default: RTP, has to comply with  EZ-WB/OpenHD. Use raw for maximum performance."
+            android:entries="@array/entriesVideoStream"
+            android:entryValues="@array/valuesVideoStream"
+            android:defaultValue="0"/>
+        <com.mapzen.prefsplus.EditIntPreference
+            android:title="@string/VS_PORT"
+            android:key="@string/VS_PORT"
+            android:summary="UDP Port to receive rtp or raw h.264 NALUS (video stream) Default:5600"
+            android:defaultValue="5600" />
 
-        <PreferenceCategory
-            android:title="Video stream source/protocol">
-            <com.mapzen.prefsplus.IntListPreference
-                android:key="@string/VS_PROTOCOL"
-                android:title="@string/VS_PROTOCOL"
-                android:summary="Default: RTP, has to comply with  EZ-WB/OpenHD. Use raw for maximum performance."
-                android:entries="@array/entriesVideoStream"
-                android:entryValues="@array/valuesVideoStream"
-                android:defaultValue="0"/>
-            <com.mapzen.prefsplus.EditIntPreference
-                android:title="@string/VS_PORT"
-                android:key="@string/VS_PORT"
-                android:summary="UDP Port to receive rtp or raw h.264 NALUS (video stream) Default:5600"
-                android:defaultValue="5600" />
-
-        </PreferenceCategory>
-
-
-        <PreferenceCategory
-            android:title="Feature: Ground recording">
-            <SwitchPreference
-                android:key="@string/VS_GROUND_RECORDING"
-                android:title="@string/VS_GROUND_RECORDING"
-                android:defaultValue="false" />
+    </PreferenceCategory>
 
 
-        </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Feature: Ground recording">
+        <SwitchPreference
+            android:key="@string/VS_GROUND_RECORDING"
+            android:title="@string/VS_GROUND_RECORDING"
+            android:defaultValue="false" />
+    </PreferenceCategory>
 
-        <PreferenceCategory
-            android:title="Advanced">
-            <com.mapzen.prefsplus.IntListPreference
-                android:key="@string/VS_SOURCE"
-                android:title="@string/VS_SOURCE"
-                android:entries="@array/entriesVIDEO_SOURCE"
-                android:entryValues="@array/valuesVIDEO_SOURCE"
-                android:defaultValue="0"/>
-            <EditTextPreference
-                android:key="@string/VS_PLAYBACK_FILENAME"
-                android:title="@string/VS_PLAYBACK_FILENAME"
-                android:defaultValue="@string/VS_PLAYBACK_FILENAME_DEFAULT_VALUE" />
-            <EditTextPreference
-                android:key="@string/VS_ASSETS_FILENAME_TEST_ONLY"
-                android:title="@string/VS_ASSETS_FILENAME_TEST_ONLY"
-                android:defaultValue="testVideo.h264" />
-        </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Advanced">
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/VS_SOURCE"
+            android:title="@string/VS_SOURCE"
+            android:entries="@array/entriesVIDEO_SOURCE"
+            android:entryValues="@array/valuesVIDEO_SOURCE"
+            android:defaultValue="0"/>
+        <EditTextPreference
+            android:key="@string/VS_PLAYBACK_FILENAME"
+            android:title="@string/VS_PLAYBACK_FILENAME"
+            android:defaultValue="@string/VS_PLAYBACK_FILENAME_DEFAULT_VALUE" />
+        <EditTextPreference
+            android:key="@string/VS_ASSETS_FILENAME_TEST_ONLY"
+            android:title="@string/VS_ASSETS_FILENAME_TEST_ONLY"
+            android:defaultValue="testVideo.h264"
+            android:editable="false"/>
+    </PreferenceCategory>
 
 
-    </PreferenceScreen>
 </PreferenceScreen>
