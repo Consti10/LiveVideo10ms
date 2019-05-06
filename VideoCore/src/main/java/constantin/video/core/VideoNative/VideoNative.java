@@ -12,6 +12,8 @@ import java.io.File;
 
 import constantin.video.core.R;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class VideoNative {
     static {
         System.loadLibrary("VideoNative");
@@ -50,11 +52,10 @@ public class VideoNative {
     public static final int SOURCE_TYPE_EXTERNAL=3;
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){
-        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         final String filename=sharedPreferences.getString(context.getString(R.string.VS_PLAYBACK_FILENAME),"");
         File tempFile = new File(filename);
-        boolean exists = tempFile.exists();
-        return exists;
+        return tempFile.exists();
     }
 
 
@@ -62,11 +63,10 @@ public class VideoNative {
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/";
     }
 
-
     @SuppressLint("ApplySharedPref")
-    public static void initializePreferences(final Context context){
-        PreferenceManager.setDefaultValues(context,R.xml.pref_video,false);
-        final SharedPreferences pref_video=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
+    public static void initializePreferences(final Context context,final boolean readAgain){
+        PreferenceManager.setDefaultValues(context,"pref_video",MODE_PRIVATE,R.xml.pref_video,readAgain);
+        final SharedPreferences pref_video=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         final String filename=pref_video.getString(context.getString(R.string.VS_PLAYBACK_FILENAME),context.getString(R.string.VS_PLAYBACK_FILENAME_DEFAULT_VALUE));
         if(filename.equals(context.getString(R.string.VS_PLAYBACK_FILENAME_DEFAULT_VALUE))){
             pref_video.edit().putString(context.getString(R.string.VS_PLAYBACK_FILENAME),

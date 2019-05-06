@@ -34,6 +34,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+
 
     implementation 'com.mapzen.android:prefs-plus:1.0.0'
 }

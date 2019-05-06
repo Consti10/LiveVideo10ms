@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.4.0'
         classpath 'com.google.gms:google-services:4.2.0'
     }
 }
@@ -25,7 +25,9 @@ allprojects {
         minSdkVersion = 21
         compileSdkVersion = 28
         targetSdkVersion = 28
-        supportLibraryVersion = '1.1.0-alpha02'
+        appcompatVersion = '1.1.0-alpha04'
+        materialVersion = '1.1.0-alpha03'
+        constraintlayoutVersion ='1.1.3'
     }
 }
 

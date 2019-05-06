@@ -1,43 +1,40 @@
-package com.example.videotester;
+package constantin.video.example;
 
 
 import android.content.Intent;
+
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import androidx.test.rule.GrantPermissionRule;
 import constantin.video.core.DecodingInfo;
-import constantin.video.example.MainActivity;
-import constantin.video.example.VideoActivity;
 
 @LargeTest
-
 public class PlayVideoTest {
-    private static final int WAIT_TIME_LONG = 30*1000; //30 seconds
+    private static final int WAIT_TIME_LONG = 10*1000; //30 seconds
 
     @Rule
-    public ActivityTestRule<VideoActivity> mActivityTestRule = new ActivityTestRule<>(VideoActivity.class,false,false);
+    public ActivityTestRule<VideoActivity> mVideoActivityTestRule = new ActivityTestRule<>(VideoActivity.class,false,false);
 
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.READ_EXTERNAL_STORAGE",
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
 
     @Test
     public void testFull() {
-        testActivityWithVideoFile(0);
-        testActivityWithVideoFile(1);
-        testActivityWithVideoFile(2);
-    }
-
-
-    private void testActivityWithVideoFile(final int whichFile){
         Intent i = new Intent();
-        i.putExtra(MainActivity.INNTENT_EXTRA_VIDEO_MODE, whichFile);
-        mActivityTestRule.launchActivity(i);
+        mVideoActivityTestRule.launchActivity(i);
         try { Thread.sleep(WAIT_TIME_LONG); } catch (InterruptedException e) { e.printStackTrace(); }
 
-        final DecodingInfo info=mActivityTestRule.getActivity().getDecodingInfo();
+        final DecodingInfo info= mVideoActivityTestRule.getActivity().getDecodingInfo();
         validateDecodingInfo(info);
-        mActivityTestRule.finishActivity();
+        mVideoActivityTestRule.finishActivity();
     }
+
 
 
     private static void validateDecodingInfo(final DecodingInfo info){

@@ -29,6 +29,7 @@ public class TestReceiverVideo implements Runnable {
         videoPlayer.prepare(null);
         videoPlayer.addAndStartReceiver();
         mThread=new Thread(this);
+        mThread.setName("TestReceiverVideo");
         mThread.start();
     }
 
@@ -59,7 +60,6 @@ public class TestReceiverVideo implements Runnable {
 
     @Override
     public void run(){
-        Thread.currentThread().setName("TestReceiverVideo");
         long lastCheckMS = System.currentTimeMillis() - 2*1000;
         while (!Thread.currentThread().isInterrupted()){
             //if the receivedVideoDataTV is !=null, we should update its content with the

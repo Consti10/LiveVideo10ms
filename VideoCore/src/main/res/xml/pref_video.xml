@@ -37,16 +37,18 @@
             android:title="@string/VS_SOURCE"
             android:entries="@array/entriesVIDEO_SOURCE"
             android:entryValues="@array/valuesVIDEO_SOURCE"
-            android:defaultValue="0"/>
+            android:defaultValue="0"
+            android:enabled="false"/>
         <EditTextPreference
             android:key="@string/VS_PLAYBACK_FILENAME"
             android:title="@string/VS_PLAYBACK_FILENAME"
-            android:defaultValue="@string/VS_PLAYBACK_FILENAME_DEFAULT_VALUE" />
+            android:defaultValue="@string/VS_PLAYBACK_FILENAME_DEFAULT_VALUE"
+            android:enabled="false"/>
         <EditTextPreference
             android:key="@string/VS_ASSETS_FILENAME_TEST_ONLY"
             android:title="@string/VS_ASSETS_FILENAME_TEST_ONLY"
             android:defaultValue="testVideo.h264"
-            android:editable="false"/>
+            android:enabled="false"/>
     </PreferenceCategory>
 
 

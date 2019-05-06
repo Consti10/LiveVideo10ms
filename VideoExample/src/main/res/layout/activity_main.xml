@@ -27,12 +27,5 @@
         tools:ignore="HardcodedText" />
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_TestReceiverVideo"
-        android:textSize="20sp"
-        android:textColor="@color/colorPrimary"
-        android:text="Video:0" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

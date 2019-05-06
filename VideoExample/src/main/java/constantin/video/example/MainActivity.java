@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import constantin.video.core.AVideoSettings;
 import constantin.video.core.TestReceiverVideo;
 import constantin.video.core.VideoNative.VideoNative;
 
@@ -39,8 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String[] ASSETS_TEST_VIDEO_FILE_NAMES ={"testVideo.h264","rpi.h264","Recording_360.h264","o2.h264"};
 
-    private TestReceiverVideo testReceiverVideo;
-    private TextView textView;
 
 
     @Override
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkAndRequestPermissions();
-        VideoNative.initializePreferences(this);
+        VideoNative.initializePreferences(this,false);
         context=this;
 
         spinnerVideoTestFile =findViewById(R.id.s_videoFileSelector);
@@ -74,12 +73,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startSettingsActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent();
-                intent.setClass(context,AVideoSettings.class);
+                final Intent intent=new Intent();
+                intent.setClass(context, AVideoSettings.class);
+                intent.putExtra(AVideoSettings.EXTRA_KEY,true);
                 startActivity(intent);
             }
         });
-        textView=findViewById(R.id.tv_TestReceiverVideo);
     }
 
     @Override
