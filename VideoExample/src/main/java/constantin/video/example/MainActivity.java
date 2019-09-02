@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import constantin.video.core.AVideoSettings;
-import constantin.video.core.TestReceiverVideo;
 import constantin.video.core.VideoNative.VideoNative;
 
 import android.content.SharedPreferences;
@@ -22,14 +21,13 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    Spinner spinnerVideoTestFile;
+    Spinner spinnerVideoTestFileFromAssets;
     Context context;
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -50,18 +48,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         VideoNative.initializePreferences(this,false);
         context=this;
 
-        spinnerVideoTestFile =findViewById(R.id.s_videoFileSelector);
+        spinnerVideoTestFileFromAssets =findViewById(R.id.s_videoFileSelector);
         ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
                 R.array.video_test_files, android.R.layout.simple_spinner_item);
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerVideoTestFile.setAdapter(adapter2);
+        spinnerVideoTestFileFromAssets.setAdapter(adapter2);
         //
         Button startVideoActivity=findViewById(R.id.b_startVideoActivity);
         startVideoActivity.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ApplySharedPref")
             @Override
             public void onClick(View v) {
-                final int selectedTestFile=spinnerVideoTestFile.getSelectedItemPosition();
+                final int selectedTestFile= spinnerVideoTestFileFromAssets.getSelectedItemPosition();
                 SharedPreferences preferences=getSharedPreferences("pref_video",MODE_PRIVATE);
                 preferences.edit().putString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),ASSETS_TEST_VIDEO_FILE_NAMES[selectedTestFile]).commit();
                 Intent intentVideoActivity = new Intent();
@@ -83,6 +81,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onResume() {
+        if(getSharedPreferences("pref_video",MODE_PRIVATE).getInt(getString(R.string.VS_SOURCE),0)==2){
+            spinnerVideoTestFileFromAssets.setEnabled(true);
+        }else{
+            spinnerVideoTestFileFromAssets.setEnabled(false);
+        }
+
         super.onResume();
     }
 
