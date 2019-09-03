@@ -24,22 +24,12 @@ import androidx.test.runner.AndroidJUnit4;
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.VideoNative.VideoNative;
 
-import static androidx.test.espresso.Espresso.onData;
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBack;
-import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.is;
+import static constantin.video.example.MainActivity.ASSETS_TEST_VIDEO_FILE_NAMES;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
-    private static final int WAIT_TIME_LONG = 10*1000; //30 seconds
+    private static final int WAIT_TIME_LONG = 10*1000; //10 seconds
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -51,13 +41,21 @@ public class MainActivityTest {
     public GrantPermissionRule mGrantPermissionRule =
             GrantPermissionRule.grant(
                     "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
+                    "android.permission.WRITE_EXTERNAL_STORAGE",
+                    "android.permission.INTERNET");
 
 
     private void writeVideoSource(final int videoSource){
         final Context context=mActivityTestRule.getActivity();
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
         sharedPreferences.edit().putInt(context.getString(R.string.VS_SOURCE),videoSource).commit();
+    }
+
+    //Dang, I cannot get the Spinner work with an Espresso test
+    private void selectVideoFilename(final int selectedFile){
+        final Context context=mActivityTestRule.getActivity();
+        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString(context.getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),ASSETS_TEST_VIDEO_FILE_NAMES[selectedFile]).commit();
     }
 
 
@@ -77,15 +75,6 @@ public class MainActivityTest {
         System.out.println(info.toString());
     }
 
-    private void selectVideoFilename(final int which){
-        onView(withId(R.id.s_videoFileSelector)).perform(click());
-        DataInteraction appCompatCheckedTextView = onData(anything())
-                .inAdapterView(childAtPosition(
-                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
-                        0))
-                .atPosition(which);
-        appCompatCheckedTextView.perform(click());
-    }
 
     @Test
     public void mainActivityTest() {
@@ -100,22 +89,4 @@ public class MainActivityTest {
         testPlayVideo();
     }
 
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position) {
-
-        return new TypeSafeMatcher<View>() {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Child at position " + position + " in parent ");
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view) {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
-    }
 }

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import constantin.video.core.AVideoSettings;
+import constantin.video.core.IsConnected;
 import constantin.video.core.VideoNative.VideoNative;
 
 import android.content.SharedPreferences;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final List<String> missingPermission = new ArrayList<>();
     private static final int REQUEST_PERMISSION_CODE = 12345;
 
-    private static final String[] ASSETS_TEST_VIDEO_FILE_NAMES ={"testVideo.h264","rpi.h264","Recording_360.h264","o2.h264"};
+    public static final String[] ASSETS_TEST_VIDEO_FILE_NAMES ={"testVideo.h264","rpi.h264","Recording_360.h264","o2.h264"};
 
 
 
@@ -75,6 +76,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.setClass(context, AVideoSettings.class);
                 intent.putExtra(AVideoSettings.EXTRA_KEY,true);
                 startActivity(intent);
+            }
+        });
+        findViewById(R.id.b_startTethering).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IsConnected.openUSBTetherSettings(context);
             }
         });
     }
