@@ -56,7 +56,7 @@ public class MainActivityTest {
 
     private void writeVideoSource(final int videoSource){
         final Context context=mActivityTestRule.getActivity();
-        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",0);
+        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
         sharedPreferences.edit().putInt(context.getString(R.string.VS_SOURCE),videoSource).commit();
     }
 
