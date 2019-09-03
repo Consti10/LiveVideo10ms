@@ -26,7 +26,6 @@
               <option value="hammerhead" />
               <option value="hero2lte" />
               <option value="hlte" />
-              <option value="herolte" />
               <option value="htc_m8" />
               <option value="hwALE-H" />
               <option value="j7xelte" />
@@ -43,12 +42,13 @@
               <option value="victara" />
               <option value="walleye" />
               <option value="zeroflte" />
+              <option value="A1N_sprout" />
             </list>
           </option>
           <option name="apiLevels">
             <list>
-              <option value="27" />
               <option value="28" />
+              <option value="27" />
             </list>
           </option>
           <option name="languages">
@@ -216,6 +216,7 @@
     <orderEntry type="library" name="Gradle: androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.print:print:1.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.constraintlayout:constraintlayout:1.1.3@aar" level="project" />
+    <orderEntry type="module" module-name="VideoCore" />
     <orderEntry type="module" module-name="VideoCore" />
     <orderEntry type="module" module-name="VideoCore" />
   </component>

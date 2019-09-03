@@ -85,8 +85,6 @@ public class MainActivityTest {
         testPlayVideo();
         selectVideoFilename(2);
         testPlayVideo();
-        selectVideoFilename(3);
-        testPlayVideo();
     }
 
 }
