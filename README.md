@@ -24,15 +24,15 @@ Playback works on a 'best effort' principle, e.g. as soon as a receiver is creat
 but no frames can be decoded until enough I-frame data was received. Make sure to use a low enough I-frame interval with your h264 encoder.
 When receiving corrupted data (e.g from a lossy connection) the decoder will still generate frames if possible.
 
-**Structure:**\
-- VideoCore: contains the native code and java bindings, one test file\
+**Structure:**
+- VideoCore: contains the native code and java bindings
 - VideoExample: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)\
 
 **Setup Dependencies**\
-There are 2 ways to use VideoCore in your Project
+There are 2 ways to use VideoCore in your Project 
 1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
-:+1 Easy\
-:-1 cannot browse native libraries\
+:+1 Easy
+:-1 cannot browse native libraries
 Gradle example:
 ```gradle
     allprojects {
@@ -46,8 +46,8 @@ Gradle example:
    }
 ```
 2. Forking the repo and including sources manually
-:+1 browse native libraries\
-:+1 modify code\
+:+1 browse native libraries
+:+1 modify code
 * To your top level settings.gradle file, add
 include ':VideoCore'
 project(':VideoCore').projectDir=new File('..\\LiveVideo10ms\\VideoCore')
