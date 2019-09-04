@@ -1,6 +1,6 @@
 # Live Video 10ms Android
 
-**Example App**
+**Example App** \
 <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="240"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" height="240">
 
 **Description** \
