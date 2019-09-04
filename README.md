@@ -2,8 +2,8 @@
 
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of \
-a) raw h264 nalus over udp and \
-b) rtp h264 data over udp.\
+* raw h264 nalus over udp and
+* rtp h264 data over udp.
 Additionally playback of raw .h264 files for testing.
 
 It has been optimized for low latency and tested on a wide variety of devices, including those running FPV-VR for wifibroadcast.
@@ -11,8 +11,8 @@ The example library also contains test cases that can be executed on the 'gooogl
 the decoder with faulty NALUs, created by a lossy connection. (e.g. wifibroadcast).
 
 The 2 most important factors for low latency are
-a) HW-accelerated decoding via the MediaCodec api
-b) Receiving,Parsing and decoding is done in cpp code (multi-threaded). This decouples it from the java runtime, which increases performance and makes latency more consistent ( garbage collection halts all java threads, for example).
+* HW-accelerated decoding via the MediaCodec api
+* Receiving,Parsing and decoding is done in cpp code (multi-threaded). This decouples it from the java runtime, which increases performance and makes latency more consistent ( garbage collection halts all java threads, for example).
 
 However, all native code needed for creating, starting and stopping the decoding process are exposed via the JNI, so you can use the lib
 without writing c/c++ code.
@@ -21,8 +21,34 @@ Playback works on a 'best effort' principle, e.g. as soon as a receiver is creat
 but no frames can be decoded until enough I-frame data was received. Make sure to use a low enough I-frame interval with your h264 encoder.
 When receiving corrupted data (e.g from a lossy connection) the decoder will still generate frames if possible.
 
-Structure:
-core: contains the native code and java bindings, one test file
-example: simple playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)
+**Structure:**\
+core: contains the native code and java bindings, one test file\
+example: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)\
 
+**Setup Dependencies**
+There are 2 ways to use VideoCore in your Project\
+- Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
++ Easy
+- cannot browse native libraries
+Gradle example:
+```gradle
+    allprojects {
+        repositories {
+            jcenter()
+            maven { url "https://jitpack.io" }
+        }
+   }
+   dependencies {
+        implementation 'com.github.Consti10:LiveVideo10ms:v1.1'
+   }
+```
+- Forking the repo and including sources manually
++ browse native libraries
++ modify code
+* To your top level settings.gradle file, add
+include ':VideoCore'
+project(':VideoCore').projectDir=new File('..\\LiveVideo10ms\\VideoCore')
+and modify the path according to your download file
+* To your app level gradle file add
+implementation project(':VideoCore')
 
