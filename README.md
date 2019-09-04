@@ -10,7 +10,7 @@ Additionally playback of raw .h264 files for testing and recording.
 **Example App** \
 <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="240"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" height="240">
 
-It has been optimized for low latency and tested on a wide variety of devices, including those running FPV-VR for wifibroadcast.
+This library has been optimized for low latency and tested on a wide variety of devices, including those running FPV-VR for wifibroadcast.
 The example library also contains test cases that can be executed on the 'gooogle firebase test lab'. These tests include feeding
 the decoder with faulty NALUs, created by a lossy connection. (e.g. wifibroadcast).
 
