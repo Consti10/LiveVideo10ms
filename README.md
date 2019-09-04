@@ -50,7 +50,8 @@ Gradle example:
 :+1 browse native libraries \
 :+1 modify code \
 * To your top level settings.gradle file, add
-```include ':VideoCore'
+```
+include ':VideoCore'
 project(':VideoCore').projectDir=new File('..\\LiveVideo10ms\\VideoCore')
 ```
 and modify the path according to your download file
