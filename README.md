@@ -6,9 +6,9 @@
 **Description**
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of
-* raw h264 nalus over udp and
-* rtp h264 data over udp.
-Additionally playback of raw .h264 files for testing.
+1. raw h264 nalus over udp and
+2. rtp h264 data over udp.
+Additionally playback of raw .h264 files for testing and recording.
 
 It has been optimized for low latency and tested on a wide variety of devices, including those running FPV-VR for wifibroadcast.
 The example library also contains test cases that can be executed on the 'gooogle firebase test lab'. These tests include feeding
