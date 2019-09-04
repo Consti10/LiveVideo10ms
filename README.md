@@ -5,7 +5,8 @@ Library for live video playback with ultra low latency (below 10ms) on android d
 Supports playback of
 1. raw h264 nalus over udp and
 2. rtp h264 data over udp. \
-Additionally playback of raw .h264 files for testing and recording.
+Additionally playback of raw .h264 files for testing and recording. \
+[![JitPack](https://jitpack.io/v/kizitonwose/colorpreference.svg)](https://jitpack.io/#Consti10/LiveVideo10ms) \
 
 **Example App** \
 <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="240"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" height="240">
@@ -58,5 +59,5 @@ and modify the path according to your download file
 * To your app level gradle file add
 ```
 implementation project(':VideoCore')
-```  
+```
 See [FPV-VR](https://github.com/Consti10/FPV_VR_2018) as an example how to add dependencies.
