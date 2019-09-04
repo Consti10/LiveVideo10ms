@@ -1,5 +1,8 @@
 # Live Video 10ms Android
 
+[Contribution guidelines for this project](Screenshots/device1.png)
+
+
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of
 * raw h264 nalus over udp and
