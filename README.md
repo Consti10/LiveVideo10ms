@@ -1,7 +1,7 @@
 # Live Video 10ms Android
 
 Library for live video playback with ultra low latency (below 10ms) on android devices.
-Supports playback of \
+Supports playback of
 * raw h264 nalus over udp and
 * rtp h264 data over udp.
 Additionally playback of raw .h264 files for testing.
@@ -22,8 +22,8 @@ but no frames can be decoded until enough I-frame data was received. Make sure t
 When receiving corrupted data (e.g from a lossy connection) the decoder will still generate frames if possible.
 
 **Structure:**\
-core: contains the native code and java bindings, one test file\
-example: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)\
+_VideoCore:_ contains the native code and java bindings, one test file\
+_VideoExample:_ simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)\
 
 **Setup Dependencies**
 There are 2 ways to use VideoCore in your Project\
