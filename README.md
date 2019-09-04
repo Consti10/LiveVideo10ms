@@ -32,8 +32,8 @@ When receiving corrupted data (e.g from a lossy connection) the decoder will sti
 **Setup Dependencies**\
 There are 2 ways to use VideoCore in your Project \
 1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
-:+1 Easy \
-:-1 cannot browse native libraries \
+:+1: Easy \
+:-1_ cannot browse native libraries \
 Gradle example:
 ```gradle
     allprojects {
@@ -47,8 +47,8 @@ Gradle example:
    }
 ```
 2. Forking the repo and including sources manually
-:+1 browse native libraries \
-:+1 modify code \
+:+1: browse native libraries \
+:+1: modify code \
 * To your top level settings.gradle file, add
 ```
 include ':VideoCore'
@@ -57,4 +57,4 @@ project(':VideoCore').projectDir=new File('..\\LiveVideo10ms\\VideoCore')
 and modify the path according to your download file
 * To your app level gradle file add \
 ```implementation project(':VideoCore')```
-
+See [FPV-VR](https://github.com/Consti10/FPV_VR_2018) as an example how to add dependencies.

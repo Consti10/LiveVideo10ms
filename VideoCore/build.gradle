@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.Consti10'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -37,6 +39,3 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
     implementation 'com.mapzen.android:prefs-plus:1.0.0'
 }
-
-apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.Consti10'
