@@ -1,7 +1,7 @@
 # Live Video 10ms Android
 
 **Example App**
-<img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="240"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" width="240">
+<img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="360"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" width="540">
 
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of
