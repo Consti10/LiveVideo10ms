@@ -26,10 +26,10 @@ _VideoCore:_ contains the native code and java bindings, one test file\
 _VideoExample:_ simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)\
 
 **Setup Dependencies**
-There are 2 ways to use VideoCore in your Project\
-- Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
-+ Easy
-- cannot browse native libraries
+There are 2 ways to use VideoCore in your Project \
+1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
+:+1 Easy
+:-1 cannot browse native libraries
 Gradle example:
 ```gradle
     allprojects {
@@ -42,9 +42,9 @@ Gradle example:
         implementation 'com.github.Consti10:LiveVideo10ms:v1.1'
    }
 ```
-- Forking the repo and including sources manually
-+ browse native libraries
-+ modify code
+2. Forking the repo and including sources manually
+:+1 browse native libraries
+:+1 modify code
 * To your top level settings.gradle file, add
 include ':VideoCore'
 project(':VideoCore').projectDir=new File('..\\LiveVideo10ms\\VideoCore')
