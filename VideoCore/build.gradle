@@ -7,7 +7,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.2"
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++17"
@@ -39,5 +39,4 @@ dependencies {
 }
 
 apply plugin: 'com.github.dcendents.android-maven'
-
 group='com.github.Consti10'
