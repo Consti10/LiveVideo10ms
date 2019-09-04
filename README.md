@@ -7,7 +7,7 @@
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of
 1. raw h264 nalus over udp and
-2. rtp h264 data over udp.
+2. rtp h264 data over udp. \
 Additionally playback of raw .h264 files for testing and recording.
 
 It has been optimized for low latency and tested on a wide variety of devices, including those running FPV-VR for wifibroadcast.
@@ -15,8 +15,8 @@ The example library also contains test cases that can be executed on the 'gooogl
 the decoder with faulty NALUs, created by a lossy connection. (e.g. wifibroadcast).
 
 The 2 most important factors for low latency are
-* HW-accelerated decoding via the MediaCodec api
-* Receiving,Parsing and decoding is done in cpp code (multi-threaded). This decouples it from the java runtime, which increases performance and makes latency more consistent ( garbage collection halts all java threads, for example).
+1. HW-accelerated decoding via the MediaCodec api
+2. Receiving,Parsing and decoding is done in cpp code (multi-threaded). This decouples it from the java runtime, which increases performance and makes latency more consistent ( garbage collection halts all java threads, for example).
 
 However, all native code needed for creating, starting and stopping the decoding process are exposed via the JNI, so you can use the lib
 without writing c/c++ code.
@@ -27,13 +27,13 @@ When receiving corrupted data (e.g from a lossy connection) the decoder will sti
 
 **Structure:**
 - VideoCore: contains the native code and java bindings
-- VideoExample: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)\
+- VideoExample: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s) \
 
 **Setup Dependencies**\
-There are 2 ways to use VideoCore in your Project
+There are 2 ways to use VideoCore in your Project \
 1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
-:+1 Easy
-:-1 cannot browse native libraries
+:+1 Easy \
+:-1 cannot browse native libraries \
 Gradle example:
 ```gradle
     allprojects {
@@ -47,8 +47,8 @@ Gradle example:
    }
 ```
 2. Forking the repo and including sources manually
-:+1 browse native libraries
-:+1 modify code
+:+1 browse native libraries \
+:+1 modify code \
 * To your top level settings.gradle file, add
 include ':VideoCore'
 project(':VideoCore').projectDir=new File('..\\LiveVideo10ms\\VideoCore')
