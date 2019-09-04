@@ -55,6 +55,8 @@ include ':VideoCore'
 project(':VideoCore').projectDir=new File('..\\LiveVideo10ms\\VideoCore')
 ```
 and modify the path according to your download file
-* To your app level gradle file add \
-```implementation project(':VideoCore')```
+* To your app level gradle file add
+```
+implementation project(':VideoCore')
+```  
 See [FPV-VR](https://github.com/Consti10/FPV_VR_2018) as an example how to add dependencies.
