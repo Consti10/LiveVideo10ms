@@ -3,7 +3,7 @@
 **Example App**
 <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="240"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" height="240">
 
-**Description**
+**Description** 
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of
 1. raw h264 nalus over udp and
