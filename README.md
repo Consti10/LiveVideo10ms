@@ -1,7 +1,6 @@
 # Live Video 10ms Android
 
-[Contribution guidelines for this project](Screenshots/device1.png)
-
+![Screenshot](Screenshots/device1.png)
 
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of
@@ -29,7 +28,7 @@ When receiving corrupted data (e.g from a lossy connection) the decoder will sti
 - VideoExample: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s)\
 
 **Setup Dependencies**\
-There are 2 ways to use VideoCore in your Project 
+There are 2 ways to use VideoCore in your Project
 1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
 :+1 Easy
 :-1 cannot browse native libraries
