@@ -31,6 +31,7 @@ public class DecodingInfo {
                 " avgParsingTime_ms:"+avgParsingTime_ms+
                 " avgWaitForInputBTime_ms:"+avgWaitForInputBTime_ms+
                 " avgDecodingTime_ms:"+avgDecodingTime_ms+
+                " totalDecodingTime_ms"+(avgParsingTime_ms+avgWaitForInputBTime_ms+avgDecodingTime_ms)+
                 " nNALU:"+nNALU+
                 " nNALUSFeeded:"+nNALUSFeeded;
     }

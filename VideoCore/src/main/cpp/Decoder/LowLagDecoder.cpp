@@ -10,9 +10,8 @@
 #define TAG "LowLagDecoder"
 
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-#define BUFFER_TIMEOUT_US 20*1000 //20ms (a little bit more than 16.6ms)
-
-#define TIME_BETWEEN_LOGS_MS 5*1000 //5s
+constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
+constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 
 using namespace std::chrono;
 
@@ -108,11 +107,11 @@ void LowLagDecoder::checkOutputLoop() {
         if (index >= 0) {
             const int64_t nowNS=(int64_t)duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count();
             const int64_t nowUS=(int64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
-            //the timestamp for releasing the buffer is in NS
+            //the timestamp for releasing the buffer is in NS, just release as fast as possible (e.g. now)
             AMediaCodec_releaseOutputBufferAtTime(decoder.codec,(size_t)index,nowNS);
             //but the presentationTime is in US
             int64_t deltaDecodingTime=nowUS-info.presentationTimeUs;
-            decodingTime_us.add(deltaDecodingTime);
+            decodingTime_us.add((long)deltaDecodingTime);
             nDecodedFrames.add(1);
             if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
                 LOGD("Decoder saw EOS");
@@ -140,7 +139,7 @@ void LowLagDecoder::checkOutputLoop() {
         const auto delta=now-decodingInfo.lastCalculation;
         if(duration_cast<seconds>(delta).count()>2){
             decodingInfo.lastCalculation=steady_clock::now();
-            decodingInfo.currentFPS=nDecodedFrames.getDeltaSinceLastCall()/duration_cast<seconds>(delta).count();
+            decodingInfo.currentFPS=nDecodedFrames.getDeltaSinceLastCall()/(float)duration_cast<seconds>(delta).count();
             decodingInfo.currentKiloBitsPerSecond=(nNALUBytesFed.getDeltaSinceLastCall()/duration_cast<seconds>(delta).count())/1024.0f*8.0f;
             //and recalculate the avg latencies. If needed,also print the log.
             decodingInfo.avgDecodingTime_ms=decodingTime_us.getAvg()/1000.0f;
@@ -170,8 +169,8 @@ void LowLagDecoder::feedDecoder(const NALU& nalu,bool justEOS){
                 //this timestamp will be later used to calculate the decoding latency
                 const uint64_t presentationTimeUS=(uint64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
                 AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, 0);
-                waitForInputB_us.add(duration_cast<microseconds>(steady_clock::now()-now).count());
-                parsingTime_us.add(duration_cast<microseconds>(deltaParsing).count());
+                waitForInputB_us.add((long)duration_cast<microseconds>(steady_clock::now()-now).count());
+                parsingTime_us.add((long)duration_cast<microseconds>(deltaParsing).count());
             }else{
                  AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)0,0, AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
             }

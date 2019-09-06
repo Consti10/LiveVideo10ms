@@ -24,7 +24,7 @@ VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject contex
     //get the function pointers to it's 2 callback functions
     jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(videoParamsChangedI);
     callToJava.onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onVideoRatioChanged", "(II)V");
-    callToJava.onDecoderFPSChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(FFFFFII)V");
+    callToJava.onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(FFFFFII)V");
     //Store a global reference to it, so we can use it later
     //callToJava.globalJavaObj = env->NewGlobalRef(videoParamsChangedI); //also need a global javaObj
     callToJava.globalJavaObj = env->NewWeakGlobalRef(videoParamsChangedI);
@@ -51,7 +51,7 @@ void VideoNative::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInf
     //When this callback is invoked, no Java VM is attached to the thread
     JNIEnv* jniENV;
     callToJava.javaVirtualMachine->AttachCurrentThread(&jniENV, nullptr);
-    jniENV->CallVoidMethod(callToJava.globalJavaObj,callToJava.onDecoderFPSChangedJAVA,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
+    jniENV->CallVoidMethod(callToJava.globalJavaObj,callToJava.onDecodingInfoChangedJAVA,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
                            (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded);
     callToJava.javaVirtualMachine->DetachCurrentThread();
 }

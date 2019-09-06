@@ -58,7 +58,6 @@ public class MainActivityTest {
         sharedPreferences.edit().putString(context.getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),ASSETS_TEST_VIDEO_FILE_NAMES[selectedFile]).commit();
     }
 
-
     private void testPlayVideo(){
         Intent i = new Intent();
         mVideoActivityTestRule.launchActivity(i);

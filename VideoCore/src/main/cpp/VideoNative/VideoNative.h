@@ -23,7 +23,7 @@ private:
     struct{
         JavaVM* javaVirtualMachine;
         jobject globalJavaObj;
-        jmethodID onDecoderFPSChangedJAVA= nullptr;
+        jmethodID onDecodingInfoChangedJAVA= nullptr;
         jmethodID onVideoRatioChangedJAVA=nullptr;
     }callToJava;
     ANativeWindow* window=nullptr;

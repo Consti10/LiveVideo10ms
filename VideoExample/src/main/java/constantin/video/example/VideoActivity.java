@@ -21,7 +21,7 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private VideoPlayer mVideoPlayer;
 
     private DecodingInfo mDecodingInfo;
-
+    long lastLogMS=System.currentTimeMillis();
 
 
     @Override
@@ -65,8 +65,11 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     @Override
     public void onDecodingInfoChanged(DecodingInfo decodingInfo) {
         mDecodingInfo=decodingInfo;
+        if(System.currentTimeMillis()-lastLogMS>5*1000){
+            System.out.println(mDecodingInfo.toString());
+            lastLogMS=System.currentTimeMillis();
+        }
     }
-
 
     public final DecodingInfo getDecodingInfo(){
         return mDecodingInfo;

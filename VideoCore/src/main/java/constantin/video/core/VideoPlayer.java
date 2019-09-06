@@ -1,10 +1,10 @@
 package constantin.video.core;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
 import android.view.Surface;
 import java.io.File;
+
 
 import constantin.video.core.VideoNative.VideoNative;
 
@@ -13,33 +13,47 @@ public class VideoPlayer implements VideoNative.NativeInterfaceVideoParamsChange
     private final IVideoParamsChanged videoParamsChanged;
     private final Context context;
 
+    //Setup as much as possible without creating the decoder
+    //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
     public VideoPlayer(final Context context,final IVideoParamsChanged iVideoParamsChanged){
         this.videoParamsChanged=iVideoParamsChanged;
         this.context=context;
         nativeVideoPlayer= VideoNative.initialize(this,context,getDirectoryToSaveDataTo());
     }
 
+    //We cannot initialize the Decoder until we have SPS and PPS data -
+    //when streaming this data will be available at some point in future
+    //Therefore we don't allocate the MediaCodec resources yet
+    //They will be allocated in the native feedDecoder thread once possible
     public void prepare(Surface surface){
         VideoNative.nativeAddConsumers(nativeVideoPlayer,surface);
     }
 
-    private void release(){
-        VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
-    }
-
+    //Depending on the selected Settings, this starts either
+    //a) Receiving RAW over UDP
+    //b) Receiving RTP over UDP
+    //c) Receiving Data from a resource file (Assets)
+    //d) Receiving Data from a file in the phone file system
     public void addAndStartReceiver(){
         VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
     }
 
+    //Stop the Receiver
+    //Stop the Decoder
+    //Free resources
     public void stopAndRemovePlayerReceiver(){
         VideoNative.nativeStopReceiver(nativeVideoPlayer);
         release();
     }
 
+    //Call this to free resources
+    private void release(){
+        VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
+    }
+
     public long getNativeInstance(){
         return nativeVideoPlayer;
     }
-
 
     @Override
     public void onVideoRatioChanged(int videoW, int videoH) {
