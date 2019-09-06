@@ -32,7 +32,7 @@ When receiving corrupted data (e.g from a lossy connection) the decoder will sti
 
 **Setup Dependencies**\
 There are 2 ways to use VideoCore in your Project \
-1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io) \
+**1 Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)** \
 :+1: Easy \
 :-1: cannot browse native libraries \
 Gradle example:
@@ -47,9 +47,9 @@ Gradle example:
         implementation 'com.github.Consti10:LiveVideo10ms:v1.1'
    }
 ```
-2. Forking the repo and including sources manually: \
+**2 Forking the repo and including sources manually:** \
 :+1: browse native libraries \
-:+1: modify code 
+:+1: modify code
 * To your top level settings.gradle file, add
 ```
 include ':VideoCore'
