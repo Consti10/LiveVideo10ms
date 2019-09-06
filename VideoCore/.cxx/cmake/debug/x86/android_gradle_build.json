@@ -1,0 +1,77 @@
+
+{
+	"buildFiles" : 
+	[
+		"C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/CMakeLists.txt"
+	],
+	"cleanCommands" : 
+	[
+		"C:\\Users\\Consti10\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Consti10\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\.cxx\\cmake\\debug\\x86 --target clean"
+	],
+	"cppFileExtensions" : [ "cpp" ],
+	"libraries" : 
+	{
+		"VideoNative-Debug-x86" : 
+		{
+			"abi" : "x86",
+			"artifactName" : "VideoNative",
+			"buildCommand" : "C:\\Users\\Consti10\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Consti10\\Desktop\\FPV_VR_for_wifibroadcast\\LiveVideo10ms\\VideoCore\\.cxx\\cmake\\debug\\x86 --target VideoNative",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DVideoNative_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security  -std=c++17 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/src/main/cpp/General/UDPReceiver.cpp",
+					"workingDirectory" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/.cxx/cmake/debug/x86"
+				},
+				
+				{
+					"flags" : "  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DVideoNative_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security  -std=c++17 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/src/main/cpp/Parser/H264Parser.cpp",
+					"workingDirectory" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/.cxx/cmake/debug/x86"
+				},
+				
+				{
+					"flags" : "  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DVideoNative_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security  -std=c++17 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/src/main/cpp/Parser/ParseRAW.cpp",
+					"workingDirectory" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/.cxx/cmake/debug/x86"
+				},
+				
+				{
+					"flags" : "  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DVideoNative_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security  -std=c++17 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/src/main/cpp/Parser/ParseRTP.cpp",
+					"workingDirectory" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/.cxx/cmake/debug/x86"
+				},
+				
+				{
+					"flags" : "  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DVideoNative_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security  -std=c++17 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/src/main/cpp/Decoder/LowLagDecoder.cpp",
+					"workingDirectory" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/.cxx/cmake/debug/x86"
+				},
+				
+				{
+					"flags" : "  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DVideoNative_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security  -std=c++17 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/src/main/cpp/Decoder/SPSHelper.cpp",
+					"workingDirectory" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/.cxx/cmake/debug/x86"
+				},
+				
+				{
+					"flags" : "  --target=i686-none-linux-android21 --gcc-toolchain=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DVideoNative_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\Video -I..\\..\\..\\..\\src\\main\\cpp\\General  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security  -std=c++17 -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/src/main/cpp/VideoNative/VideoNative.cpp",
+					"workingDirectory" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/.cxx/cmake/debug/x86"
+				}
+			],
+			"output" : "C:/Users/Consti10/Desktop/FPV_VR_for_wifibroadcast/LiveVideo10ms/VideoCore/build/intermediates/cmake/debug/obj/x86/libVideoNative.so",
+			"toolchain" : "1543376759"
+		}
+	},
+	"toolchains" : 
+	{
+		"1543376759" : 
+		{
+			"cCompilerExecutable" : "C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "C:/Users/Consti10/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+		}
+	}
+}

@@ -1,0 +1,9 @@
+# ninja log v5
+4	4585	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/ParseRAW.cpp.o	1ee03e3f8890197e
+691	4589	0	CMakeFiles/VideoNative.dir/src/main/cpp/Decoder/LowLagDecoder.cpp.o	98bdfdb4b4920894
+1296	4592	0	CMakeFiles/VideoNative.dir/src/main/cpp/General/UDPReceiver.cpp.o	5e4031e9247a9e6
+1918	4593	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/ParseRTP.cpp.o	6da9859fed834f58
+3203	4818	0	CMakeFiles/VideoNative.dir/src/main/cpp/Decoder/SPSHelper.cpp.o	78e418d711663f3f
+2542	5414	0	CMakeFiles/VideoNative.dir/src/main/cpp/Parser/H264Parser.cpp.o	b491cb6184aa4f1f
+3885	8724	0	CMakeFiles/VideoNative.dir/src/main/cpp/VideoNative/VideoNative.cpp.o	9420a86f1f21a239
+8725	9968	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libVideoNative.so	13c64dfb715cfe36
