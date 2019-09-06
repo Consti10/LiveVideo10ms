@@ -49,7 +49,7 @@ Gradle example:
 ```
 2. Forking the repo and including sources manually: \
 :+1: browse native libraries \
-:+1: modify code \
+:+1: modify code 
 * To your top level settings.gradle file, add
 ```
 include ':VideoCore'
