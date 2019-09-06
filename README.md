@@ -32,9 +32,9 @@ When receiving corrupted data (e.g from a lossy connection) the decoder will sti
 
 **Setup Dependencies**\
 There are 2 ways to use VideoCore in your Project \
-1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io)
-:+1: Easy
-:-1: cannot browse native libraries
+1. Declaring Dependency via Jitpack: [jitpack.io](https://jitpack.io) \
+:+1: Easy \
+:-1: cannot browse native libraries \
 Gradle example:
 ```gradle
     allprojects {
