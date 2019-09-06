@@ -1,4 +1,5 @@
 # Live Video 10ms Android
+[![Release](https://jitpack.io/v/Consti10/Telemetry.svg)](https://jitpack.io/#Consti10/Telemetry)
 
 **Description** \
 Library for live video playback with ultra low latency (below 10ms) on android devices.
@@ -6,7 +7,6 @@ Supports playback of
 1. raw h264 nalus over udp and
 2. rtp h264 data over udp. \
 Additionally playback of raw .h264 files for testing and recording. \
-[![Release](https://jitpack.io/v/Consti10/Telemetry.svg)](https://jitpack.io/#Consti10/Telemetry)
 
 **Example App** \
 <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="240"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" height="240">
