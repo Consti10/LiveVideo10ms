@@ -26,9 +26,9 @@ allprojects {
         minSdkVersion = 21
         compileSdkVersion = 28
         targetSdkVersion = 28
-        appcompatVersion = '1.1.0-rc01'
-        materialVersion = '1.1.0-alpha03'
-        constraintlayoutVersion ='1.1.3'
+        appcompatVersion = '1.1.0'
+        materialVersion = '1.1.0-alpha10'
+        constraintlayoutVersion='1.1.3'
     }
 }
 
