@@ -3,8 +3,10 @@ package constantin.video.example;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -15,7 +17,7 @@ import constantin.video.core.VideoPlayer;
 
 
 public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Callback, IVideoParamsChanged {
-
+    private final static String TAG="VIdeoActivity";
     private Context mContext;
     private AspectFrameLayout mAspectFrameLayout;
     private VideoPlayer mVideoPlayer;
@@ -27,13 +29,38 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Intent intent = getIntent();
         mContext=this;
         setContentView(R.layout.activity_video);
         //
         SurfaceView mSurfaceView = findViewById(R.id.sv_video);
         mSurfaceView.getHolder().addCallback(this);
         mAspectFrameLayout =  findViewById(R.id.afl_video);
+        //
+        //Trace myTrace = FirebasePerformance.getInstance().newTrace("test_trace");
+        //myTrace.start();
+        //myTrace.putAttribute("my_attribute",""+System.currentTimeMillis());
+        //myTrace.putMetric("my_metric",System.currentTimeMillis());
+// code that you want to trace
+        //myTrace.stop();
+        /*FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> user = new HashMap<>();
+        user.put("first", "Ada");
+        user.put("last", "Lovelace");
+        user.put("born", 1815);
+        db.collection("users")
+                .add(user)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });*/
     }
 
     @Override
