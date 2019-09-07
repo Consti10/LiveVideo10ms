@@ -5,10 +5,11 @@ import android.content.Intent;
 
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+
 import org.junit.Rule;
 import org.junit.Test;
 
-import androidx.test.rule.GrantPermissionRule;
 import constantin.video.core.DecodingInfo;
 
 @LargeTest

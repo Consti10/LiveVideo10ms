@@ -4,15 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import constantin.video.core.AVideoSettings;
-import constantin.video.core.IsConnected;
-import constantin.video.core.VideoNative.VideoNative;
-
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -23,9 +14,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import constantin.video.core.AVideoSettings;
+import constantin.video.core.IsConnected;
+import constantin.video.core.VideoNative.VideoNative;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     Spinner spinnerVideoTestFileFromAssets;

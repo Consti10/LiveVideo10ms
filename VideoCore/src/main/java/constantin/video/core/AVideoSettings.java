@@ -1,13 +1,11 @@
 package constantin.video.core;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class AVideoSettings extends AppCompatActivity {
     public static final String EXTRA_KEY="SHOW_ADVANCED_SETTINGS";
