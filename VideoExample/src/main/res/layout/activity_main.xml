@@ -32,5 +32,11 @@
         android:layout_height="wrap_content"
         android:text="Start Tethering" />
 
+    <Button
+        android:id="@+id/b_startViewDatabase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Database" />
+
 
 </androidx.appcompat.widget.LinearLayoutCompat>

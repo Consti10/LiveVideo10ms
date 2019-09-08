@@ -21,7 +21,7 @@ import static constantin.video.example.MainActivity.ASSETS_TEST_VIDEO_FILE_NAMES
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest {
+public class PlayAllTestVideosTest {
     private static final int WAIT_TIME_LONG = 10*1000; //10 seconds
 
     @Rule
@@ -69,8 +69,8 @@ public class MainActivityTest {
 
 
     @Test
-    public void mainActivityTest() {
-        writeVideoSource(VideoNative.SOURCE_TYPE_ASSETS);
+    public void playAllTestVideosTest() {
+        writeVideoSource(VideoNative.VS_SOURCE_ASSETS);
         selectVideoFilename(0);
         testPlayVideo();
         selectVideoFilename(1);

@@ -84,6 +84,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 IsConnected.openUSBTetherSettings(context);
             }
         });
+        findViewById(R.id.b_startViewDatabase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent().setClass(context,ViewDataActivity.class));
+            }
+        });
     }
 
     @Override

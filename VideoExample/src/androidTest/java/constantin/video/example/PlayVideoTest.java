@@ -30,7 +30,6 @@ public class PlayVideoTest {
         Intent i = new Intent();
         mVideoActivityTestRule.launchActivity(i);
         try { Thread.sleep(WAIT_TIME_LONG); } catch (InterruptedException e) { e.printStackTrace(); }
-
         final DecodingInfo info= mVideoActivityTestRule.getActivity().getDecodingInfo();
         validateDecodingInfo(info);
         mVideoActivityTestRule.finishActivity();

@@ -1,15 +1,32 @@
 package constantin.video.example;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.ArrayMap;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.External.AspectFrameLayout;
 import constantin.video.core.IVideoParamsChanged;
+import constantin.video.core.VideoNative.VideoNative;
 import constantin.video.core.VideoPlayer;
 
 
@@ -21,7 +38,8 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
 
     private DecodingInfo mDecodingInfo;
     long lastLogMS=System.currentTimeMillis();
-
+    private int VS_SOURCE;
+    private String VS_ASSETS_FILENAME_TEST_ONLY="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,25 +57,7 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
         //myTrace.putMetric("my_metric",System.currentTimeMillis());
 // code that you want to trace
         //myTrace.stop();
-        /*FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Map<String, Object> user = new HashMap<>();
-        user.put("first", "Ada");
-        user.put("last", "Lovelace");
-        user.put("born", 1815);
-        db.collection("users")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });*/
+
     }
 
     @Override
@@ -65,6 +65,9 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
         mVideoPlayer=new VideoPlayer(this,this);
         mVideoPlayer.prepare(holder.getSurface());
         mVideoPlayer.addAndStartReceiver();
+        final SharedPreferences preferences=getSharedPreferences("pref_video",MODE_PRIVATE);
+        VS_SOURCE=preferences.getInt(getString(R.string.VS_SOURCE),0);
+        VS_ASSETS_FILENAME_TEST_ONLY=preferences.getString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),"");
     }
 
     @Override
@@ -87,6 +90,40 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mDecodingInfo!=null && mDecodingInfo.nNALUSFeeded>0){
+            final FirebaseFirestore db = FirebaseFirestore.getInstance();
+            final Map<String,Object> dataMap=new ArrayMap<>();
+            //dataMap.put("Build_MODEL",Build.MODEL);
+            //dataMap.put("Build_VERSION_SDK_INT", Build.VERSION.SDK_INT);
+            dataMap.put("DATE",getDate());
+            dataMap.put("TIME",getTime());
+            dataMap.put("EMULATOR",isEmulator());
+            System.out.println(getDeviceName());
+            //Add all the settings to differentiate which video was decoded
+            dataMap.put(getString(R.string.VS_SOURCE),VS_SOURCE);
+            dataMap.put(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),VS_SOURCE==VideoNative.VS_SOURCE_ASSETS ?
+                    VS_ASSETS_FILENAME_TEST_ONLY : "Unknown");
+            dataMap.putAll(mDecodingInfo.toMap());
+            db.collection("Decoding info").document(getDeviceName()).collection(getBuildVersionRelease()).add(dataMap)
+            //db.collection("Decoding info").add(dataMap)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error adding document", e);
+                        }
+                    });
+        }
+    }
+
+    @Override
     public void onDecodingInfoChanged(DecodingInfo decodingInfo) {
         mDecodingInfo=decodingInfo;
         if(System.currentTimeMillis()-lastLogMS>5*1000){
@@ -97,6 +134,56 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
 
     public final DecodingInfo getDecodingInfo(){
         return mDecodingInfo;
+    }
+
+    private static String getDate(){
+        SimpleDateFormat formatter= new SimpleDateFormat("dd.MM.yyyy");
+        Date date = new Date(System.currentTimeMillis());
+        return formatter.format(date);
+    }
+    private static String getTime(){
+        SimpleDateFormat formatter= new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        return formatter.format(date);
+    }
+    private static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT);
+    }
+    public static String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        String ret;
+        if (model.toLowerCase().startsWith(manufacturer.toLowerCase())) {
+            ret=capitalize(model);
+        } else {
+            ret=capitalize(manufacturer) + " " + model;
+        }
+        if(ret.length()>0){
+            return ret;
+        }
+        return "Unknown";
+    }
+    private static String capitalize(String s) {
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        char first = s.charAt(0);
+        if (Character.isUpperCase(first)) {
+            return s;
+        } else {
+            return Character.toUpperCase(first) + s.substring(1);
+        }
+    }
+    private static String getBuildVersionRelease(){
+        final String ret=Build.VERSION.RELEASE;
+        return ret==null ? "Unknown" : ret;
     }
 
 }

@@ -46,10 +46,10 @@ public class VideoNative {
                                    int nNALU, int nNALUSFeeded);
     }
 
-    public static final int SOURCE_TYPE_UDP=0;
-    public static final int SOURCE_TYPE_FILE=1;
-    public static final int SOURCE_TYPE_ASSETS=2;
-    public static final int SOURCE_TYPE_EXTERNAL=3;
+    public static final int VS_SOURCE_UDP=0;
+    public static final int VS_SOURCE_FILE=1;
+    public static final int VS_SOURCE_ASSETS =2;
+    public static final int VS_SOURCE_EXTERNAL=3;
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
@@ -57,7 +57,6 @@ public class VideoNative {
         File tempFile = new File(filename);
         return tempFile.exists();
     }
-
 
     private static String getDirectory(){
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/";
