@@ -5,7 +5,7 @@
 **Description** \
 Library for live video playback with ultra low latency (below 10ms) on android devices.
 Supports playback of .h264 encoded live video data transmitted via UDP encapsulated in RAW or RTP and simple file playback. \
-Latency data (see example for more information)
+Latency data (see example for more information) \
 | Device | Encoder | avgTotalDecodingTime
 | --- | --- | --- |
 | Pixel 3 | rpi cam | 11.2ms
