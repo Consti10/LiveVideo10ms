@@ -41,6 +41,22 @@ public class ViewDataActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.textViewOS)).setText("OS:"+os);
 
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        //This one is to populate the spinner with all tested device names
+        /*db.collection("Decoding info").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    final QuerySnapshot documentSnapshots= task.getResult();
+                    final ArrayList<String> deviceNames=new ArrayList<>();
+                    for(DocumentSnapshot snapshot : documentSnapshots.getDocuments()){
+                        deviceNames.add(snapshot.getId());
+                    }
+                    Log.d(TAG,"Devices:"+deviceNames.toString());
+                }else{
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });*/
         //.whereEqualTo("Build.VERSION.SDK_INT", 28);
         db.collection("Decoding info").document(device).collection(os).
                 whereEqualTo("VS_ASSETS_FILENAME_TEST_ONLY","rpi.h264"). //only rpi decoding
