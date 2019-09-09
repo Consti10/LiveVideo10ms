@@ -9,10 +9,10 @@ Latency data (see example for more information)
 
 | Device   | Encoder   | avgTotalDecodingTime
 | --- | --- | --- |
-| Pixel 3 | rpi cam | 11.2ms |
-| Pixel 3 | x264 | 10.5ms |
 | Galaxy s9+ | rpi cam | 8.0ms |
 | Galaxy s9+ | x264 | 11.5ms |
+| Pixel 3 | rpi cam | 11.2ms |
+| Pixel 3 | x264 | 10.5ms |
 | HTC U11 | rpi cam | 8.6ms |
 | HTC U11 | x264 | 10.1ms |
 
