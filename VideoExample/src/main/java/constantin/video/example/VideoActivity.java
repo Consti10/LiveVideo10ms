@@ -146,7 +146,7 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
         Date date = new Date(System.currentTimeMillis());
         return formatter.format(date);
     }
-    private static boolean isEmulator() {
+    public static boolean isEmulator() {
         return Build.FINGERPRINT.startsWith("generic")
                 || Build.FINGERPRINT.startsWith("unknown")
                 || Build.MODEL.contains("google_sdk")
@@ -181,7 +181,7 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
             return Character.toUpperCase(first) + s.substring(1);
         }
     }
-    private static String getBuildVersionRelease(){
+    public static String getBuildVersionRelease(){
         final String ret=Build.VERSION.RELEASE;
         return ret==null ? "Unknown" : ret;
     }

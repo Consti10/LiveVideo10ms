@@ -4,10 +4,16 @@
 
 **Description** \
 Library for live video playback with ultra low latency (below 10ms) on android devices.
-Supports playback of
-1. raw h264 nalus over udp and
-2. rtp h264 data over udp. \
-Additionally playback of raw .h264 files for testing and recording. \
+Supports playback of .h264 encoded live video data transmitted via UDP encapsulated in RAW or RTP and simple file playback. \
+Latency data (see example for more information)
+| Device | Encoder | avgTotalDecodingTime
+| --- | --- | --- |
+| Pixel 3 | rpi cam | 11.2ms
+| Pixel 3 | .x264 | 10.5ms
+| Galaxy s9+ | rpi cam | 8.0ms
+| Galaxy s9+ | .x264 | 11.5ms
+| HTC U11 | rpi cam | 8.6ms
+| HTC U11 | .x264 | 10.1ms
 
 **Example App** \
 <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device1.png" alt="ExampleMain" width="240"> <img src="https://github.com/Consti10/LiveVideo10ms/blob/master/Screenshots/device2.png" height="240">

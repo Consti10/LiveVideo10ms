@@ -8,6 +8,7 @@ import java.io.File;
 
 import constantin.video.core.VideoNative.VideoNative;
 
+//Convenient wrapper around the native functions from VideoNative
 public class VideoPlayer implements VideoNative.NativeInterfaceVideoParamsChanged {
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged videoParamsChanged;
