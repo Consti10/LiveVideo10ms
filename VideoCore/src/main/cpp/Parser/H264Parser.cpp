@@ -8,7 +8,7 @@
 #include <chrono>
 #include <thread>
 
-#define TAG "H264Parser"
+constexpr auto TAG="H264Parser";
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 //---------

@@ -6,12 +6,11 @@
 #include <android/native_window_jni.h>
 #include <android/asset_manager_jni.h>
 
-#define TAG "VideoNative"
+constexpr auto TAG="VideoNative";
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
-#define CPU_PRIORITY_UDPRECEIVER_VIDEO (-16)  //needs low latency and does not use the cpu that much
-#define CPU_PRIORITY_DECODER_OUTPUT (-16)     //needs low latency and does not use the cpu that much
-
+constexpr auto CPU_PRIORITY_UDPRECEIVER_VIDEO=(-16);  //needs low latency and does not use the cpu that much
+constexpr auto CPU_PRIORITY_DECODER_OUTPUT (-16);     //needs low latency and does not use the cpu that much
 
 
 VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject context,const char* DIR) :
