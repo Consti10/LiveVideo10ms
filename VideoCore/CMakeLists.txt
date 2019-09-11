@@ -36,6 +36,21 @@ set_target_properties( # Specifies the target library.
         ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libavutil.so)
 include_directories(${FFMPEG_DIR}/include)
 
+#Webbn 360 stuff
+add_library( FFMpegVideoPlayer
+        SHARED
+        src/main/cpp/Experiment360/FFMpegVideoPlayer.cpp
+        )
+target_link_libraries( FFMpegVideoPlayer
+        ${log-lib}
+        log
+        android
+        mediandk
+        OpenMAXAL
+        avcodec-lib
+        avformat-lib
+        avutil-lib
+        )
 
 #######################################################
 ########## Build the VideoCore native libary ##########

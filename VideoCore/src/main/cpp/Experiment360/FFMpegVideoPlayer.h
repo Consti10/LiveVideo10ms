@@ -1,4 +1,7 @@
-#pragma once
+#ifndef FFMPEG_VIDEO_PLAYER_H
+#define FFMPEG_VIDEO_PLAYER_H
+
+#include <jni.h>
 
 #include <string>
 #include <thread>
@@ -39,3 +42,6 @@ private:
 
   std::function<void(uint8_t[],int)> m_callback;
 };
+
+
+#endif //FFMPEG_VIDEO_PLAYER_H

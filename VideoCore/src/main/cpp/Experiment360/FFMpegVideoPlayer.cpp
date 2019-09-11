@@ -1,14 +1,13 @@
 
 #include <iostream>
-
 #include <jni.h>
+#include <android/log.h>
 
 #include "FFMpegVideoPlayer.h"
-#include "../Helper/Time.h"
-#include "../Helper/CPUPriorities.h"
 
-#define TAG "FFMpegVideoPlaeyr.cpp"
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
+
+constexpr auto TAG="FFMpegVideoPlayer.cpp";
+#define LOGV(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 //compilation without any changes (ok) but run time error on Pixel api 28
 ///lib/x86/libavcodec.so" has text relocations (https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#Text-Relocations-Enforced-for-API-level-23)
