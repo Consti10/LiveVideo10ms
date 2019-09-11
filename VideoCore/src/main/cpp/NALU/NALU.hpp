@@ -31,6 +31,12 @@
 #include <string>
 #include <chrono>
 
+
+//A NALU consists of
+//a) DATA buffer
+//b) buffer length
+//c) creation time
+
 class NALU{
 public:
     NALU(const uint8_t* data,const int data_length):
@@ -84,8 +90,6 @@ public:
        return nal_unit_type_name;
    };
 };
-
-//typedef uint8_t* NALU_BUFF[NALU_MAXLEN];
 
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;
 
