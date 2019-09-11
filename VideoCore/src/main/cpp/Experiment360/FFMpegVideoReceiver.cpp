@@ -3,10 +3,10 @@
 #include <jni.h>
 #include <android/log.h>
 
-#include "FFMpegVideoPlayer.h"
+#include "FFMpegVideoReceiver.h"
 
 
-constexpr auto TAG="FFMpegVideoPlayer.cpp";
+constexpr auto TAG="FFMpegVideoReceiver.cpp";
 #define LOGV(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 //compilation without any changes (ok) but run time error on Pixel api 28
@@ -21,10 +21,10 @@ constexpr auto TAG="FFMpegVideoPlayer.cpp";
 //java.lang.UnsatisfiedLinkError: dlopen failed: cannot locate symbol "iconv_close" referenced by "/data/app/com.constantin.wilson.FPV_VR-mxC0B6_-lmepeN9MZfItsw==/lib/arm64/libavcodec.so"...
 
 static int g_shutdown_callback(void *d) {
-  return reinterpret_cast<FFMpegVideoPlayer*>(d)->shutdown_callback();
+  return reinterpret_cast<FFMpegVideoReceiver*>(d)->shutdown_callback();
 }
 
-FFMpegVideoPlayer::FFMpegVideoPlayer(std::string url, int cpu_priority,
+FFMpegVideoReceiver::FFMpegVideoReceiver(std::string url, int cpu_priority,
                                      NALU_DATA_CALLBACK callback, uint32_t bufsize) :
   m_url(url), m_cpu_priority(cpu_priority), m_bufsize(bufsize), m_shutdown(false),
   m_callback(callback) {
@@ -38,12 +38,12 @@ FFMpegVideoPlayer::FFMpegVideoPlayer(std::string url, int cpu_priority,
   avformat_network_init();
 }
 
-void FFMpegVideoPlayer::start_playing() {
+void FFMpegVideoReceiver::start_playing() {
   m_shutdown = false;
   m_thread.reset(new std::thread([this] { this->run(); }));
 }
 
-void FFMpegVideoPlayer::stop_playing() {
+void FFMpegVideoReceiver::stop_playing() {
   m_shutdown = true;
   if (m_thread) {
     m_thread->join();
@@ -51,7 +51,7 @@ void FFMpegVideoPlayer::stop_playing() {
   }
 }
 
-void FFMpegVideoPlayer::run() {
+void FFMpegVideoReceiver::run() {
   LOGV("FFMPeg playing: %s", m_url.c_str());
 
   // Add a callback that we can use to shutdown.
@@ -135,7 +135,7 @@ void FFMpegVideoPlayer::run() {
   avformat_close_input(&m_format_ctx);
 }
 
-int FFMpegVideoPlayer::shutdown_callback() {
+int FFMpegVideoReceiver::shutdown_callback() {
   if (m_shutdown) {
     LOGV("Shutting down");
     return 1;

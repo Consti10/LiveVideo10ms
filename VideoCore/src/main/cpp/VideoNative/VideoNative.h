@@ -12,7 +12,7 @@
 #include "../Parser/H264Parser.h"
 #include "../Helper/SettingsN.hpp"
 #include "../Helper/FileReader.hpp"
-#include "../Experiment360/FFMpegVideoPlayer.h"
+#include "../Experiment360/FFMpegVideoReceiver.h"
 
 class VideoNative{
 public:
@@ -46,7 +46,7 @@ public:
     GroundRecorder* mGroundRecorder= nullptr;
     long nNALUsAtLastCall=0;
 
-    FFMpegVideoPlayer* test=nullptr;
+    FFMpegVideoReceiver* test=nullptr;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

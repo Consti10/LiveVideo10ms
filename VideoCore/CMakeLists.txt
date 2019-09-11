@@ -37,11 +37,11 @@ set_target_properties( # Specifies the target library.
 include_directories(${FFMPEG_DIR}/include)
 
 #Webbn 360 stuff
-add_library( FFMpegVideoPlayer
+add_library( FFMpegVideoReceiver
         SHARED
-        src/main/cpp/Experiment360/FFMpegVideoPlayer.cpp
+        src/main/cpp/Experiment360/FFMpegVideoReceiver.cpp
         )
-target_link_libraries( FFMpegVideoPlayer
+target_link_libraries( FFMpegVideoReceiver
         ${log-lib}
         log
         android
@@ -71,7 +71,7 @@ add_library( VideoNative
         ${VIDEO_PATH}/VideoNative/VideoNative.cpp)
 
 target_link_libraries( VideoNative
-        FFMpegVideoPlayer
+        FFMpegVideoReceiver
         ${log-lib}
         log
         android

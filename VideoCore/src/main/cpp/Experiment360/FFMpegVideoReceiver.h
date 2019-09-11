@@ -16,9 +16,9 @@ extern "C" {
 #include <libavformat/avio.h>
 }
 
-class FFMpegVideoPlayer {
+class FFMpegVideoReceiver {
 public:
-  FFMpegVideoPlayer(std::string url, int cpu_priority,
+  FFMpegVideoReceiver(std::string url, int cpu_priority,
 		    NALU_DATA_CALLBACK callback, uint32_t bufsize = 1000000);
   void start_playing();
   void stop_playing();
