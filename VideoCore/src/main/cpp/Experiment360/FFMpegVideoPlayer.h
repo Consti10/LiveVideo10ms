@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <media/NdkMediaCodec.h>
+#include "../NALU/NALU.hpp"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -18,7 +19,7 @@ extern "C" {
 class FFMpegVideoPlayer {
 public:
   FFMpegVideoPlayer(std::string url, int cpu_priority,
-		    std::function<void(uint8_t[],int)> callback, uint32_t bufsize = 1000000);
+		    NALU_DATA_CALLBACK callback, uint32_t bufsize = 1000000);
   void start_playing();
   void stop_playing();
   int shutdown_callback();
@@ -40,7 +41,7 @@ private:
   AVPacket m_packet;
   AVFrame *m_frame;
 
-  std::function<void(uint8_t[],int)> m_callback;
+  const NALU_DATA_CALLBACK m_callback;
 };
 
 
