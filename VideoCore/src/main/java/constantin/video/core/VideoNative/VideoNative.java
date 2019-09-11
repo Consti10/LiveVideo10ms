@@ -46,10 +46,12 @@ public class VideoNative {
                                    int nNALU, int nNALUSFeeded);
     }
 
+
     public static final int VS_SOURCE_UDP=0;
     public static final int VS_SOURCE_FILE=1;
     public static final int VS_SOURCE_ASSETS =2;
-    public static final int VS_SOURCE_EXTERNAL=3;
+    public static final int VS_SOURCE_TEST360=3;
+    public static final int VS_SOURCE_EXTERNAL=4;
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);

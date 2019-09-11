@@ -10,6 +10,8 @@
     <string name="VS_SOURCE">VS_SOURCE</string>
     <string name="VS_PLAYBACK_FILENAME">VS_PLAYBACK_FILENAME</string>
     <string name="VS_ASSETS_FILENAME_TEST_ONLY">VS_ASSETS_FILENAME_TEST_ONLY</string>
-
+    //new (360)
+    <string name="VS_TEST360_URL">VS_TEST360_URL</string>
+    <string name="VS_VIDEO_VIEW_TYPE">VS_VIDEO_VIEW_TYPE</string>
 
 </resources>

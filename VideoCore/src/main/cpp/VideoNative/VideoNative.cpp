@@ -27,8 +27,6 @@ VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject contex
     //Store a global reference to it, so we can use it later
     //callToJava.globalJavaObj = env->NewGlobalRef(videoParamsChangedI); //also need a global javaObj
     callToJava.globalJavaObj = env->NewWeakGlobalRef(videoParamsChangedI);
-    //TODO: init as late as possible, settings
-    test=new FFMpegVideoReceiver("",0,std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1));
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
@@ -138,6 +136,13 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             //Data is being received somewhere else and passed trough-init nothing.
             LOGD("Started with SOURCE=EXTERNAL");
         }break;
+        case TEST360:{
+            LOGD("Started with SOURCE=TEST360");
+            const std::string url=mSettingsN.getString(IDV::VS_TEST360_URL);
+            LOGD("url:%s",url.c_str());
+            mFFMpegVideoReceiver=new FFMpegVideoReceiver(url,0,std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1));
+            mFFMpegVideoReceiver->start_playing();
+        }break;
     }
 }
 
@@ -151,6 +156,12 @@ void VideoNative::stopReceiver() {
         mFileReceiver->stopReading();
         delete(mFileReceiver);
         mFileReceiver= nullptr;
+    }
+    if(mFFMpegVideoReceiver!= nullptr){
+        mFFMpegVideoReceiver->shutdown_callback();
+        mFFMpegVideoReceiver->stop_playing();
+        delete(mFFMpegVideoReceiver);
+        mFFMpegVideoReceiver=nullptr;
     }
 }
 

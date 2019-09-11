@@ -29,7 +29,7 @@ private:
     }callToJava;
     ANativeWindow* window=nullptr;
     SettingsN mSettingsN;
-    enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,EXTERNAL};
+    enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,TEST360,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
 public:
     void onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const bool limitFPS);
@@ -46,7 +46,7 @@ public:
     GroundRecorder* mGroundRecorder= nullptr;
     long nNALUsAtLastCall=0;
 
-    FFMpegVideoReceiver* test=nullptr;
+    FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

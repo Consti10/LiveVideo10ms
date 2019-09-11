@@ -11,6 +11,7 @@ public:
     static constexpr const char* VS_SOURCE="VS_SOURCE";
     static constexpr const char* VS_PLAYBACK_FILENAME="VS_PLAYBACK_FILENAME";
     static constexpr const char* VS_ASSETS_FILENAME_TEST_ONLY="VS_ASSETS_FILENAME_TEST_ONLY";
+    static constexpr const char* VS_TEST360_URL="VS_TEST360_URL";
 };
 
 #endif //CONSTI_10_100_IDV

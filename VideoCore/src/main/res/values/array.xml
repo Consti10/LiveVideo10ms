@@ -15,6 +15,7 @@
         <item>UDP</item>
         <item>FILE</item>
         <item>ASSETS</item>
+        <item>TEST360</item>
         <item>EXTERNAL</item>
     </string-array>
 
@@ -23,6 +24,20 @@
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    //
+    <string-array name="entriesVS_VIDEO_VIEW_TYPE" >
+        <item>MONO</item>
+        <item>STEREO</item>
+        <item>360</item>
+    </string-array>
+
+    <string-array name="valuesVS_VIDEO_VIEW_TYPE" >
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 
 </resources>

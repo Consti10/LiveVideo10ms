@@ -21,7 +21,6 @@
 
     </PreferenceCategory>
 
-
     <PreferenceCategory
         android:title="Feature: Ground recording">
         <SwitchPreference
@@ -49,6 +48,24 @@
             android:title="@string/VS_ASSETS_FILENAME_TEST_ONLY"
             android:defaultValue="testVideo.h264"
             android:enabled="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="New" >
+        <EditTextPreference
+            android:key="@string/VS_TEST360_URL"
+            android:title="@string/VS_TEST360_URL"
+            android:defaultValue="tcp://*server*:*port*"
+            android:enabled="true"/>
+
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/VS_VIDEO_VIEW_TYPE"
+            android:title="@string/VS_VIDEO_VIEW_TYPE"
+            android:entries="@array/entriesVS_VIDEO_VIEW_TYPE"
+            android:entryValues="@array/valuesVS_VIDEO_VIEW_TYPE"
+            android:defaultValue="0"
+            android:enabled="true"/>
+
     </PreferenceCategory>
 
 
