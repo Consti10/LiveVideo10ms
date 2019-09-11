@@ -27,7 +27,7 @@ VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject contex
     //Store a global reference to it, so we can use it later
     //callToJava.globalJavaObj = env->NewGlobalRef(videoParamsChangedI); //also need a global javaObj
     callToJava.globalJavaObj = env->NewWeakGlobalRef(videoParamsChangedI);
-    
+    //TODO: init as late as possible, settings
     test=new FFMpegVideoReceiver("",0,std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1));
 }
 
