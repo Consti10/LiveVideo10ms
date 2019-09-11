@@ -3,7 +3,43 @@ cmake_minimum_required(VERSION 3.6)
 find_library( log-lib
               log )
 
+#########################################################
+########## Import ffmpeg as apre-built library ##########
+#########################################################
+set(FFMPEG_DIR ${CMAKE_SOURCE_DIR}/libs/ffmpeg)
+add_library( avcodec-lib
+        SHARED
+        IMPORTED )
+add_library( avformat-lib
+        SHARED
+        IMPORTED )
+add_library( avutil-lib
+        SHARED
+        IMPORTED )
+set_target_properties( # Specifies the target library.
+        avcodec-lib
+        # Specifies the parameter you want to define.
+        PROPERTIES IMPORTED_LOCATION
+        # Provides the path to the library you want to import.
+        ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libavcodec.so)
+set_target_properties( # Specifies the target library.
+        avformat-lib
+        # Specifies the parameter you want to define.
+        PROPERTIES IMPORTED_LOCATION
+        # Provides the path to the library you want to import.
+        ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libavformat.so)
+set_target_properties( # Specifies the target library.
+        avutil-lib
+        # Specifies the parameter you want to define.
+        PROPERTIES IMPORTED_LOCATION
+        # Provides the path to the library you want to import.
+        ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libavutil.so)
+include_directories(${FFMPEG_DIR}/include)
 
+
+#######################################################
+########## Build the VideoCore native libary ##########
+#######################################################
 include_directories(src/main/cpp/Video)
 include_directories(src/main/cpp/General)
 set(VIDEO_PATH src/main/cpp)

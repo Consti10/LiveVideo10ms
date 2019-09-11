@@ -32,6 +32,11 @@ android {
             path file('CMakeLists.txt')
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs/ffmpeg/lib']
+        }
+    }
 }
 
 dependencies {
