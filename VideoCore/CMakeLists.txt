@@ -71,8 +71,9 @@ add_library( VideoNative
         ${VIDEO_PATH}/VideoNative/VideoNative.cpp)
 
 target_link_libraries( VideoNative
-                       ${log-lib}
-                       log
-                       android
-                       mediandk
-                       OpenMAXAL )
+        FFMpegVideoPlayer
+        ${log-lib}
+        log
+        android
+        mediandk
+        OpenMAXAL )
