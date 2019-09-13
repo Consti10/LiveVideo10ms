@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final List<String> missingPermission = new ArrayList<>();
     private static final int REQUEST_PERMISSION_CODE = 12345;
 
-    public static final String[] ASSETS_TEST_VIDEO_FILE_NAMES ={"testVideo.h264","rpi.h264","Recording_360.h264","o2.h264"};
+    public static final String[] ASSETS_TEST_VIDEO_FILE_NAMES ={"testVideo.h264","rpi.h264","Recording_360_short.h264","o2.h264"};
 
 
 
