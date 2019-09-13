@@ -12,11 +12,15 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,6 +45,7 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
     private int VS_SOURCE;
     private String VS_ASSETS_FILENAME_TEST_ONLY="";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,14 +55,6 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
         SurfaceView mSurfaceView = findViewById(R.id.sv_video);
         mSurfaceView.getHolder().addCallback(this);
         mAspectFrameLayout =  findViewById(R.id.afl_video);
-        //
-        //Trace myTrace = FirebasePerformance.getInstance().newTrace("test_trace");
-        //myTrace.start();
-        //myTrace.putAttribute("my_attribute",""+System.currentTimeMillis());
-        //myTrace.putMetric("my_metric",System.currentTimeMillis());
-// code that you want to trace
-        //myTrace.stop();
-
     }
 
     @Override
@@ -106,20 +103,19 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
             dataMap.put(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),VS_SOURCE==VideoNative.VS_SOURCE_ASSETS ?
                     VS_ASSETS_FILENAME_TEST_ONLY : "Unknown");
             dataMap.putAll(mDecodingInfo.toMap());
-            db.collection("Decoding info").document(getDeviceName()).collection(getBuildVersionRelease()).add(dataMap)
-            //db.collection("Decoding info").add(dataMap)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error adding document", e);
-                        }
-                    });
+            WriteBatch writeBatch=db.batch();
+            final DocumentReference thisDeviceReference = db.collection("Decoding info").document(getDeviceName());
+            final Map<String,Object> dummyMap=new ArrayMap<>();
+            dummyMap.put(getBuildVersionRelease(),1);
+            writeBatch.set(thisDeviceReference,dummyMap);
+            final DocumentReference thisDeviceOsNewTestData=thisDeviceReference.collection(getBuildVersionRelease()).document();
+            writeBatch.set(thisDeviceOsNewTestData,dataMap);
+            writeBatch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "WriteBatch added DocumentSnapshot with id: " + thisDeviceOsNewTestData.getId());
+                }
+            });
         }
     }
 
