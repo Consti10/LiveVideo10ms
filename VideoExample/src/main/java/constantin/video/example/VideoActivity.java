@@ -2,29 +2,20 @@ package constantin.video.example;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import constantin.video.core.DecodingInfo;
@@ -94,21 +85,21 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
             final Map<String,Object> dataMap=new ArrayMap<>();
             //dataMap.put("Build_MODEL",Build.MODEL);
             //dataMap.put("Build_VERSION_SDK_INT", Build.VERSION.SDK_INT);
-            dataMap.put("DATE",getDate());
-            dataMap.put("TIME",getTime());
-            dataMap.put("EMULATOR",isEmulator());
-            System.out.println(getDeviceName());
+            dataMap.put("DATE", Helper.getDate());
+            dataMap.put("TIME", Helper.getTime());
+            dataMap.put("EMULATOR", Helper.isEmulator());
+            System.out.println(Helper.getDeviceName());
             //Add all the settings to differentiate which video was decoded
             dataMap.put(getString(R.string.VS_SOURCE),VS_SOURCE);
             dataMap.put(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),VS_SOURCE==VideoNative.VS_SOURCE_ASSETS ?
                     VS_ASSETS_FILENAME_TEST_ONLY : "Unknown");
             dataMap.putAll(mDecodingInfo.toMap());
             WriteBatch writeBatch=db.batch();
-            final DocumentReference thisDeviceReference = db.collection("Decoding info").document(getDeviceName());
+            final DocumentReference thisDeviceReference = db.collection("Decoding info").document(Helper.getDeviceName());
             final Map<String,Object> dummyMap=new ArrayMap<>();
-            dummyMap.put(getBuildVersionRelease(),1);
-            writeBatch.set(thisDeviceReference,dummyMap);
-            final DocumentReference thisDeviceOsNewTestData=thisDeviceReference.collection(getBuildVersionRelease()).document();
+            dummyMap.put(Helper.getBuildVersionRelease(),1);
+            writeBatch.set(thisDeviceReference,dummyMap,SetOptions.merge());
+            final DocumentReference thisDeviceOsNewTestData=thisDeviceReference.collection(Helper.getBuildVersionRelease()).document();
             writeBatch.set(thisDeviceOsNewTestData,dataMap);
             writeBatch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
@@ -130,56 +121,6 @@ public class VideoActivity extends AppCompatActivity implements SurfaceHolder.Ca
 
     public final DecodingInfo getDecodingInfo(){
         return mDecodingInfo;
-    }
-
-    private static String getDate(){
-        SimpleDateFormat formatter= new SimpleDateFormat("dd.MM.yyyy");
-        Date date = new Date(System.currentTimeMillis());
-        return formatter.format(date);
-    }
-    private static String getTime(){
-        SimpleDateFormat formatter= new SimpleDateFormat("HH:mm:ss");
-        Date date = new Date(System.currentTimeMillis());
-        return formatter.format(date);
-    }
-    public static boolean isEmulator() {
-        return Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                || Build.MANUFACTURER.contains("Genymotion")
-                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
-                || "google_sdk".equals(Build.PRODUCT);
-    }
-    public static String getDeviceName() {
-        String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL;
-        String ret;
-        if (model.toLowerCase().startsWith(manufacturer.toLowerCase())) {
-            ret=capitalize(model);
-        } else {
-            ret=capitalize(manufacturer) + " " + model;
-        }
-        if(ret.length()>0){
-            return ret;
-        }
-        return "Unknown";
-    }
-    private static String capitalize(String s) {
-        if (s == null || s.length() == 0) {
-            return "";
-        }
-        char first = s.charAt(0);
-        if (Character.isUpperCase(first)) {
-            return s;
-        } else {
-            return Character.toUpperCase(first) + s.substring(1);
-        }
-    }
-    public static String getBuildVersionRelease(){
-        final String ret=Build.VERSION.RELEASE;
-        return ret==null ? "Unknown" : ret;
     }
 
 }

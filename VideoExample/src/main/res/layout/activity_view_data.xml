@@ -23,7 +23,10 @@
             android:layout_weight="1"
             android:text="OS:XX" />
     </LinearLayout>
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/background_light"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,8 +43,18 @@
             android:layout_weight="1" />
     </LinearLayout>
 
-
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@android:color/background_light"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorPrimary"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@android:color/background_light"/>
 
     <TableLayout
         android:id="@+id/table_layout_results"

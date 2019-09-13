@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -50,8 +49,8 @@ public class ViewDataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_data);
         context=this;
         //textView=findViewById(R.id.textView2);
-        final String device=VideoActivity.getDeviceName();
-        final String os=VideoActivity.getBuildVersionRelease();
+        final String device= Helper.getDeviceName();
+        final String os= Helper.getBuildVersionRelease();
         ((TextView)findViewById(R.id.textViewDevice)).setText("Device:"+device);
         ((TextView)findViewById(R.id.textViewOS)).setText("OS:"+os);
         spinnerDeviceNames=findViewById(R.id.spinner_device);
@@ -101,7 +100,7 @@ public class ViewDataActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
-        final String thisDeviceName=VideoActivity.getDeviceName();
+        final String thisDeviceName= Helper.getDeviceName();
         if(deviceNames.indexOf(thisDeviceName)>=0){
             System.out.println("Yor device exists in the database");
             spinnerDeviceNames.setSelection(deviceNames.indexOf(thisDeviceName));
@@ -129,7 +128,7 @@ public class ViewDataActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
         //spinnerOSVersions.setSelection(0,false);
-        final String thisOS=VideoActivity.getBuildVersionRelease();
+        final String thisOS= Helper.getBuildVersionRelease();
         if(osVersionsForThisDevice.indexOf(thisOS)>=0){
             System.out.println("Your OS version exists in the database");
             spinnerDeviceNames.setSelection(deviceNames.indexOf(thisOS));
