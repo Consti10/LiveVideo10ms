@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DecimalFormat;
@@ -148,14 +149,16 @@ public class ViewDataActivity extends AppCompatActivity {
             //Query data for all possible test files
             updateValuesInsideTextViews(selectedDevice,selectedOS,"rpi.h264",tvDataRpiCam);
             updateValuesInsideTextViews(selectedDevice,selectedOS,"testVideo.h264",tvDataX264);
-            updateValuesInsideTextViews(selectedDevice,selectedOS,"Recording_360.h264",tvDataInsta360);
+            updateValuesInsideTextViews(selectedDevice,selectedOS,"Recording_360_short.h264",tvDataInsta360);
         }
     }
 
     @SuppressLint("SetTextI18n")
     private void updateValuesInsideTextViews(final String selectedDevice,final String selectedOS,final String testFileName,final TextView tvData){
         db.collection("Decoding info").document(selectedDevice).collection(selectedOS).
-                whereEqualTo("VS_ASSETS_FILENAME_TEST_ONLY",testFileName).limit(1).get()
+                whereEqualTo("VS_ASSETS_FILENAME_TEST_ONLY",testFileName).
+                //orderBy("nNALUSFeeded", Query.Direction.ASCENDING).
+                limit(1).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
