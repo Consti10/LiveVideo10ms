@@ -82,6 +82,8 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
             else
                 "Unknown")!!,mDecodingInfo!!);
             val writeBatch = db.batch()
+            //val allCombinationsReference=db.collection(DECODING_INFO).document("ALL_DEVICE_OS_COMBINATIONS")
+            //writeBatch.set(allCombinationsReference,"",FieldValue.arrayUnion(Helper.getBuildVersionRelease()),SetOptions.merge())
             val thisDeviceReference = db.collection(DECODING_INFO).document(Helper.getManufacturerAndDeviceName())
             val dummyMap = ArrayMap<String, Any>()
             //dummyMap["OsVersions."+Helper.getBuildVersionRelease().replace(".","_")] = null

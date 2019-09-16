@@ -24,6 +24,11 @@ import com.jaredrummler.android.device.DeviceName
 
 import java.text.DecimalFormat
 import java.util.ArrayList
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 
 @SuppressLint("SetTextI18n")
@@ -32,6 +37,8 @@ class ViewDataActivity : AppCompatActivity() {
     //They become valid once the firebase request finished
     //private val deviceNames = ArrayList<Pair<String,String>>()
     private val deviceNames = ArrayList<String>()
+    private val deviceNamesSimple=ArrayList<String>();
+
     private val osVersions = ArrayList<List<String>>()
 
     private var spinnerDeviceNames: Spinner? = null
@@ -75,7 +82,8 @@ class ViewDataActivity : AppCompatActivity() {
                     //DeviceName.getDeviceName(Build.DEVICE!,)
                     //val deviceName = Pair(doc.id,doc.id)
                     //System.out.println(""+DeviceName.getDeviceName("","","""))
-                    //DeviceName.getDeviceName()
+                    val simpleDeviceName=DeviceName.getDeviceName(doc.getString(ID_BUILD_DEVICE),doc.getString(ID_BUILD_MODEL),doc.id)
+                    deviceNamesSimple.add(simpleDeviceName)
                     deviceNames.add(doc.id)
                     val osVersionsForThisDevice : List<String> = doc.data!!.get(ID_OS_VERSIONS) as List<String>
                     osVersions.add(osVersionsForThisDevice)
@@ -92,7 +100,7 @@ class ViewDataActivity : AppCompatActivity() {
 
     private fun setupSpinner() {
         //The spinner with the device names does not change
-        val adapter1 = ArrayAdapter(context!!, android.R.layout.simple_spinner_item, deviceNames)
+        val adapter1 = ArrayAdapter(context!!, android.R.layout.simple_spinner_item, deviceNamesSimple)
         spinnerDeviceNames!!.adapter = adapter1
         spinnerDeviceNames!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -153,6 +161,7 @@ class ViewDataActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateValuesInsideTextViews(selectedDevice: String, selectedOS: String, testFileName: String, tvData: TextView?) {
+        //db.collection("").whereEqualTo("",0).whereEqualTo("",1).
         db.collection(DECODING_INFO).document(selectedDevice).collection(selectedOS).
                 whereEqualTo("vs_assets_filename", testFileName).
                 limit(1).get()
