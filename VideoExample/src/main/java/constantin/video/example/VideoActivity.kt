@@ -77,7 +77,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     private fun writeTestResult() {
         if (mDecodingInfo != null && mDecodingInfo!!.nNALUSFeeded > 0) {
             val db = FirebaseFirestore.getInstance()
-            val mTestResult=TestResultDecodingInfoConstructor.create(VS_SOURCE,(if (VS_SOURCE == VideoNative.VS_SOURCE_ASSETS)
+            val mTestResult=TestResultDecodingInfoConstructor.create(VS_SOURCE,(if (VS_SOURCE == VideoNative.VS_SOURCE.ASSETS.ordinal)
                 VS_ASSETS_FILENAME_TEST_ONLY
             else
                 "Unknown")!!,mDecodingInfo!!);

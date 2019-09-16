@@ -52,12 +52,26 @@ public class VideoNative {
     public static final int VS_SOURCE_ASSETS =2;
     public static final int VS_SOURCE_FFMPEG_URL=3;
     public static final int VS_SOURCE_EXTERNAL=4;
+    public enum VS_SOURCE{UDP,FILE,ASSETS,FFMPEG,EXTERNAL}
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         final String filename=sharedPreferences.getString(context.getString(R.string.VS_PLAYBACK_FILENAME),"");
         File tempFile = new File(filename);
         return tempFile.exists();
+    }
+
+    public static VS_SOURCE getVS_SOURCE(final Context context){
+        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
+        final int val=sharedPreferences.getInt(context.getString(R.string.VS_SOURCE),0);
+        VS_SOURCE ret=VS_SOURCE.values()[val];
+        sharedPreferences.getInt(context.getString(R.string.VS_SOURCE),0);
+        return ret;
+    }
+
+    public static void setVS_SOURCE(final Context context,final VS_SOURCE val){
+        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
+        sharedPreferences.edit().putInt(context.getString(R.string.VS_SOURCE),val.ordinal()).commit();
     }
 
     private static String getDirectory(){
