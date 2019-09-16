@@ -25,9 +25,9 @@ static int g_shutdown_callback(void *d) {
 }
 
 FFMpegVideoReceiver::FFMpegVideoReceiver(std::string url, int cpu_priority,
-                                     NALU_DATA_CALLBACK callback, uint32_t bufsize) :
+                                         std::function<void(uint8_t[],int)> callback, uint32_t bufsize) :
   m_url(url), m_cpu_priority(cpu_priority), m_bufsize(bufsize), m_shutdown(false),
-  m_callback(callback) {
+  raw_h264_data_callback(callback) {
 
   // Allocate the packet
   av_init_packet(&m_packet);
@@ -118,8 +118,9 @@ void FFMpegVideoReceiver::run() {
     }
     if (m_packet.stream_index == m_video_stream) {
       LOGV("Read packet: %d", m_packet.size);
-      NALU nalu(m_packet.data, m_packet.size);
-      m_callback(nalu);
+      //NALU nalu(m_packet.data, m_packet.size);
+      //m_callback(nalu);
+      raw_h264_data_callback(m_packet.data,m_packet.size);
       //m_callback(m_packet.data, m_packet.size);
     }
   }

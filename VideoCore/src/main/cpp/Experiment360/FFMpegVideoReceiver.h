@@ -19,7 +19,7 @@ extern "C" {
 class FFMpegVideoReceiver {
 public:
   FFMpegVideoReceiver(std::string url, int cpu_priority,
-		    NALU_DATA_CALLBACK callback, uint32_t bufsize = 1000000);
+					  std::function<void(uint8_t[],int)> callback, uint32_t bufsize = 1000000);
   void start_playing();
   void stop_playing();
   int shutdown_callback();
@@ -41,7 +41,7 @@ private:
   AVPacket m_packet;
   AVFrame *m_frame;
 
-  const NALU_DATA_CALLBACK m_callback;
+  const std::function<void(uint8_t[],int)> raw_h264_data_callback;
 };
 
 
