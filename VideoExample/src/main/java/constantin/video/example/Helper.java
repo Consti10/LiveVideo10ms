@@ -30,7 +30,7 @@ public class Helper {
                 || "google_sdk".equals(Build.PRODUCT);
     }
 
-    public static String getDeviceName() {
+    public static String getManufacturerAndDeviceName() {
         String manufacturer = Build.MANUFACTURER;
         String model = Build.MODEL;
         String ret;

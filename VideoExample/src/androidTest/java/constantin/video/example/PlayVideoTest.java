@@ -10,6 +10,8 @@ import androidx.test.rule.GrantPermissionRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.annotation.Nullable;
+
 import constantin.video.core.DecodingInfo;
 
 @LargeTest
@@ -30,14 +32,15 @@ public class PlayVideoTest {
         Intent i = new Intent();
         mVideoActivityTestRule.launchActivity(i);
         try { Thread.sleep(WAIT_TIME_LONG); } catch (InterruptedException e) { e.printStackTrace(); }
-        final DecodingInfo info= mVideoActivityTestRule.getActivity().getDecodingInfo();
+        final DecodingInfo info= mVideoActivityTestRule.getActivity().getMDecodingInfo();
         validateDecodingInfo(info);
         mVideoActivityTestRule.finishActivity();
     }
 
 
 
-    private static void validateDecodingInfo(final DecodingInfo info){
+    private static void validateDecodingInfo(final @Nullable DecodingInfo info){
+        assert info!=null : "info!=null";
         assert info.nNALU<=0 : "nNalu<=0";
         assert info.nNALUSFeeded<=0 : "nNaluFeeded<=0";
         assert info.currentFPS<=10 : "info.currentFPS<=10";

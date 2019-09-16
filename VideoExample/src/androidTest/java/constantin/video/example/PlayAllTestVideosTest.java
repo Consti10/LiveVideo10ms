@@ -14,10 +14,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.annotation.Nullable;
+
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.VideoNative.VideoNative;
 
-import static constantin.video.example.MainActivity.ASSETS_TEST_VIDEO_FILE_NAMES;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -48,19 +49,20 @@ public class PlayAllTestVideosTest {
     private void selectVideoFilename(final int selectedFile){
         final Context context=mActivityTestRule.getActivity();
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(context.getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),ASSETS_TEST_VIDEO_FILE_NAMES[selectedFile]).commit();
+        sharedPreferences.edit().putString(context.getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), MainActivity.Companion.getASSETS_TEST_VIDEO_FILE_NAMES()[selectedFile]).commit();
     }
 
     private void testPlayVideo(){
         Intent i = new Intent();
         mVideoActivityTestRule.launchActivity(i);
         try { Thread.sleep(WAIT_TIME_LONG); } catch (InterruptedException e) { e.printStackTrace(); }
-        final DecodingInfo info= mVideoActivityTestRule.getActivity().getDecodingInfo();
+        final DecodingInfo info= mVideoActivityTestRule.getActivity().getMDecodingInfo();
         validateDecodingInfo(info);
         mVideoActivityTestRule.finishActivity();
     }
 
-    private static void validateDecodingInfo(final DecodingInfo info){
+    private static void validateDecodingInfo(final @Nullable DecodingInfo info){
+        assert info!=null : "info!=null";
         assert info.nNALU<=0 : "nNalu<=0";
         assert info.nNALUSFeeded<=0 : "nNaluFeeded<=0";
         assert info.currentFPS<=10 : "info.currentFPS<=10";
