@@ -53,8 +53,8 @@
     <PreferenceCategory
         android:title="New" >
         <EditTextPreference
-            android:key="@string/VS_TEST360_URL"
-            android:title="@string/VS_TEST360_URL"
+            android:key="@string/VS_FFMPEG_URL"
+            android:title="@string/VS_FFMPEG_URL"
             android:defaultValue="tcp://*server*:*port*"
             android:enabled="true"/>
 

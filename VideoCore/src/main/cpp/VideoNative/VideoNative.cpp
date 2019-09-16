@@ -132,20 +132,21 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             },1024);
             mFileReceiver->startReading();
         }break;
-        case EXTERNAL:{
-            //Data is being received somewhere else and passed trough-init nothing.
-            LOGD("Started with SOURCE=EXTERNAL");
-        }break;
-        case TEST360:{
+        case VIA_FFMPEG_URL:{
             LOGD("Started with SOURCE=TEST360");
-            //const std::string url=mSettingsN.getString(IDV::VS_TEST360_URL);
-            const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/Video/13-09-2019 20-13.h264";
+            const std::string url=mSettingsN.getString(IDV::VS_TEST360_URL);
+            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/Video/13-09-2019 20-13.h264";
             LOGD("url:%s",url.c_str());
             mFFMpegVideoReceiver=new FFMpegVideoReceiver(url,0,[this](uint8_t* data,int data_length) {
                 onNewVideoData(data,data_length,false,false);
             });
             mFFMpegVideoReceiver->start_playing();
         }break;
+        case EXTERNAL:{
+            //Data is being received somewhere else and passed trough-init nothing.
+            LOGD("Started with SOURCE=EXTERNAL");
+        }break;
+
     }
 }
 

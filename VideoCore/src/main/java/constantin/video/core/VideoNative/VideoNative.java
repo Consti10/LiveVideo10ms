@@ -50,7 +50,7 @@ public class VideoNative {
     public static final int VS_SOURCE_UDP=0;
     public static final int VS_SOURCE_FILE=1;
     public static final int VS_SOURCE_ASSETS =2;
-    public static final int VS_SOURCE_TEST360=3;
+    public static final int VS_SOURCE_FFMPEG_URL=3;
     public static final int VS_SOURCE_EXTERNAL=4;
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){

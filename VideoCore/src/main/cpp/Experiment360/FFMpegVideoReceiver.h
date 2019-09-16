@@ -36,7 +36,7 @@ private:
 
   AVCodec *m_codec;
   AVCodecContext  *m_codec_ctx;
-  AVCodecParserContext *m_parser;
+  AVCodecParserContext *m_pCodecPaser;
   AVFormatContext *m_format_ctx;
   AVPacket m_packet;
   AVFrame *m_frame;

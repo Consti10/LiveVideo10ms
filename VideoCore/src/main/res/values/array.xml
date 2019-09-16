@@ -15,7 +15,7 @@
         <item>UDP</item>
         <item>FILE</item>
         <item>ASSETS</item>
-        <item>TEST360</item>
+        <item>VIA_FFMPEG_URL</item>
         <item>EXTERNAL</item>
     </string-array>
 
