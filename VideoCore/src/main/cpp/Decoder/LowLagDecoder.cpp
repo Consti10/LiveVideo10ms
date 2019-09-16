@@ -31,7 +31,7 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(std::function<void(Low
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-    LOGD("::interpretNALU %d",nalu.data_length);
+    //LOGD("::interpretNALU %d",nalu.data_length);
     //we need this lock, since the receiving/parsing/feeding runs on its own thread, relative to the thread that creates / deletes the decoder
     std::lock_guard<std::mutex> lock(mMutex);
     decodingInfo.nNALU++;
