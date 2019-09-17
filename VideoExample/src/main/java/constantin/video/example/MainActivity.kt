@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             startActivity(intent)
         }
         findViewById<View>(R.id.b_startTethering).setOnClickListener { IsConnected.openUSBTetherSettings(context) }
-        findViewById<View>(R.id.b_startViewDatabase).setOnClickListener { startActivity(Intent().setClass(context, ViewDataActivity::class.java)) }
+        findViewById<View>(R.id.b_startViewDatabase).setOnClickListener { startActivity(Intent().setClass(context, ViewBenchmarkDataActivity::class.java)) }
     }
 
     override fun onResume() {
@@ -110,7 +109,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         private val REQUIRED_PERMISSION_LIST = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
         private val REQUEST_PERMISSION_CODE = 12345
-
+//Recording_360_short
         val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("testVideo.h264", "rpi.h264", "Recording_360_short.h264", "o2.h264")
     }
 }

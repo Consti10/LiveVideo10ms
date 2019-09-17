@@ -32,7 +32,7 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
 @SuppressLint("SetTextI18n")
-class ViewDataActivity : AppCompatActivity() {
+class ViewBenchmarkDataActivity : AppCompatActivity() {
     private val TAG = this::class.java.simpleName
     //They become valid once the firebase request finished
     //private val deviceNames = ArrayList<Pair<String,String>>()
