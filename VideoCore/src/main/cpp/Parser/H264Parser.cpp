@@ -47,7 +47,7 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
     if(limitFPS){
         const auto now=steady_clock::now();
         const auto deltaSinceLastFrame=now-lastFrameLimitFPS;
-        const int64_t waitTimeMS=12-duration_cast<milliseconds>(deltaSinceLastFrame).count();
+        const int64_t waitTimeMS=16-duration_cast<milliseconds>(deltaSinceLastFrame).count();
         lastFrameLimitFPS=now;
         if(waitTimeMS>0){
             try{
