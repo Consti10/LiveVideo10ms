@@ -51,13 +51,18 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="New" >
+        android:title="Valid when Source==FFMPEG" >
         <EditTextPreference
             android:key="@string/VS_FFMPEG_URL"
             android:title="@string/VS_FFMPEG_URL"
             android:defaultValue="tcp://*server*:*port*"
             android:enabled="true"/>
+    </PreferenceCategory>
 
+
+    <!--Decoding 360 video is the same as any other video, but fpv-vr handles the content depending on the video stream type-->
+    <PreferenceCategory
+        android:title="Other" >
         <com.mapzen.prefsplus.IntListPreference
             android:key="@string/VS_VIDEO_VIEW_TYPE"
             android:title="@string/VS_VIDEO_VIEW_TYPE"
@@ -65,6 +70,12 @@
             android:entryValues="@array/valuesVS_VIDEO_VIEW_TYPE"
             android:defaultValue="0"
             android:enabled="true"/>
+
+        <com.mapzen.prefsplus.EditFloatPreference
+            android:key="@string/VS_360_VIDEO_FOV"
+            android:title="@string/VS_360_VIDEO_FOV"
+            android:summary="FOV of 360° video"
+            android:defaultValue="50"/>
 
     </PreferenceCategory>
 

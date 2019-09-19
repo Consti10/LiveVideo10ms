@@ -13,5 +13,6 @@
     //new (360)
     <string name="VS_FFMPEG_URL">VS_FFMPEG_URL</string>
     <string name="VS_VIDEO_VIEW_TYPE">VS_VIDEO_VIEW_TYPE</string>
+    <string name="VS_360_VIDEO_FOV">VS_360_VIDEO_FOV</string>
 
 </resources>

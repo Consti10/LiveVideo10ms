@@ -146,7 +146,6 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             //Data is being received somewhere else and passed trough-init nothing.
             LOGD("Started with SOURCE=EXTERNAL");
         }break;
-
     }
 }
 
