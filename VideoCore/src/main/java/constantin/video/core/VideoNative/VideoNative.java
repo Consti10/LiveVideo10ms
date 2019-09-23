@@ -78,6 +78,11 @@ public class VideoNative {
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/";
     }
 
+    public static boolean video360(final Context c){
+        final SharedPreferences pref_video=c.getSharedPreferences("pref_video",MODE_PRIVATE);
+        return pref_video.getInt(c.getString(R.string.VS_VIDEO_VIEW_TYPE),0)==2;
+    }
+
     @SuppressLint("ApplySharedPref")
     public static void initializePreferences(final Context context,final boolean readAgain){
         PreferenceManager.setDefaultValues(context,"pref_video",MODE_PRIVATE,R.xml.pref_video,readAgain);
