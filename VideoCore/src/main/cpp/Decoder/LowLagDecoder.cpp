@@ -83,6 +83,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoW);
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoH);
 
+
     AMediaFormat_setBuffer(decoder.format,"csd-0",&CSDO,(size_t)CSD0Length);
     AMediaFormat_setBuffer(decoder.format,"csd-1",&CSD1,(size_t)CSD1Length);
 

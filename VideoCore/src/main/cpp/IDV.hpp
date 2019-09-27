@@ -11,7 +11,9 @@ public:
     static constexpr const char* VS_SOURCE="VS_SOURCE";
     static constexpr const char* VS_PLAYBACK_FILENAME="VS_PLAYBACK_FILENAME";
     static constexpr const char* VS_ASSETS_FILENAME_TEST_ONLY="VS_ASSETS_FILENAME_TEST_ONLY";
-    static constexpr const char* VS_TEST360_URL="VS_TEST360_URL";
+    static constexpr const char* VS_FFMPEG_URL="VS_FFMPEG_URL";
+    static constexpr const char* VS_VIDEO_VIEW_TYPE="VS_VIDEO_VIEW_TYPE";
+    static constexpr const char* VS_360_VIDEO_FOV="VS_360_VIDEO_FOV";
 };
 
 #endif //CONSTI_10_100_IDV
