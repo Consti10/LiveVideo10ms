@@ -61,6 +61,7 @@ public class VideoPlayer implements VideoNative.NativeInterfaceVideoParamsChange
         if(videoParamsChanged!=null){
             videoParamsChanged.onVideoRatioChanged(videoW,videoH);
         }
+        //System.out.println("Video W and H"+videoW+","+videoH);
     }
 
     @Override
