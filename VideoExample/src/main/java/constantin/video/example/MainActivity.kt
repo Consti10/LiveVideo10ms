@@ -109,7 +109,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         private val REQUIRED_PERMISSION_LIST = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
         private val REQUEST_PERMISSION_CODE = 12345
-//Recording_360_short
-        val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("testVideo.h264", "rpi.h264", "Recording_360_short.h264", "o2.h264")
+        val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("testVideo.h264", "rpi.h264", "Recording_360_short.h264","360_test.h264","o2.h264")
     }
 }

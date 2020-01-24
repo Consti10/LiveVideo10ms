@@ -7,6 +7,10 @@ import android.util.ArrayMap
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import android.widget.ToggleButton
 
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FieldValue
@@ -30,6 +34,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     private var context: Context? = null
     private var mAspectFrameLayout: AspectFrameLayout? = null
     private var mVideoPlayer: VideoPlayer? = null
+    private var mTextViewStatistics : TextView?=null;
 
     var mDecodingInfo: DecodingInfo? = null
         private set
@@ -47,6 +52,18 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         val mSurfaceView = findViewById<SurfaceView>(R.id.sv_video)
         mSurfaceView.holder.addCallback(this)
         mAspectFrameLayout = findViewById(R.id.afl_video)
+        mTextViewStatistics=findViewById(R.id.tv_decoding_stats)
+        //Find the toggle button. If user taps on it, the toggle button itself
+        //is disabled and the view showing decoding stats is enabled
+        val toggleButton=findViewById<Button>(R.id.tb_show_decoding_info);
+        toggleButton.setOnClickListener{
+            mTextViewStatistics!!.visibility= View.VISIBLE;
+            toggleButton.visibility=View.INVISIBLE;
+        }
+        mTextViewStatistics!!.setOnClickListener{
+            mTextViewStatistics!!.visibility= View.INVISIBLE;
+            toggleButton.visibility=View.VISIBLE;
+        }
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -102,6 +119,9 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     }
 
     override fun onDecodingInfoChanged(decodingInfo: DecodingInfo) {
+        runOnUiThread(java.lang.Runnable {
+            mTextViewStatistics!!.setText(decodingInfo.toString(true))
+        })
         mDecodingInfo = decodingInfo
         if (System.currentTimeMillis() - lastLogMS > 5 * 1000) {
             Log.d(TAG,mDecodingInfo!!.toString());

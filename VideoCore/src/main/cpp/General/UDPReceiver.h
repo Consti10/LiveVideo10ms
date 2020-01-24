@@ -11,10 +11,10 @@
 #include <thread>
 #include <atomic>
 
-typedef std::function<void(uint8_t[],int)> DATA_CALLBACK;
-typedef std::function<void(const char*)> SOURCE_IP_CALLBACK;
-
 class UDPReceiver {
+public:
+    typedef std::function<void(uint8_t[],int)> DATA_CALLBACK;
+    typedef std::function<void(const char*)> SOURCE_IP_CALLBACK;
 public:
     UDPReceiver(int port,const std::string& name,int CPUPriority,int buffsize,const DATA_CALLBACK& onDataReceivedCallback);
     void registerOnSourceIPfound(const SOURCE_IP_CALLBACK& onSourceIP);
