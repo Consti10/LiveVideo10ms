@@ -18,8 +18,10 @@ extern "C" {
 
 class FFMpegVideoReceiver {
 public:
+	//For debugging takes a raw h264 data (not parsed) and another callback for already parsed data (not working yet)
   FFMpegVideoReceiver(std::string url, int cpu_priority,
-					  std::function<void(uint8_t[],int)> callback, uint32_t bufsize = 1000000);
+					  std::function<void(uint8_t[],int)> callback,
+					  NALU_DATA_CALLBACK callback2,uint32_t bufsize = 1000000);
   void start_playing();
   void stop_playing();
   int shutdown_callback();
@@ -42,6 +44,7 @@ private:
   AVFrame *m_frame;
 
   const std::function<void(uint8_t[],int)> raw_h264_data_callback;
+  const NALU_DATA_CALLBACK onNewNALUCallback;
 };
 
 

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <jni.h>
 #include <android/log.h>
+#include <chrono>
+#include <thread>
 
 #include "FFMpegVideoReceiver.h"
 
@@ -25,9 +27,10 @@ static int g_shutdown_callback(void *d) {
 }
 
 FFMpegVideoReceiver::FFMpegVideoReceiver(std::string url, int cpu_priority,
-                                         std::function<void(uint8_t[],int)> callback, uint32_t bufsize) :
+                                         std::function<void(uint8_t[],int)> callback,
+                                         NALU_DATA_CALLBACK callback2,uint32_t bufsize) :
         m_url(url), m_cpu_priority(cpu_priority), m_bufsize(bufsize), m_shutdown(false),
-        raw_h264_data_callback(callback) {
+        raw_h264_data_callback(callback),onNewNALUCallback(callback2) {
 
     // Allocate the packet
     av_init_packet(&m_packet);
@@ -112,18 +115,74 @@ void FFMpegVideoReceiver::run() {
         return;
     }
 
-    //m_pCodecPaser = av_parser_init(AV_CODEC_ID_H264);
+    m_pCodecPaser = av_parser_init(AV_CODEC_ID_H264);
+    if(!m_pCodecPaser){
+        LOGV("Cannot find parser");
+    }
+    m_frame=av_frame_alloc();
+    if(!m_frame){
+        LOGV("Could not allocate video frame");
+    }
+
+    int ret;
+    uint8_t *data;
+    size_t   data_size;
+    AVPacket* pkt=av_packet_alloc();
+
+    int naluC=0;
+
+    AVFrame *frame = av_frame_alloc();
+
+    bool alreadySentSPS_PPS=false;
 
     while (av_read_frame(m_format_ctx, &m_packet) >= 0) {
         if (m_shutdown) {
             break;
         }
         if (m_packet.stream_index == m_video_stream) {
-            LOGV("Read packet: %d", m_packet.size);
+
+            //LOGV("Read packet: %d", m_packet.size);
             //NALU nalu(m_packet.data, m_packet.size);
-            //m_callback(nalu);
-            raw_h264_data_callback(m_packet.data,m_packet.size);
-            //m_callback(m_packet.data, m_packet.size);
+            //raw_h264_data_callback(m_packet.data,m_packet.size);
+
+            while(m_packet.size>0){
+                /*if(m_codec_ctx->extradata_size>0 && !alreadySentSPS_PPS){
+                    const NALU extradataNALU(m_codec_ctx->extradata,m_codec_ctx->extradata_size);
+                    LOGV("Extradata %d is %s",m_codec_ctx->extradata_size,extradataNALU.get_nal_name().c_str());
+                    //The extradata from ffmpeg needs to be split into sps and pps
+                    raw_h264_data_callback(m_codec_ctx->extradata,m_codec_ctx->extradata_size);
+                    alreadySentSPS_PPS=true;
+                }*/
+                ret = av_parser_parse2(m_pCodecPaser, m_codec_ctx, &pkt->data,&pkt->size,
+                                       m_packet.data,m_packet.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+                if (ret < 0) {
+                    LOGV("Error while parsing");
+                    break;
+                }
+                m_packet.data+=ret;
+                m_packet.size-=ret;
+                if(pkt->size){
+                    //TODO: Investigate: Looks like the av_parser_parse2 function does not split sps/pps
+                    //Submits them together or something ?
+                    if(naluC<2){
+                        raw_h264_data_callback(pkt->data,pkt->size);
+                    }else{
+                        onNewNALUCallback(NALU(pkt->data,pkt->size));
+                    }
+                    naluC++;
+                    //if(lala>10){
+                        //onNewNALUCallback(pkt->data,pkt->size);
+                    //}else{
+                        //raw_h264_data_callback(pkt->data,pkt->size);
+                    //}
+                    //onNewNALUCallback(pkt->data,pkt->size);
+                    //LOGV("key frame %d w %d h %d",m_pCodecPaser->key_frame,m_pCodecPaser->width,m_pCodecPaser->height);
+                }
+                /*avcodec_send_packet(m_codec_ctx,&m_packet);
+                int response = avcodec_receive_frame(m_codec_ctx, frame);
+                LOGV("Repsonse %d",response);*/
+            }
+            //--
         }
     }
 
@@ -136,6 +195,8 @@ void FFMpegVideoReceiver::run() {
 
     // Close the format context
     avformat_close_input(&m_format_ctx);
+
+    av_parser_close(m_pCodecPaser);
 }
 
 int FFMpegVideoReceiver::shutdown_callback() {
