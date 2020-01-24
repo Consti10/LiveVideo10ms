@@ -32,14 +32,16 @@ public:
 public:
     long nParsedNALUs=0;
     long nParsedKeyFrames=0;
-    bool limitFPS=false;
+    //For live video set to -1 (no fps limitation), else additional latency will be generated
+    void setLimitFPS(int maxFPS);
 private:
+    //If enabled, limit fps
+    bool limitFPS;
+    float minTimeBetweenFramesIfEnabled;
     void newNaluExtracted(const NALU& nalu);
     const NALU_DATA_CALLBACK onNewNALU;
-    uint8_t nalu_data[NALU_MAXLEN];
-
     std::chrono::steady_clock::time_point lastFrameLimitFPS=std::chrono::steady_clock::now();
-
+    std::chrono::steady_clock::time_point lastTimeOnNewNALUCalled=std::chrono::steady_clock::now();
     ParseRAW mParseRAW;
     ParseRTP mParseRTP;
 };
