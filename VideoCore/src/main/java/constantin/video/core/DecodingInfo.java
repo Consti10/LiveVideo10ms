@@ -52,17 +52,21 @@ public class DecodingInfo {
         return decodingInfo;
     }
 
+    public String toString(final boolean newline){
+        final String s=newline ? "\n" : "";
+        return "Decoding info:"+s+
+                " currentFPS:"+currentFPS+s+
+                " currentKiloBitsPerSecond:"+currentKiloBitsPerSecond+s+
+                " avgParsingTime_ms:"+avgParsingTime_ms+s+
+                " avgWaitForInputBTime_ms:"+avgWaitForInputBTime_ms+s+
+                " avgHWDecodingTime_ms:"+ avgHWDecodingTime_ms+s+
+                " avgDecodingTime_ms"+avgDecodingTime_ms+s+
+                " nNALU:"+nNALU+s+
+                " nNALUSFeeded:"+nNALUSFeeded;
+    }
 
     @Override
     public String toString() {
-        return "Decoding info.>"+
-                " currentFPS:"+currentFPS+
-                " currentKiloBitsPerSecond:"+currentKiloBitsPerSecond+
-                " avgParsingTime_ms:"+avgParsingTime_ms+
-                " avgWaitForInputBTime_ms:"+avgWaitForInputBTime_ms+
-                " avgHWDecodingTime_ms:"+ avgHWDecodingTime_ms +
-                " avgDecodingTime_ms"+avgDecodingTime_ms+
-                " nNALU:"+nNALU+
-                " nNALUSFeeded:"+nNALUSFeeded;
+        return toString(false);
     }
 }

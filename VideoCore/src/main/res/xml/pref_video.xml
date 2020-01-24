@@ -48,6 +48,12 @@
             android:title="@string/VS_ASSETS_FILENAME_TEST_ONLY"
             android:defaultValue="testVideo.h264"
             android:enabled="false"/>
+
+        <com.mapzen.prefsplus.EditIntPreference
+            android:key="@string/VS_FILE_ONLY_LIMIT_FPS"
+            android:title="@string/VS_FILE_ONLY_LIMIT_FPS"
+            android:defaultValue="60"
+            android:summary="Limit FPS when playing from file/assets. Default 60fps. Select 0 for unlimited fps." />
     </PreferenceCategory>
 
     <PreferenceCategory
