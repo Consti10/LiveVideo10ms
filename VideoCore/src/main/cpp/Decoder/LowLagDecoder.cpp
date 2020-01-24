@@ -9,6 +9,9 @@
 #define PRINT_DEBUG_INFO
 #define TAG "LowLagDecoder"
 
+#include <h264_stream.h>
+
+
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
 constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
@@ -20,6 +23,8 @@ LowLagDecoder::LowLagDecoder(ANativeWindow* window,const int checkOutputThreadCp
     decoder.SW= false;
     decoder.window=window;
     decoder.configured=false;
+
+
 }
 
 void LowLagDecoder::registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC) {
@@ -31,7 +36,18 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-    //LOGD("::interpretNALU %d %s",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str());
+
+    /*int s,t;
+    int res=find_nal_unit(const_cast<uint8_t*>(nalu.data),nalu.data_length,&s,&t);
+    LOGD("find nal %d %d %d",res,s,t);*/
+
+    LOGD("::interpretNALU %d %s",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str());
+    if(nalu.isSPS() || nalu.isPPS()){
+        h264_stream_t* h = h264_new();
+        read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.data_length-4);
+        h264_free(h);
+    }
+
     //we need this lock, since the receiving/parsing/feeding runs on its own thread, relative to the thread that creates / deletes the decoder
     std::lock_guard<std::mutex> lock(mMutexInputPipe);
     decodingInfo.nNALU++;

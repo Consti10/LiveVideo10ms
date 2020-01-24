@@ -22,6 +22,7 @@
 #include "ParseRAW.h"
 #include "ParseRTP.h"
 
+#include "FrameLimiter.h"
 
 class H264Parser {
 public:
@@ -35,15 +36,14 @@ public:
     //For live video set to -1 (no fps limitation), else additional latency will be generated
     void setLimitFPS(int maxFPS);
 private:
-    //If enabled, limit fps
-    bool limitFPS;
-    float minTimeBetweenFramesIfEnabled;
     void newNaluExtracted(const NALU& nalu);
     const NALU_DATA_CALLBACK onNewNALU;
     std::chrono::steady_clock::time_point lastFrameLimitFPS=std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point lastTimeOnNewNALUCalled=std::chrono::steady_clock::now();
     ParseRAW mParseRAW;
     ParseRTP mParseRTP;
+    FrameLimiter mFrameLimiter;
+    int maxFPS;
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

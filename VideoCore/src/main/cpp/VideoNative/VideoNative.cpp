@@ -29,6 +29,18 @@ VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject contex
     callToJava.globalJavaObj = env->NewWeakGlobalRef(videoParamsChangedI);
 }
 
+//Not yet parsed bit stream (e.g. raw h264 or rtp data)
+void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const int maxFPS=-1){
+    mParser.setLimitFPS(maxFPS);
+    //LOGD("onNewVideoData %d",data_length);
+    if(isRTPData){
+        mParser.parse_rtp_h264_stream(data,data_length);
+    }else{
+        mParser.parse_raw_h264_stream(data,data_length);
+    }
+
+}
+
 void VideoNative::onNewNALU(const NALU& nalu){
     //LOGD("VideoNative::onNewNALU %d",nalu.data_length);
     if(mLowLagDecoder!=nullptr){
@@ -54,17 +66,6 @@ void VideoNative::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInf
     jniENV->CallVoidMethod(callToJava.globalJavaObj,callToJava.onDecodingInfoChangedJAVA,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
                            (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded);
     callToJava.javaVirtualMachine->DetachCurrentThread();
-}
-
-//Not yet parsed bit stream (e.g. raw h264 or rtp data)
-void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const int maxFPS=-1){
-    mParser.setLimitFPS(maxFPS);
-    //LOGD("onNewVideoData %d",data_length);
-    if(isRTPData){
-        mParser.parse_rtp_h264_stream(data,data_length);
-    }else{
-        mParser.parse_raw_h264_stream(data,data_length);
-    }
 }
 
 void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
@@ -138,9 +139,9 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         }break;
         case VIA_FFMPEG_URL:{
             LOGD("Started with SOURCE=TEST360");
-            const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
+            //const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/capture1.h264";
-            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
+            const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
             LOGD("url:%s",url.c_str());

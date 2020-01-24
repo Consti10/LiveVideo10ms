@@ -36,13 +36,7 @@ void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const  int data_l
 }
 
 void H264Parser::setLimitFPS(int maxFPS) {
-    //Disable if maxFPS<=0 (e.g. live video) or maxFPS>240 (in this case, the bit rate becomes the limiting factor anyway)
-    if(maxFPS<=0 || maxFPS>240){
-       limitFPS=false;
-    }else{
-        limitFPS=true;
-        minTimeBetweenFramesIfEnabled=1000.0f/((float)maxFPS);
-    }
+    this->maxFPS=maxFPS;
 }
 
 void H264Parser::newNaluExtracted(const NALU& nalu) {
@@ -52,35 +46,15 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
         onNewNALU(nalu);
     }
     nParsedNALUs++;
-    if(nalu.isSPS() || nalu.isPPS()){
+    const bool sps_or_pps=nalu.isSPS() || nalu.isPPS();
+    if(sps_or_pps){
         nParsedKeyFrames++;
     }
-    //Wait until at least n ms are elapsed since the last call to onNewNALU
-    if(limitFPS){
-        //LOGD("Min frame time of %f",minTimeBetweenFramesIfEnabled);
-        const auto minimumTimeBetweenMS=minTimeBetweenFramesIfEnabled;
-        while(true){
-            const auto now=steady_clock::now();
-            const auto deltaSinceLastFrame=now-lastTimeOnNewNALUCalled;
-            const int64_t deltaSinceLastFrameMS=duration_cast<milliseconds>(deltaSinceLastFrame).count();
-            if(deltaSinceLastFrameMS>=minimumTimeBetweenMS){
-                break;
-            }
-        }
-        lastTimeOnNewNALUCalled=steady_clock::now();
-        /*const auto now=steady_clock::now();
-        const auto deltaSinceLastFrame=now-lastFrameLimitFPS;
-        const int64_t waitTimeMS=32-duration_cast<milliseconds>(deltaSinceLastFrame).count();
-        lastFrameLimitFPS=now;
-        if(waitTimeMS>0){
-            try{
-                LOGD("Sleeping for %d",waitTimeMS);
-                std::this_thread::sleep_for(milliseconds(waitTimeMS));
-            }catch (...){
-            }
-        }*/
+    //sps or pps NALUs do not count as frames, as well as AUD
+    //E.g. they won't create a frame on the output pipe)
+    if(!(sps_or_pps || nalu.get_nal_unit_type()==NALU::NAL_UNIT_TYPE_AUD)){
+        mFrameLimiter.limitFps(maxFPS);
     }
-    //LOGD("length: %d type: %s",data_length,get_nal_name(get_nal_unit_type(data,data_length)).c_str());
 }
 
 
