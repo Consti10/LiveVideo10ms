@@ -6,7 +6,7 @@
 #include <sstream>
 
 
-//#define PRINT_DEBUG_INFO
+#define PRINT_DEBUG_INFO
 #define TAG "LowLagDecoder"
 
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
@@ -22,18 +22,18 @@ LowLagDecoder::LowLagDecoder(ANativeWindow* window,const int checkOutputThreadCp
     decoder.configured=false;
 }
 
-void LowLagDecoder::registerOnDecoderRatioChangedCallback(std::function<void (int,int)> decoderRatioChangedC) {
+void LowLagDecoder::registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC) {
     onDecoderRatioChangedCallback=decoderRatioChangedC;
 }
 
-void LowLagDecoder::registerOnDecodingInfoChangedCallback(std::function<void(LowLagDecoder::DecodingInfo&)> decodingInfoChangedCallback){
+void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback){
     onDecodingInfoChangedCallback=decodingInfoChangedCallback;
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-    //LOGD("::interpretNALU %d",nalu.data_length);
+    //LOGD("::interpretNALU %d %s",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str());
     //we need this lock, since the receiving/parsing/feeding runs on its own thread, relative to the thread that creates / deletes the decoder
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutexInputPipe);
     decodingInfo.nNALU++;
     nNALUBytesFed.add(nalu.data_length);
     if(inputPipeClosed){
@@ -53,7 +53,8 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     }
 }
 
-
+//store sps / pps data. As soon as enough data has been buffered to initialize the decoder,
+//Do so.
 void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     if(nalu.isSPS()){
         memcpy(CSDO,nalu.data,(size_t )nalu.data_length);
@@ -80,9 +81,13 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     SPSHelper::ParseSPS(&CSDO[5],CSD0Length,&videoW,&videoH);
     LOGD("XYZ %d %d",videoW,videoH);
 
+    //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
+    //AVCProfileBaseline==1
+    //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
+    //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
+
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoW);
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoH);
-
 
     AMediaFormat_setBuffer(decoder.format,"csd-0",&CSDO,(size_t)CSD0Length);
     AMediaFormat_setBuffer(decoder.format,"csd-1",&CSD1,(size_t)CSD1Length);
@@ -90,7 +95,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     AMediaCodec_configure(decoder.codec, decoder.format, decoder.window, nullptr, 0);
     if (decoder.codec== nullptr) {
         LOGD("Cannot configure decoder");
-        //set csdo and csd1 back to 0, maybe they were just faulty but we have better luck with the next ones
+        //set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
         CSD0Length=0;
         CSD1Length=0;
         return;
@@ -107,8 +112,9 @@ void LowLagDecoder::checkOutputLoop() {
     while(!decoderSawEOS) {
         ssize_t index=AMediaCodec_dequeueOutputBuffer(decoder.codec,&info,BUFFER_TIMEOUT_US);
         if (index >= 0) {
-            const int64_t nowNS=(int64_t)duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count();
-            const int64_t nowUS=(int64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
+            const auto now=steady_clock::now();
+            const int64_t nowNS=(int64_t)duration_cast<nanoseconds>(now.time_since_epoch()).count();
+            const int64_t nowUS=(int64_t)duration_cast<microseconds>(now.time_since_epoch()).count();
             //the timestamp for releasing the buffer is in NS, just release as fast as possible (e.g. now)
             AMediaCodec_releaseOutputBufferAtTime(decoder.codec,(size_t)index,nowNS);
             //but the presentationTime is in US
@@ -129,7 +135,7 @@ void LowLagDecoder::checkOutputLoop() {
             }
             //LOGD("AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED %d %d",mWidth,mHeight);
         } else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
-            //LOGD("AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED");
+            LOGD("AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED");
         } else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
             //LOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER");
         } else {
@@ -137,7 +143,7 @@ void LowLagDecoder::checkOutputLoop() {
             return;
         }
         //every 2 seconds recalculate the current fps and bitrate
-        steady_clock::time_point now=steady_clock::now();
+        const auto now=steady_clock::now();
         const auto delta=now-decodingInfo.lastCalculation;
         if(duration_cast<seconds>(delta).count()>2){
             decodingInfo.lastCalculation=steady_clock::now();
@@ -158,40 +164,50 @@ void LowLagDecoder::checkOutputLoop() {
 void LowLagDecoder::feedDecoder(const NALU& nalu,bool justEOS){
     const auto now=std::chrono::steady_clock::now();
     const auto deltaParsing=now-nalu.creationTime;
+    /*const bool isKeyFrame=nalu.data_length>0 &&( nalu.isSPS() || nalu.isSPS());
+    if(isKeyFrame){
+        return;
+    }*/
     while (true) {
-        ssize_t index=AMediaCodec_dequeueInputBuffer(decoder.codec,BUFFER_TIMEOUT_US);
-        size_t size;
+        const auto index=AMediaCodec_dequeueInputBuffer(decoder.codec,BUFFER_TIMEOUT_US);
         if (index >=0) {
-            void* buf = AMediaCodec_getInputBuffer(decoder.codec,(size_t)index,&size);
-            if(!justEOS){
-                if(nalu.data_length>size){
+            size_t inputBufferSize;
+            void* buf = AMediaCodec_getInputBuffer(decoder.codec,(size_t)index,&inputBufferSize);
+            if(justEOS){
+                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)0,0, AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
+            }else{
+                if(nalu.data_length>inputBufferSize){
                     return;
                 }
                 std::memcpy(buf, nalu.data,(size_t)nalu.data_length);
                 //this timestamp will be later used to calculate the decoding latency
                 const uint64_t presentationTimeUS=(uint64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
-                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, 0);
+                const auto flag=nalu.isPPS() || nalu.isSPS() ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
+                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, flag);
                 waitForInputB_us.add((long)duration_cast<microseconds>(steady_clock::now()-now).count());
                 parsingTime_us.add((long)duration_cast<microseconds>(deltaParsing).count());
-            }else{
-                 AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)0,0, AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
             }
             return;
         }else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER){
-            //just try again
+            //just try again. But if we had no success in the last 1 second,log a warning and return
+            const int deltaMS=(int)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-now).count();
+            if(deltaMS>1000){
+                LOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second %d. return.",deltaMS);
+                return;
+            }
         }else{
             //Something went wrong. But we will feed the next nalu soon anyways
-            LOGD("dequeueInputBuffer idx %d Exit.",(int)index);
+            LOGD("dequeueInputBuffer idx %d return.",(int)index);
             return;
         }
     }
 }
 
 
-//when this call returns, it is guaranteed that no more data will be feed to the decoder
+//when this call returns, it is guaranteed that no more data will be fed to the decoder
 //but output buffer(s) are still polled from the queue
 void LowLagDecoder::closeInputPipe() {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::mutex> lock(mMutexInputPipe);
     inputPipeClosed=true;
 }
 

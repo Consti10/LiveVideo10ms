@@ -14,46 +14,7 @@
 #include <atomic>
 
 #include "../NALU/NALU.hpp"
-
-class AvgCalculator{
-private:
-    long sum=0;
-    long sumCount=0;
-public:
-    AvgCalculator() = default;
-
-    void add(long x){
-        sum+=x;
-        sumCount++;
-    }
-    long getAvg(){
-        if(sumCount==0)return 0;
-        return sum/sumCount;
-    }
-    void reset(){
-        sum=0;
-        sumCount=0;
-    }
-};
-
-class RelativeCalculator{
-private:
-    long sum=0;
-    long sumAtLastCall=0;
-public:
-    RelativeCalculator() = default;
-    void add(long x){
-        sum+=x;
-    }
-    long getDeltaSinceLastCall() {
-        long ret = sum - sumAtLastCall;
-        sumAtLastCall = sum;
-        return ret;
-    }
-    long getAbsolute(){
-        return sum;
-    }
-};
+#include "../Helper/TimeHelper.hpp"
 
 
 class LowLagDecoder {
@@ -63,7 +24,7 @@ private:
         bool SW= false;
         AMediaCodec *codec= nullptr;
         ANativeWindow* window= nullptr;
-        AMediaFormat *format= nullptr;
+        AMediaFormat *format=nullptr;
     };
 public:
     struct DecodingInfo{
@@ -76,10 +37,12 @@ public:
         float avgWaitForInputBTime_ms=0;
         float avgDecodingTime_ms=0;
     };
+    typedef std::function<void(DecodingInfo&)> DECODING_INFO_CHANGED_CALLBACK;
+    typedef std::function<void(int,int)> DECODER_RATIO_CHANGED;
 public:
     LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio);
-    void registerOnDecoderRatioChangedCallback(std::function<void(int,int)> decoderRatioChangedC);
-    void registerOnDecodingInfoChangedCallback(std::function<void(DecodingInfo&)> decodingInfoChangedCallback);
+    void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
+    void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
     void interpretNALU(const NALU& nalu);
     void waitForShutdownAndDelete();
 private:
@@ -96,9 +59,9 @@ private:
     uint8_t CSDO[NALU_MAXLEN],CSD1[NALU_MAXLEN];
     int CSD0Length=0,CSD1Length=0;
     bool inputPipeClosed=false;
-    std::mutex mMutex;
-    std::function<void(int,int)> onDecoderRatioChangedCallback= nullptr;
-    std::function<void(DecodingInfo&)> onDecodingInfoChangedCallback= nullptr;
+    std::mutex mMutexInputPipe;
+    DECODER_RATIO_CHANGED onDecoderRatioChangedCallback= nullptr;
+    DECODING_INFO_CHANGED_CALLBACK onDecodingInfoChangedCallback= nullptr;
     std::chrono::steady_clock::time_point lastLog=std::chrono::steady_clock::now();
     RelativeCalculator nDecodedFrames;
     RelativeCalculator nNALUBytesFed;
