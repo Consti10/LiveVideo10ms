@@ -89,6 +89,10 @@ public:
        }
        return nal_unit_type_name;
    };
+
+    std::string get_nal_name()const{
+        return get_nal_name(get_nal_unit_type());
+    }
 };
 
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;
