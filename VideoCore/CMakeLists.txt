@@ -34,7 +34,8 @@ set_target_properties( # Specifies the target library.
         PROPERTIES IMPORTED_LOCATION
         # Provides the path to the library you want to import.
         ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libavutil.so)
-include_directories(${FFMPEG_DIR}/include)
+include_directories(${FFMPEG_DIR}/include/${ANDROID_ABI}/)
+
 
 #Webbn 360 stuff
 add_library( FFMpegVideoReceiver
@@ -51,6 +52,21 @@ target_link_libraries( FFMpegVideoReceiver
         avformat-lib
         avutil-lib
         )
+
+set(H264_BITSTREAM_DIR ${CMAKE_SOURCE_DIR}/libs/h264bitstream)
+add_library(h264bitstream
+        SHARED
+        ${H264_BITSTREAM_DIR}/h264_stream.c
+        ${H264_BITSTREAM_DIR}/h264_sei.c
+        ${H264_BITSTREAM_DIR}/h264_nal.c
+        )
+target_link_libraries(h264bitstream
+        ${log-lib}
+        log
+        android)
+include_directories(${H264_BITSTREAM_DIR})
+
+
 
 #######################################################
 ########## Build the VideoCore native libary ##########
@@ -76,4 +92,5 @@ target_link_libraries( VideoNative
         log
         android
         mediandk
-        OpenMAXAL )
+        OpenMAXAL
+        h264bitstream)
