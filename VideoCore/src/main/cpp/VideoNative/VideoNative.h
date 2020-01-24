@@ -32,7 +32,7 @@ private:
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
 public:
-    void onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const bool limitFPS);
+    void onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const int limitFPS);
     void addConsumers(JNIEnv* env,jobject surface);
     void removeConsumers();
     void startReceiver(JNIEnv *env, AAssetManager *assetManager);
@@ -45,7 +45,6 @@ public:
     FileReader* mFileReceiver=nullptr;
     GroundRecorder* mGroundRecorder= nullptr;
     long nNALUsAtLastCall=0;
-
     FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
 };
 

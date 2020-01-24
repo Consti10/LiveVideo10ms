@@ -30,6 +30,7 @@ VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject contex
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
+    //LOGD("VideoNative::onNewNALU %d",nalu.data_length);
     if(mLowLagDecoder!=nullptr){
         mLowLagDecoder->interpretNALU(nalu);
     }
@@ -55,8 +56,10 @@ void VideoNative::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInf
     callToJava.javaVirtualMachine->DetachCurrentThread();
 }
 
-void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const bool limitFPS=false){
-    mParser.limitFPS=limitFPS;
+//Not yet parsed bit stream (e.g. raw h264 or rtp data)
+void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const int maxFPS=-1){
+    mParser.setLimitFPS(maxFPS);
+    //LOGD("onNewVideoData %d",data_length);
     if(isRTPData){
         mParser.parse_rtp_h264_stream(data,data_length);
     }else{
@@ -108,37 +111,43 @@ void VideoNative::removeConsumers(){
 void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
     mSettingsN.replaceJNI(env);
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
+    const int VS_FILE_ONLY_LIMIT_FPS=mSettingsN.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS,60);
     //LOGD("VS_SOURCE: %d",VS_SOURCE);
     switch (VS_SOURCE){
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
             mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](uint8_t* data,int data_length) {
-                onNewVideoData(data,data_length,useRTP,false);
+                onNewVideoData(data,data_length,useRTP,-1);
             });
             mVideoReceiver->startReceiving();
         }break;
         case FILE:{
             const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            mFileReceiver=new FileReader(filename,0,[this](uint8_t* data,int data_length) {
-                onNewVideoData(data,data_length,false,true);
+            mFileReceiver=new FileReader(filename,0,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,int data_length) {
+                onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();
         }break;
         case ASSETS:{
             const std::string filename=mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264");
-            mFileReceiver=new FileReader(assetManager,filename,0,[this](uint8_t* data,int data_length) {
-                onNewVideoData(data,data_length,false,true);
+            mFileReceiver=new FileReader(assetManager,filename,0,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,int data_length) {
+                onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();
         }break;
         case VIA_FFMPEG_URL:{
             LOGD("Started with SOURCE=TEST360");
             const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
-            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/Video/13-09-2019 20-13.h264";
+            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/capture1.h264";
+            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
+            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360.h264";
+            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
             LOGD("url:%s",url.c_str());
             mFFMpegVideoReceiver=new FFMpegVideoReceiver(url,0,[this](uint8_t* data,int data_length) {
-                onNewVideoData(data,data_length,false,false);
+                onNewVideoData(data,data_length,false,-1);
+            },[this](const NALU& nalu) {
+                onNewNALU(nalu);
             });
             mFFMpegVideoReceiver->start_playing();
         }break;
