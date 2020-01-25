@@ -16,7 +16,7 @@ void ParseRAW::reset(){
 void ParseRAW::parseData(const uint8_t* data,const int data_length){
     for (int i = 0; i < data_length; ++i) {
         nalu_data[nalu_data_position++] = data[i];
-        if (nalu_data_position == NALU_MAXLEN - 1) {
+        if (nalu_data_position == NALU::NALU_MAXLEN - 1) {
             nalu_data_position = 0;
         }
         switch (nalu_search_state) {

@@ -7,6 +7,7 @@
 
 #include "FFMpegVideoReceiver.h"
 
+#include <h264_stream.h>
 
 constexpr auto TAG="FFMpegVideoReceiver.cpp";
 #define LOGV(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
@@ -146,13 +147,18 @@ void FFMpegVideoReceiver::run() {
             //raw_h264_data_callback(m_packet.data,m_packet.size);
 
             while(m_packet.size>0){
-                /*if(m_codec_ctx->extradata_size>0 && !alreadySentSPS_PPS){
+                if(m_codec_ctx->extradata_size>0 && !alreadySentSPS_PPS){
                     const NALU extradataNALU(m_codec_ctx->extradata,m_codec_ctx->extradata_size);
                     LOGV("Extradata %d is %s",m_codec_ctx->extradata_size,extradataNALU.get_nal_name().c_str());
                     //The extradata from ffmpeg needs to be split into sps and pps
-                    raw_h264_data_callback(m_codec_ctx->extradata,m_codec_ctx->extradata_size);
-                    alreadySentSPS_PPS=true;
-                }*/
+                    //raw_h264_data_callback(m_codec_ctx->extradata,m_codec_ctx->extradata_size);
+                    //alreadySentSPS_PPS=true;
+
+                    h264_stream_t* h = h264_new();
+                    read_debug_nal_unit(h,&m_codec_ctx->extradata[4],m_codec_ctx->extradata_size-4);
+                    h264_free(h);
+
+                }
                 ret = av_parser_parse2(m_pCodecPaser, m_codec_ctx, &pkt->data,&pkt->size,
                                        m_packet.data,m_packet.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
                 if (ret < 0) {
@@ -165,9 +171,9 @@ void FFMpegVideoReceiver::run() {
                     //TODO: Investigate: Looks like the av_parser_parse2 function does not split sps/pps
                     //Submits them together or something ?
                     if(naluC<2){
-                        raw_h264_data_callback(pkt->data,pkt->size);
+                        //raw_h264_data_callback(pkt->data,pkt->size);
                     }else{
-                        onNewNALUCallback(NALU(pkt->data,pkt->size));
+                        //onNewNALUCallback(NALU(pkt->data,pkt->size));
                     }
                     naluC++;
                     //if(lala>10){

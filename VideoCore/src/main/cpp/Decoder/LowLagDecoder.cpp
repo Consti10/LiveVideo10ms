@@ -10,11 +10,13 @@
 #define TAG "LowLagDecoder"
 
 #include <h264_stream.h>
+#include <vector>
 
 
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
 constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
+
 
 using namespace std::chrono;
 
@@ -23,8 +25,6 @@ LowLagDecoder::LowLagDecoder(ANativeWindow* window,const int checkOutputThreadCp
     decoder.SW= false;
     decoder.window=window;
     decoder.configured=false;
-
-
 }
 
 void LowLagDecoder::registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC) {
@@ -41,12 +41,80 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     int res=find_nal_unit(const_cast<uint8_t*>(nalu.data),nalu.data_length,&s,&t);
     LOGD("find nal %d %d %d",res,s,t);*/
 
-    LOGD("::interpretNALU %d %s",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str());
-    if(nalu.isSPS() || nalu.isPPS()){
+    //LOGD("::interpretNALU %d %s prefix %d",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str(),nalu.hasValidPrefix());
+
+
+    NALU* naluX=nullptr;
+    /*if(nalu.isSPS()){
+
+        LOGD("NALU DATA %s",nalu.dataAsString().c_str());
+
         h264_stream_t* h = h264_new();
-        read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.data_length-4);
+        //read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
+        read_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
+
+        //LOGD("Nalu unit type %d",h->nal->nal_unit_type);
+        //h->sps->vui_parameters_present_flag=0;
+        h->sps->vui_parameters_present_flag=0;
+        h->sps->constraint_set0_flag=1;
+        h->sps->constraint_set1_flag=1;
+        h->sps->num_ref_frames=3;
+
+
+        std::vector<uint8_t> data(1024);
+        int writeRet=write_nal_unit(h,data.data(),1024);
+        data.insert(data.begin(),0);
+        data.insert(data.begin(),0);
+        data.insert(data.begin(),0);
+        data.at(3)=1;
+        writeRet+=3;
+
+
+        LOGD("write ret %d",writeRet);
+        NALU newNALU(data.data(),writeRet);
+        LOGD("::newNALU %d %s prefix %d",newNALU.data_length,newNALU.get_nal_name().c_str(),nalu.hasValidPrefix());
+        LOGD("NALU DATA %s",newNALU.dataAsString().c_str());
+
+
+        read_debug_nal_unit(h,const_cast<uint8_t*>(newNALU.getDataWithoutPrefix()),newNALU.getDataSizeWithoutPrefix());
+
         h264_free(h);
-    }
+        naluX=&newNALU;
+        //naluX=new NALU(SPS_X264_NO_VUI,sizeof(SPS_X264_NO_VUI));
+    }*/
+
+    /*if(nalu.isPPS()){
+        LOGD("NALU DATA %s",nalu.dataAsString().c_str());
+
+        h264_stream_t* h = h264_new();
+        //read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
+        read_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
+
+        //LOGD("Nalu unit type %d",h->nal->nal_unit_type);
+        //h->sps->vui_parameters_present_flag=0;
+
+        std::vector<uint8_t> data(1024);
+        int writeRet=write_nal_unit(h,data.data(),1024);
+        data.insert(data.begin(),0);
+        data.insert(data.begin(),0);
+        data.insert(data.begin(),0);
+        data.at(3)=1;
+        writeRet+=3;
+
+
+        LOGD("write ret %d",writeRet);
+        NALU newNALU(data.data(),writeRet);
+        LOGD("::newNALU %d %s prefix %d",newNALU.data_length,newNALU.get_nal_name().c_str(),nalu.hasValidPrefix());
+        LOGD("NALU DATA %s",newNALU.dataAsString().c_str());
+
+
+        read_debug_nal_unit(h,const_cast<uint8_t*>(newNALU.getDataWithoutPrefix()),newNALU.getDataSizeWithoutPrefix());
+
+        h264_free(h);
+        naluX=&newNALU;
+
+    }*/
+
 
     //we need this lock, since the receiving/parsing/feeding runs on its own thread, relative to the thread that creates / deletes the decoder
     std::lock_guard<std::mutex> lock(mMutexInputPipe);
@@ -62,10 +130,18 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         return;
     }
     if(decoder.configured){
-        feedDecoder(nalu,false);
+        if(naluX!=nullptr){
+            feedDecoder(*naluX,false);
+        }else{
+            feedDecoder(nalu,false);
+        }
         decodingInfo.nNALUSFeeded++;
     } else{
-        configureStartDecoder(nalu);
+        if(naluX!=nullptr){
+            configureStartDecoder(*naluX);
+        }else{
+            configureStartDecoder(nalu);
+        }
     }
 }
 
@@ -104,6 +180,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
 
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoW);
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoH);
+
 
     AMediaFormat_setBuffer(decoder.format,"csd-0",&CSDO,(size_t)CSD0Length);
     AMediaFormat_setBuffer(decoder.format,"csd-1",&CSD1,(size_t)CSD1Length);
@@ -184,7 +261,7 @@ void LowLagDecoder::feedDecoder(const NALU& nalu,bool justEOS){
     if(isKeyFrame){
         return;
     }*/
-    while (true) {
+    while(true){
         const auto index=AMediaCodec_dequeueInputBuffer(decoder.codec,BUFFER_TIMEOUT_US);
         if (index >=0) {
             size_t inputBufferSize;

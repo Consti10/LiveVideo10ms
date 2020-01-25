@@ -160,7 +160,7 @@ void read_dec_ref_base_pic_marking(nal_t* nal, bs_t* b);
 
 
 //7.3.1 NAL unit syntax
-int read_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
+int read_nal_unit(h264_stream_t* h,const uint8_t* buf, int size)
 {
     nal_t* nal = h->nal;
 
@@ -1491,7 +1491,7 @@ void write_dec_ref_base_pic_marking(nal_t* nal, bs_t* b);
 
 
 //7.3.1 NAL unit syntax
-int write_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
+int write_nal_unit(const h264_stream_t* h, uint8_t* buf, int size)
 {
     nal_t* nal = h->nal;
 
@@ -1514,6 +1514,8 @@ int write_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
     bs_t* b = bs_new(rbsp_buf, rbsp_size);
     /* forbidden_zero_bit */ bs_write_u(b, 1, 0);
     bs_write_u(b, 2, nal->nal_ref_idc);
+    printf("here nal unit type %d",nal->nal_unit_type);
+
     bs_write_u(b, 5, nal->nal_unit_type);
     
     if( nal->nal_unit_type == 14 || nal->nal_unit_type == 21 || nal->nal_unit_type == 20 )
@@ -1551,7 +1553,7 @@ int write_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
         case NAL_UNIT_TYPE_SPS: 
             write_seq_parameter_set_rbsp(h->sps, b);
             write_rbsp_trailing_bits(b);
-            
+            printf("write sps");
             if( 0 )
             {
                 memcpy(h->sps_table[h->sps->seq_parameter_set_id], h->sps, sizeof(sps_t));
@@ -1616,7 +1618,9 @@ int write_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
             return -1;
     }
 
-    if (bs_overrun(b)) { bs_free(b); free(rbsp_buf); return -1; }
+    if (bs_overrun(b)) {
+        printf("Overrunn");
+        bs_free(b); free(rbsp_buf); return -1; }
 
     if( 1 )
     {
@@ -2820,7 +2824,7 @@ void read_debug_dec_ref_base_pic_marking(nal_t* nal, bs_t* b);
 
 
 //7.3.1 NAL unit syntax
-int read_debug_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
+int read_debug_nal_unit(h264_stream_t* h,const uint8_t* buf, int size)
 {
     nal_t* nal = h->nal;
 

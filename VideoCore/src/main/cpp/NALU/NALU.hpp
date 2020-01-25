@@ -7,11 +7,10 @@
 
 //https://github.com/Dash-Industry-Forum/Conformance-and-reference-source/blob/master/conformance/TSValidator/h264bitstream/h264_stream.h
 
-#define NALU_MAXLEN 1024*1024 //test video white iceland: Max 117
 
 #include <string>
 #include <chrono>
-
+#include <sstream>
 
 //A NALU consists of
 //a) DATA buffer
@@ -39,7 +38,7 @@ public:
     // 20..23    // Reserved
     // 24..31    // Unspecified
     //
-
+    static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
 public:
     NALU(const uint8_t* data,const int data_length):
         data(data),
@@ -70,6 +69,9 @@ public:
     const uint8_t* getDataWithoutPrefix()const{
         return &data[4];
     }
+    const int getDataSizeWithoutPrefix()const{
+        return data_length-4;
+    }
     static std::string get_nal_name(int nal_unit_type){
        std::string nal_unit_type_name;
        switch (nal_unit_type)
@@ -99,6 +101,19 @@ public:
 
     std::string get_nal_name()const{
         return get_nal_name(get_nal_unit_type());
+    }
+
+    //returns true if starts with 0001, false otherwise
+    bool hasValidPrefix()const{
+        return data[0]==0 && data[1]==0 &&data[2]==0 &&data[3]==1;
+    }
+
+    std::string dataAsString()const{
+        std::stringstream ss;
+        for(int i=0;i<data_length;i++){
+            ss<<(int)data[i]<<",";
+        }
+        return ss.str();
     }
 };
 

@@ -56,7 +56,7 @@ private:
     const int mCheckOutputThreadCPUPriority;
     Decoder decoder;
     DecodingInfo decodingInfo;
-    uint8_t CSDO[NALU_MAXLEN],CSD1[NALU_MAXLEN];
+    uint8_t CSDO[NALU::NALU_MAXLEN],CSD1[NALU::NALU_MAXLEN];
     int CSD0Length=0,CSD1Length=0;
     bool inputPipeClosed=false;
     std::mutex mMutexInputPipe;
@@ -68,6 +68,13 @@ private:
     AvgCalculator parsingTime_us;
     AvgCalculator waitForInputB_us;
     AvgCalculator decodingTime_us;
+private:
+    static constexpr uint8_t SPS_X264[31]{
+            0,0,0,1,103,66,192,40,217,0,120,2,39,229,192,90,128,128,128,160,0,0,125,32,0,29,76,17,227,6,73
+    };
+    static constexpr uint8_t SPS_X264_NO_VUI[15]{
+            0,0,0,1,103,66,192,40,217,0,120,2,39,229,64
+    };
 };
 
 #endif //LOW_LAG_DECODER

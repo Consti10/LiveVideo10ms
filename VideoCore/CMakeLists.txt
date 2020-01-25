@@ -36,6 +36,18 @@ set_target_properties( # Specifies the target library.
         ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libavutil.so)
 include_directories(${FFMPEG_DIR}/include/${ANDROID_ABI}/)
 
+set(H264_BITSTREAM_DIR ${CMAKE_SOURCE_DIR}/libs/h264bitstream)
+add_library(h264bitstream
+        SHARED
+        ${H264_BITSTREAM_DIR}/h264_stream.c
+        ${H264_BITSTREAM_DIR}/h264_sei.c
+        ${H264_BITSTREAM_DIR}/h264_nal.c
+        )
+target_link_libraries(h264bitstream
+        ${log-lib}
+        log
+        android)
+include_directories(${H264_BITSTREAM_DIR})
 
 #Webbn 360 stuff
 add_library( FFMpegVideoReceiver
@@ -51,22 +63,8 @@ target_link_libraries( FFMpegVideoReceiver
         avcodec-lib
         avformat-lib
         avutil-lib
+        h264bitstream
         )
-
-set(H264_BITSTREAM_DIR ${CMAKE_SOURCE_DIR}/libs/h264bitstream)
-add_library(h264bitstream
-        SHARED
-        ${H264_BITSTREAM_DIR}/h264_stream.c
-        ${H264_BITSTREAM_DIR}/h264_sei.c
-        ${H264_BITSTREAM_DIR}/h264_nal.c
-        )
-target_link_libraries(h264bitstream
-        ${log-lib}
-        log
-        android)
-include_directories(${H264_BITSTREAM_DIR})
-
-
 
 #######################################################
 ########## Build the VideoCore native libary ##########
