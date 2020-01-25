@@ -318,6 +318,8 @@ void LowLagDecoder::waitForShutdownAndDelete() {
         //now clean up the hw decoder
         AMediaCodec_stop(decoder.codec);
         AMediaCodec_delete(decoder.codec);
+        CSD0Length=0;
+        CSD1Length=0;
     }
 }
 
