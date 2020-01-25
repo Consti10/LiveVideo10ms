@@ -92,7 +92,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     }
 
     private fun writeTestResult() {
-        if (mDecodingInfo != null && mDecodingInfo!!.nNALUSFeeded > 0) {
+        if (mDecodingInfo != null && mDecodingInfo!!.nNALUSFeeded > 120) {
             val db = FirebaseFirestore.getInstance()
             val mTestResult=TestResultDecodingInfoConstructor.create(VS_SOURCE,(if (VS_SOURCE == VideoNative.VS_SOURCE.ASSETS.ordinal)
                 VS_ASSETS_FILENAME_TEST_ONLY
@@ -123,10 +123,10 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
             mTextViewStatistics!!.setText(decodingInfo.toString(true))
         })
         mDecodingInfo = decodingInfo
-        if (System.currentTimeMillis() - lastLogMS > 5 * 1000) {
+        /*if (System.currentTimeMillis() - lastLogMS > 5 * 1000) {
             Log.d(TAG,mDecodingInfo!!.toString());
             lastLogMS = System.currentTimeMillis()
-        }
+        }*/
     }
 
 
