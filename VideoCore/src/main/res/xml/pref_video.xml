@@ -54,6 +54,12 @@
             android:title="@string/VS_FILE_ONLY_LIMIT_FPS"
             android:defaultValue="60"
             android:summary="Limit FPS when playing from file/assets. Default 60fps. Select 0 for unlimited fps." />
+        <SwitchPreference
+            android:key="@string/VS_USE_SW_DECODER"
+            android:title="@string/VS_USE_SW_DECODER"
+            android:defaultValue="false"
+            android:summary="Use SW decoder instead of HW Decoder. Usually has worse performance than HW. Default off.">
+        </SwitchPreference>
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -40,7 +40,7 @@ public:
     typedef std::function<void(DecodingInfo&)> DECODING_INFO_CHANGED_CALLBACK;
     typedef std::function<void(int,int)> DECODER_RATIO_CHANGED;
 public:
-    LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio);
+    LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
     void interpretNALU(const NALU& nalu);

@@ -10,6 +10,7 @@ public:
     static constexpr const char* VS_PLAYBACK_FILENAME="VS_PLAYBACK_FILENAME";
     static constexpr const char* VS_ASSETS_FILENAME_TEST_ONLY="VS_ASSETS_FILENAME_TEST_ONLY";
     static constexpr const char* VS_FILE_ONLY_LIMIT_FPS="VS_FILE_ONLY_LIMIT_FPS";
+    static constexpr const char* VS_USE_SW_DECODER="VS_USE_SW_DECODER";
     static constexpr const char* VS_FFMPEG_URL="VS_FFMPEG_URL";
     static constexpr const char* VS_VIDEO_VIEW_TYPE="VS_VIDEO_VIEW_TYPE";
     static constexpr const char* VS_360_VIDEO_FOV="VS_360_VIDEO_FOV";

@@ -6,6 +6,7 @@
     <string-array name="video_test_files">
         <item>Iceland (x264)</item>
         <item>Rpi Camera</item>
+        <item>Webcam</item>
         <item>Recording 360 1</item>
         <item>Recording 360 2</item>
         <item>Other 2</item>

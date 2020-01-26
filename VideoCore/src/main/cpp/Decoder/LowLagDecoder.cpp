@@ -20,9 +20,9 @@ constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 
 using namespace std::chrono;
 
-LowLagDecoder::LowLagDecoder(ANativeWindow* window,const int checkOutputThreadCpuPrio):
+LowLagDecoder::LowLagDecoder(ANativeWindow* window,const int checkOutputThreadCpuPrio,bool SW):
         mCheckOutputThreadCPUPriority(checkOutputThreadCpuPrio){
-    decoder.SW= false;
+    decoder.SW=SW;
     decoder.window=window;
     decoder.configured=false;
 }
@@ -41,8 +41,16 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     int res=find_nal_unit(const_cast<uint8_t*>(nalu.data),nalu.data_length,&s,&t);
     LOGD("find nal %d %d %d",res,s,t);*/
 
-    //LOGD("::interpretNALU %d %s prefix %d",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str(),nalu.hasValidPrefix());
+    LOGD("::interpretNALU %d %s prefix %d",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str(),nalu.hasValidPrefix());
 
+    /*h264_stream_t* h = h264_new();
+    read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
+    h264_free(h);
+
+    try{
+        std::this_thread::sleep_for(milliseconds(1000));
+    }catch (...){
+    }*/
 
     NALU* naluX=nullptr;
     /*if(nalu.isSPS()){
@@ -163,9 +171,13 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     }
     //SW decoder seems to be broken in native
     if(decoder.SW){
-        decoder.codec = AMediaCodec_createDecoderByType("OMX.google.h264.decoder");
+        decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
     }else {
         decoder.codec = AMediaCodec_createDecoderByType("video/avc");
+        //char* name;
+        //AMediaCodec_getName(decoder.codec,&name);
+        //LOGD("Created decoder %s",name);
+        //AMediaCodec_releaseName(decoder.codec,name);
     }
     decoder.format=AMediaFormat_new();
     AMediaFormat_setString(decoder.format,AMEDIAFORMAT_KEY_MIME,"video/avc");
@@ -180,7 +192,6 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
 
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoW);
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoH);
-
 
     AMediaFormat_setBuffer(decoder.format,"csd-0",&CSDO,(size_t)CSD0Length);
     AMediaFormat_setBuffer(decoder.format,"csd-1",&CSD1,(size_t)CSD1Length);
@@ -226,7 +237,7 @@ void LowLagDecoder::checkOutputLoop() {
             if(onDecoderRatioChangedCallback!= nullptr && mWidth!=0 && mHeight!=0){
                 onDecoderRatioChangedCallback(mWidth,mHeight);
             }
-            //LOGD("AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED %d %d",mWidth,mHeight);
+            LOGD("AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED %d %d %s",mWidth,mHeight,AMediaFormat_toString(format));
         } else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
             LOGD("AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED");
         } else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER) {

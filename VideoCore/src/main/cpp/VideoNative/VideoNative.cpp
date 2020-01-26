@@ -71,17 +71,19 @@ void VideoNative::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInf
 void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     //reset the parser so the statistics start again from 0
     mParser.reset();
+    //set the jni object for settings
+    mSettingsN.replaceJNI(env);
     //add decoder if surface!=nullptr
+    const bool VS_USE_SW_DECODER=mSettingsN.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
-        mLowLagDecoder=new LowLagDecoder(window,CPU_PRIORITY_DECODER_OUTPUT);
+        mLowLagDecoder=new LowLagDecoder(window,CPU_PRIORITY_DECODER_OUTPUT,VS_USE_SW_DECODER);
         mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](int w,int h) { this->onDecoderRatioChangedCallback(w,h); });
         mLowLagDecoder->registerOnDecodingInfoChangedCallback([this](LowLagDecoder::DecodingInfo& info) {
             this->onDecodingInfoChangedCallback(info);
         });
     }
     //Add Ground recorder if enabled
-    mSettingsN.replaceJNI(env);
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
     if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
