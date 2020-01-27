@@ -146,7 +146,7 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
-            LOGD("url:%s",url.c_str());
+            //LOGD("url:%s",url.c_str());
             mFFMpegVideoReceiver=new FFMpegVideoReceiver(url,0,[this](uint8_t* data,int data_length) {
                 onNewVideoData(data,data_length,false,-1);
             },[this](const NALU& nalu) {

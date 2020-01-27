@@ -36,94 +36,6 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-
-    /*int s,t;
-    int res=find_nal_unit(const_cast<uint8_t*>(nalu.data),nalu.data_length,&s,&t);
-    LOGD("find nal %d %d %d",res,s,t);*/
-
-    LOGD("::interpretNALU %d %s prefix %d",nalu.data_length,nalu.get_nal_name(nalu.get_nal_unit_type()).c_str(),nalu.hasValidPrefix());
-
-    /*h264_stream_t* h = h264_new();
-    read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
-    h264_free(h);
-
-    try{
-        std::this_thread::sleep_for(milliseconds(1000));
-    }catch (...){
-    }*/
-
-    NALU* naluX=nullptr;
-    /*if(nalu.isSPS()){
-
-        LOGD("NALU DATA %s",nalu.dataAsString().c_str());
-
-        h264_stream_t* h = h264_new();
-        //read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
-        read_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
-
-        //LOGD("Nalu unit type %d",h->nal->nal_unit_type);
-        //h->sps->vui_parameters_present_flag=0;
-        h->sps->vui_parameters_present_flag=0;
-        h->sps->constraint_set0_flag=1;
-        h->sps->constraint_set1_flag=1;
-        h->sps->num_ref_frames=3;
-
-
-        std::vector<uint8_t> data(1024);
-        int writeRet=write_nal_unit(h,data.data(),1024);
-        data.insert(data.begin(),0);
-        data.insert(data.begin(),0);
-        data.insert(data.begin(),0);
-        data.at(3)=1;
-        writeRet+=3;
-
-
-        LOGD("write ret %d",writeRet);
-        NALU newNALU(data.data(),writeRet);
-        LOGD("::newNALU %d %s prefix %d",newNALU.data_length,newNALU.get_nal_name().c_str(),nalu.hasValidPrefix());
-        LOGD("NALU DATA %s",newNALU.dataAsString().c_str());
-
-
-        read_debug_nal_unit(h,const_cast<uint8_t*>(newNALU.getDataWithoutPrefix()),newNALU.getDataSizeWithoutPrefix());
-
-        h264_free(h);
-        naluX=&newNALU;
-        //naluX=new NALU(SPS_X264_NO_VUI,sizeof(SPS_X264_NO_VUI));
-    }*/
-
-    /*if(nalu.isPPS()){
-        LOGD("NALU DATA %s",nalu.dataAsString().c_str());
-
-        h264_stream_t* h = h264_new();
-        //read_debug_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
-        read_nal_unit(h,const_cast<uint8_t*>(nalu.getDataWithoutPrefix()),nalu.getDataSizeWithoutPrefix());
-
-        //LOGD("Nalu unit type %d",h->nal->nal_unit_type);
-        //h->sps->vui_parameters_present_flag=0;
-
-        std::vector<uint8_t> data(1024);
-        int writeRet=write_nal_unit(h,data.data(),1024);
-        data.insert(data.begin(),0);
-        data.insert(data.begin(),0);
-        data.insert(data.begin(),0);
-        data.at(3)=1;
-        writeRet+=3;
-
-
-        LOGD("write ret %d",writeRet);
-        NALU newNALU(data.data(),writeRet);
-        LOGD("::newNALU %d %s prefix %d",newNALU.data_length,newNALU.get_nal_name().c_str(),nalu.hasValidPrefix());
-        LOGD("NALU DATA %s",newNALU.dataAsString().c_str());
-
-
-        read_debug_nal_unit(h,const_cast<uint8_t*>(newNALU.getDataWithoutPrefix()),newNALU.getDataSizeWithoutPrefix());
-
-        h264_free(h);
-        naluX=&newNALU;
-
-    }*/
-
-
     //we need this lock, since the receiving/parsing/feeding runs on its own thread, relative to the thread that creates / deletes the decoder
     std::lock_guard<std::mutex> lock(mMutexInputPipe);
     decodingInfo.nNALU++;
@@ -138,18 +50,10 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         return;
     }
     if(decoder.configured){
-        if(naluX!=nullptr){
-            feedDecoder(*naluX,false);
-        }else{
-            feedDecoder(nalu,false);
-        }
+        feedDecoder(nalu,false);
         decodingInfo.nNALUSFeeded++;
     } else{
-        if(naluX!=nullptr){
-            configureStartDecoder(*naluX);
-        }else{
-            configureStartDecoder(nalu);
-        }
+        configureStartDecoder(nalu);
     }
 }
 

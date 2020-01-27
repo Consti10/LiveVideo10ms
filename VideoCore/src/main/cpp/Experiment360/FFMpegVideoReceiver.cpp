@@ -144,10 +144,10 @@ void FFMpegVideoReceiver::run() {
 
             //LOGV("Read packet: %d", m_packet.size);
             //NALU nalu(m_packet.data, m_packet.size);
-            //raw_h264_data_callback(m_packet.data,m_packet.size);
+            raw_h264_data_callback(m_packet.data,m_packet.size);
 
             while(m_packet.size>0){
-                if(m_codec_ctx->extradata_size>0 && !alreadySentSPS_PPS){
+                /*if(m_codec_ctx->extradata_size>0 && !alreadySentSPS_PPS){
                     const NALU extradataNALU(m_codec_ctx->extradata,m_codec_ctx->extradata_size);
                     LOGV("Extradata %d is %s",m_codec_ctx->extradata_size,extradataNALU.get_nal_name().c_str());
                     //The extradata from ffmpeg needs to be split into sps and pps
