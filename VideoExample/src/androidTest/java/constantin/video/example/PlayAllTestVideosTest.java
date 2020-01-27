@@ -79,6 +79,8 @@ public class PlayAllTestVideosTest {
         testPlayVideo();
         selectVideoFilename(2);
         testPlayVideo();
+        selectVideoFilename(3);
+        testPlayVideo();
     }
 
 }
