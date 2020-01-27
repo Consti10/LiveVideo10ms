@@ -125,6 +125,8 @@ void FFMpegVideoReceiver::run() {
         LOGV("Could not allocate video frame");
     }
 
+    LOGV("Started receiving");
+
     int ret;
     uint8_t *data;
     size_t   data_size;
@@ -146,8 +148,8 @@ void FFMpegVideoReceiver::run() {
             //NALU nalu(m_packet.data, m_packet.size);
             raw_h264_data_callback(m_packet.data,m_packet.size);
 
-            while(m_packet.size>0){
-                /*if(m_codec_ctx->extradata_size>0 && !alreadySentSPS_PPS){
+            /*while(m_packet.size>0){
+                if(m_codec_ctx->extradata_size>0 && !alreadySentSPS_PPS){
                     const NALU extradataNALU(m_codec_ctx->extradata,m_codec_ctx->extradata_size);
                     LOGV("Extradata %d is %s",m_codec_ctx->extradata_size,extradataNALU.get_nal_name().c_str());
                     //The extradata from ffmpeg needs to be split into sps and pps
@@ -187,7 +189,7 @@ void FFMpegVideoReceiver::run() {
                 /*avcodec_send_packet(m_codec_ctx,&m_packet);
                 int response = avcodec_receive_frame(m_codec_ctx, frame);
                 LOGV("Repsonse %d",response);*/
-            }
+            //}
             //--
         }
     }
