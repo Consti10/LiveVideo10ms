@@ -28,7 +28,7 @@ allprojects {
         jcenter()
     }
     ext {
-        minSdkVersion = 26
+        minSdkVersion = 21
         compileSdkVersion = 28
         targetSdkVersion = 28
         appcompatVersion = '1.1.0'

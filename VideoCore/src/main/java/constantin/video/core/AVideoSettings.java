@@ -36,9 +36,13 @@ public class AVideoSettings extends AppCompatActivity {
                 Preference p1=findPreference(getString(R.string.VS_PLAYBACK_FILENAME));
                 Preference p2=findPreference(getString(R.string.VS_SOURCE));
                 Preference p3=findPreference(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY));
+				Preference p4=findPreference(getString(R.string.VS_FILE_ONLY_LIMIT_FPS));
+				Preference p5=findPreference(getString(R.string.VS_USE_SW_DECODER));
                 p1.setEnabled(true);
                 p2.setEnabled(true);
                 p3.setEnabled(true);
+				p4.setEnabled(true);
+				p5.setEnabled(true);
             }
         }
 

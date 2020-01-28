@@ -58,8 +58,8 @@
             android:key="@string/VS_USE_SW_DECODER"
             android:title="@string/VS_USE_SW_DECODER"
             android:defaultValue="false"
-            android:summary="Use SW decoder instead of HW Decoder. Usually has worse performance than HW. Default off.">
-        </SwitchPreference>
+            android:enabled="false"
+            android:summary="Use SW decoder instead of HW Decoder. Usually has worse performance than HW. Default off."/>
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -22,7 +22,8 @@
         </activity>
         <activity
             android:name=".VideoActivity"
-            android:theme="@style/MyStyleFullscreen" />
+            android:theme="@style/MyStyleFullscreen"
+            android:screenOrientation="landscape" />
     </application> <!-- DANGEROUS (needs runtime request) -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- DANGEROUS (needs runtime request) -->
     <!-- open UDP ports -->
