@@ -23,7 +23,7 @@ public:
         while(true){
             const auto now=std::chrono::steady_clock::now();
             const auto deltaSinceLastFrame=now-lastTimeCalled;
-            const int64_t deltaSinceLastFrameMS=duration_cast<std::chrono::milliseconds>(deltaSinceLastFrame).count();
+            const int64_t deltaSinceLastFrameMS=std::chrono::duration_cast<std::chrono::milliseconds>(deltaSinceLastFrame).count();
             if(deltaSinceLastFrameMS>=minimumTimeBetweenMS){
                 break;
             }
