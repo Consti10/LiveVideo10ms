@@ -141,9 +141,9 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         }break;
         case VIA_FFMPEG_URL:{
             LOGD("Started with SOURCE=TEST360");
-            //const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
+            const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/capture1.h264";
-            const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
+            //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
             //LOGD("url:%s",url.c_str());
