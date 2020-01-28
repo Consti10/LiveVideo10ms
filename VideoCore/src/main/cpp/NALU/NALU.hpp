@@ -11,6 +11,8 @@
 #include <string>
 #include <chrono>
 #include <sstream>
+#include <array>
+#include <h264_stream.h>
 
 //A NALU consists of
 //a) DATA buffer
@@ -19,7 +21,7 @@
 
 class NALU{
 public:
-    static constexpr const auto NAL_UNIT_TYPE_UNSPECIFIED =                  0;    // Unspecified
+    /*static constexpr const auto NAL_UNIT_TYPE_UNSPECIFIED =                  0;    // Unspecified
     static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_NON_IDR =          1;    // Coded slice of a non-IDR picture
     static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A = 2;    // Coded slice data partition A
     static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_B = 3;    // Coded slice data partition B
@@ -37,7 +39,7 @@ public:
     static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_AUX              =19;    // Coded slice of an auxiliary coded picture without partitioning
     // 20..23    // Reserved
     // 24..31    // Unspecified
-    //
+    //*/
     static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
 public:
     NALU(const uint8_t* data,const int data_length):
@@ -114,6 +116,20 @@ public:
             ss<<(int)data[i]<<",";
         }
         return ss.str();
+    }
+
+    //Returns video width and height if the NALU is an SPS
+    std::array<int,2> getVideoWidthHeightSPS(){
+        if(!isSPS()){
+            return {-1,-1};
+        }
+        h264_stream_t* h = h264_new();
+        read_nal_unit(h,const_cast<uint8_t*>(getDataWithoutPrefix()),getDataSizeWithoutPrefix());
+        sps_t* sps=h->sps;
+        int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
+        int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
+        h264_free(h);
+        return {Width,Height};
     }
 };
 

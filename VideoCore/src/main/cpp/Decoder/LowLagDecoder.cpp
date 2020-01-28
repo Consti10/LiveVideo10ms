@@ -1,7 +1,6 @@
 
 #include "LowLagDecoder.h"
 #include "../General/CPUPriority.hpp"
-#include "SPSHelper.h"
 #include <unistd.h>
 #include <sstream>
 
@@ -85,17 +84,16 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     }
     decoder.format=AMediaFormat_new();
     AMediaFormat_setString(decoder.format,AMEDIAFORMAT_KEY_MIME,"video/avc");
-    int videoW,videoH;
-    SPSHelper::ParseSPS(&CSDO[5],CSD0Length,&videoW,&videoH);
-    LOGD("XYZ %d %d",videoW,videoH);
+    const auto videoWH= NALU(CSDO, CSD0Length).getVideoWidthHeightSPS();
+    LOGD("XYZ %d %d",videoWH[0],videoWH[1]);
 
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
     //AVCProfileBaseline==1
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
 
-    AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoW);
-    AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoH);
+    AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
+    AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
 
     AMediaFormat_setBuffer(decoder.format,"csd-0",&CSDO,(size_t)CSD0Length);
     AMediaFormat_setBuffer(decoder.format,"csd-1",&CSD1,(size_t)CSD1Length);

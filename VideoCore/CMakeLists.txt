@@ -81,7 +81,6 @@ add_library( VideoNative
         ${VIDEO_PATH}/Parser/ParseRTP.cpp
 
         ${VIDEO_PATH}/Decoder/LowLagDecoder.cpp
-        ${VIDEO_PATH}/Decoder/SPSHelper.cpp
         ${VIDEO_PATH}/VideoNative/VideoNative.cpp)
 
 target_link_libraries( VideoNative
