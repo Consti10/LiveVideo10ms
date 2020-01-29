@@ -37,6 +37,12 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_
 void LowLagDecoder::interpretNALU(const NALU& nalu){
     //we need this lock, since the receiving/parsing/feeding runs on its own thread, relative to the thread that creates / deletes the decoder
     std::lock_guard<std::mutex> lock(mMutexInputPipe);
+    /*NALU* modNALU=nullptr;
+    if(nalu.isSPS()){
+        h264_stream_t* h=nalu.toH264Stream();
+        //Do manipulations to h->sps...
+        modNALU=NALU::fromH264StreamAndFree(h,&nalu);
+    }*/
     decodingInfo.nNALU++;
     nNALUBytesFed.add(nalu.data_length);
     if(inputPipeClosed){
@@ -48,6 +54,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         //No data in NALU (e.g at the beginning of a stream)
         return;
     }
+    //const NALU& naluToFeed=modNALU== nullptr ? nalu:*modNALU;
     if(decoder.configured){
         feedDecoder(nalu,false);
         decodingInfo.nNALUSFeeded++;

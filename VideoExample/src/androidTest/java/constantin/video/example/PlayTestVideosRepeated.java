@@ -72,8 +72,10 @@ public class PlayTestVideosRepeated {
     @Test
     public void playAllTestVideosTest() {
         writeVideoSource(VideoNative.VS_SOURCE_ASSETS);
-        //Alternating, play x264 test video and rpi cam video
+        //Alternating, play x264 test video ,rpi cam, webcam
         for(int i=0;i<N_ITERATIONS;i++){
+            selectVideoFilename(0);
+            testPlayVideo();
             selectVideoFilename(1);
             testPlayVideo();
             selectVideoFilename(2);
