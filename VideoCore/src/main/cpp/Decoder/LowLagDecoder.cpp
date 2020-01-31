@@ -114,15 +114,16 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
         return;
     }
     AMediaCodec_start(decoder.codec);
-    decoder.configured=true;
     mCheckOutputThread=new std::thread([this] { this->checkOutputLoop(); });
+    decoder.configured=true;
 }
 
 void LowLagDecoder::checkOutputLoop() {
     setCPUPriority(mCheckOutputThreadCPUPriority,"DecoderCheckOutput");
     AMediaCodecBufferInfo info;
     bool decoderSawEOS=false;
-    while(!decoderSawEOS) {
+    bool decoderProducedUnknown=false;
+    while(!decoderSawEOS && !decoderProducedUnknown) {
         ssize_t index=AMediaCodec_dequeueOutputBuffer(decoder.codec,&info,BUFFER_TIMEOUT_US);
         if (index >= 0) {
             const auto now=steady_clock::now();
@@ -153,7 +154,8 @@ void LowLagDecoder::checkOutputLoop() {
             //LOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER");
         } else {
             LOGD("dequeueOutputBuffer idx: %d .Exit.",(int)index);
-            return;
+            decoderProducedUnknown=true;
+            continue;
         }
         //every 2 seconds recalculate the current fps and bitrate
         const auto now=steady_clock::now();
@@ -172,6 +174,7 @@ void LowLagDecoder::checkOutputLoop() {
             }
         }
     }
+    LOGD("Exit CheckOutputLoop");
 }
 
 void LowLagDecoder::feedDecoder(const NALU& nalu,bool justEOS){
@@ -240,6 +243,7 @@ void LowLagDecoder::waitForShutdownAndDelete() {
         AMediaCodec_delete(decoder.codec);
         CSD0Length=0;
         CSD1Length=0;
+        decoder.configured=false;
     }
 }
 

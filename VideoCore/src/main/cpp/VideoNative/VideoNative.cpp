@@ -115,6 +115,14 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
     mSettingsN.replaceJNI(env);
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
     const int VS_FILE_ONLY_LIMIT_FPS=mSettingsN.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS,60);
+
+    //TODO use url instead of all these settings
+    //If url starts with udp: raw h264 over udp
+    //If url starts with rtp: rtp h264 over udp
+    //If url starts with asset: play file from android assets folder
+    //If url starts with file: play file from android local storage
+    //If url starts with rtsp: play rtsp via ffmpeg
+
     //LOGD("VS_SOURCE: %d",VS_SOURCE);
     switch (VS_SOURCE){
         case UDP:{
