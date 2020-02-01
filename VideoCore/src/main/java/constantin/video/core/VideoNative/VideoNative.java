@@ -69,9 +69,16 @@ public class VideoNative {
         return ret;
     }
 
-    public static void setVS_SOURCE(final Context context,final VS_SOURCE val){
+    @SuppressLint("ApplySharedPref")
+    public static void setVS_SOURCE(final Context context, final VS_SOURCE val){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         sharedPreferences.edit().putInt(context.getString(R.string.VS_SOURCE),val.ordinal()).commit();
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setVS_ASSETS_FILENAME_TEST_ONLY(final Context context, final String filename){
+        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
+        sharedPreferences.edit().putString(context.getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),filename).commit();
     }
 
     private static String getDirectory(){
