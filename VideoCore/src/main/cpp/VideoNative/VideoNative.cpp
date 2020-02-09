@@ -5,6 +5,8 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <android/asset_manager_jni.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 constexpr auto TAG="VideoNative";
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
@@ -42,12 +44,45 @@ void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
-    //LOGD("VideoNative::onNewNALU %d",nalu.data_length);
+    LOGD("VideoNative::onNewNALU %d %s",nalu.data_length,nalu.get_nal_name().c_str());
     if(mLowLagDecoder!=nullptr){
         mLowLagDecoder->interpretNALU(nalu);
     }
     if(mGroundRecorder!= nullptr){
         mGroundRecorder->writeData(nalu.data,nalu.data_length);
+    }
+    if(mMuxer== nullptr){
+        mKeyFrameFInder.saveIfKeyFrame(nalu);
+        if(mKeyFrameFInder.allKeyFramesAvailable()){
+            const std::string fn=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
+            mFD = open(fn.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+
+            mMuxer=AMediaMuxer_new(mFD,AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
+            AMediaFormat*format=AMediaFormat_new();
+            const auto SPS=mKeyFrameFInder.getCSD0();
+            const auto PPS=mKeyFrameFInder.getCSD1();
+            const auto videoWH= SPS.getVideoWidthHeightSPS();
+            AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/avc");
+            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
+            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
+            AMediaFormat_setBuffer(format,"csd-0",SPS.data,(size_t)SPS.data_length);
+            AMediaFormat_setBuffer(format,"csd-1",PPS.data,(size_t)PPS.data_length);
+            mTrackIndex=AMediaMuxer_addTrack(mMuxer,format);
+            LOGD("Media Muxer track index %d",mTrackIndex);
+            const auto status=AMediaMuxer_start(mMuxer);
+            LOGD("Media Muxer status %d",status);
+            AMediaFormat_delete(format);
+            //Write SEI ?!
+
+        }
+    }else{
+        AMediaCodecBufferInfo info;
+        info.offset=0;
+        info.size=nalu.data_length;
+        info.presentationTimeUs=0;
+        //info.flags=0;
+        info.flags=AMEDIACODEC_CONFIGURE_FLAG_ENCODE; //1
+        AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,nalu.data,&info);
     }
 }
 
@@ -109,6 +144,11 @@ void VideoNative::removeConsumers(){
         ANativeWindow_release(window);
         window=nullptr;
     }
+    if(mMuxer!= nullptr){
+        AMediaMuxer_stop(mMuxer);
+        AMediaMuxer_delete(mMuxer);
+        close(mFD);
+    }
 }
 
 void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
@@ -135,14 +175,14 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         }break;
         case FILE:{
             const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            mFileReceiver=new FileReader(filename,0,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,int data_length) {
+            mFileReceiver=new FileReader(filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,int data_length) {
                 onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();
         }break;
         case ASSETS:{
             const std::string filename=mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264");
-            mFileReceiver=new FileReader(assetManager,filename,0,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,int data_length) {
+            mFileReceiver=new FileReader(assetManager,filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,int data_length) {
                 onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();

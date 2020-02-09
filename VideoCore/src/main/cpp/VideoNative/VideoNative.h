@@ -11,8 +11,10 @@
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
 #include "../Helper/SettingsN.hpp"
-#include "../Helper/FileReader.hpp"
+#include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
+
+#include <media/NdkMediaMuxer.h>
 
 class VideoNative{
 public:
@@ -45,6 +47,11 @@ public:
     GroundRecorder* mGroundRecorder= nullptr;
     long nNALUsAtLastCall=0;
     FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
+private:
+    AMediaMuxer* mMuxer=nullptr;
+    size_t mTrackIndex;
+    KeyFrameFinder mKeyFrameFInder;
+    int mFD;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

@@ -9,9 +9,7 @@ import android.preference.PreferenceManager;
 import android.view.Surface;
 
 import java.io.File;
-
 import constantin.video.core.R;
-
 import static android.content.Context.MODE_PRIVATE;
 
 public class VideoNative {
@@ -37,15 +35,6 @@ public class VideoNative {
     public static native boolean anyVideoDataReceived(long nativeInstance);
     public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
     public static native boolean receivingVideoButCannotParse(long nativeInstance);
-
-    public interface NativeInterfaceVideoParamsChanged {
-        @SuppressWarnings("unused")
-        void onVideoRatioChanged(int videoW, int videoH);
-        @SuppressWarnings("unused")
-        void onDecodingInfoChanged(float currentFPS, float currentKiloBitsPerSecond, float avgParsingTime_ms, float avgWaitForInputBTime_ms, float avgDecodingTime_ms,
-                                   int nNALU, int nNALUSFeeded);
-    }
-
 
     public static final int VS_SOURCE_UDP=0;
     public static final int VS_SOURCE_FILE=1;

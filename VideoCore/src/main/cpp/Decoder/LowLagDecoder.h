@@ -15,7 +15,7 @@
 
 #include "../NALU/NALU.hpp"
 #include "../Helper/TimeHelper.hpp"
-
+#include "../NALU/KeyFrameFinder.h"
 
 class LowLagDecoder {
 private:
@@ -46,7 +46,7 @@ public:
     void interpretNALU(const NALU& nalu);
     void waitForShutdownAndDelete();
 private:
-    void configureStartDecoder(const NALU& nalu);
+    void configureStartDecoder(const NALU& sps,const NALU& pps);
     void feedDecoder(const NALU& nalu,bool justEOS);
     void checkOutputLoop();
     void printAvgLog();
@@ -56,8 +56,6 @@ private:
     const int mCheckOutputThreadCPUPriority;
     Decoder decoder;
     DecodingInfo decodingInfo;
-    uint8_t CSDO[NALU::NALU_MAXLEN],CSD1[NALU::NALU_MAXLEN];
-    int CSD0Length=0,CSD1Length=0;
     bool inputPipeClosed=false;
     std::mutex mMutexInputPipe;
     DECODER_RATIO_CHANGED onDecoderRatioChangedCallback= nullptr;
@@ -75,6 +73,7 @@ private:
     static constexpr uint8_t SPS_X264_NO_VUI[15]{
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,64
     };
+    KeyFrameFinder mKeyFrameFinder;
 };
 
 #endif //LOW_LAG_DECODER

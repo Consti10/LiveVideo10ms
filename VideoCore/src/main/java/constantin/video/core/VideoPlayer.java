@@ -6,10 +6,14 @@ import android.view.Surface;
 
 import java.io.File;
 
+import constantin.video.core.VideoNative.NativeInterfaceVideoParamsChanged;
 import constantin.video.core.VideoNative.VideoNative;
+import constantin.video.core.IVideoParamsChanged;
+import constantin.video.core.DecodingInfo;
+
 
 //Convenient wrapper around the native functions from VideoNative
-public class VideoPlayer implements VideoNative.NativeInterfaceVideoParamsChanged {
+public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged videoParamsChanged;
     private final Context context;

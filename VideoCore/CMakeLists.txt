@@ -75,11 +75,11 @@ set(VIDEO_PATH src/main/cpp)
 add_library( VideoNative
              SHARED
         ${VIDEO_PATH}/General/UDPReceiver.cpp
+        ${VIDEO_PATH}/General/FileReader.cpp
 
         ${VIDEO_PATH}/Parser/H264Parser.cpp
         ${VIDEO_PATH}/Parser/ParseRAW.cpp
         ${VIDEO_PATH}/Parser/ParseRTP.cpp
-
         ${VIDEO_PATH}/Decoder/LowLagDecoder.cpp
         ${VIDEO_PATH}/VideoNative/VideoNative.cpp)
 

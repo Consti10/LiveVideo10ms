@@ -54,32 +54,21 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         //No data in NALU (e.g at the beginning of a stream)
         return;
     }
-    //const NALU& naluToFeed=modNALU== nullptr ? nalu:*modNALU;
     if(decoder.configured){
         feedDecoder(nalu,false);
         decodingInfo.nNALUSFeeded++;
-    } else{
-        configureStartDecoder(nalu);
+    }else{
+        //store sps / pps data. As soon as enough data has been buffered to initialize the decoder,do so.
+        mKeyFrameFinder.saveIfKeyFrame(nalu);
+        if(mKeyFrameFinder.allKeyFramesAvailable()){
+            configureStartDecoder(mKeyFrameFinder.getCSD0(),mKeyFrameFinder.getCSD1());
+        }
     }
 }
 
-//store sps / pps data. As soon as enough data has been buffered to initialize the decoder,
-//Do so.
-void LowLagDecoder::configureStartDecoder(const NALU& nalu){
-    if(nalu.isSPS()){
-        memcpy(CSDO,nalu.data,(size_t )nalu.data_length);
-        CSD0Length=nalu.data_length;
-        LOGD("SPS found");
-    }else if(nalu.isPPS()){
-        memcpy(CSD1,nalu.data,(size_t )nalu.data_length);
-        CSD1Length=nalu.data_length;
-        LOGD("PPS found");
-    }
-    if(CSD0Length==0||CSD1Length==0){
-        //There is no CSD0/CSD1 data yet. We don't have enough information to initialize the decoder.
-        return;
-    }
-    //SW decoder seems to be broken in native
+//Initialize decoder with provided SPS/PPS data.
+//Set Decoder.configured to true on success
+void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     if(decoder.SW){
         decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
     }else {
@@ -91,26 +80,23 @@ void LowLagDecoder::configureStartDecoder(const NALU& nalu){
     }
     decoder.format=AMediaFormat_new();
     AMediaFormat_setString(decoder.format,AMEDIAFORMAT_KEY_MIME,"video/avc");
-    const auto videoWH= NALU(CSDO, CSD0Length).getVideoWidthHeightSPS();
+    const auto videoWH= sps.getVideoWidthHeightSPS();
     LOGD("XYZ %d %d",videoWH[0],videoWH[1]);
-
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
     //AVCProfileBaseline==1
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
-
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
     AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-
-    AMediaFormat_setBuffer(decoder.format,"csd-0",&CSDO,(size_t)CSD0Length);
-    AMediaFormat_setBuffer(decoder.format,"csd-1",&CSD1,(size_t)CSD1Length);
+    AMediaFormat_setBuffer(decoder.format,"csd-0",sps.data,(size_t)sps.data_length);
+    AMediaFormat_setBuffer(decoder.format,"csd-1",pps.data,(size_t)pps.data_length);
+    
 
     AMediaCodec_configure(decoder.codec, decoder.format, decoder.window, nullptr, 0);
     if (decoder.codec== nullptr) {
         LOGD("Cannot configure decoder");
         //set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
-        CSD0Length=0;
-        CSD1Length=0;
+        mKeyFrameFinder.reset();
         return;
     }
     AMediaCodec_start(decoder.codec);
@@ -241,8 +227,7 @@ void LowLagDecoder::waitForShutdownAndDelete() {
         //now clean up the hw decoder
         AMediaCodec_stop(decoder.codec);
         AMediaCodec_delete(decoder.codec);
-        CSD0Length=0;
-        CSD1Length=0;
+        mKeyFrameFinder.reset();
         decoder.configured=false;
     }
 }

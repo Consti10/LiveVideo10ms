@@ -11,7 +11,7 @@ public class DecodingInfo {
     public final float avgParsingTime_ms;
     public final float avgWaitForInputBTime_ms;
     public final float avgHWDecodingTime_ms; //time the hw decoder was holding on to frames. Not the full decoding time !
-    public final float avgDecodingTime_ms;
+    public final float avgTotalDecodingTime_ms;
     public final int nNALU;
     public final int nNALUSFeeded;
 
@@ -23,7 +23,7 @@ public class DecodingInfo {
         avgHWDecodingTime_ms=0;
         nNALU=0;
         nNALUSFeeded=0;
-        avgDecodingTime_ms=0;
+        avgTotalDecodingTime_ms =0;
     }
 
     public DecodingInfo(float currentFPS, float currentKiloBitsPerSecond,float avgParsingTime_ms,float avgWaitForInputBTime_ms,float avgHWDecodingTime_ms,
@@ -33,9 +33,9 @@ public class DecodingInfo {
         this.avgParsingTime_ms=avgParsingTime_ms;
         this.avgWaitForInputBTime_ms=avgWaitForInputBTime_ms;
         this.avgHWDecodingTime_ms =avgHWDecodingTime_ms;
+        this.avgTotalDecodingTime_ms =avgParsingTime_ms+avgWaitForInputBTime_ms+avgHWDecodingTime_ms;
         this.nNALU=nNALU;
         this.nNALUSFeeded=nNALUSFeeded;
-        this.avgDecodingTime_ms=avgParsingTime_ms+avgWaitForInputBTime_ms+avgHWDecodingTime_ms;
     }
 
     public Map<String,Object> toMap(){
@@ -45,24 +45,23 @@ public class DecodingInfo {
         decodingInfo.put("avgParsingTime_ms",avgParsingTime_ms);
         decodingInfo.put("avgWaitForInputBTime_ms",avgWaitForInputBTime_ms);
         decodingInfo.put("avgHWDecodingTime_ms", avgHWDecodingTime_ms);
-        decodingInfo.put("avgTotalDecodingTime_ms",(avgParsingTime_ms+avgWaitForInputBTime_ms+ avgHWDecodingTime_ms));
+        decodingInfo.put("avgTotalDecodingTime_ms", avgTotalDecodingTime_ms);
         decodingInfo.put("nNALU",nNALU);
         decodingInfo.put("nNALUSFeeded",nNALUSFeeded);
-        decodingInfo.put("avgDecodingTime_ms",avgDecodingTime_ms);
         return decodingInfo;
     }
 
     public String toString(final boolean newline){
-        final String s=newline ? "\n" : "";
-        return "Decoding info:"+s+
-                " currentFPS:"+currentFPS+s+
-                " currentKiloBitsPerSecond:"+currentKiloBitsPerSecond+s+
-                " avgParsingTime_ms:"+avgParsingTime_ms+s+
-                " avgWaitForInputBTime_ms:"+avgWaitForInputBTime_ms+s+
-                " avgHWDecodingTime_ms:"+ avgHWDecodingTime_ms+s+
-                " avgDecodingTime_ms"+avgDecodingTime_ms+s+
-                " nNALU:"+nNALU+s+
-                " nNALUSFeeded:"+nNALUSFeeded;
+        final StringBuilder builder=new StringBuilder();
+        builder.append( "Decoding info:\n");
+        final Map<String,Object> map=toMap();
+        for(final String key:map.keySet()){
+            //Either float or int, toString available
+            final Object value=map.get(key);
+            builder.append(key).append(":").append(value);
+            if(newline)builder.append("\n");
+        }
+        return builder.toString();
     }
 
     @Override

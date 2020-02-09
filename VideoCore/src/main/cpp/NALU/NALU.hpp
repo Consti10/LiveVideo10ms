@@ -20,6 +20,7 @@
 //a) DATA buffer
 //b) buffer length
 //c) creation time
+//Does NOT own the data
 
 class NALU{
 public:
@@ -119,6 +120,7 @@ public:
         }
         return ss.str();
     }
+
 
     //Returns video width and height if the NALU is an SPS
     std::array<int,2> getVideoWidthHeightSPS()const{
