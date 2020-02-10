@@ -18,6 +18,9 @@ static const constexpr auto TAG="FileReader";
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
+    if(data.size()==0){
+        return;
+    }
     int offset=0;
     const int len=(int)data.size();
     while(receiving){
@@ -127,14 +130,14 @@ FileReader::loadAssetAsRawVideoStream(AAssetManager *assetManager, const std::st
 void FileReader::receiveLoop() {
     nReceivedB=0;
     if(assetManager!= nullptr){
-        //from Assets we support both raw and mp4
+        //load once into memory, then loop (repeating) until done
         const auto data=loadAssetAsRawVideoStream(assetManager,filename);
         while(receiving){
             passDataInChunks(data);
         }
     }else{
-        //from file we only support mp4
-        parseMP4FileAsRawVideoStream(filename);
+        //load and pass small chunks one by one, reset to beginning of file when done
+        parseFileAsRawVideoStream(filename);
     }
 }
 
@@ -146,65 +149,88 @@ ssize_t fsize(const char *filename) {
     return -1;
 }
 
-void FileReader::parseMP4FileAsRawVideoStream(const std::string &filename) {
-    const auto fileSize=fsize(filename.c_str());
-    if(fileSize<=0){
-        LOGD("Error file size %d",(int)fileSize);
-        return;
-    }
-    const int fd = open(filename.c_str(), O_RDONLY, 0666);
-    if(fd<0){
-        LOGD("Error open file: %s fp: %d",filename.c_str(),fd);
-        return;
-    }
-    AMediaExtractor* extractor=AMediaExtractor_new();
-    auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,0,fileSize);
-    if(mediaStatus!=AMEDIA_OK){
-        LOGD("Error open File %s,mediaStatus: %d",filename.c_str(),mediaStatus);
+void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
+    if(endsWith(filename,".mp4")){
+        const auto fileSize=fsize(filename.c_str());
+        if(fileSize<=0){
+            LOGD("Error file size %d",(int)fileSize);
+            return;
+        }
+        const int fd = open(filename.c_str(), O_RDONLY, 0666);
+        if(fd<0){
+            LOGD("Error open file: %s fp: %d",filename.c_str(),fd);
+            return;
+        }
+        AMediaExtractor* extractor=AMediaExtractor_new();
+        auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,0,fileSize);
+        if(mediaStatus!=AMEDIA_OK){
+            LOGD("Error open File %s,mediaStatus: %d",filename.c_str(),mediaStatus);
+            AMediaExtractor_delete(extractor);
+            close(fd);
+            return;
+        }
+        const auto trackCount=AMediaExtractor_getTrackCount(extractor);
+        bool videoTrackFound=false;
+        std::vector<uint8_t> csd0;
+        std::vector<uint8_t> csd1;
+        for(size_t i=0;i<trackCount;i++){
+            AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
+            const char* s;
+            AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
+            LOGD("Track is %s",s);
+            if(std::string(s).compare("video/avc")==0){
+                mediaStatus=AMediaExtractor_selectTrack(extractor,i);
+                csd0=getBufferFromMediaFormat("csd-0",format);
+                csd1=getBufferFromMediaFormat("csd-1",format);
+                LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
+                AMediaFormat_delete(format);
+                videoTrackFound=true;
+                break;
+            }
+        }
+        if(!videoTrackFound){
+            LOGD("Cannot find video track");
+            AMediaExtractor_delete(extractor);
+            close(fd);
+        }
+        //All good, feed configuration, then load & feed data one by one
+        passDataInChunks(csd0);
+        passDataInChunks(csd1);
+        //Loop until done
+        std::vector<uint8_t> buffer;
+        while(receiving){
+            const auto sampleSize=FileReader::AMediaExtractor_readSampleDataCPP(extractor,buffer);
+            if(sampleSize<0){
+                //TODO seek back to 0
+                break;
+            }
+            const auto flags=AMediaExtractor_getSampleFlags(extractor);
+            passDataInChunks(buffer);
+            AMediaExtractor_advance(extractor);
+        }
         AMediaExtractor_delete(extractor);
         close(fd);
-        return;
-    }
-    const auto trackCount=AMediaExtractor_getTrackCount(extractor);
-    bool videoTrackFound=false;
-    std::vector<uint8_t> csd0;
-    std::vector<uint8_t> csd1;
-    for(size_t i=0;i<trackCount;i++){
-        AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
-        const char* s;
-        AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
-        LOGD("Track is %s",s);
-        if(std::string(s).compare("video/avc")==0){
-            mediaStatus=AMediaExtractor_selectTrack(extractor,i);
-            csd0=getBufferFromMediaFormat("csd-0",format);
-            csd1=getBufferFromMediaFormat("csd-1",format);
-            LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
-            AMediaFormat_delete(format);
-            videoTrackFound=true;
-            break;
+    }else{
+        std::ifstream file (filename.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
+        if (!file.is_open()) {
+            LOGD("Cannot open file %s",filename.c_str());
+        } else {
+            LOGD("Opened File %s",filename.c_str());
+            file.seekg (0, std::ios::beg);
+            std::vector<uint8_t> buffer(NALU::NALU_MAXLEN);
+            while (receiving) {
+                if(file.eof()){
+                    file.clear();
+                    file.seekg (0, std::ios::beg);
+                }
+                buffer.resize(NALU::NALU_MAXLEN);
+                file.read((char*)buffer.data(), buffer.size());
+                std::streamsize dataSize = file.gcount();
+                buffer.resize(dataSize>=0 ?(unsigned) dataSize : 0);
+                passDataInChunks(buffer);
+            }
+            file.close();
         }
     }
-    if(!videoTrackFound){
-        LOGD("Cannot find video track");
-        AMediaExtractor_delete(extractor);
-        close(fd);
-    }
-    //All good, feed configuration, then load & feed data one by one
-    passDataInChunks(csd0);
-    passDataInChunks(csd1);
-    //Loop until done
-    std::vector<uint8_t> buffer;
-    while(receiving){
-        const auto sampleSize=FileReader::AMediaExtractor_readSampleDataCPP(extractor,buffer);
-        if(sampleSize<0){
-            //TODO seek back to 0
-            break;
-        }
-        const auto flags=AMediaExtractor_getSampleFlags(extractor);
-        passDataInChunks(buffer);
-        AMediaExtractor_advance(extractor);
-    }
-    AMediaExtractor_delete(extractor);
-    close(fd);
 }
 

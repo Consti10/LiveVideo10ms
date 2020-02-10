@@ -59,7 +59,7 @@ private:
     static std::vector<uint8_t> loadAssetAsRawVideoStream(AAssetManager* assetManager,const std::string& path);
 
     //instead of loading whole file into memory, pass data one by one
-    void parseMP4FileAsRawVideoStream(const std::string &filename);
+    void parseFileAsRawVideoStream(const std::string &filename);
 
     //Utility for MediaFormat Handling, return buffer as std::vector that owns memory
     static std::vector<uint8_t> getBufferFromMediaFormat(const char* name,AMediaFormat* format);
