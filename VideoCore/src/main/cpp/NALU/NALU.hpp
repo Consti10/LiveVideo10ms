@@ -45,19 +45,19 @@ public:
     //*/
     static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
 public:
-    NALU(const uint8_t* data,const int data_length):
+    NALU(const uint8_t* data,const size_t data_length):
         data(data),
         data_length(data_length),
         creationTime{std::chrono::steady_clock::now()}{
 
     };
-    NALU(const uint8_t* data,const int data_length,const std::chrono::steady_clock::time_point creationTime):
+    NALU(const uint8_t* data,const size_t data_length,const std::chrono::steady_clock::time_point creationTime):
         data(data),
         data_length(data_length),
         creationTime{creationTime}{
     };
     const uint8_t* data;
-    const int data_length;
+    const size_t data_length;
     const std::chrono::steady_clock::time_point creationTime;
     const uint32_t presentationTimeMS=0;
 public:
@@ -75,7 +75,7 @@ public:
     const uint8_t* getDataWithoutPrefix()const{
         return &data[4];
     }
-    const int getDataSizeWithoutPrefix()const{
+    const ssize_t getDataSizeWithoutPrefix()const{
         return data_length-4;
     }
     static std::string get_nal_name(int nal_unit_type){
@@ -129,7 +129,7 @@ public:
             return {-1,-1};
         }
         h264_stream_t* h = h264_new();
-        read_nal_unit(h,getDataWithoutPrefix(),getDataSizeWithoutPrefix());
+        read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
         sps_t* sps=h->sps;
         int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
         int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
@@ -140,13 +140,13 @@ public:
     //Don't forget to free the h264 stream
     h264_stream_t* toH264Stream()const{
         h264_stream_t* h = h264_new();
-        read_nal_unit(h,getDataWithoutPrefix(),getDataSizeWithoutPrefix());
+        read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
         return h;
     }
 
     void debugX()const{
         h264_stream_t* h = h264_new();
-        read_debug_nal_unit(h,getDataWithoutPrefix(),getDataSizeWithoutPrefix());
+        read_debug_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
         h264_free(h);
     }
 
@@ -174,11 +174,11 @@ public:
         memcpy(newNaluData,tmp.data(),(size_t)writeRet);
         if(oldNALU!= nullptr){
             if(oldNALU->data_length!=writeRet){
-                __android_log_print(ANDROID_LOG_ERROR,"NALU","Error h264bitstream %d %d",oldNALU->data_length,writeRet);
+                __android_log_print(ANDROID_LOG_ERROR,"NALU","Error h264bitstream %d %d",(int)oldNALU->data_length,writeRet);
             }
-            return new NALU(newNaluData,writeRet,oldNALU->creationTime);
+            return new NALU(newNaluData,(size_t)writeRet,oldNALU->creationTime);
         }
-        return new NALU(newNaluData,writeRet);
+        return new NALU(newNaluData,(size_t)writeRet);
     }
 };
 

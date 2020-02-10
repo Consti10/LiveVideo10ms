@@ -36,9 +36,9 @@ void VideoNative::onNewVideoData(const uint8_t* data,const std::size_t data_leng
     mParser.setLimitFPS(maxFPS);
     //LOGD("onNewVideoData %d",data_length);
     if(isRTPData){
-        mParser.parse_rtp_h264_stream(data,(int)data_length);
+        mParser.parse_rtp_h264_stream(data,data_length);
     }else{
-        mParser.parse_raw_h264_stream(data,(int)data_length);
+        mParser.parse_raw_h264_stream(data,data_length);
     }
 
 }
@@ -174,21 +174,21 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
-            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](uint8_t* data,int data_length) {
+            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,useRTP,-1);
             });
             mVideoReceiver->startReceiving();
         }break;
         case FILE:{
             const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            mFileReceiver=new FileReader(filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,std::size_t data_length) {
+            mFileReceiver=new FileReader(filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();
         }break;
         case ASSETS:{
             const std::string filename=mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264");
-            mFileReceiver=new FileReader(assetManager,filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,std::size_t data_length) {
+            mFileReceiver=new FileReader(assetManager,filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();

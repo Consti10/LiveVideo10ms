@@ -68,7 +68,7 @@ void UDPReceiver::receiveFromUDPLoop() {
         ssize_t message_length = recvfrom(mSocket, buff, (size_t)mBuffsize, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
         //ssize_t message_length = recv(mSocket, buff, (size_t) mBuffsize, MSG_WAITALL);
         if (message_length > 0) { //else -1 was returned;timeout/No data received
-            onDataReceivedCallback(buff, (int) message_length);
+            onDataReceivedCallback(buff, (size_t)message_length);
             const char* p=inet_ntoa(source.sin_addr);
             if(onSourceIP!=nullptr){
                 onSourceIP(p);

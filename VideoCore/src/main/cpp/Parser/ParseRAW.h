@@ -15,12 +15,12 @@
 class ParseRAW {
 public:
     ParseRAW(NALU_DATA_CALLBACK cb);
-    void parseData(const uint8_t* data,const int data_length);
+    void parseData(const uint8_t* data,const size_t data_length);
     void reset();
 private:
     const NALU_DATA_CALLBACK cb;
     uint8_t nalu_data[NALU::NALU_MAXLEN];
-    int nalu_data_position=4;
+    unsigned int nalu_data_position=4;
     int nalu_search_state=0;
 };
 
