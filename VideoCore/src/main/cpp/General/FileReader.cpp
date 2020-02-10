@@ -115,7 +115,9 @@ void FileReader::receiveLoop() {
     if(assetManager!= nullptr){
         //from Assets we support both raw and mp4
         const auto data=loadAssetAsRawVideoStream(assetManager,filename);
-        passDataInChunks(data);
+        while(receiving){
+            passDataInChunks(data);
+        }
     }else{
         //from file we only support mp4
         parseMP4FileAsRawVideoStream(filename);

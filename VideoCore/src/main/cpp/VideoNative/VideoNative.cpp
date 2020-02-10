@@ -81,7 +81,7 @@ void VideoNative::onNewNALU(const NALU& nalu){
         const auto now=std::chrono::steady_clock::now();
         const auto duration=now-lastFeed;
         lastFeed=now;
-        info.presentationTimeUs=std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+        //info.presentationTimeUs=std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
         //info.flags=0;
         info.flags=AMEDIACODEC_CONFIGURE_FLAG_ENCODE; //1
         AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,nalu.data,&info);
