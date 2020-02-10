@@ -201,8 +201,8 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
         while(receiving){
             const auto sampleSize=FileReader::AMediaExtractor_readSampleDataCPP(extractor,buffer);
             if(sampleSize<0){
-                //TODO seek back to 0
-                break;
+                AMediaExtractor_seekTo(extractor,0, AMEDIAEXTRACTOR_SEEK_CLOSEST_SYNC);
+                continue;
             }
             const auto flags=AMediaExtractor_getSampleFlags(extractor);
             passDataInChunks(buffer);

@@ -16,6 +16,9 @@
 #include <sstream>
 #include <fstream>
 
+//Creates a new thread that 'receives' data from File and forwards video data
+//Via the RAW_DATA_CALLBACK
+
 class FileReader{
 public:
     //RAW H264 NALUs, not specified how and when SPS/PPS come
