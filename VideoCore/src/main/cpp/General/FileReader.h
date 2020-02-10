@@ -21,23 +21,25 @@
 
 class FileReader{
 public:
-    //RAW H264 NALUs, not specified how and when SPS/PPS come
-    typedef std::function<void(const uint8_t[],int)> RAW_DATA_CALLBACK;
+    //RAW H264 NALUs,not specified how and when SPS/PPS come
+    typedef std::function<void(const uint8_t[],std::size_t)> RAW_DATA_CALLBACK;
     //Read from file system
-    FileReader(const std::string fn,RAW_DATA_CALLBACK onDataReceivedCallback,int chunkSize=1024):
+    FileReader(const std::string fn,RAW_DATA_CALLBACK onDataReceivedCallback,std::size_t chunkSize=1024):
             filename(fn),CHUNK_SIZE(chunkSize),
             onDataReceivedCallback(onDataReceivedCallback){
     }
     //Read from the android asset manager
-    FileReader(AAssetManager* assetManager,const std::string filename,RAW_DATA_CALLBACK onDataReceivedCallback,int chunkSize=1024):
+    FileReader(AAssetManager* assetManager,const std::string filename,RAW_DATA_CALLBACK onDataReceivedCallback,std::size_t chunkSize=1024):
             filename(filename),CHUNK_SIZE(chunkSize),
             onDataReceivedCallback(onDataReceivedCallback){
         this->assetManager=assetManager;
     }
+    //Create and start the receiving thread, which will run until stopReading() is called.
     void startReading(){
         receiving=true;
         mThread=new std::thread([this] { this->receiveLoop(); });
     }
+    //After stopReading() it is guaranteed that no more data will be fed trough the callback
     void stopReading(){
         receiving=false;
         if(mThread->joinable()){
@@ -51,6 +53,7 @@ public:
 private:
     //Pass all data divided in parts of data of size==CHUNK_SIZE
     //Returns when all data has been passed or stopReceiving is called
+    void passDataInChunks(const uint8_t data[],const size_t size);
     void passDataInChunks(const std::vector<uint8_t>& data);
 
     //Parse the specified asset into raw h264 video data (if needed), then return it as one big std::vector
@@ -66,17 +69,15 @@ private:
 
     //Utility for MediaFormat Handling, return buffer as std::vector that owns memory
     static std::vector<uint8_t> getBufferFromMediaFormat(const char* name,AMediaFormat* format);
-    //Utility, re-sizes vector to NALU_MAXLEN, then calls AMediaExtractor_readSampleData
-    //Afterwards, re-sizes vector again to sample size if sample size>0 and returns sample size
-    static ssize_t AMediaExtractor_readSampleDataCPP(AMediaExtractor* extractor,std::vector<uint8_t>& data);
 private:
     const RAW_DATA_CALLBACK onDataReceivedCallback;
     std::thread* mThread= nullptr;
     std::atomic<bool> receiving;
     int nReceivedB=0;
-    const std::string filename;
-    const int CHUNK_SIZE;
+    const std::size_t CHUNK_SIZE;
+    //if assetManager!=nullptr the filename is relative to the assets directory,else normal filesystem
     AAssetManager* assetManager= nullptr;
+    const std::string filename;
     void receiveLoop();
 };
 

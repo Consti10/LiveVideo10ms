@@ -19,7 +19,7 @@
 class VideoNative{
 public:
     VideoNative(JNIEnv * env,jobject videoParamsChangedI,jobject context,const char* DIR);
-    void onNewVideoData(const uint8_t* data,const int data_length,const bool isRTPData,const int limitFPS);
+    void onNewVideoData(const uint8_t* data,const std::size_t data_length,const bool isRTPData,const int limitFPS);
     void addConsumers(JNIEnv* env,jobject surface);
     void removeConsumers();
     void startReceiver(JNIEnv *env, AAssetManager *assetManager);

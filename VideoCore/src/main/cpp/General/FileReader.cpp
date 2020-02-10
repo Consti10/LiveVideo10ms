@@ -17,24 +17,20 @@ static bool endsWith(const std::string& str, const std::string& suffix){
 static const constexpr auto TAG="FileReader";
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
+void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
+    if(!receiving || size==0)return;
+    if(size>CHUNK_SIZE){
+        nReceivedB+=CHUNK_SIZE;
+        onDataReceivedCallback(data,CHUNK_SIZE);
+        passDataInChunks(&data[CHUNK_SIZE],size-CHUNK_SIZE);
+    }else{
+        nReceivedB+=size;
+        onDataReceivedCallback(data,(int)size);
+    }
+}
 void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
-    if(data.size()==0){
-        return;
-    }
-    int offset=0;
-    const int len=(int)data.size();
-    while(receiving){
-        const int len_left=len-offset;
-        if(len_left>=CHUNK_SIZE){
-            nReceivedB+=CHUNK_SIZE;
-            onDataReceivedCallback(&data[offset],CHUNK_SIZE);
-            offset+=CHUNK_SIZE;
-        }else{
-            nReceivedB+=len_left;
-            onDataReceivedCallback(&data[offset],len_left);
-            return;
-        }
-    }
+    LOGD("X %d",(int)data.size());
+    passDataInChunks(data.data(),data.size());
 }
 
 std::vector<uint8_t> FileReader::getBufferFromMediaFormat(const char *name, AMediaFormat *format) {
@@ -46,17 +42,15 @@ std::vector<uint8_t> FileReader::getBufferFromMediaFormat(const char *name, AMed
     return ret;
 }
 
-ssize_t FileReader::AMediaExtractor_readSampleDataCPP(AMediaExtractor *extractor,std::vector<uint8_t> &data) {
-    data.resize(NALU::NALU_MAXLEN);
-    const auto sampleSize=AMediaExtractor_readSampleData(extractor,data.data(),data.size());
-    data.resize(sampleSize >= 0 ? (unsigned) sampleSize : 0);
-    return sampleSize;
-}
-
 //Append whole content of vector1 to vector0, why is there no cpp standart for that ?!
 template<typename T>
-static void vector_append(std::vector<T>& vector0,const std::vector<T> vector1){
+static inline void vector_append(std::vector<T>& vector0,const std::vector<T>& vector1){
     vector0.insert(vector0.end(),vector1.begin(),vector1.end());
+}
+//the ndk resize() is not usable without compiler optimization level 'o3'
+template<typename T>
+static inline void vector_append(std::vector<T>& vector0,const std::vector<T>& vector1,const size_t vector1Size){
+    vector0.insert(vector0.end(),vector1.begin(),vector1.begin()+vector1Size);
 }
 
 std::vector<uint8_t>
@@ -76,6 +70,7 @@ FileReader::loadAssetAsRawVideoStream(AAssetManager *assetManager, const std::st
         //This will save all data as RAW
         //SPS/PPS in the beginning, rest afterwards
         std::vector<uint8_t> rawData;
+        rawData.reserve((unsigned)length);
         for(size_t i=0;i<trackCount;i++){
             AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
             const char* s;
@@ -92,35 +87,37 @@ FileReader::loadAssetAsRawVideoStream(AAssetManager *assetManager, const std::st
             }
             AMediaFormat_delete(format);
         }
-        std::vector<uint8_t> buffer;
+        std::vector<uint8_t> sampleBuffer(NALU::NALU_MAXLEN);
         while(true){
-            const auto sampleSize=FileReader::AMediaExtractor_readSampleDataCPP(extractor,buffer);
-            if(sampleSize<0){
+            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer.data(),sampleBuffer.size());
+            if(sampleSize<=0){
                 break;
             }
             const auto flags=AMediaExtractor_getSampleFlags(extractor);
-            LOGD("Read sample %d flags %d",sampleSize,flags);
-            const NALU nalu(buffer.data(),sampleSize);
-            LOGD("NALU %s",nalu.get_nal_name().c_str());
-            vector_append(rawData,buffer);
+            LOGD("Read sample %d flags %d",(int)sampleSize,flags);
+            vector_append(rawData,sampleBuffer,(unsigned)sampleSize);
+            //rawData.insert(rawData.end(),sampleBuffer.begin(),sampleBuffer.begin()+sampleSize);
             AMediaExtractor_advance(extractor);
         }
         AMediaExtractor_delete(extractor);
+        AAsset_close(asset);
+        LOGD("The entire file content (asset,mp4) is in memory %d",(int)rawData.size());
         return rawData;
     }else if(endsWith(path,".h264")){
         //Read raw data from file (without MediaExtractor)
         AAsset* asset = AAssetManager_open(assetManager, path.c_str(), 0);
         if(!asset){
             LOGD("Error asset not found:%s",path.c_str());
-        }else{
-            const size_t size=(size_t)AAsset_getLength(asset);
-            AAsset_seek(asset,0,SEEK_SET);
-            std::vector<uint8_t> rawData(size);
-            int len=AAsset_read(asset,rawData.data(),size);
-            AAsset_close(asset);
-            LOGD("The entire file content (asset) is in memory %d",(int)size);
-            return rawData;
+            return std::vector<uint8_t>();
         }
+        const size_t size=(size_t)AAsset_getLength(asset);
+        AAsset_seek(asset,0,SEEK_SET);
+        std::vector<uint8_t> rawData(size);
+        int len=AAsset_read(asset,rawData.data(),size);
+        AAsset_close(asset);
+        LOGD("The entire file content (asset,h264) is in memory %d",(int)rawData.size());
+        return rawData;
+
     }
     LOGD("Error not supported file %s",path.c_str());
     return std::vector<uint8_t>();
@@ -197,15 +194,15 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
         passDataInChunks(csd0);
         passDataInChunks(csd1);
         //Loop until done
-        std::vector<uint8_t> buffer;
+        std::vector<uint8_t> buffer(NALU::NALU_MAXLEN);
         while(receiving){
-            const auto sampleSize=FileReader::AMediaExtractor_readSampleDataCPP(extractor,buffer);
+            const auto sampleSize=AMediaExtractor_readSampleData(extractor,buffer.data(),buffer.size());
             if(sampleSize<0){
                 AMediaExtractor_seekTo(extractor,0, AMEDIAEXTRACTOR_SEEK_CLOSEST_SYNC);
                 continue;
             }
             const auto flags=AMediaExtractor_getSampleFlags(extractor);
-            passDataInChunks(buffer);
+            passDataInChunks(buffer.data(),(unsigned)sampleSize);
             AMediaExtractor_advance(extractor);
         }
         AMediaExtractor_delete(extractor);
@@ -233,4 +230,5 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
         }
     }
 }
+
 
