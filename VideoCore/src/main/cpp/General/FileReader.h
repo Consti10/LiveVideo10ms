@@ -61,8 +61,11 @@ private:
     //instead of loading whole file into memory, pass data one by one
     void parseMP4FileAsRawVideoStream(const std::string &filename);
 
-    //Utility for MediaFormat Handling
+    //Utility for MediaFormat Handling, return buffer as std::vector that owns memory
     static std::vector<uint8_t> getBufferFromMediaFormat(const char* name,AMediaFormat* format);
+    //Utility, re-sizes vector to NALU_MAXLEN, then calls AMediaExtractor_readSampleData
+    //Afterwards, re-sizes vector again to sample size if sample size>0 and returns sample size
+    static ssize_t AMediaExtractor_readSampleDataCPP(AMediaExtractor* extractor,std::vector<uint8_t>& data);
 private:
     const RAW_DATA_CALLBACK onDataReceivedCallback;
     std::thread* mThread= nullptr;
