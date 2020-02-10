@@ -48,12 +48,11 @@ public:
     long nNALUsAtLastCall=0;
     FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
 private:
-    int mFD;
+    /*int mFD;
     AMediaMuxer* mMuxer=nullptr;
-    size_t mTrackIndex;
+    ssize_t mTrackIndex;
     KeyFrameFinder mKeyFrameFInder;
-    //
-    std::chrono::steady_clock::time_point lastFeed;
+    std::chrono::steady_clock::time_point lastFeed;*/
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

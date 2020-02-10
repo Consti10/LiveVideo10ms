@@ -44,14 +44,16 @@ void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
-    //LOGD("VideoNative::onNewNALU %d %s",nalu.data_length,nalu.get_nal_name().c_str());
+    LOGD("VideoNative::onNewNALU %d %s",nalu.data_length,nalu.get_nal_name().c_str());
+    //nalu.debugX();
+
     if(mLowLagDecoder!=nullptr){
         mLowLagDecoder->interpretNALU(nalu);
     }
     if(mGroundRecorder!= nullptr){
         mGroundRecorder->writeData(nalu.data,nalu.data_length);
     }
-    if(mMuxer== nullptr){
+    /*if(mMuxer== nullptr){
         mKeyFrameFInder.saveIfKeyFrame(nalu);
         if(mKeyFrameFInder.allKeyFramesAvailable()){
             const std::string fn=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
@@ -66,8 +68,10 @@ void VideoNative::onNewNALU(const NALU& nalu){
             AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
             AMediaFormat_setBuffer(format,"csd-0",SPS.data,(size_t)SPS.data_length);
             AMediaFormat_setBuffer(format,"csd-1",PPS.data,(size_t)PPS.data_length);
+            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_MAX_INPUT_SIZE,NALU::NALU_MAXLEN);
+            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,30);
             mTrackIndex=AMediaMuxer_addTrack(mMuxer,format);
-            LOGD("Media Muxer track index %d",mTrackIndex);
+            LOGD("Media Muxer track index %d",(int)mTrackIndex);
             const auto status=AMediaMuxer_start(mMuxer);
             LOGD("Media Muxer status %d",status);
             AMediaFormat_delete(format);
@@ -81,11 +85,11 @@ void VideoNative::onNewNALU(const NALU& nalu){
         const auto now=std::chrono::steady_clock::now();
         const auto duration=now-lastFeed;
         lastFeed=now;
-        //info.presentationTimeUs=std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+        info.presentationTimeUs=std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
         //info.flags=0;
         info.flags=AMEDIACODEC_CONFIGURE_FLAG_ENCODE; //1
         AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,nalu.data,&info);
-    }
+    }*/
 }
 
 void VideoNative::onDecoderRatioChangedCallback(const int videoW,const int videoH) {
@@ -146,11 +150,11 @@ void VideoNative::removeConsumers(){
         ANativeWindow_release(window);
         window=nullptr;
     }
-    if(mMuxer!= nullptr){
+    /*if(mMuxer!= nullptr){
         AMediaMuxer_stop(mMuxer);
         AMediaMuxer_delete(mMuxer);
         close(mFD);
-    }
+    }*/
 }
 
 void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {

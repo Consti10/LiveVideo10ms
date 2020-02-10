@@ -36,6 +36,7 @@ FILE* h264_dbgfile = NULL;
 //#define printf(...) fprintf((h264_dbgfile == NULL ? stdout : h264_dbgfile), __VA_ARGS__)
 #define printf(...) __android_log_print(ANDROID_LOG_DEBUG, "h264stream", __VA_ARGS__)
 
+//#define HAVE_SEI //Consti
 
 /** 
  Calculate the log base 2 of the argument, rounded up. 

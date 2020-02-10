@@ -144,6 +144,12 @@ public:
         return h;
     }
 
+    void debugX()const{
+        h264_stream_t* h = h264_new();
+        read_debug_nal_unit(h,getDataWithoutPrefix(),getDataSizeWithoutPrefix());
+        h264_free(h);
+    }
+
     //Create a NALU from h264stream object
     //Only tested on PSP/PPS !!!!!!!!!!
     //After copying data into the new NALU the h264_stream object is deleted
