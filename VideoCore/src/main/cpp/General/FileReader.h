@@ -50,11 +50,13 @@ private:
     //Returns when all data has been passed or stopReceiving is called
     void passDataInChunks(const std::vector<uint8_t>& data);
 
-    //Parse the specified asset into raw h264 video data, then return it as one big std::vector
+    //Parse the specified asset into raw h264 video data (if needed), then return it as one big std::vector
     //Make sure to only call this on small video files,else the application might run out of memory
     //Takes files of either type .h264 -> already in raw format or
     //of type .mp4 ->use MediaExtractor to convert into raw stream
-    static std::vector<uint8_t> loadAssetAsRawVideoStream(AAssetManager* assetManager,const std::string& filename);
+    //@assetManager: valid ndk asset manager
+    //@path: path to asset
+    static std::vector<uint8_t> loadAssetAsRawVideoStream(AAssetManager* assetManager,const std::string& path);
 
     //instead of loading whole file into memory, pass data one by one
     void parseMP4FileAsRawVideoStream(const std::string &filename);

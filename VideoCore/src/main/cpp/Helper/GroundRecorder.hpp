@@ -31,7 +31,6 @@ public:
         }
         ofstream.write((char*)data,data_length);
     }
-
     void stop() {
         ofstream.flush();
         ofstream.close();

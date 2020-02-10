@@ -44,6 +44,8 @@ private:
     ParseRTP mParseRTP;
     FrameLimiter mFrameLimiter;
     int maxFPS;
+    //First time a NALU was succesfully decoded
+    //std::chrono::steady_clock::time_point timeFirstNALUArrived=std::chrono::steady_clock::time_point(0);
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

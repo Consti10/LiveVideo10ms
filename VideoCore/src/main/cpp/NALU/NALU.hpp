@@ -59,6 +59,7 @@ public:
     const uint8_t* data;
     const int data_length;
     const std::chrono::steady_clock::time_point creationTime;
+    const uint32_t presentationTimeMS=0;
 public:
     bool isSPS()const{
         return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);

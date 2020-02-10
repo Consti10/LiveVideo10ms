@@ -44,7 +44,7 @@ void VideoNative::onNewVideoData(const uint8_t* data,const int data_length,const
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
-    LOGD("VideoNative::onNewNALU %d %s",nalu.data_length,nalu.get_nal_name().c_str());
+    //LOGD("VideoNative::onNewNALU %d %s",nalu.data_length,nalu.get_nal_name().c_str());
     if(mLowLagDecoder!=nullptr){
         mLowLagDecoder->interpretNALU(nalu);
     }
@@ -56,7 +56,6 @@ void VideoNative::onNewNALU(const NALU& nalu){
         if(mKeyFrameFInder.allKeyFramesAvailable()){
             const std::string fn=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
             mFD = open(fn.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
-
             mMuxer=AMediaMuxer_new(mFD,AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
             AMediaFormat*format=AMediaFormat_new();
             const auto SPS=mKeyFrameFInder.getCSD0();
@@ -73,13 +72,16 @@ void VideoNative::onNewNALU(const NALU& nalu){
             LOGD("Media Muxer status %d",status);
             AMediaFormat_delete(format);
             //Write SEI ?!
-
+            lastFeed=std::chrono::steady_clock::now();
         }
     }else{
         AMediaCodecBufferInfo info;
         info.offset=0;
         info.size=nalu.data_length;
-        info.presentationTimeUs=0;
+        const auto now=std::chrono::steady_clock::now();
+        const auto duration=now-lastFeed;
+        lastFeed=now;
+        info.presentationTimeUs=std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
         //info.flags=0;
         info.flags=AMEDIACODEC_CONFIGURE_FLAG_ENCODE; //1
         AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,nalu.data,&info);
