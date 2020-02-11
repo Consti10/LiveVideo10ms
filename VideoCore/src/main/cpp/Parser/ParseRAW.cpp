@@ -16,7 +16,9 @@ void ParseRAW::reset(){
 
 void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
     std::stringstream ss;
-    for (int i = 0; i < data_length; ++i) {
+    __android_log_print(ANDROID_LOG_DEBUG,"TAG","X data len%d",(int)data_length);
+
+    for (size_t i = 0; i < data_length; ++i) {
        /*ss<<nalu_data[nalu_data_position]<<data[i];
        if(ss.str().length()>1000){
            __android_log_print(ANDROID_LOG_DEBUG,"TAG","%s",ss.str().c_str());

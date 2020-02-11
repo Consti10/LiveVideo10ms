@@ -15,7 +15,7 @@
 
 class UDPReceiver {
 public:
-    typedef std::function<void(uint8_t[],size_t)> DATA_CALLBACK;
+    typedef std::function<void(const uint8_t[],size_t)> DATA_CALLBACK;
     typedef std::function<void(const char*)> SOURCE_IP_CALLBACK;
 public:
     UDPReceiver(int port,const std::string& name,int CPUPriority,int buffsize,const DATA_CALLBACK& onDataReceivedCallback);

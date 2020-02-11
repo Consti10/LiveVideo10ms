@@ -79,6 +79,7 @@ private:
     AAssetManager* assetManager= nullptr;
     const std::string filename;
     void receiveLoop();
+    static constexpr const size_t NALU_BUFF_SIZE=1024*1024;
 };
 
 #endif //FPV_VR_FILERECEIVER_H

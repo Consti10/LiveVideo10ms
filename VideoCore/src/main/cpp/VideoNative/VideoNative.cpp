@@ -172,7 +172,7 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
-            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](uint8_t* data,size_t data_length) {
+            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,1024*8,[this,useRTP](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,useRTP,-1);
             });
             mVideoReceiver->startReceiving();
@@ -200,7 +200,7 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
             //LOGD("url:%s",url.c_str());
             mFFMpegVideoReceiver=new FFMpegVideoReceiver(url,0,[this](uint8_t* data,int data_length) {
-                onNewVideoData(data,data_length,false,-1);
+                onNewVideoData(data,(size_t)data_length,false,-1);
             },[this](const NALU& nalu) {
                 onNewNALU(nalu);
             });

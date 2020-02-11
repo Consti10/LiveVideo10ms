@@ -3,13 +3,13 @@
 //
 
 #include "FileReader.h"
-#include "../NALU/NALU.hpp"
 #include <iterator>
+#include <array>
 #include <cstring>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <fstream>
+#include <memory>
 
 static bool endsWith(const std::string& str, const std::string& suffix){
     return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
@@ -25,7 +25,7 @@ void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
         passDataInChunks(&data[CHUNK_SIZE],size-CHUNK_SIZE);
     }else{
         nReceivedB+=size;
-        onDataReceivedCallback(data,(int)size);
+        onDataReceivedCallback(data,size);
     }
 }
 void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
@@ -43,15 +43,42 @@ std::vector<uint8_t> FileReader::getBufferFromMediaFormat(const char *name, AMed
 }
 
 //Append whole content of vector1 to vector0, why is there no cpp standart for that ?!
-template<typename T>
-static inline void vector_append(std::vector<T>& vector0,const std::vector<T>& vector1){
-    vector0.insert(vector0.end(),vector1.begin(),vector1.end());
+static inline void vector_append(std::vector<uint8_t>& destination,const std::vector<uint8_t>& source){
+    //vector0.insert(vector0.end(),vector1.begin(),vector1.end());
+    const auto vector0InitialSize=destination.size();
+    destination.resize(vector0InitialSize+source.size());
+    memcpy(&destination.data()[vector0InitialSize],source.data(),source.size());
 }
-//the ndk resize() is not usable without compiler optimization level 'o3'
-template<typename T>
-static inline void vector_append(std::vector<T>& vector0,const std::vector<T>& vector1,const size_t vector1Size){
-    vector0.insert(vector0.end(),vector1.begin(),vector1.begin()+vector1Size);
+//the ndk insert() gives warnings with IntelliJ and does not work with vector+array
+template<size_t S>
+static inline void vector_append2(std::vector<uint8_t>& destination,const std::array<uint8_t,S>& source,const size_t sourceSize){
+    //vector0.insert(vector0.end(),vector1.begin(),vector1.begin()+vector1Size);
+    const auto vector0InitialSize=destination.size();
+    destination.resize(vector0InitialSize+sourceSize);
+    memcpy(&destination.data()[vector0InitialSize],source.data(),sourceSize);
 }
+
+static void crash1(){
+    std::array<uint8_t,1024*1024> buff;
+    buff[buff.size()-1]=0;
+}
+static void crash2(){
+    uint8_t data[1024*1024];
+    data[1024*1024-1]=0;
+}
+static void ok1(){
+    std::vector<uint8_t> buff(1024*1024);
+    buff[buff.size()-1]=0;
+}
+static void ok2(){
+    uint8_t* buff=new uint8_t[1024*1024];
+    buff[1024*1024-1]=0;
+}
+static void ok3(){
+    const auto buff=std::make_unique<std::array<uint8_t,1024*1024>>();
+    (*buff)[buff->size()-1]=0;
+}
+
 
 std::vector<uint8_t>
 FileReader::convertAssetIntoRawVideoBuffer(AAssetManager *assetManager, const std::string &path) {
@@ -87,15 +114,16 @@ FileReader::convertAssetIntoRawVideoBuffer(AAssetManager *assetManager, const st
             }
             AMediaFormat_delete(format);
         }
-        std::vector<uint8_t> sampleBuffer(NALU::NALU_MAXLEN);
+        //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
+        const auto sampleBuffer=std::make_unique<std::array<uint8_t,NALU_BUFF_SIZE>>();
         while(true){
-            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer.data(),sampleBuffer.size());
+            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
             if(sampleSize<=0){
                 break;
             }
             const auto flags=AMediaExtractor_getSampleFlags(extractor);
             LOGD("Read sample %d flags %d",(int)sampleSize,flags);
-            vector_append(rawData,sampleBuffer,(unsigned)sampleSize);
+            vector_append2(rawData,(*sampleBuffer),(size_t)sampleSize);
             AMediaExtractor_advance(extractor);
         }
         AMediaExtractor_delete(extractor);
@@ -112,11 +140,10 @@ FileReader::convertAssetIntoRawVideoBuffer(AAssetManager *assetManager, const st
         const size_t size=(size_t)AAsset_getLength(asset);
         AAsset_seek(asset,0,SEEK_SET);
         std::vector<uint8_t> rawData(size);
-        int len=AAsset_read(asset,rawData.data(),size);
+        const auto len=AAsset_read(asset,rawData.data(),size);
         AAsset_close(asset);
         LOGD("The entire file content (asset,h264) is in memory %d",(int)rawData.size());
         return rawData;
-
     }
     LOGD("Error not supported file %s",path.c_str());
     return std::vector<uint8_t>();
@@ -167,8 +194,6 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
         }
         const auto trackCount=AMediaExtractor_getTrackCount(extractor);
         bool videoTrackFound=false;
-        std::vector<uint8_t> csd0;
-        std::vector<uint8_t> csd1;
         for(size_t i=0;i<trackCount;i++){
             AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
             const char* s;
@@ -176,8 +201,10 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
             LOGD("Track is %s",s);
             if(std::string(s).compare("video/avc")==0){
                 mediaStatus=AMediaExtractor_selectTrack(extractor,i);
-                csd0=getBufferFromMediaFormat("csd-0",format);
-                csd1=getBufferFromMediaFormat("csd-1",format);
+                const auto csd0=getBufferFromMediaFormat("csd-0",format);
+                passDataInChunks(csd0);
+                const auto csd1=getBufferFromMediaFormat("csd-1",format);
+                passDataInChunks(csd1);
                 LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
                 AMediaFormat_delete(format);
                 videoTrackFound=true;
@@ -188,19 +215,19 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
             LOGD("Cannot find video track");
             AMediaExtractor_delete(extractor);
             close(fd);
+            return;
         }
         //All good, feed configuration, then load & feed data one by one
-        passDataInChunks(csd0);
-        passDataInChunks(csd1);
         //Loop until done
-        std::vector<uint8_t> buffer(NALU::NALU_MAXLEN);
+        //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
+        const auto sampleBuffer=std::make_unique<std::array<uint8_t,NALU_BUFF_SIZE>>();
         while(receiving){
-            const auto sampleSize=AMediaExtractor_readSampleData(extractor,buffer.data(),buffer.size());
+            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
             if(sampleSize<=0){
                 AMediaExtractor_seekTo(extractor,0, AMEDIAEXTRACTOR_SEEK_CLOSEST_SYNC);
                 continue;
             }
-            passDataInChunks(buffer.data(),(size_t)sampleSize);
+            passDataInChunks(sampleBuffer->data(),(size_t)sampleSize);
             AMediaExtractor_advance(extractor);
         }
         AMediaExtractor_delete(extractor);
@@ -209,19 +236,20 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
         std::ifstream file (filename.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
         if (!file.is_open()) {
             LOGD("Cannot open file %s",filename.c_str());
+            return;
         } else {
             LOGD("Opened File %s",filename.c_str());
             file.seekg (0, std::ios::beg);
-            std::vector<uint8_t> buffer(NALU::NALU_MAXLEN);
+            const auto buffer=std::make_unique<std::array<uint8_t,NALU_BUFF_SIZE>>();
             while (receiving) {
                 if(file.eof()){
                     file.clear();
                     file.seekg (0, std::ios::beg);
                 }
-                file.read((char*)buffer.data(), buffer.size());
+                file.read((char*)buffer->data(), buffer->size());
                 std::streamsize dataSize = file.gcount();
                 if(dataSize>0){
-                    passDataInChunks(buffer.data(),(size_t)dataSize);
+                    passDataInChunks(buffer->data(),(size_t)dataSize);
                 }
             }
             file.close();
