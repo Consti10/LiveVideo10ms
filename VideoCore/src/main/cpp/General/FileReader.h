@@ -62,7 +62,7 @@ private:
     //of type .mp4 ->use MediaExtractor to convert into raw stream
     //@assetManager: valid ndk asset manager
     //@path: path to asset
-    static std::vector<uint8_t> loadAssetAsRawVideoStream(AAssetManager* assetManager,const std::string& path);
+    static std::vector<uint8_t> convertAssetIntoRawVideoBuffer(AAssetManager *assetManager,const std::string &path);
 
     //instead of loading whole file into memory, pass data one by one
     void parseFileAsRawVideoStream(const std::string &filename);

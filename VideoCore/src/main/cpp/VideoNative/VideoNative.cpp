@@ -40,13 +40,11 @@ void VideoNative::onNewVideoData(const uint8_t* data,const std::size_t data_leng
     }else{
         mParser.parse_raw_h264_stream(data,data_length);
     }
-
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
     LOGD("VideoNative::onNewNALU %ld %s",nalu.data_length,nalu.get_nal_name().c_str());
     //nalu.debugX();
-
     if(mLowLagDecoder!=nullptr){
         mLowLagDecoder->interpretNALU(nalu);
     }

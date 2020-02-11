@@ -54,7 +54,7 @@ static inline void vector_append(std::vector<T>& vector0,const std::vector<T>& v
 }
 
 std::vector<uint8_t>
-FileReader::loadAssetAsRawVideoStream(AAssetManager *assetManager, const std::string &path) {
+FileReader::convertAssetIntoRawVideoBuffer(AAssetManager *assetManager, const std::string &path) {
     if(endsWith(path,".mp4")){
         //Use MediaExtractor to parse .mp4 file
         AAsset* asset = AAssetManager_open(assetManager,path.c_str(), 0);
@@ -96,7 +96,6 @@ FileReader::loadAssetAsRawVideoStream(AAssetManager *assetManager, const std::st
             const auto flags=AMediaExtractor_getSampleFlags(extractor);
             LOGD("Read sample %d flags %d",(int)sampleSize,flags);
             vector_append(rawData,sampleBuffer,(unsigned)sampleSize);
-            //rawData.insert(rawData.end(),sampleBuffer.begin(),sampleBuffer.begin()+sampleSize);
             AMediaExtractor_advance(extractor);
         }
         AMediaExtractor_delete(extractor);
@@ -128,7 +127,7 @@ void FileReader::receiveLoop() {
     nReceivedB=0;
     if(assetManager!= nullptr){
         //load once into memory, then loop (repeating) until done
-        const auto data=loadAssetAsRawVideoStream(assetManager,filename);
+        const auto data= convertAssetIntoRawVideoBuffer(assetManager, filename);
         while(receiving){
             passDataInChunks(data);
         }
@@ -197,12 +196,11 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
         std::vector<uint8_t> buffer(NALU::NALU_MAXLEN);
         while(receiving){
             const auto sampleSize=AMediaExtractor_readSampleData(extractor,buffer.data(),buffer.size());
-            if(sampleSize<0){
+            if(sampleSize<=0){
                 AMediaExtractor_seekTo(extractor,0, AMEDIAEXTRACTOR_SEEK_CLOSEST_SYNC);
                 continue;
             }
-            const auto flags=AMediaExtractor_getSampleFlags(extractor);
-            passDataInChunks(buffer.data(),(unsigned)sampleSize);
+            passDataInChunks(buffer.data(),(size_t)sampleSize);
             AMediaExtractor_advance(extractor);
         }
         AMediaExtractor_delete(extractor);
@@ -220,11 +218,11 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
                     file.clear();
                     file.seekg (0, std::ios::beg);
                 }
-                buffer.resize(NALU::NALU_MAXLEN);
                 file.read((char*)buffer.data(), buffer.size());
                 std::streamsize dataSize = file.gcount();
-                buffer.resize(dataSize>=0 ?(unsigned) dataSize : 0);
-                passDataInChunks(buffer);
+                if(dataSize>0){
+                    passDataInChunks(buffer.data(),(size_t)dataSize);
+                }
             }
             file.close();
         }

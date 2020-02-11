@@ -20,7 +20,7 @@ public:
     void reset();
 private:
     const NALU_DATA_CALLBACK cb;
-    uint8_t nalu_data[NALU::NALU_MAXLEN];
-    unsigned int nalu_data_length=0;
+    std::array<uint8_t,NALU::NALU_MAXLEN> nalu_data;
+    size_t nalu_data_length=0;
 };
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H

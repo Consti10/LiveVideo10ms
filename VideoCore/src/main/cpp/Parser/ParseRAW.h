@@ -19,8 +19,8 @@ public:
     void reset();
 private:
     const NALU_DATA_CALLBACK cb;
-    uint8_t nalu_data[NALU::NALU_MAXLEN];
-    unsigned int nalu_data_position=4;
+    std::array<uint8_t,NALU::NALU_MAXLEN> nalu_data;
+    size_t nalu_data_position=4;
     int nalu_search_state=0;
 };
 

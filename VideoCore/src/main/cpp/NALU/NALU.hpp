@@ -49,7 +49,6 @@ public:
         data(data),
         data_length(data_length),
         creationTime{std::chrono::steady_clock::now()}{
-
     };
     NALU(const uint8_t* data,const size_t data_length,const std::chrono::steady_clock::time_point creationTime):
         data(data),
@@ -68,6 +67,7 @@ public:
         return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
     }
     int get_nal_unit_type()const{
+        if(data_length<5)return -1;
         return data[4]&0x1f;
     }
     //not safe if data_length<=4;
@@ -100,7 +100,7 @@ public:
            case  NAL_UNIT_TYPE_CODED_SLICE_AUX :               nal_unit_type_name = "Coded slice of an auxiliary coded picture without partitioning"; break;
                // 20..23    // Reserved
                // 24..31    // Unspecified
-           default :                                           nal_unit_type_name = "Unknown"; break;
+           default :                                           nal_unit_type_name = "Unknown"+std::to_string(nal_unit_type); break;
        }
        return nal_unit_type_name;
    };
