@@ -37,7 +37,7 @@ public:
     //Create and start the receiving thread, which will run until stopReading() is called.
     void startReading(){
         receiving=true;
-        mThread=new std::thread([this] { this->receiveLoop(); });
+        mThread=std::make_unique<std::thread>([this]{this->receiveLoop();} );
     }
     //After stopReading() it is guaranteed that no more data will be fed trough the callback
     void stopReading(){
@@ -45,7 +45,7 @@ public:
         if(mThread->joinable()){
             mThread->join();
         }
-        delete(mThread);
+        mThread.reset();
     }
     int getNReceivedBytes(){
         return nReceivedB;
@@ -71,7 +71,7 @@ private:
     static std::vector<uint8_t> getBufferFromMediaFormat(const char* name,AMediaFormat* format);
 private:
     const RAW_DATA_CALLBACK onDataReceivedCallback;
-    std::thread* mThread= nullptr;
+    std::unique_ptr<std::thread> mThread;
     std::atomic<bool> receiving;
     int nReceivedB=0;
     const std::size_t CHUNK_SIZE;

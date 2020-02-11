@@ -40,6 +40,7 @@ void UDPReceiver::stopReceiving() {
     shutdown(mSocket,SHUT_RD);
     mUDPReceiverThread->join();
     close(mSocket);
+    mUDPReceiverThread.reset();
 }
 
 void UDPReceiver::receiveFromUDPLoop() {

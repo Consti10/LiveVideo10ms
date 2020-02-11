@@ -22,7 +22,7 @@ public:
 
 //only as soon as we actually write data the file is created
 //to not pollute the file system with empty files
-    void writeData(const uint8_t *data,const int data_length) {
+    void writeData(const uint8_t *data,const size_t data_length) {
         if(data_length==0){
             return;
         }
