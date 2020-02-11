@@ -26,12 +26,12 @@ void H264Parser::reset(){
     setLimitFPS(-1);
 }
 
-void H264Parser::parse_raw_h264_stream(const uint8_t *data,const  int data_length) {
+void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_length) {
     //LOGD("H264Parser::parse_raw_h264_stream %d",data_length);
     mParseRAW.parseData(data,data_length);
 }
 
-void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const  int data_length) {
+void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
     mParseRTP.parseData(rtp_data,data_length);
 }
 

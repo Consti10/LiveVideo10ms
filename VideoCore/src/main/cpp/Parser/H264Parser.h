@@ -27,8 +27,8 @@
 class H264Parser {
 public:
     H264Parser(NALU_DATA_CALLBACK onNewNALU);
-    void parse_raw_h264_stream(const uint8_t* data,const int data_length);
-    void parse_rtp_h264_stream(const uint8_t* rtp_data,const int data_len);
+    void parse_raw_h264_stream(const uint8_t* data,const size_t data_length);
+    void parse_rtp_h264_stream(const uint8_t* rtp_data,const size_t data_len);
     void reset();
 public:
     long nParsedNALUs=0;
