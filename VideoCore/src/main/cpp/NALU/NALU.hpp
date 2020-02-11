@@ -45,16 +45,15 @@ public:
     //*/
     static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
 public:
-    NALU(const uint8_t* data,const size_t data_length):
-        data(data),
-        data_length(data_length),
-        creationTime{std::chrono::steady_clock::now()}{
-    };
-    NALU(const uint8_t* data,const size_t data_length,const std::chrono::steady_clock::time_point creationTime):
+    NALU(const uint8_t* data,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
         data(data),
         data_length(data_length),
         creationTime{creationTime}{
+        check();
     };
+    void check(){
+        __android_log_print(ANDROID_LOG_DEBUG,"NALU","check %d",data[data_length-1]);
+    }
     const uint8_t* data;
     const size_t data_length;
     const std::chrono::steady_clock::time_point creationTime;
@@ -100,8 +99,10 @@ public:
            case  NAL_UNIT_TYPE_CODED_SLICE_AUX :               nal_unit_type_name = "Coded slice of an auxiliary coded picture without partitioning"; break;
                // 20..23    // Reserved
                // 24..31    // Unspecified
-           default :                                           nal_unit_type_name = "Unknown"+std::to_string(nal_unit_type); break;
+           default :                                           nal_unit_type_name = std::string("Unknown")+std::to_string(nal_unit_type); break;
        }
+       // __android_log_print(ANDROID_LOG_DEBUG,"NALU","code %s len %d",nal_unit_type_name.c_str(),(int)data_length);
+
        return nal_unit_type_name;
    };
 

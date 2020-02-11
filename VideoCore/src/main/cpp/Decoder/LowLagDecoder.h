@@ -47,7 +47,8 @@ public:
     void waitForShutdownAndDelete();
 private:
     void configureStartDecoder(const NALU& sps,const NALU& pps);
-    void feedDecoder(const NALU& nalu,bool justEOS);
+    //Feed nullptr for EOS signal
+    void feedDecoder(const NALU* nalu);
     void checkOutputLoop();
     void printAvgLog();
     void closeInputPipe();

@@ -55,7 +55,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         return;
     }
     if(decoder.configured){
-        feedDecoder(nalu,false);
+        feedDecoder(&nalu);
         decodingInfo.nNALUSFeeded++;
     }else{
         //store sps / pps data. As soon as enough data has been buffered to initialize the decoder,do so.
@@ -163,9 +163,10 @@ void LowLagDecoder::checkOutputLoop() {
     LOGD("Exit CheckOutputLoop");
 }
 
-void LowLagDecoder::feedDecoder(const NALU& nalu,bool justEOS){
+//Feed nullptr to indicate EOS
+void LowLagDecoder::feedDecoder(const NALU* naluP){
     const auto now=std::chrono::steady_clock::now();
-    const auto deltaParsing=now-nalu.creationTime;
+    const auto deltaParsing=naluP!= nullptr ? now-naluP->creationTime : std::chrono::steady_clock::duration::zero();
     /*const bool isKeyFrame=nalu.data_length>0 &&( nalu.isSPS() || nalu.isSPS());
     if(isKeyFrame){
         return;
@@ -175,9 +176,10 @@ void LowLagDecoder::feedDecoder(const NALU& nalu,bool justEOS){
         if (index >=0) {
             size_t inputBufferSize;
             void* buf = AMediaCodec_getInputBuffer(decoder.codec,(size_t)index,&inputBufferSize);
-            if(justEOS){
+            if(naluP== nullptr){
                 AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)0,0, AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
             }else{
+                const NALU& nalu=*naluP;
                 if(nalu.data_length>inputBufferSize){
                     return;
                 }
@@ -217,7 +219,7 @@ void LowLagDecoder::waitForShutdownAndDelete() {
     closeInputPipe();
     if(decoder.configured){
         //feed the EOS
-        feedDecoder(NALU(nullptr,0),true);
+        feedDecoder(nullptr);
         //if not already happened, wait for EOS to arrive at the checkOutput thread
         if(mCheckOutputThread->joinable()){
             mCheckOutputThread->join();

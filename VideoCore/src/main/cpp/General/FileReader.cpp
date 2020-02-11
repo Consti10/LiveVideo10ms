@@ -17,19 +17,35 @@ static bool endsWith(const std::string& str, const std::string& suffix){
 static const constexpr auto TAG="FileReader";
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
+//We cannot use recursion due to stack pointer size limitation. -> Use loop instead.
 void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
-    if(!receiving || size==0)return;
+    /*if(!receiving || size==0)return;
     if(size>CHUNK_SIZE){
         nReceivedB+=CHUNK_SIZE;
         onDataReceivedCallback(data,CHUNK_SIZE);
         passDataInChunks(&data[CHUNK_SIZE],size-CHUNK_SIZE);
     }else{
+        LOGD("Size < %d",size);
         nReceivedB+=size;
         onDataReceivedCallback(data,size);
+    }*/
+    int offset=0;
+    const ssize_t len=size;
+    while(receiving){
+        const ssize_t len_left=len-offset;
+        if(len_left>=CHUNK_SIZE){
+            nReceivedB+=CHUNK_SIZE;
+            onDataReceivedCallback(&data[offset],CHUNK_SIZE);
+            offset+=CHUNK_SIZE;
+        }else{
+            nReceivedB+=len_left;
+            onDataReceivedCallback(&data[offset],(size_t)len_left);
+            return;
+        }
     }
 }
 void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
-    LOGD("X %d",(int)data.size());
+    LOGD("passDataInChunks %d",(int)data.size());
     passDataInChunks(data.data(),data.size());
 }
 
