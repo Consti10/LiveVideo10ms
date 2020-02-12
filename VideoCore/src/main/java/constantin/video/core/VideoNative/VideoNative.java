@@ -69,6 +69,11 @@ public class VideoNative {
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         sharedPreferences.edit().putString(context.getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY),filename).commit();
     }
+    @SuppressLint("ApplySharedPref")
+    public static void setVS_FILE_ONLY_LIMIT_FPS(final Context context, final int limitFPS){
+        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
+        sharedPreferences.edit().putInt(context.getString(R.string.VS_FILE_ONLY_LIMIT_FPS),limitFPS).commit();
+    }
 
     private static String getDirectory(){
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/";

@@ -47,6 +47,10 @@ public:
     GroundRecorder* mGroundRecorder= nullptr;
     long nNALUsAtLastCall=0;
     FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
+
+private:
+    LowLagDecoder::DecodingInfo latestDecodingInfo;
+    std::array<int,2> latestVideoRatio;
 private:
     /*int mFD;
     AMediaMuxer* mMuxer=nullptr;

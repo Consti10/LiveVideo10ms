@@ -38,10 +38,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         context = this
 
         spinnerVideoTestFileFromAssets = findViewById<Spinner>(R.id.s_videoFileSelector)
-        val adapter2 = ArrayAdapter.createFromResource(this,
+        val adapter = ArrayAdapter.createFromResource(this,
                 R.array.video_test_files, android.R.layout.simple_spinner_item)
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerVideoTestFileFromAssets!!.adapter = adapter2
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerVideoTestFileFromAssets!!.adapter = adapter
         //
         val startVideoActivity = findViewById<Button>(R.id.b_startVideoActivity)
         startVideoActivity.setOnClickListener {
