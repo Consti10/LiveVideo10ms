@@ -49,6 +49,7 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     public void addAndStartReceiver(){
         VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
         final NativeInterfaceVideoParamsChanged interfaceVideoParamsChanged=this;
+        Log.d(TAG,"Starting timer");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -63,6 +64,7 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     public void stopAndRemovePlayerReceiver(){
         timer.cancel();
         timer.purge();
+        Log.d(TAG,"Stopped timer");
         VideoNative.nativeStopReceiver(nativeVideoPlayer);
         release();
     }
