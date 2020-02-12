@@ -26,15 +26,7 @@ public:
     void stopReceiver();
     std::string getInfoString();
 private:
-    void onDecoderRatioChangedCallback(int videoW,int videoH);
-    void onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInfo & info);
     void onNewNALU(const NALU& nalu);
-    struct{
-        JavaVM* javaVirtualMachine;
-        jobject globalJavaObj;
-        jmethodID onDecodingInfoChangedJAVA= nullptr;
-        jmethodID onVideoRatioChangedJAVA=nullptr;
-    }callToJava;
     ANativeWindow* window=nullptr;
     SettingsN mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
@@ -47,11 +39,11 @@ public:
     GroundRecorder* mGroundRecorder= nullptr;
     long nNALUsAtLastCall=0;
     FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
-
-private:
+public:
     LowLagDecoder::DecodingInfo latestDecodingInfo;
-    std::array<int,2> latestVideoRatio;
+    LowLagDecoder::VideoRatio latestVideoRatio;
 private:
+    std::condition_variable conditionVariable;
     /*int mFD;
     AMediaMuxer* mMuxer=nullptr;
     ssize_t mTrackIndex;

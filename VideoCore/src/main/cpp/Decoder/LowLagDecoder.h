@@ -37,8 +37,10 @@ public:
         float avgWaitForInputBTime_ms=0;
         float avgDecodingTime_ms=0;
     };
-    typedef std::function<void(DecodingInfo&)> DECODING_INFO_CHANGED_CALLBACK;
-    typedef std::function<void(int,int)> DECODER_RATIO_CHANGED;
+    using VideoRatio=std::array<int,2>;
+    //Make sure to do no heavy lifting on this callback (best to copy values and leave processing to another thread)
+    typedef std::function<void(const DecodingInfo)> DECODING_INFO_CHANGED_CALLBACK;
+    typedef std::function<void(const VideoRatio)> DECODER_RATIO_CHANGED;
 public:
     LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);

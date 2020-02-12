@@ -131,7 +131,7 @@ void LowLagDecoder::checkOutputLoop() {
             AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_WIDTH,&mWidth);
             AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_HEIGHT,&mHeight);
             if(onDecoderRatioChangedCallback!= nullptr && mWidth!=0 && mHeight!=0){
-                onDecoderRatioChangedCallback(mWidth,mHeight);
+                onDecoderRatioChangedCallback({mWidth,mHeight});
             }
             LOGD("AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED %d %d %s",mWidth,mHeight,AMediaFormat_toString(format));
         } else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){

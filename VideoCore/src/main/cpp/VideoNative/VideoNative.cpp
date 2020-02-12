@@ -19,16 +19,6 @@ VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject contex
     mParser{std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1)},
     mSettingsN(env,context,"pref_video",true),
     GROUND_RECORDING_DIRECTORY(DIR){
-    //We need a reference to the JavaVM to attach the callback thread to it
-    env->GetJavaVM(&callToJava.javaVirtualMachine);
-    //Get the class that implements the IVideoParamsChanged, so that we can
-    //get the function pointers to it's 2 callback functions
-    jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(videoParamsChangedI);
-    callToJava.onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onVideoRatioChanged", "(II)V");
-    callToJava.onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(FFFFFII)V");
-    //Store a global reference to it, so we can use it later
-    //callToJava.globalJavaObj = env->NewGlobalRef(videoParamsChangedI); //also need a global javaObj
-    callToJava.globalJavaObj = env->NewWeakGlobalRef(videoParamsChangedI);
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
@@ -90,23 +80,6 @@ void VideoNative::onNewNALU(const NALU& nalu){
     }*/
 }
 
-void VideoNative::onDecoderRatioChangedCallback(const int videoW,const int videoH) {
-    //When this callback is invoked, no Java VM is attached to the thread
-    JNIEnv* jniENV;
-    callToJava.javaVirtualMachine->AttachCurrentThread(&jniENV, nullptr);
-    jniENV->CallVoidMethod(callToJava.globalJavaObj,callToJava.onVideoRatioChangedJAVA,(jint)videoW,(jint)videoH);
-    callToJava.javaVirtualMachine->DetachCurrentThread();
-}
-
-void VideoNative::onDecodingInfoChangedCallback(const LowLagDecoder::DecodingInfo& info) {
-    //When this callback is invoked, no Java VM is attached to the thread
-    JNIEnv* jniENV;
-    callToJava.javaVirtualMachine->AttachCurrentThread(&jniENV, nullptr);
-    jniENV->CallVoidMethod(callToJava.globalJavaObj,callToJava.onDecodingInfoChangedJAVA,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
-                           (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded);
-    callToJava.javaVirtualMachine->DetachCurrentThread();
-}
-
 void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     //reset the parser so the statistics start again from 0
     mParser.reset();
@@ -117,10 +90,8 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
         mLowLagDecoder=new LowLagDecoder(window,CPU_PRIORITY_DECODER_OUTPUT,VS_USE_SW_DECODER);
-        mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](int w,int h) { this->onDecoderRatioChangedCallback(w,h); });
-        mLowLagDecoder->registerOnDecodingInfoChangedCallback([this](LowLagDecoder::DecodingInfo& info) {
-            this->onDecodingInfoChangedCallback(info);
-        });
+        mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const LowLagDecoder::VideoRatio ratio) { this->latestVideoRatio=ratio; });
+        mLowLagDecoder->registerOnDecodingInfoChangedCallback([this](const LowLagDecoder::DecodingInfo info) {this->latestDecodingInfo=info;});
     }
     //Add Ground recorder if enabled
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
@@ -332,13 +303,18 @@ JNI_METHOD(jboolean , receivingVideoButCannotParse)
     return (jboolean) (p->mVideoReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
 }
 
-
 JNI_METHOD(jboolean , anyVideoBytesParsedSinceLastCall)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
     long nalusSinceLast = p->mParser.nParsedNALUs - p->nNALUsAtLastCall;
     p->nNALUsAtLastCall += nalusSinceLast;
     return (jboolean) (nalusSinceLast > 0);
+}
+
+JNI_METHOD(void,nativeInitializeCallbacks)
+(JNIEnv *env,jclass jclass1,jlong testReceiverN){
+    VideoNative* p=native(testReceiverN);
+
 }
 
 }
