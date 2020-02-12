@@ -16,7 +16,7 @@ public class VideoNative {
     static {
         System.loadLibrary("VideoNative");
     }
-    public static native  <T extends NativeInterfaceVideoParamsChanged> long initialize(T t, Context context, String groundRecordingDirectory);
+    public static native long initialize(Context context, String groundRecordingDirectory);
     public static native void finalize(long nativeVideoPlayer);
     //Consumers are currently
     //1) The LowLag decoder (if Surface!=null)
@@ -35,6 +35,10 @@ public class VideoNative {
     public static native boolean anyVideoDataReceived(long nativeInstance);
     public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
     public static native boolean receivingVideoButCannotParse(long nativeInstance);
+
+    //call this via java to run the callback(s)
+    //TODO: Use message queue from cpp for performance
+    public static native <T extends NativeInterfaceVideoParamsChanged> void nativeCallBack(T t,long nativeInstance);
 
     public static final int VS_SOURCE_UDP=0;
     public static final int VS_SOURCE_FILE=1;

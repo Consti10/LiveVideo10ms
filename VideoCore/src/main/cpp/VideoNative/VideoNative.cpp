@@ -15,7 +15,7 @@ constexpr auto CPU_PRIORITY_UDPRECEIVER_VIDEO=(-16);  //needs low latency and do
 constexpr auto CPU_PRIORITY_DECODER_OUTPUT (-16);     //needs low latency and does not use the cpu that much
 
 
-VideoNative::VideoNative(JNIEnv* env, jobject videoParamsChangedI,jobject context,const char* DIR) :
+VideoNative::VideoNative(JNIEnv* env,jobject context,const char* DIR) :
     mParser{std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1)},
     mSettingsN(env,context,"pref_video",true),
     GROUND_RECORDING_DIRECTORY(DIR){
@@ -233,9 +233,9 @@ inline VideoNative *native(jlong ptr) {
 extern "C"{
 
 JNI_METHOD(jlong, initialize)
-(JNIEnv * env,jclass jclass1,jobject videoParamsChangedI,jobject context,jstring groundRecordingDirectory) {
+(JNIEnv * env,jclass jclass1,jobject context,jstring groundRecordingDirectory) {
     const char *str = env->GetStringUTFChars(groundRecordingDirectory, nullptr);
-    auto* p=new VideoNative(env,videoParamsChangedI,context,str);
+    auto* p=new VideoNative(env,context,str);
     env->ReleaseStringUTFChars(groundRecordingDirectory,str);
     return jptr(p);
 }
@@ -311,10 +311,17 @@ JNI_METHOD(jboolean , anyVideoBytesParsedSinceLastCall)
     return (jboolean) (nalusSinceLast > 0);
 }
 
-JNI_METHOD(void,nativeInitializeCallbacks)
-(JNIEnv *env,jclass jclass1,jlong testReceiverN){
+JNI_METHOD(void,nativeCallBack)
+(JNIEnv *env,jclass jclass1,jobject videoParamsChangedI,jlong testReceiverN){
+    //Update all java stuff
+    jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(videoParamsChangedI);
+    jmethodID onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onVideoRatioChanged", "(II)V");
+    jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(FFFFFII)V");
     VideoNative* p=native(testReceiverN);
-
+    env->CallVoidMethod(videoParamsChangedI,onVideoRatioChangedJAVA,(jint)p->latestVideoRatio[0],(jint)p->latestVideoRatio[1]);
+    LowLagDecoder::DecodingInfo info=p->latestDecodingInfo;
+    env->CallVoidMethod(videoParamsChangedI,onDecodingInfoChangedJAVA,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
+                           (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded);
 }
 
 }

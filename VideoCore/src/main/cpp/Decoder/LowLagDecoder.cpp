@@ -78,21 +78,21 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         //LOGD("Created decoder %s",name);
         //AMediaCodec_releaseName(decoder.codec,name);
     }
-    decoder.format=AMediaFormat_new();
-    AMediaFormat_setString(decoder.format,AMEDIAFORMAT_KEY_MIME,"video/avc");
+    AMediaFormat* format=AMediaFormat_new();
+    AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/avc");
     const auto videoWH= sps.getVideoWidthHeightSPS();
     LOGD("XYZ %d %d",videoWH[0],videoWH[1]);
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
     //AVCProfileBaseline==1
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
-    AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
-    AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-    AMediaFormat_setBuffer(decoder.format,"csd-0",sps.data,(size_t)sps.data_length);
-    AMediaFormat_setBuffer(decoder.format,"csd-1",pps.data,(size_t)pps.data_length);
-    
+    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
+    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
+    AMediaFormat_setBuffer(format,"csd-0",sps.data,(size_t)sps.data_length);
+    AMediaFormat_setBuffer(format,"csd-1",pps.data,(size_t)pps.data_length);
 
-    AMediaCodec_configure(decoder.codec, decoder.format, decoder.window, nullptr, 0);
+    AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
+    AMediaFormat_delete(format);
     if (decoder.codec== nullptr) {
         LOGD("Cannot configure decoder");
         //set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
@@ -143,10 +143,11 @@ void LowLagDecoder::checkOutputLoop() {
             decoderProducedUnknown=true;
             continue;
         }
+        //Recalculate the
         //every 2 seconds recalculate the current fps and bitrate
         const auto now=steady_clock::now();
         const auto delta=now-decodingInfo.lastCalculation;
-        if(duration_cast<seconds>(delta).count()>2){
+        if(duration_cast<milliseconds>(delta).count()>DECODING_INFO_RECALCULATION_INTERVAL_MS){
             decodingInfo.lastCalculation=steady_clock::now();
             decodingInfo.currentFPS=nDecodedFrames.getDeltaSinceLastCall()/(float)duration_cast<seconds>(delta).count();
             decodingInfo.currentKiloBitsPerSecond=(nNALUBytesFed.getDeltaSinceLastCall()/duration_cast<seconds>(delta).count())/1024.0f*8.0f;

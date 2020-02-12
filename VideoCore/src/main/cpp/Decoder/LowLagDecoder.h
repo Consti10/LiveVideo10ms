@@ -24,7 +24,6 @@ private:
         bool SW= false;
         AMediaCodec *codec= nullptr;
         ANativeWindow* window= nullptr;
-        AMediaFormat *format=nullptr;
     };
 public:
     struct DecodingInfo{
@@ -38,8 +37,10 @@ public:
         float avgDecodingTime_ms=0;
     };
     using VideoRatio=std::array<int,2>;
-    //Make sure to do no heavy lifting on this callback (best to copy values and leave processing to another thread)
+    //Make sure to do no heavy lifting on this callback, since it is called from the low-latency mCheckOutputThread thread (best to copy values and leave processing to another thread)
+    //The decoding info callback is called every DECODING_INFO_RECALCULATION_INTERVAL_MS
     typedef std::function<void(const DecodingInfo)> DECODING_INFO_CHANGED_CALLBACK;
+    //The decoder ratio callback is called every time the output format changes
     typedef std::function<void(const VideoRatio)> DECODER_RATIO_CHANGED;
 public:
     LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
@@ -69,6 +70,8 @@ private:
     AvgCalculator parsingTime_us;
     AvgCalculator waitForInputB_us;
     AvgCalculator decodingTime_us;
+    //Every n ms re-calculate the Decoding info
+    static const constexpr int DECODING_INFO_RECALCULATION_INTERVAL_MS=1000;
 private:
     static constexpr uint8_t SPS_X264[31]{
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,192,90,128,128,128,160,0,0,125,32,0,29,76,17,227,6,73

@@ -18,7 +18,7 @@
 
 class VideoNative{
 public:
-    VideoNative(JNIEnv * env,jobject videoParamsChangedI,jobject context,const char* DIR);
+    VideoNative(JNIEnv * env,jobject context,const char* DIR);
     void onNewVideoData(const uint8_t* data,const std::size_t data_length,const bool isRTPData,const int limitFPS);
     void addConsumers(JNIEnv* env,jobject surface);
     void removeConsumers();

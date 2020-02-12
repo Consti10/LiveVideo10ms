@@ -1,10 +1,14 @@
 package constantin.video.core;
 
 import android.content.Context;
+import android.os.Debug;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Surface;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import constantin.video.core.VideoNative.NativeInterfaceVideoParamsChanged;
 import constantin.video.core.VideoNative.VideoNative;
@@ -14,16 +18,19 @@ import constantin.video.core.DecodingInfo;
 
 //Convenient wrapper around the native functions from VideoNative
 public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
+    private static final String TAG="VideoPlayer";
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged videoParamsChanged;
     private final Context context;
+    private final Timer timer;
 
     //Setup as much as possible without creating the decoder
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
     public VideoPlayer(final Context context,final IVideoParamsChanged iVideoParamsChanged){
         this.videoParamsChanged=iVideoParamsChanged;
         this.context=context;
-        nativeVideoPlayer= VideoNative.initialize(this,context,getDirectoryToSaveDataTo());
+        nativeVideoPlayer= VideoNative.initialize(context,getDirectoryToSaveDataTo());
+        timer=new Timer();
     }
 
     //We cannot initialize the Decoder until we have SPS and PPS data -
@@ -41,12 +48,21 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     //d) Receiving Data from a file in the phone file system
     public void addAndStartReceiver(){
         VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
+        final NativeInterfaceVideoParamsChanged interfaceVideoParamsChanged=this;
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                VideoNative.nativeCallBack(interfaceVideoParamsChanged,nativeVideoPlayer);
+            }
+        },0,1000);
     }
 
     //Stop the Receiver
     //Stop the Decoder
     //Free resources
     public void stopAndRemovePlayerReceiver(){
+        timer.cancel();
+        timer.purge();
         VideoNative.nativeStopReceiver(nativeVideoPlayer);
         release();
     }
@@ -71,10 +87,11 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     @Override
     public void onDecodingInfoChanged(float currentFPS, float currentKiloBitsPerSecond, float avgParsingTime_ms, float avgWaitForInputBTime_ms, float avgDecodingTime_ms,
                                       int nNALU,int nNALUSFeeded) {
+        final DecodingInfo decodingInfo=new DecodingInfo(currentFPS,currentKiloBitsPerSecond,avgParsingTime_ms,avgWaitForInputBTime_ms,avgDecodingTime_ms,nNALU,nNALUSFeeded);
         if(videoParamsChanged!=null){
-            final DecodingInfo decodingInfo=new DecodingInfo(currentFPS,currentKiloBitsPerSecond,avgParsingTime_ms,avgWaitForInputBTime_ms,avgDecodingTime_ms,nNALU,nNALUSFeeded);
             videoParamsChanged.onDecodingInfoChanged(decodingInfo);
         }
+        Log.d(TAG,"onDecodingInfoChanged"+decodingInfo.toString());
     }
 
     @Override
