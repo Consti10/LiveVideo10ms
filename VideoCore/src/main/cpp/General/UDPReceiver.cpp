@@ -2,14 +2,15 @@
 #include "UDPReceiver.h"
 #include "CPUPriority.hpp"
 #include <arpa/inet.h>
+#include <vector>
 
 #define TAG "UDPReceiver"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 //#define PRINT_RECEIVED_BYTES
 
-UDPReceiver::UDPReceiver(int port,const std::string& name,int CPUPriority,int buffsize,const DATA_CALLBACK& onDataReceivedCallback):
-        mPort(port),mName(name),mBuffsize(buffsize),mCPUPriority(CPUPriority){
+UDPReceiver::UDPReceiver(int port,const std::string& name,int CPUPriority,size_t buffsize,const DATA_CALLBACK& onDataReceivedCallback):
+        mPort(port),mName(name),RECV_BUFF_SIZE(buffsize),mCPUPriority(CPUPriority){
     this->onDataReceivedCallback=onDataReceivedCallback;
     receiving=false;
     nReceivedBytes=0;
@@ -62,14 +63,15 @@ void UDPReceiver::receiveFromUDPLoop() {
         LOGD("Error binding Port; %d", mPort);
         return;
     }
-    uint8_t buff[mBuffsize];
+    std::vector<uint8_t> buff(RECV_BUFF_SIZE);
     sockaddr_in source{};
     socklen_t sourceLen= sizeof(sockaddr_in);
     while (receiving) {
-        ssize_t message_length = recvfrom(mSocket, buff, (size_t)mBuffsize, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
+        ssize_t message_length = recvfrom(mSocket,buff.data(),RECV_BUFF_SIZE, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
         //ssize_t message_length = recv(mSocket, buff, (size_t) mBuffsize, MSG_WAITALL);
         if (message_length > 0) { //else -1 was returned;timeout/No data received
-            onDataReceivedCallback(buff, (size_t)message_length);
+            LOGD("Data size %d",(int)message_length);
+            onDataReceivedCallback(buff.data(), (size_t)message_length);
             const char* p=inet_ntoa(source.sin_addr);
             if(onSourceIP!=nullptr){
                 onSourceIP(p);

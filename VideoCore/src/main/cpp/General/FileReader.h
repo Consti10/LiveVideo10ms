@@ -23,6 +23,9 @@ class FileReader{
 public:
     //RAW H264 NALUs,not specified how and when SPS/PPS come
     typedef std::function<void(const uint8_t[],std::size_t)> RAW_DATA_CALLBACK;
+    //@param chunkSize Determines how big the data chunks are that are fed to the parser. The smaller the chunk size
+    //The faster does the onDataReceivedCallback() return
+    //Therefore allowing the file receiver to stop and exit quicker
     //Read from file system
     FileReader(const std::string fn,RAW_DATA_CALLBACK onDataReceivedCallback,std::size_t chunkSize=1024):
             filename(fn),CHUNK_SIZE(chunkSize),
