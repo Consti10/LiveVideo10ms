@@ -7,16 +7,11 @@
 #define TAG "UDPReceiver"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
-//#define PRINT_RECEIVED_BYTES
-
-UDPReceiver::UDPReceiver(int port,const std::string& name,int CPUPriority,size_t buffsize,const DATA_CALLBACK& onDataReceivedCallback):
-        mPort(port),mName(name),RECV_BUFF_SIZE(buffsize),mCPUPriority(CPUPriority){
-    this->onDataReceivedCallback=onDataReceivedCallback;
-    receiving=false;
-    nReceivedBytes=0;
+UDPReceiver::UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t buffsize):
+        mPort(port),mName(name),RECV_BUFF_SIZE(buffsize),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback){
 }
 
-void UDPReceiver::registerOnSourceIPfound(const SOURCE_IP_CALLBACK& onSourceIP) {
+void UDPReceiver::registerOnSourceIPFound(const SOURCE_IP_CALLBACK& onSourceIP) {
     this->onSourceIP=onSourceIP;
 }
 
@@ -25,7 +20,7 @@ long UDPReceiver::getNReceivedBytes()const {
 }
 
 std::string UDPReceiver::getSourceIPAddress()const {
-    return mIP;
+    return senderIP;
 }
 
 void UDPReceiver::startReceiving() {
@@ -36,8 +31,10 @@ void UDPReceiver::startReceiving() {
 void UDPReceiver::stopReceiving() {
     if(receiving== false){
         LOGD("UDP Receiver %s already stopped",mName.c_str());
+        return;
     }
     receiving=false;
+    shutdown(mSocket,SHUT_RD);
     if(mUDPReceiverThread->joinable()){
         mUDPReceiverThread->join();
     }
@@ -45,13 +42,13 @@ void UDPReceiver::stopReceiving() {
 }
 
 void UDPReceiver::receiveFromUDPLoop() {
-    const int m_socket=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (m_socket == -1) {
+    mSocket=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (mSocket == -1) {
         LOGD("Error creating socket");
         return;
     }
     int enable = 1;
-    if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0){
+    if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0){
         LOGD("Error setting reuse");
     }
     setCPUPriority(mCPUPriority,mName);
@@ -60,7 +57,7 @@ void UDPReceiver::receiveFromUDPLoop() {
     myaddr.sin_family = AF_INET;
     myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myaddr.sin_port = htons(mPort);
-    if (bind(m_socket, (struct sockaddr *) &myaddr, sizeof(myaddr)) == -1) {
+    if (bind(mSocket, (struct sockaddr *) &myaddr, sizeof(myaddr)) == -1) {
         LOGD("Error binding Port; %d", mPort);
         return;
     }
@@ -70,27 +67,24 @@ void UDPReceiver::receiveFromUDPLoop() {
     while (receiving) {
         //TODO investigate: does a big buffer size create latency with MSG_WAITALL ?
         //Hypothesis: it should on linux, but does not on android ? what ?
-        ssize_t message_length = recvfrom(m_socket,buff.data(),RECV_BUFF_SIZE, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
+        ssize_t message_length = recvfrom(mSocket,buff.data(),RECV_BUFF_SIZE, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
         //ssize_t message_length = recv(mSocket, buff, (size_t) mBuffsize, MSG_WAITALL);
         if (message_length > 0) { //else -1 was returned;timeout/No data received
             LOGD("Data size %d",(int)message_length);
             onDataReceivedCallback(buff.data(), (size_t)message_length);
+            nReceivedBytes+=message_length;
+            //The source ip stuff
             const char* p=inet_ntoa(source.sin_addr);
+            std::string s1=std::string(p);
+            if(senderIP!=s1){
+                senderIP=s1;
+            }
             if(onSourceIP!=nullptr){
                 onSourceIP(p);
             }
-            nReceivedBytes+=message_length;
-            std::string s1=std::string(p);
-            if(mIP!=s1){
-                mIP=s1;
-            }
         }
-#ifdef PRINT_RECEIVED_BYTES
-        LOGD("%s: received %d bytes\n", mName.c_str(),(int) message_length);
-#endif
     }
-    shutdown(m_socket,SHUT_RD);
-    close(m_socket);
+    close(mSocket);
 }
 
 int UDPReceiver::getPort() const {

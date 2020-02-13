@@ -143,9 +143,9 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
-            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,UDP_RECEIVER_BUFFER_SIZE,[this,useRTP](const uint8_t* data,size_t data_length) {
+            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,[this,useRTP](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,useRTP,-1);
-            });
+            },UDP_RECEIVER_BUFFER_SIZE);
             mVideoReceiver->startReceiving();
         }break;
         case FILE:{
