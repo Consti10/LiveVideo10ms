@@ -38,19 +38,20 @@ void UDPReceiver::stopReceiving() {
         LOGD("UDP Receiver %s already stopped",mName.c_str());
     }
     receiving=false;
-    shutdown(mSocket,SHUT_RD);
-    mUDPReceiverThread->join();
-    close(mSocket);
+    if(mUDPReceiverThread->joinable()){
+        mUDPReceiverThread->join();
+    }
     mUDPReceiverThread.reset();
 }
 
 void UDPReceiver::receiveFromUDPLoop() {
-    if ((mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+    const int m_socket=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (m_socket == -1) {
         LOGD("Error creating socket");
         return;
     }
     int enable = 1;
-    if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0){
+    if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0){
         LOGD("Error setting reuse");
     }
     setCPUPriority(mCPUPriority,mName);
@@ -59,7 +60,7 @@ void UDPReceiver::receiveFromUDPLoop() {
     myaddr.sin_family = AF_INET;
     myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myaddr.sin_port = htons(mPort);
-    if (bind(mSocket, (struct sockaddr *) &myaddr, sizeof(myaddr)) == -1) {
+    if (bind(m_socket, (struct sockaddr *) &myaddr, sizeof(myaddr)) == -1) {
         LOGD("Error binding Port; %d", mPort);
         return;
     }
@@ -67,7 +68,9 @@ void UDPReceiver::receiveFromUDPLoop() {
     sockaddr_in source{};
     socklen_t sourceLen= sizeof(sockaddr_in);
     while (receiving) {
-        ssize_t message_length = recvfrom(mSocket,buff.data(),RECV_BUFF_SIZE, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
+        //TODO investigate: does a big buffer size create latency with MSG_WAITALL ?
+        //Hypothesis: it should on linux, but does not on android ? what ?
+        ssize_t message_length = recvfrom(m_socket,buff.data(),RECV_BUFF_SIZE, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
         //ssize_t message_length = recv(mSocket, buff, (size_t) mBuffsize, MSG_WAITALL);
         if (message_length > 0) { //else -1 was returned;timeout/No data received
             LOGD("Data size %d",(int)message_length);
@@ -86,6 +89,8 @@ void UDPReceiver::receiveFromUDPLoop() {
         LOGD("%s: received %d bytes\n", mName.c_str(),(int) message_length);
 #endif
     }
+    shutdown(m_socket,SHUT_RD);
+    close(m_socket);
 }
 
 int UDPReceiver::getPort() const {

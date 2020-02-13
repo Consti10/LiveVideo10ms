@@ -44,7 +44,7 @@ public:
     LowLagDecoder::VideoRatio latestVideoRatio;
 private:
     std::condition_variable conditionVariable;
-    static constexpr const size_t UDP_RECEIVER_BUFFER_SIZE=1024*1024*5; //1 MB should be plenty
+    static constexpr const size_t UDP_RECEIVER_BUFFER_SIZE=1024*1024*5; //5 MB should be plenty
     /*int mFD;
     AMediaMuxer* mMuxer=nullptr;
     ssize_t mTrackIndex;

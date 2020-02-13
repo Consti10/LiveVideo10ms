@@ -43,7 +43,6 @@ private:
     std::string mIP="0.0.0.0";
     std::atomic<bool> receiving;
     std::atomic<long> nReceivedBytes;
-    int mSocket;
     std::unique_ptr<std::thread> mUDPReceiverThread;
 };
 
