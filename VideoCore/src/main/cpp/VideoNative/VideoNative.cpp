@@ -5,8 +5,6 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <android/asset_manager_jni.h>
-#include <unistd.h>
-#include <fcntl.h>
 
 constexpr auto TAG="VideoNative";
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
@@ -41,44 +39,11 @@ void VideoNative::onNewNALU(const NALU& nalu){
     if(mGroundRecorder!= nullptr){
         mGroundRecorder->writeData(nalu.data,nalu.data_length);
     }
-    /*if(mMuxer== nullptr){
-        mKeyFrameFInder.saveIfKeyFrame(nalu);
-        if(mKeyFrameFInder.allKeyFramesAvailable()){
-            const std::string fn=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
-            mFD = open(fn.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
-            mMuxer=AMediaMuxer_new(mFD,AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
-            AMediaFormat*format=AMediaFormat_new();
-            const auto SPS=mKeyFrameFInder.getCSD0();
-            const auto PPS=mKeyFrameFInder.getCSD1();
-            const auto videoWH= SPS.getVideoWidthHeightSPS();
-            AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/avc");
-            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
-            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-            AMediaFormat_setBuffer(format,"csd-0",SPS.data,(size_t)SPS.data_length);
-            AMediaFormat_setBuffer(format,"csd-1",PPS.data,(size_t)PPS.data_length);
-            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_MAX_INPUT_SIZE,NALU::NALU_MAXLEN);
-            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,30);
-            mTrackIndex=AMediaMuxer_addTrack(mMuxer,format);
-            LOGD("Media Muxer track index %d",(int)mTrackIndex);
-            const auto status=AMediaMuxer_start(mMuxer);
-            LOGD("Media Muxer status %d",status);
-            AMediaFormat_delete(format);
-            //Write SEI ?!
-            lastFeed=std::chrono::steady_clock::now();
-        }
-    }else{
-        AMediaCodecBufferInfo info;
-        info.offset=0;
-        info.size=nalu.data_length;
-        const auto now=std::chrono::steady_clock::now();
-        const auto duration=now-lastFeed;
-        lastFeed=now;
-        info.presentationTimeUs=std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
-        //info.flags=0;
-        info.flags=AMEDIACODEC_CONFIGURE_FLAG_ENCODE; //1
-        AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,nalu.data,&info);
-    }*/
+    if(mMP4GroundRecorder!=nullptr){
+        mMP4GroundRecorder->writeData(nalu);
+    }
 }
+
 
 void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     //reset the parser so the statistics start again from 0
@@ -97,10 +62,12 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
     if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
+    //if(false){
         const std::string groundRecordingFlename=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"h264");
         //LOGD("Filename%s",groundRecordingFlename.c_str());
          mGroundRecorder=new GroundRecorder(groundRecordingFlename);
     }
+    //mMP4GroundRecorder=new GroundRecorderMP4(GROUND_RECORDING_DIRECTORY);
 }
 
 void VideoNative::removeConsumers(){
@@ -114,16 +81,16 @@ void VideoNative::removeConsumers(){
         delete(mGroundRecorder);
         mGroundRecorder=nullptr;
     }
+    if(mMP4GroundRecorder!= nullptr){
+        mMP4GroundRecorder->stop();
+        delete(mMP4GroundRecorder);
+        mMP4GroundRecorder= nullptr;
+    }
     if(window!=nullptr){
         //Don't forget to release the window, does not matter if the decoder has been created or not
         ANativeWindow_release(window);
         window=nullptr;
     }
-    /*if(mMuxer!= nullptr){
-        AMediaMuxer_stop(mMuxer);
-        AMediaMuxer_delete(mMuxer);
-        close(mFD);
-    }*/
 }
 
 void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {

@@ -5,11 +5,11 @@
 #ifndef TELEMETRY_GROUNDRECORDER_HPP
 #define TELEMETRY_GROUNDRECORDER_HPP
 
-#include <cstdio>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <filesystem>
+#include "../../../../../../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/cstdio"
+#include "../../../../../../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/string"
+#include "../../../../../../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/fstream"
+#include "../../../../../../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/sstream"
+#include "../../../../../../../../AppData/Local/Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/filesystem"
 
 
 class GroundRecorder{

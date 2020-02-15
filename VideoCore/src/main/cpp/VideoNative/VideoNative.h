@@ -7,14 +7,13 @@
 
 #include <jni.h>
 #include <UDPReceiver.h>
-#include "../Helper/GroundRecorder.hpp"
+#include "GroundRecorder.hpp"
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
 #include "../Helper/SettingsN.hpp"
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
-
-#include <media/NdkMediaMuxer.h>
+#include "GroundRecorderMP4.h"
 
 class VideoNative{
 public:
@@ -45,11 +44,7 @@ public:
 private:
     std::condition_variable conditionVariable;
     static constexpr const size_t UDP_RECEIVER_BUFFER_SIZE=1024*1024*5; //5 MB should be plenty
-    /*int mFD;
-    AMediaMuxer* mMuxer=nullptr;
-    ssize_t mTrackIndex;
-    KeyFrameFinder mKeyFrameFInder;
-    std::chrono::steady_clock::time_point lastFeed;*/
+    GroundRecorderMP4* mMP4GroundRecorder;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H
