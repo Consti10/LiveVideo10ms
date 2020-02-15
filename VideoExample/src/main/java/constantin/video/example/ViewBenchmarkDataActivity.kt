@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.Pair
@@ -15,20 +14,11 @@ import android.widget.Spinner
 import android.widget.TextView
 
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.jaredrummler.android.device.DeviceName
 
 import java.text.DecimalFormat
 import java.util.ArrayList
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
 
 
 @SuppressLint("SetTextI18n")
@@ -154,8 +144,8 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
             lastFetchedConfiguration = Pair(selectedDevice, selectedOS)
             //Query data for all possible test files
             updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi.h264", tvDataRpiCam)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "testVideo.h264", tvDataX264)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "Recording_360_short.h264", tvDataInsta360)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "", tvDataX264)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "webbn_second.h264", tvDataInsta360)
         }
     }
 
