@@ -3,7 +3,7 @@
 //
 
 #include "ParseRTP.h"
-#include <android/log.h>
+#include "../Helper/MDebug.hpp"
 
 //changed "unsigned char" to uint8_t
 typedef struct rtp_header {
@@ -61,6 +61,11 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             LOGD("Not enough rtp data");
             return;
         }
+        //
+        const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
+        LOGD("Sequence number %d",(int)rtp_header->sequence);
+
+
         nalu_header_t *nalu_header;
         fu_header_t   *fu_header;
         uint8_t h264_nal_header;

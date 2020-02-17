@@ -7,7 +7,7 @@
 
 #include "NALU.hpp"
 #include <vector>
-#include <android/log.h>
+#include <../Helper/MDebug.hpp>
 
 //Takes a continuous stream of NALUs and save SPS / PPS data
 //For later use
@@ -23,11 +23,11 @@ public:
         if(nalu.isSPS()){
             CSD0.resize((unsigned)nalu.data_length);
             memcpy(CSD0.data(),nalu.data,(size_t )nalu.data_length);
-            __android_log_print(ANDROID_LOG_ERROR,"KeyFrameFinder","SPS found");
+            MDebug::log("KeyFrameFinder","SPS found");
         }else if(nalu.isPPS()){
             CSD1.resize((unsigned)nalu.data_length);
             memcpy(CSD1.data(),nalu.data,(size_t )nalu.data_length);
-            __android_log_print(ANDROID_LOG_ERROR,"KeyFrameFinder","PPS found");
+            MDebug::log("KeyFrameFinder","PPS found");
         }
     }
     bool allKeyFramesAvailable(){
