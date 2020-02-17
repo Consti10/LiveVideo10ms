@@ -13,7 +13,7 @@
 #include "../Helper/SettingsN.hpp"
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
-#include "GroundRecorderMP4.h"
+#include "GroundRecorderMP4.hpp"
 
 class VideoNative{
 public:

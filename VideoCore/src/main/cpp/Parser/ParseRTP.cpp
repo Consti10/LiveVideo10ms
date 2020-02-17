@@ -62,9 +62,8 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             return;
         }
         //
-        const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
-        LOGD("Sequence number %d",(int)rtp_header->sequence);
-
+        //const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
+        //LOGD("Sequence number %d",(int)rtp_header->sequence);
 
         nalu_header_t *nalu_header;
         fu_header_t   *fu_header;

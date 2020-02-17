@@ -2,8 +2,8 @@
 // Created by geier on 24/01/2020.
 //
 
-#ifndef LIVEVIDEO10MS_FRAMELIMITER_H
-#define LIVEVIDEO10MS_FRAMELIMITER_H
+#ifndef LIVEVIDEO10MS_FRAMELIMITER_HPP
+#define LIVEVIDEO10MS_FRAMELIMITER_HPP
 
 #include <chrono>
 
@@ -45,4 +45,4 @@ private:
     std::chrono::steady_clock::time_point lastTimeCalled=std::chrono::steady_clock::now();
 };
 
-#endif //LIVEVIDEO10MS_FRAMELIMITER_H
+#endif //LIVEVIDEO10MS_FRAMELIMITER_HPP

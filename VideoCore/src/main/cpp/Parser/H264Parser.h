@@ -22,7 +22,7 @@
 #include "ParseRAW.h"
 #include "ParseRTP.h"
 
-#include "FrameLimiter.h"
+#include "FrameLimiter.hpp"
 
 class H264Parser {
 public:
