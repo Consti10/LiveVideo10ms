@@ -46,7 +46,7 @@ public:
 private:
     std::condition_variable conditionVariable;
     static constexpr const size_t UDP_RECEIVER_BUFFER_SIZE=1024*1024*5; //5 MB should be plenty
-    GroundRecorderMP4* mMP4GroundRecorder;
+    GroundRecorderMP4* mMP4GroundRecorder= nullptr;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

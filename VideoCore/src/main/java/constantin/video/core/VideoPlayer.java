@@ -1,7 +1,6 @@
 package constantin.video.core;
 
 import android.content.Context;
-import android.os.Debug;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Surface;
@@ -18,14 +17,14 @@ import constantin.video.core.VideoNative.VideoNative;
 public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     private static final String TAG="VideoPlayer";
     private final long nativeVideoPlayer;
-    private final IVideoParamsChanged videoParamsChanged;
+    private final IVideoParamsChanged mVideoParamsChanged;
     private final Context context;
     private final Timer timer;
 
     //Setup as much as possible without creating the decoder
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
     public VideoPlayer(final Context context,final IVideoParamsChanged iVideoParamsChanged){
-        this.videoParamsChanged=iVideoParamsChanged;
+        this.mVideoParamsChanged =iVideoParamsChanged;
         this.context=context;
         nativeVideoPlayer= VideoNative.initialize(context,getDirectoryToSaveDataTo());
         timer=new Timer();
@@ -46,7 +45,7 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     //d) Receiving Data from a file in the phone file system
     public void addAndStartReceiver(){
         VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
-        if(videoParamsChanged!=null){
+        if(mVideoParamsChanged !=null){
             final NativeInterfaceVideoParamsChanged interfaceVideoParamsChanged=this;
             Log.d(TAG,"Starting timer");
             //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
@@ -64,7 +63,7 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     //Stop the Decoder
     //Free resources
     public void stopAndRemovePlayerReceiver(){
-        if(videoParamsChanged!=null){
+        if(mVideoParamsChanged !=null){
             timer.cancel();
             timer.purge();
             Log.d(TAG,"Stopped timer");
@@ -84,8 +83,8 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
 
     @Override
     public void onVideoRatioChanged(int videoW, int videoH) {
-        if(videoParamsChanged!=null){
-            videoParamsChanged.onVideoRatioChanged(videoW,videoH);
+        if(mVideoParamsChanged !=null){
+            mVideoParamsChanged.onVideoRatioChanged(videoW,videoH);
         }
         //System.out.println("Video W and H"+videoW+","+videoH);
     }
@@ -94,8 +93,8 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     public void onDecodingInfoChanged(float currentFPS, float currentKiloBitsPerSecond, float avgParsingTime_ms, float avgWaitForInputBTime_ms, float avgDecodingTime_ms,
                                       int nNALU,int nNALUSFeeded) {
         final DecodingInfo decodingInfo=new DecodingInfo(currentFPS,currentKiloBitsPerSecond,avgParsingTime_ms,avgWaitForInputBTime_ms,avgDecodingTime_ms,nNALU,nNALUSFeeded);
-        if(videoParamsChanged!=null){
-            videoParamsChanged.onDecodingInfoChanged(decodingInfo);
+        if(mVideoParamsChanged !=null){
+            mVideoParamsChanged.onDecodingInfoChanged(decodingInfo);
         }
         Log.d(TAG,"onDecodingInfoChanged"+decodingInfo.toString());
     }
