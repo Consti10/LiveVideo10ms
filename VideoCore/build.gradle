@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 4
-        versionName "1.4"
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++17"
