@@ -6,13 +6,13 @@
 
 
 #define PRINT_DEBUG_INFO
-#define TAG "LowLagDecoder"
+constexpr const auto TAG="LowLagDecoder";
 
 #include <h264_stream.h>
 #include <vector>
 
 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
+#define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
 constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 
@@ -75,13 +75,13 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         decoder.codec = AMediaCodec_createDecoderByType("video/avc");
         //char* name;
         //AMediaCodec_getName(decoder.codec,&name);
-        //LOGD("Created decoder %s",name);
+        //MLOGD("Created decoder %s",name);
         //AMediaCodec_releaseName(decoder.codec,name);
     }
     AMediaFormat* format=AMediaFormat_new();
     AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/avc");
     const auto videoWH= sps.getVideoWidthHeightSPS();
-    LOGD("XYZ %d %d",videoWH[0],videoWH[1]);
+    MLOGD("XYZ %d %d",videoWH[0],videoWH[1]);
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
     //AVCProfileBaseline==1
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
@@ -94,7 +94,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
     AMediaFormat_delete(format);
     if (decoder.codec== nullptr) {
-        LOGD("Cannot configure decoder");
+        MLOGD("Cannot configure decoder");
         //set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
         mKeyFrameFinder.reset();
         return;
@@ -122,7 +122,7 @@ void LowLagDecoder::checkOutputLoop() {
             decodingTime_us.add((long)deltaDecodingTime);
             nDecodedFrames.add(1);
             if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
-                LOGD("Decoder saw EOS");
+                MLOGD("Decoder saw EOS");
                 decoderSawEOS=true;
                 continue;
             }
@@ -133,13 +133,13 @@ void LowLagDecoder::checkOutputLoop() {
             if(onDecoderRatioChangedCallback!= nullptr && mWidth!=0 && mHeight!=0){
                 onDecoderRatioChangedCallback({mWidth,mHeight});
             }
-            LOGD("AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED %d %d %s",mWidth,mHeight,AMediaFormat_toString(format));
+            MLOGD("AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED %d %d %s",mWidth,mHeight,AMediaFormat_toString(format));
         } else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
-            LOGD("AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED");
+            MLOGD("AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED");
         } else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
             //LOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER");
         } else {
-            LOGD("dequeueOutputBuffer idx: %d .Exit.",(int)index);
+            MLOGD("dequeueOutputBuffer idx: %d .Exit.",(int)index);
             decoderProducedUnknown=true;
             continue;
         }
@@ -161,7 +161,7 @@ void LowLagDecoder::checkOutputLoop() {
             }
         }
     }
-    LOGD("Exit CheckOutputLoop");
+    MLOGD("Exit CheckOutputLoop");
 }
 
 //Feed nullptr to indicate EOS
@@ -197,12 +197,12 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
             //just try again. But if we had no success in the last 1 second,log a warning and return
             const int deltaMS=(int)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-now).count();
             if(deltaMS>1000){
-                LOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second %d. return.",deltaMS);
+                MLOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second %d. return.",deltaMS);
                 return;
             }
         }else{
             //Something went wrong. But we will feed the next nalu soon anyways
-            LOGD("dequeueInputBuffer idx %d return.",(int)index);
+            MLOGD("dequeueInputBuffer idx %d return.",(int)index);
             return;
         }
     }
@@ -255,7 +255,7 @@ void LowLagDecoder::printAvgLog() {
             "\nN NALUS:"<<decodingInfo.nNALU
             <<" | N NALUES feeded:" <<decodingInfo.nNALUSFeeded<<" | N Decoded Frames:"<<nDecodedFrames.getAbsolute()<<
             "\nFPS:"<<decodingInfo.currentFPS;
-    LOGD("%s",frameLog.str().c_str());
+    MLOGD("%s",frameLog.str().c_str());
 #endif
 
     /*std::stringstream properties;

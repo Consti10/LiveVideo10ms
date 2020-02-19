@@ -17,6 +17,29 @@
 #include "../Helper/TimeHelper.hpp"
 #include "../NALU/KeyFrameFinder.h"
 
+struct DecodingInfo{
+    std::chrono::steady_clock::time_point lastCalculation=std::chrono::steady_clock::now();
+    long nNALU=0;
+    long nNALUSFeeded=0;
+    float currentFPS=0;
+    float currentKiloBitsPerSecond=0;
+    float avgParsingTime_ms=0;
+    float avgWaitForInputBTime_ms=0;
+    float avgDecodingTime_ms=0;
+    bool operator==(const DecodingInfo& d2)const{
+        return nNALU==d2.nNALU && nNALUSFeeded==d2.nNALUSFeeded && currentFPS==d2.currentFPS &&
+               currentKiloBitsPerSecond==d2.currentKiloBitsPerSecond && avgParsingTime_ms==d2.avgParsingTime_ms &&
+               avgWaitForInputBTime_ms==d2.avgWaitForInputBTime_ms && avgDecodingTime_ms==d2.avgDecodingTime_ms;
+    }
+};
+struct VideoRatio{
+    int width;
+    int height;
+    bool operator==(const VideoRatio& b)const{
+        return width==b.width && height==b.height;
+    }
+};
+
 class LowLagDecoder {
 private:
     struct Decoder{
@@ -26,17 +49,6 @@ private:
         ANativeWindow* window= nullptr;
     };
 public:
-    struct DecodingInfo{
-        std::chrono::steady_clock::time_point lastCalculation=std::chrono::steady_clock::now();
-        long nNALU=0;
-        long nNALUSFeeded=0;
-        float currentFPS=0;
-        float currentKiloBitsPerSecond=0;
-        float avgParsingTime_ms=0;
-        float avgWaitForInputBTime_ms=0;
-        float avgDecodingTime_ms=0;
-    };
-    using VideoRatio=std::array<int,2>;
     //Make sure to do no heavy lifting on this callback, since it is called from the low-latency mCheckOutputThread thread (best to copy values and leave processing to another thread)
     //The decoding info callback is called every DECODING_INFO_RECALCULATION_INTERVAL_MS
     typedef std::function<void(const DecodingInfo)> DECODING_INFO_CHANGED_CALLBACK;
