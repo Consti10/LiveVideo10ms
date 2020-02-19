@@ -39,8 +39,10 @@ public:
     long nNALUsAtLastCall=0;
     FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
 public:
-    LowLagDecoder::DecodingInfo latestDecodingInfo;
-    LowLagDecoder::VideoRatio latestVideoRatio;
+    DecodingInfo latestDecodingInfo;
+    std::atomic<bool> latestDecodingInfoChanged;
+    VideoRatio latestVideoRatio;
+    std::atomic<bool> latestVideoRatioChanged;
 private:
     std::condition_variable conditionVariable;
     static constexpr const size_t UDP_RECEIVER_BUFFER_SIZE=1024*1024*5; //5 MB should be plenty

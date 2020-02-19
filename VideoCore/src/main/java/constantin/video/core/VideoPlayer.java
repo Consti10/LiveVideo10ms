@@ -12,8 +12,6 @@ import java.util.TimerTask;
 
 import constantin.video.core.VideoNative.NativeInterfaceVideoParamsChanged;
 import constantin.video.core.VideoNative.VideoNative;
-import constantin.video.core.IVideoParamsChanged;
-import constantin.video.core.DecodingInfo;
 
 
 //Convenient wrapper around the native functions from VideoNative
@@ -48,23 +46,29 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     //d) Receiving Data from a file in the phone file system
     public void addAndStartReceiver(){
         VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
-        final NativeInterfaceVideoParamsChanged interfaceVideoParamsChanged=this;
-        Log.d(TAG,"Starting timer");
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                VideoNative.nativeCallBack(interfaceVideoParamsChanged,nativeVideoPlayer);
-            }
-        },0,1000);
+        if(videoParamsChanged!=null){
+            final NativeInterfaceVideoParamsChanged interfaceVideoParamsChanged=this;
+            Log.d(TAG,"Starting timer");
+            //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
+            //TODO: proper queue, but how to do synchronization in java ndk ?!
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    VideoNative.nativeCallBack(interfaceVideoParamsChanged,nativeVideoPlayer);
+                }
+            },0,500);
+        }
     }
 
     //Stop the Receiver
     //Stop the Decoder
     //Free resources
     public void stopAndRemovePlayerReceiver(){
-        timer.cancel();
-        timer.purge();
-        Log.d(TAG,"Stopped timer");
+        if(videoParamsChanged!=null){
+            timer.cancel();
+            timer.purge();
+            Log.d(TAG,"Stopped timer");
+        }
         VideoNative.nativeStopReceiver(nativeVideoPlayer);
         release();
     }

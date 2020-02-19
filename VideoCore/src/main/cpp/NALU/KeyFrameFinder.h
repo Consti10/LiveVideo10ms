@@ -19,7 +19,7 @@ private:
     std::vector<uint8_t> CSD1;
 public:
     void saveIfKeyFrame(const NALU &nalu){
-        if(nalu.data_length<0)return;
+        if(nalu.data_length<=0)return;
         if(nalu.isSPS()){
             CSD0.resize((unsigned)nalu.data_length);
             memcpy(CSD0.data(),nalu.data,(size_t )nalu.data_length);

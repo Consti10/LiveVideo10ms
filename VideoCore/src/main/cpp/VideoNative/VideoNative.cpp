@@ -55,8 +55,16 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
         mLowLagDecoder=new LowLagDecoder(window,CPU_PRIORITY_DECODER_OUTPUT,VS_USE_SW_DECODER);
-        mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const LowLagDecoder::VideoRatio ratio) { this->latestVideoRatio=ratio; });
-        mLowLagDecoder->registerOnDecodingInfoChangedCallback([this](const LowLagDecoder::DecodingInfo info) {this->latestDecodingInfo=info;});
+        mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
+            const bool changed=!(ratio==this->latestVideoRatio);
+            this->latestVideoRatio=ratio;
+            latestVideoRatioChanged=changed;
+        });
+        mLowLagDecoder->registerOnDecodingInfoChangedCallback([this](const DecodingInfo info) {
+            const bool changed=!(info==this->latestDecodingInfo);
+            this->latestDecodingInfo=info;
+            latestDecodingInfoChanged=changed;
+        });
     }
     //Add Ground recorder if enabled
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
@@ -280,15 +288,23 @@ JNI_METHOD(jboolean , anyVideoBytesParsedSinceLastCall)
 
 JNI_METHOD(void,nativeCallBack)
 (JNIEnv *env,jclass jclass1,jobject videoParamsChangedI,jlong testReceiverN){
-    //Update all java stuff
-    jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(videoParamsChangedI);
-    jmethodID onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onVideoRatioChanged", "(II)V");
-    jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(FFFFFII)V");
     VideoNative* p=native(testReceiverN);
-    env->CallVoidMethod(videoParamsChangedI,onVideoRatioChangedJAVA,(jint)p->latestVideoRatio[0],(jint)p->latestVideoRatio[1]);
-    LowLagDecoder::DecodingInfo info=p->latestDecodingInfo;
-    env->CallVoidMethod(videoParamsChangedI,onDecodingInfoChangedJAVA,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
-                           (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded);
+    //Update all java stuff
+    if(p->latestDecodingInfoChanged || p->latestVideoRatioChanged){
+        jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(videoParamsChangedI);
+        if(p->latestVideoRatioChanged){
+            jmethodID onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onVideoRatioChanged", "(II)V");
+            env->CallVoidMethod(videoParamsChangedI,onVideoRatioChangedJAVA,(jint)p->latestVideoRatio.width,(jint)p->latestVideoRatio.height);
+            p->latestVideoRatioChanged=false;
+        }
+        if(p->latestDecodingInfoChanged){
+            jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(FFFFFII)V");
+            const auto info=p->latestDecodingInfo;
+            env->CallVoidMethod(videoParamsChangedI,onDecodingInfoChangedJAVA,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
+                                (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded);
+            p->latestDecodingInfoChanged=false;
+        }
+    }
 }
 
 }
