@@ -26,11 +26,11 @@ public:
     std::string getInfoString();
 private:
     void onNewNALU(const NALU& nalu);
+    //don't forget to call ANativeWindow_release() on this pointer
     ANativeWindow* window=nullptr;
     SettingsN mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
-    std::string createUrl();
 public:
     H264Parser mParser;
     std::unique_ptr<LowLagDecoder> mLowLagDecoder;

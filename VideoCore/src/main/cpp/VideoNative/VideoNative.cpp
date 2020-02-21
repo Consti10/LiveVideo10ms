@@ -180,11 +180,6 @@ std::string VideoNative::getInfoString(){
     return ostringstream1.str();
 }
 
-std::string VideoNative::createUrl() {
-    return std::string();
-}
-
-
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
