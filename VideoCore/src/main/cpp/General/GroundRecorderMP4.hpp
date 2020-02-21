@@ -17,6 +17,13 @@
 class GroundRecorderMP4 {
 public:
     GroundRecorderMP4(const std::string GROUND_RECORDING_DIRECTORY):GROUND_RECORDING_DIRECTORY(GROUND_RECORDING_DIRECTORY){}
+    ~GroundRecorderMP4(){
+        if(mMuxer!= nullptr){
+            AMediaMuxer_stop(mMuxer);
+            AMediaMuxer_delete(mMuxer);
+            close(mFD);
+        }
+    }
     //
     void writeData(const NALU& nalu) {
         if(mMuxer== nullptr){
@@ -55,13 +62,6 @@ public:
             //info.flags=0;
             info.flags=AMEDIACODEC_CONFIGURE_FLAG_ENCODE; //1
             AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,nalu.data,&info);
-        }
-    }
-    void stop() {
-        if(mMuxer!= nullptr){
-            AMediaMuxer_stop(mMuxer);
-            AMediaMuxer_delete(mMuxer);
-            close(mFD);
         }
     }
 private:

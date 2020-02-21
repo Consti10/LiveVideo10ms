@@ -16,8 +16,12 @@ class GroundRecorder{
 private:
     const std::string filename;
 public:
-    GroundRecorder(std::string s):filename(s) {
-        //ofstream.open (filename.c_str());
+    GroundRecorder(std::string s):filename(s) {}
+    ~GroundRecorder(){
+        if(ofstream.is_open()){
+            ofstream.flush();
+            ofstream.close();
+        }
     }
 
 //only as soon as we actually write data the file is created
@@ -30,10 +34,6 @@ public:
             ofstream.open (filename.c_str());
         }
         ofstream.write((char*)data,data_length);
-    }
-    void stop() {
-        ofstream.flush();
-        ofstream.close();
     }
     static std::string findUnusedFilename(std::string directory,std::string filetype) {
         auto t = std::time(nullptr);
