@@ -30,23 +30,23 @@ private:
     SettingsN mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
+    std::string createUrl();
 public:
     H264Parser mParser;
-    LowLagDecoder* mLowLagDecoder= nullptr;
-    UDPReceiver* mVideoReceiver= nullptr;
-    FileReader* mFileReceiver=nullptr;
-    GroundRecorder* mGroundRecorder= nullptr;
+    std::unique_ptr<LowLagDecoder> mLowLagDecoder;
+    std::unique_ptr<FFMpegVideoReceiver> mFFMpegVideoReceiver;
+    std::unique_ptr<UDPReceiver> mVideoReceiver;
+    std::unique_ptr<FileReader> mFileReceiver;
     long nNALUsAtLastCall=0;
-    FFMpegVideoReceiver* mFFMpegVideoReceiver=nullptr;
 public:
     DecodingInfo latestDecodingInfo;
     std::atomic<bool> latestDecodingInfoChanged;
     VideoRatio latestVideoRatio;
     std::atomic<bool> latestVideoRatioChanged;
 private:
-    std::condition_variable conditionVariable;
+    std::unique_ptr<GroundRecorder> mGroundRecorder;
+    std::unique_ptr<GroundRecorderMP4> mMP4GroundRecorder;
     static constexpr const size_t UDP_RECEIVER_BUFFER_SIZE=1024*1024*5; //5 MB should be plenty
-    GroundRecorderMP4* mMP4GroundRecorder= nullptr;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

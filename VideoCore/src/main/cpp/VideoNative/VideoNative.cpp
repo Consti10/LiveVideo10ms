@@ -7,7 +7,7 @@
 #include <android/asset_manager_jni.h>
 
 constexpr auto TAG="VideoNative";
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
+#define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 constexpr auto CPU_PRIORITY_UDPRECEIVER_VIDEO=(-16);  //needs low latency and does not use the cpu that much
 constexpr auto CPU_PRIORITY_DECODER_OUTPUT (-16);     //needs low latency and does not use the cpu that much
@@ -22,7 +22,7 @@ VideoNative::VideoNative(JNIEnv* env,jobject context,const char* DIR) :
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
 void VideoNative::onNewVideoData(const uint8_t* data,const std::size_t data_length,const bool isRTPData,const int maxFPS=-1){
     mParser.setLimitFPS(maxFPS);
-    //LOGD("onNewVideoData %d",data_length);
+    //MLOGD("onNewVideoData %d",data_length);
     if(isRTPData){
         mParser.parse_rtp_h264_stream(data,data_length);
     }else{
@@ -31,15 +31,16 @@ void VideoNative::onNewVideoData(const uint8_t* data,const std::size_t data_leng
 }
 
 void VideoNative::onNewNALU(const NALU& nalu){
-    //LOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
+    //MLOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
     //nalu.debugX();
-    if(mLowLagDecoder!=nullptr){
+    if(mLowLagDecoder){
         mLowLagDecoder->interpretNALU(nalu);
     }
-    if(mGroundRecorder!= nullptr){
+    //same as get!=nullptr
+    if(mGroundRecorder){
         mGroundRecorder->writeData(nalu.data,nalu.data_length);
     }
-    if(mMP4GroundRecorder!=nullptr){
+    if(mMP4GroundRecorder){
         mMP4GroundRecorder->writeData(nalu);
     }
 }
@@ -54,7 +55,7 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     const bool VS_USE_SW_DECODER=mSettingsN.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
-        mLowLagDecoder=new LowLagDecoder(window,CPU_PRIORITY_DECODER_OUTPUT,VS_USE_SW_DECODER);
+        mLowLagDecoder=std::make_unique<LowLagDecoder>(window,CPU_PRIORITY_DECODER_OUTPUT,VS_USE_SW_DECODER);
         mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
             const bool changed=!(ratio==this->latestVideoRatio);
             this->latestVideoRatio=ratio;
@@ -72,28 +73,19 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
     //if(false){
         const std::string groundRecordingFlename=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"h264");
-        //LOGD("Filename%s",groundRecordingFlename.c_str());
-         mGroundRecorder=new GroundRecorder(groundRecordingFlename);
+        //MLOGD("Filename%s",groundRecordingFlename.c_str());
+         mGroundRecorder=std::make_unique<GroundRecorder>(groundRecordingFlename);
     }
     //mMP4GroundRecorder=new GroundRecorderMP4(GROUND_RECORDING_DIRECTORY);
 }
 
 void VideoNative::removeConsumers(){
-    if(mLowLagDecoder!= nullptr){
+    if(mLowLagDecoder){
         mLowLagDecoder->waitForShutdownAndDelete();
-        delete(mLowLagDecoder);
-        mLowLagDecoder= nullptr;
+        mLowLagDecoder.reset();
     }
-    if(mGroundRecorder!= nullptr){
-        mGroundRecorder->stop();
-        delete(mGroundRecorder);
-        mGroundRecorder=nullptr;
-    }
-    if(mMP4GroundRecorder!= nullptr){
-        mMP4GroundRecorder->stop();
-        delete(mMP4GroundRecorder);
-        mMP4GroundRecorder= nullptr;
-    }
+    mGroundRecorder.reset();
+    mMP4GroundRecorder.reset();
     if(window!=nullptr){
         //Don't forget to release the window, does not matter if the decoder has been created or not
         ANativeWindow_release(window);
@@ -113,39 +105,39 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
     //If url starts with file: play file from android local storage
     //If url starts with rtsp: play rtsp via ffmpeg
 
-    //LOGD("VS_SOURCE: %d",VS_SOURCE);
+    //MLOGD("VS_SOURCE: %d",VS_SOURCE);
     switch (VS_SOURCE){
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
-            mVideoReceiver=new UDPReceiver(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,[this,useRTP](const uint8_t* data,size_t data_length) {
+            mVideoReceiver=std::make_unique<UDPReceiver>(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,[this,useRTP](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,useRTP,-1);
             },UDP_RECEIVER_BUFFER_SIZE);
             mVideoReceiver->startReceiving();
         }break;
         case FILE:{
             const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            mFileReceiver=new FileReader(filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length) {
+            mFileReceiver=std::make_unique<FileReader>(filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();
         }break;
         case ASSETS:{
             const std::string filename=mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264");
-            mFileReceiver=new FileReader(assetManager,filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length) {
+            mFileReceiver=std::make_unique<FileReader>(assetManager,filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
             },1024);
             mFileReceiver->startReading();
         }break;
         case VIA_FFMPEG_URL:{
-            LOGD("Started with SOURCE=TEST360");
+            MLOGD("Started with SOURCE=TEST360");
             const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/capture1.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
-            //LOGD("url:%s",url.c_str());
-            mFFMpegVideoReceiver=new FFMpegVideoReceiver(url,0,[this](uint8_t* data,int data_length) {
+            //MLOGD("url:%s",url.c_str());
+            mFFMpegVideoReceiver=std::make_unique<FFMpegVideoReceiver>(url,0,[this](uint8_t* data,int data_length) {
                 onNewVideoData(data,(size_t)data_length,false,-1);
             },[this](const NALU& nalu) {
                 onNewNALU(nalu);
@@ -154,33 +146,30 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         }break;
         case EXTERNAL:{
             //Data is being received somewhere else and passed trough-init nothing.
-            LOGD("Started with SOURCE=EXTERNAL");
+            MLOGD("Started with SOURCE=EXTERNAL");
         }break;
     }
 }
 
 void VideoNative::stopReceiver() {
-    if(mVideoReceiver!=nullptr){
+    if(mVideoReceiver){
         mVideoReceiver->stopReceiving();
-        delete(mVideoReceiver);
-        mVideoReceiver= nullptr;
+       mVideoReceiver.reset();
     }
-    if(mFileReceiver!=nullptr){
+    if(mFileReceiver){
         mFileReceiver->stopReading();
-        delete(mFileReceiver);
-        mFileReceiver= nullptr;
+        mFileReceiver.reset();
     }
-    if(mFFMpegVideoReceiver!= nullptr){
+    if(mFFMpegVideoReceiver){
         mFFMpegVideoReceiver->shutdown_callback();
         mFFMpegVideoReceiver->stop_playing();
-        delete(mFFMpegVideoReceiver);
-        mFFMpegVideoReceiver=nullptr;
+        mFFMpegVideoReceiver.reset();
     }
 }
 
 std::string VideoNative::getInfoString(){
     std::ostringstream ostringstream1;
-    if(mVideoReceiver!= nullptr){
+    if(mVideoReceiver){
         ostringstream1 << "Listening for video on port " << mVideoReceiver->getPort();
         ostringstream1 << "\nReceived: " << mVideoReceiver->getNReceivedBytes() << "B"
                        << " | parsed frames: "
@@ -189,6 +178,10 @@ std::string VideoNative::getInfoString(){
         ostringstream1<<"Not receiving from udp";
     }
     return ostringstream1.str();
+}
+
+std::string VideoNative::createUrl() {
+    return std::string();
 }
 
 
@@ -262,7 +255,7 @@ JNI_METHOD(jstring , getVideoInfoString)
 JNI_METHOD(jboolean , anyVideoDataReceived)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
-    if(p->mVideoReceiver== nullptr){
+    if(p->mVideoReceiver){
         return (jboolean) false;
     }
     bool ret = (p->mVideoReceiver->getNReceivedBytes()  > 0);
@@ -272,7 +265,7 @@ JNI_METHOD(jboolean , anyVideoDataReceived)
 JNI_METHOD(jboolean , receivingVideoButCannotParse)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
-    if(p->mVideoReceiver== nullptr){
+    if(p->mVideoReceiver){
         return (jboolean) false;
     }
     return (jboolean) (p->mVideoReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
