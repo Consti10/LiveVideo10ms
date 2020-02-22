@@ -40,11 +40,11 @@ struct VideoRatio{
     }
 };
 
+//Handles decoding of .h264 video
 class LowLagDecoder {
 private:
     struct Decoder{
         bool configured= false;
-        bool SW= false;
         AMediaCodec *codec= nullptr;
         ANativeWindow* window= nullptr;
     };
@@ -55,21 +55,38 @@ public:
     //The decoder ratio callback is called every time the output format changes
     typedef std::function<void(const VideoRatio)> DECODER_RATIO_CHANGED;
 public:
+    //@param window: must be a valid ANativeWindow
+    //@param checkOutputThreadCpuPrio the CPU priority the check output buffer thread will run on
+    //@param SW use SW or HW decoder
     LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
+    //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
+    //If the decoder has been configured, feed NALU. Else search for configuration data and
+    //configure as soon as possible
     void interpretNALU(const NALU& nalu);
+    //close input pipe, then feed EOS input
+    //wait for EOS to arrive at output, then free all resources.
     void waitForShutdownAndDelete();
 private:
+    //Initialize decoder with provided SPS/PPS data.
+    //Set Decoder.configured to true on success
     void configureStartDecoder(const NALU& sps,const NALU& pps);
-    //Feed nullptr for EOS signal
+    //Feed nullptr to indicate EOS.
+    //Else,wait for input buffer to become avalable before feeding NALU
     void feedDecoder(const NALU* nalu);
+    //Runs until EOS arrives at output buffer
     void checkOutputLoop();
-    void printAvgLog();
+    //when this call returns, it is guaranteed that no more data will be fed to the decoder
+    //but output buffer(s) are still polled from the queue. Use this before feeding EOS
     void closeInputPipe();
+    //Debug log
+    void printAvgLog();
     int mWidth,mHeight;
     std::thread* mCheckOutputThread= nullptr;
     const int mCheckOutputThreadCPUPriority;
+    const bool SW;
+    //Holds the AMediaCodec instance, as well as the state (configured or not configured)
     Decoder decoder;
     DecodingInfo decodingInfo;
     bool inputPipeClosed=false;

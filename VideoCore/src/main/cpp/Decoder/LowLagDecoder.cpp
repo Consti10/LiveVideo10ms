@@ -1,6 +1,6 @@
 
 #include "LowLagDecoder.h"
-#include "../General/CPUPriority.hpp"
+#include "../Helper/CPUPriority.hpp"
 #include <unistd.h>
 #include <sstream>
 
@@ -20,8 +20,7 @@ constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 using namespace std::chrono;
 
 LowLagDecoder::LowLagDecoder(ANativeWindow* window,const int checkOutputThreadCpuPrio,bool SW):
-        mCheckOutputThreadCPUPriority(checkOutputThreadCpuPrio){
-    decoder.SW=SW;
+        mCheckOutputThreadCPUPriority(checkOutputThreadCpuPrio),SW(SW){
     decoder.window=window;
     decoder.configured=false;
 }
@@ -66,10 +65,8 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     }
 }
 
-//Initialize decoder with provided SPS/PPS data.
-//Set Decoder.configured to true on success
 void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
-    if(decoder.SW){
+    if(SW){
         decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
     }else {
         decoder.codec = AMediaCodec_createDecoderByType("video/avc");
@@ -164,7 +161,6 @@ void LowLagDecoder::checkOutputLoop() {
     MLOGD("Exit CheckOutputLoop");
 }
 
-//Feed nullptr to indicate EOS
 void LowLagDecoder::feedDecoder(const NALU* naluP){
     const auto now=std::chrono::steady_clock::now();
     const auto deltaParsing=naluP!= nullptr ? now-naluP->creationTime : std::chrono::steady_clock::duration::zero();
@@ -201,13 +197,12 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
                 return;
             }
         }else{
-            //Something went wrong. But we will feed the next nalu soon anyways
+            //Something went wrong. But we will feed the next NALU soon anyways
             MLOGD("dequeueInputBuffer idx %d return.",(int)index);
             return;
         }
     }
 }
-
 
 //when this call returns, it is guaranteed that no more data will be fed to the decoder
 //but output buffer(s) are still polled from the queue

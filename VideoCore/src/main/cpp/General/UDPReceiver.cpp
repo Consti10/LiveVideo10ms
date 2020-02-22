@@ -1,6 +1,6 @@
 
 #include "UDPReceiver.h"
-#include "CPUPriority.hpp"
+#include "../Helper/CPUPriority.hpp"
 #include <arpa/inet.h>
 #include <vector>
 #include <sstream>

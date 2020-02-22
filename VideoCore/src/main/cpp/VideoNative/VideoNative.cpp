@@ -1,6 +1,6 @@
 
 #include "VideoNative.h"
-#include "../General/CPUPriority.hpp"
+#include "../Helper/CPUPriority.hpp"
 #include "../IDV.hpp"
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
