@@ -9,12 +9,12 @@ import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import constantin.video.core.VideoNative.NativeInterfaceVideoParamsChanged;
+import constantin.video.core.VideoNative.INativeVideoParamsChanged;
 import constantin.video.core.VideoNative.VideoNative;
 
 
 //Convenient wrapper around the native functions from VideoNative
-public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
+public class VideoPlayer implements INativeVideoParamsChanged {
     private static final String TAG="VideoPlayer";
     private final long nativeVideoPlayer;
     private final IVideoParamsChanged mVideoParamsChanged;
@@ -46,7 +46,7 @@ public class VideoPlayer implements NativeInterfaceVideoParamsChanged {
     public void addAndStartReceiver(){
         VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
         if(mVideoParamsChanged !=null){
-            final NativeInterfaceVideoParamsChanged interfaceVideoParamsChanged=this;
+            final INativeVideoParamsChanged interfaceVideoParamsChanged=this;
             Log.d(TAG,"Starting timer");
             //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
             //TODO: proper queue, but how to do synchronization in java ndk ?!

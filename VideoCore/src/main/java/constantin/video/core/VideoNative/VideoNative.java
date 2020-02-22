@@ -38,7 +38,7 @@ public class VideoNative {
 
     //call this via java to run the callback(s)
     //TODO: Use message queue from cpp for performance
-    public static native <T extends NativeInterfaceVideoParamsChanged> void nativeCallBack(T t,long nativeInstance);
+    public static native <T extends INativeVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
 
     public static final int VS_SOURCE_UDP=0;
     public static final int VS_SOURCE_FILE=1;

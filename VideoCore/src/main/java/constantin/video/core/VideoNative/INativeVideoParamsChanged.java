@@ -1,7 +1,8 @@
 package constantin.video.core.VideoNative;
 
-
-public interface NativeInterfaceVideoParamsChanged {
+//These methods are called by the native code.
+//See also IVideoParamsChanged
+public interface INativeVideoParamsChanged {
     @SuppressWarnings("unused")
     void onVideoRatioChanged(int videoW, int videoH);
     @SuppressWarnings("unused")
