@@ -29,7 +29,7 @@ public:
         if(mMuxer== nullptr){
             mKeyFrameFInder.saveIfKeyFrame(nalu);
             if(mKeyFrameFInder.allKeyFramesAvailable()){
-                const std::string fn=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
+                const std::string fn=GroundRecorderRAW::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
                 mFD = open(fn.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
                 mMuxer=AMediaMuxer_new(mFD,AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
                 AMediaFormat*format=AMediaFormat_new();

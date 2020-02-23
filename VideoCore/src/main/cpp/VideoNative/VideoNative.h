@@ -7,7 +7,7 @@
 
 #include <jni.h>
 #include <UDPReceiver.h>
-#include "GroundRecorder.hpp"
+#include "GroundRecorderRAW.hpp"
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
 #include "../Helper/SettingsN.hpp"
@@ -44,7 +44,7 @@ public:
     VideoRatio latestVideoRatio;
     std::atomic<bool> latestVideoRatioChanged;
 private:
-    std::unique_ptr<GroundRecorder> mGroundRecorder;
+    std::unique_ptr<GroundRecorderRAW> mGroundRecorder;
     std::unique_ptr<GroundRecorderMP4> mMP4GroundRecorder;
     static constexpr const size_t UDP_RECEIVER_BUFFER_SIZE=1024*1024*5; //5 MB should be plenty
 };

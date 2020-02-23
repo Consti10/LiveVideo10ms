@@ -72,9 +72,9 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
     if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
     //if(false){
-        const std::string groundRecordingFlename=GroundRecorder::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"h264");
+        const std::string groundRecordingFlename=GroundRecorderRAW::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"h264");
         //MLOGD("Filename%s",groundRecordingFlename.c_str());
-         mGroundRecorder=std::make_unique<GroundRecorder>(groundRecordingFlename);
+         mGroundRecorder=std::make_unique<GroundRecorderRAW>(groundRecordingFlename);
     }
     //mMP4GroundRecorder=new GroundRecorderMP4(GROUND_RECORDING_DIRECTORY);
 }

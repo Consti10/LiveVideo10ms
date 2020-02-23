@@ -20,7 +20,7 @@ public class VideoNative {
     public static native void finalize(long nativeVideoPlayer);
     //Consumers are currently
     //1) The LowLag decoder (if Surface!=null)
-    //2) The GroundRecorder (if enableGroundRecording=true)
+    //2) The GroundRecorderRAW (if enableGroundRecording=true)
     public static native void nativeAddConsumers(long nativeInstance, Surface surface);
     public static native void nativeRemoveConsumers(long videoPlayerN);
 

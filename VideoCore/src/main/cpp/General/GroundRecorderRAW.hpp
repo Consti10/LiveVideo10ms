@@ -11,13 +11,16 @@
 #include <sstream>
 #include <filesystem>
 
+//Write raw data into the file specified by filename.
+//The file is only created as soon as any data is written, to not pollute
+//the file system with empty files
 
-class GroundRecorder{
+class GroundRecorderRAW{
 private:
     const std::string filename;
 public:
-    GroundRecorder(std::string s):filename(s) {}
-    ~GroundRecorder(){
+    GroundRecorderRAW(std::string s):filename(s) {}
+    ~GroundRecorderRAW(){
         if(ofstream.is_open()){
             ofstream.flush();
             ofstream.close();
