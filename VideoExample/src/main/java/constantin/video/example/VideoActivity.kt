@@ -23,6 +23,7 @@ import constantin.video.core.External.AspectFrameLayout
 import constantin.video.core.IVideoParamsChanged
 import constantin.video.core.VideoNative.VideoNative
 import constantin.video.core.VideoPlayer
+import constantin.video.core.VideoPlayerSurfaceHolder
 
 const val ID_OS_VERSIONS : String ="OSVersions";
 const val ID_BUILD_MODEL : String ="BuildModel";
@@ -33,7 +34,8 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     private val TAG = this::class.java.simpleName
     private var context: Context? = null
     private var mAspectFrameLayout: AspectFrameLayout? = null
-    private var mVideoPlayer: VideoPlayer? = null
+    //private var mVideoPlayer: VideoPlayer? = null
+    private var mVideoPlayer: VideoPlayerSurfaceHolder?=null
     private var mTextViewStatistics : TextView?=null;
 
     var mDecodingInfo: DecodingInfo? = null
@@ -51,6 +53,8 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         //
         val mSurfaceView = findViewById<SurfaceView>(R.id.sv_video)
         mSurfaceView.holder.addCallback(this)
+        mVideoPlayer= VideoPlayerSurfaceHolder(this,this);
+        mSurfaceView.holder.addCallback(mVideoPlayer)
         mAspectFrameLayout = findViewById(R.id.afl_video)
         mTextViewStatistics=findViewById(R.id.tv_decoding_stats)
         //Find the toggle button. If user taps on it, the toggle button itself
@@ -67,9 +71,6 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        mVideoPlayer = VideoPlayer(this, this)
-        mVideoPlayer!!.prepare(holder.surface)
-        mVideoPlayer!!.addAndStartReceiver()
         val preferences = getSharedPreferences("pref_video", Context.MODE_PRIVATE)
         VS_SOURCE = preferences.getInt(getString(R.string.VS_SOURCE), 0)
         VS_ASSETS_FILENAME_TEST_ONLY = preferences.getString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), "")
@@ -77,10 +78,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
 
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-        mVideoPlayer!!.stopAndRemovePlayerReceiver()
-        mVideoPlayer = null
-    }
+    override fun surfaceDestroyed(holder: SurfaceHolder) {}
 
     override fun onVideoRatioChanged(videoW: Int, videoH: Int) {
         runOnUiThread { mAspectFrameLayout!!.setAspectRatio(videoW.toDouble() / videoH) }
