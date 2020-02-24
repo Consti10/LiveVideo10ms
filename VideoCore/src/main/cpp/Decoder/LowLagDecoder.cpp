@@ -189,8 +189,10 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
                 std::memcpy(buf, nalu.data,(size_t)nalu.data_length);
                 //this timestamp will be later used to calculate the decoding latency
                 const uint64_t presentationTimeUS=(uint64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
-                const auto flag=nalu.isPPS() || nalu.isSPS() ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
-                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, flag);
+                //Doing so causes garbage bug TODO investigate
+                //const auto flag=nalu.isPPS() || nalu.isSPS() ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
+                //AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, flag);
+                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS,0);
                 waitForInputB_us.add((long)duration_cast<microseconds>(steady_clock::now()-now).count());
                 parsingTime_us.add((long)duration_cast<microseconds>(deltaParsing).count());
             }
