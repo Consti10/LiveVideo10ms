@@ -42,6 +42,11 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         //Do manipulations to h->sps...
         modNALU=NALU::fromH264StreamAndFree(h,&nalu);
     }*/
+    LOGD("%s",nalu.get_nal_name().c_str());
+    //if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
+     //   return;
+    //}
+
     decodingInfo.nNALU++;
     nNALUBytesFed.add(nalu.data_length);
     if(inputPipeClosed){

@@ -138,7 +138,7 @@ FileReader::convertAssetIntoRawVideoBuffer(AAssetManager *assetManager, const st
                 break;
             }
             const auto flags=AMediaExtractor_getSampleFlags(extractor);
-            LOGD("Read sample %d flags %d",(int)sampleSize,flags);
+            //LOGD("Read sample %d flags %d",(int)sampleSize,flags);
             vector_append2(rawData,(*sampleBuffer),(size_t)sampleSize);
             AMediaExtractor_advance(extractor);
         }

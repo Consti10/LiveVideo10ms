@@ -21,11 +21,11 @@ public:
     void saveIfKeyFrame(const NALU &nalu){
         if(nalu.data_length<=0)return;
         if(nalu.isSPS()){
-            CSD0.resize((unsigned)nalu.data_length);
+            CSD0.resize(nalu.data_length);
             memcpy(CSD0.data(),nalu.data,(size_t )nalu.data_length);
             MDebug::log("KeyFrameFinder","SPS found");
         }else if(nalu.isPPS()){
-            CSD1.resize((unsigned)nalu.data_length);
+            CSD1.resize(nalu.data_length);
             memcpy(CSD1.data(),nalu.data,(size_t )nalu.data_length);
             MDebug::log("KeyFrameFinder","PPS found");
         }
