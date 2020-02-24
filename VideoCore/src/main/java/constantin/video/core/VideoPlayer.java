@@ -17,9 +17,9 @@ import constantin.video.core.VideoNative.VideoNative;
 public class VideoPlayer implements INativeVideoParamsChanged {
     private static final String TAG="VideoPlayer";
     private final long nativeVideoPlayer;
-    private final IVideoParamsChanged mVideoParamsChanged;
+    private IVideoParamsChanged mVideoParamsChanged;
     private final Context context;
-    private final Timer timer;
+    private Timer timer;
 
     //Setup as much as possible without creating the decoder
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
@@ -27,7 +27,10 @@ public class VideoPlayer implements INativeVideoParamsChanged {
         this.mVideoParamsChanged =iVideoParamsChanged;
         this.context=context;
         nativeVideoPlayer= VideoNative.initialize(context,getDirectoryToSaveDataTo());
-        timer=new Timer();
+    }
+
+    public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged){
+        mVideoParamsChanged=iVideoParamsChanged;
     }
 
     //We cannot initialize the Decoder until we have SPS and PPS data -
@@ -50,6 +53,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
             Log.d(TAG,"Starting timer");
             //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
             //TODO: proper queue, but how to do synchronization in java ndk ?!
+            timer=new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -81,7 +85,11 @@ public class VideoPlayer implements INativeVideoParamsChanged {
         return nativeVideoPlayer;
     }
 
+    /**
+     * called by native code via NDK
+     */
     @Override
+    @SuppressWarnings({"UnusedDeclaration"})
     public void onVideoRatioChanged(int videoW, int videoH) {
         if(mVideoParamsChanged !=null){
             mVideoParamsChanged.onVideoRatioChanged(videoW,videoH);
@@ -89,7 +97,11 @@ public class VideoPlayer implements INativeVideoParamsChanged {
         //System.out.println("Video W and H"+videoW+","+videoH);
     }
 
+    /**
+     * called by native code via NDK
+     */
     @Override
+    @SuppressWarnings({"UnusedDeclaration"})
     public void onDecodingInfoChanged(float currentFPS, float currentKiloBitsPerSecond, float avgParsingTime_ms, float avgWaitForInputBTime_ms, float avgDecodingTime_ms,
                                       int nNALU,int nNALUSFeeded) {
         final DecodingInfo decodingInfo=new DecodingInfo(currentFPS,currentKiloBitsPerSecond,avgParsingTime_ms,avgWaitForInputBTime_ms,avgDecodingTime_ms,nNALU,nNALUSFeeded);
