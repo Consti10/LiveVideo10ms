@@ -44,6 +44,7 @@ void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
         }
     }
 }
+
 void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
     LOGD("passDataInChunks %d",(int)data.size());
     passDataInChunks(data.data(),data.size());
@@ -73,28 +74,6 @@ static inline void vector_append2(std::vector<uint8_t>& destination,const std::a
     destination.resize(vector0InitialSize+sourceSize);
     memcpy(&destination.data()[vector0InitialSize],source.data(),sourceSize);
 }
-
-static void crash1(){
-    std::array<uint8_t,1024*1024> buff;
-    buff[buff.size()-1]=0;
-}
-static void crash2(){
-    uint8_t data[1024*1024];
-    data[1024*1024-1]=0;
-}
-static void ok1(){
-    std::vector<uint8_t> buff(1024*1024);
-    buff[buff.size()-1]=0;
-}
-static void ok2(){
-    uint8_t* buff=new uint8_t[1024*1024];
-    buff[1024*1024-1]=0;
-}
-static void ok3(){
-    const auto buff=std::make_unique<std::array<uint8_t,1024*1024>>();
-    (*buff)[buff->size()-1]=0;
-}
-
 
 std::vector<uint8_t>
 FileReader::convertAssetIntoRawVideoBuffer(AAssetManager *assetManager, const std::string &path) {
