@@ -32,7 +32,7 @@ private:
     long sumAtLastCall=0;
 public:
     RelativeCalculator() = default;
-    void add(long x){
+    void add(unsigned long x){
         sum+=x;
     }
     long getDeltaSinceLastCall() {

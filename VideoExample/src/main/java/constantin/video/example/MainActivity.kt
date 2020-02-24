@@ -110,6 +110,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         private val REQUIRED_PERMISSION_LIST = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
         private val REQUEST_PERMISSION_CODE = 12345
         public val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("x264/testVideo.h264", "rpi_cam/rpi.h264","webcam/720p_usb.h264","360/insta_interference.h264",
-                "360/insta_webbn_1_shortened.h264","360/insta_webbn_2.h264","360/testRoom1_1920Mono.mp4")
+                "360/insta_webbn_1_shortened.h264","360/insta_webbn_2.h264","360/insta_mjpeg_test.h264","360/testRoom1_1920Mono.mp4")
     }
 }
