@@ -27,7 +27,8 @@ public class AspectFrameLayout extends FrameLayout {
      */
     public void setAspectRatio(double aspectRatio) {
         if (aspectRatio < 0) {
-            throw new IllegalArgumentException();
+            //throw new IllegalArgumentException();
+            aspectRatio=1.0f;
         }
         Debug("Setting aspect ratio to " + aspectRatio + " (was " + mTargetAspect + ")");
         if (mTargetAspect != aspectRatio) {
