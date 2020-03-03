@@ -54,7 +54,7 @@ void UDPReceiver::receiveFromUDPLoop() {
     //setMaxSocketBuffer();
     // 30Mbps 50ms buffer
     int val=1;
-    socklen_t len=sizeof(int);
+    socklen_t len=sizeof(val);
     getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &val,&len);
     LOGD("Default socket recv buffer is %d bytes", val);
 
@@ -80,13 +80,10 @@ void UDPReceiver::receiveFromUDPLoop() {
 
     sockaddr_in source;
     socklen_t sourceLen= sizeof(sockaddr_in);
-
     std::vector<uint8_t> sequenceNumbers;
-
 
     while (receiving) {
         //TODO investigate: does a big buffer size create latency with MSG_WAITALL ?
-        //Hypothesis: it should on linux, but does not on android ? what ?
         const ssize_t message_length = recvfrom(mSocket,buff->data(),UDP_PACKET_MAX_SIZE, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
         //ssize_t message_length = recv(mSocket, buff, (size_t) mBuffsize, MSG_WAITALL);
         if (message_length > 0) { //else -1 was returned;timeout/No data received
