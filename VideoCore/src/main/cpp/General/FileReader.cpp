@@ -76,69 +76,79 @@ static inline void vector_append2(std::vector<uint8_t>& destination,const std::a
 }
 
 std::vector<uint8_t>
+FileReader::loadRawAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
+    //Read raw data from file (without MediaExtractor)
+    AAsset* asset = AAssetManager_open(assetManager, path.c_str(), 0);
+    if(!asset){
+        LOGD("Error asset not found:%s",path.c_str());
+        return std::vector<uint8_t>();
+    }
+    const size_t size=(size_t)AAsset_getLength(asset);
+    AAsset_seek(asset,0,SEEK_SET);
+    std::vector<uint8_t> rawData(size);
+    const auto len=AAsset_read(asset,rawData.data(),size);
+    AAsset_close(asset);
+    LOGD("The entire file content (asset,raw) is in memory %d",(int)rawData.size());
+    return rawData;
+}
+
+std::vector<uint8_t>
+FileReader::loadConvertMP4AssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
+    //Use MediaExtractor to parse .mp4 file
+    AAsset* asset = AAssetManager_open(assetManager,path.c_str(), 0);
+    off_t start, length;
+    auto fd=AAsset_openFileDescriptor(asset,&start,&length);
+    if(fd<0){
+        LOGD("ERROR AAsset_openFileDescriptor %d",fd);
+        return std::vector<uint8_t>();
+    }
+    AMediaExtractor* extractor=AMediaExtractor_new();
+    AMediaExtractor_setDataSourceFd(extractor,fd,start,length);
+    const auto trackCount=AMediaExtractor_getTrackCount(extractor);
+    //This will save all data as RAW
+    //SPS/PPS in the beginning, rest afterwards
+    std::vector<uint8_t> rawData;
+    rawData.reserve((unsigned)length);
+    for(size_t i=0;i<trackCount;i++){
+        AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
+        const char* s;
+        AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
+        LOGD("Track is %s",s);
+        if(std::string(s).compare("video/avc")==0){
+            const auto mediaStatus=AMediaExtractor_selectTrack(extractor,i);
+            auto tmp=getBufferFromMediaFormat("csd-0",format);
+            vector_append(rawData,tmp);
+            tmp=getBufferFromMediaFormat("csd-1",format);
+            vector_append(rawData,tmp);
+            LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
+            break;
+        }
+        AMediaFormat_delete(format);
+    }
+    //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
+    const auto sampleBuffer=std::make_unique<std::array<uint8_t,NALU_BUFF_SIZE>>();
+    while(true){
+        const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
+        if(sampleSize<=0){
+            break;
+        }
+        const auto flags=AMediaExtractor_getSampleFlags(extractor);
+        //LOGD("Read sample %d flags %d",(int)sampleSize,flags);
+        vector_append2(rawData,(*sampleBuffer),(size_t)sampleSize);
+        AMediaExtractor_advance(extractor);
+    }
+    AMediaExtractor_delete(extractor);
+    AAsset_close(asset);
+    LOGD("The entire file content (asset,mp4) is in memory %d",(int)rawData.size());
+    return rawData;
+}
+
+std::vector<uint8_t>
 FileReader::convertAssetIntoRawVideoBuffer(AAssetManager *assetManager, const std::string &path) {
     if(endsWith(path,".mp4")){
-        //Use MediaExtractor to parse .mp4 file
-        AAsset* asset = AAssetManager_open(assetManager,path.c_str(), 0);
-        off_t start, length;
-        auto fd=AAsset_openFileDescriptor(asset,&start,&length);
-        if(fd<0){
-            LOGD("ERROR AAsset_openFileDescriptor %d",fd);
-            return std::vector<uint8_t>();
-        }
-        AMediaExtractor* extractor=AMediaExtractor_new();
-        AMediaExtractor_setDataSourceFd(extractor,fd,start,length);
-        const auto trackCount=AMediaExtractor_getTrackCount(extractor);
-        //This will save all data as RAW
-        //SPS/PPS in the beginning, rest afterwards
-        std::vector<uint8_t> rawData;
-        rawData.reserve((unsigned)length);
-        for(size_t i=0;i<trackCount;i++){
-            AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
-            const char* s;
-            AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
-            LOGD("Track is %s",s);
-            if(std::string(s).compare("video/avc")==0){
-                const auto mediaStatus=AMediaExtractor_selectTrack(extractor,i);
-                auto tmp=getBufferFromMediaFormat("csd-0",format);
-                vector_append(rawData,tmp);
-                tmp=getBufferFromMediaFormat("csd-1",format);
-                vector_append(rawData,tmp);
-                LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
-                break;
-            }
-            AMediaFormat_delete(format);
-        }
-        //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
-        const auto sampleBuffer=std::make_unique<std::array<uint8_t,NALU_BUFF_SIZE>>();
-        while(true){
-            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
-            if(sampleSize<=0){
-                break;
-            }
-            const auto flags=AMediaExtractor_getSampleFlags(extractor);
-            //LOGD("Read sample %d flags %d",(int)sampleSize,flags);
-            vector_append2(rawData,(*sampleBuffer),(size_t)sampleSize);
-            AMediaExtractor_advance(extractor);
-        }
-        AMediaExtractor_delete(extractor);
-        AAsset_close(asset);
-        LOGD("The entire file content (asset,mp4) is in memory %d",(int)rawData.size());
-        return rawData;
+        return loadConvertMP4AssetFileIntoMemory(assetManager,path);
     }else if(endsWith(path,".h264")){
-        //Read raw data from file (without MediaExtractor)
-        AAsset* asset = AAssetManager_open(assetManager, path.c_str(), 0);
-        if(!asset){
-            LOGD("Error asset not found:%s",path.c_str());
-            return std::vector<uint8_t>();
-        }
-        const size_t size=(size_t)AAsset_getLength(asset);
-        AAsset_seek(asset,0,SEEK_SET);
-        std::vector<uint8_t> rawData(size);
-        const auto len=AAsset_read(asset,rawData.data(),size);
-        AAsset_close(asset);
-        LOGD("The entire file content (asset,h264) is in memory %d",(int)rawData.size());
-        return rawData;
+        return loadRawAssetFileIntoMemory(assetManager,path);
     }
     LOGD("Error not supported file %s",path.c_str());
     return std::vector<uint8_t>();
@@ -251,5 +261,6 @@ void FileReader::parseFileAsRawVideoStream(const std::string &filename) {
         }
     }
 }
+
 
 

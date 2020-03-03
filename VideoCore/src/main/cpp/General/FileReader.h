@@ -59,6 +59,15 @@ private:
     void passDataInChunks(const uint8_t data[],const size_t size);
     void passDataInChunks(const std::vector<uint8_t>& data);
 
+    //Load the Asset file specified by path into memory and return as one big data buffer
+    static std::vector<uint8_t>
+    loadRawAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path);
+
+    //convert the asset file specified at path from .mp4 into raw .h264 bistream
+    //then return as one big data buffer
+    static std::vector<uint8_t>
+    loadConvertMP4AssetFileIntoMemory(AAssetManager *assetManager, const std::string &path);
+
     //Parse the specified asset into raw h264 video data (if needed), then return it as one big std::vector
     //Make sure to only call this on small video files,else the application might run out of memory
     //Takes files of either type .h264 -> already in raw format or
