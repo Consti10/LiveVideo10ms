@@ -21,8 +21,8 @@ public:
     /**
      * @param port : The port to listen on
      * @param CPUPriority: The priority the receiver thread will run with
-     * @param buffsize: Too small values can result in packet loss
      * @param onDataReceivedCallback: called every time new data is received
+     * @param buffsize: TODO test ?
      */
     UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t buffsize);
     /**
@@ -54,6 +54,9 @@ private:
     std::atomic<bool> receiving=false;
     std::atomic<long> nReceivedBytes=0;
     std::unique_ptr<std::thread> mUDPReceiverThread;
+    //https://en.wikipedia.org/wiki/User_Datagram_Protocol
+    //65,507 bytes (65,535 − 8 byte UDP header − 20 byte IP header).
+    static constexpr const size_t UDP_PACKET_MAX_SIZE=65507;
 };
 
 #endif // FPV_VR_UDPRECEIVER_H
