@@ -65,13 +65,10 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
         //const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
         //LOGD("Sequence number %d",(int)rtp_header->sequence);
 
-        nalu_header_t *nalu_header;
-        fu_header_t   *fu_header;
-        uint8_t h264_nal_header;
+        const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[12];
 
-        nalu_header = (nalu_header_t *)&rtp_data[12];
         if (nalu_header->type == 28) { /* FU-A */
-            fu_header = (fu_header_t*)&rtp_data[13];
+            const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
             if (fu_header->e == 1) {
                 /* end of fu-a */
                 memcpy(&nalu_data[nalu_data_length],&rtp_data[14],(size_t)data_len-14);
@@ -88,7 +85,7 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
                 nalu_data[2]=0;
                 nalu_data[3]=1;
                 nalu_data_length=4;
-                h264_nal_header = (uint8_t)(fu_header->type & 0x1f)
+                const uint8_t h264_nal_header = (uint8_t)(fu_header->type & 0x1f)
                                   | (nalu_header->nri << 5)
                                   | (nalu_header->f << 7);
                 nalu_data[4]=h264_nal_header;
@@ -108,7 +105,7 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             nalu_data[2]=0;
             nalu_data[3]=1;
             nalu_data_length=4;
-            h264_nal_header = (uint8_t )(nalu_header->type & 0x1f)
+            const uint8_t h264_nal_header = (uint8_t )(nalu_header->type & 0x1f)
                               | (nalu_header->nri << 5)
                               | (nalu_header->f << 7);
             nalu_data[4]=h264_nal_header;
