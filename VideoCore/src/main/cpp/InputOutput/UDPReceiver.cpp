@@ -9,8 +9,8 @@
 #define TAG "UDPReceiver"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
-UDPReceiver::UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t buffsize):
-        mPort(port),mName(name),RECV_BUFF_SIZE(buffsize),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback){
+UDPReceiver::UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
+        mPort(port),mName(name),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback){
 }
 
 void UDPReceiver::registerOnSourceIPFound(const SOURCE_IP_CALLBACK& onSourceIP) {
@@ -50,20 +50,19 @@ void UDPReceiver::receiveFromUDPLoop() {
     if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0){
         LOGD("Error setting reuse");
     }
-    //
-    //setMaxSocketBuffer();
-    // 30Mbps 50ms buffer
-    int val=1;
-    socklen_t len=sizeof(val);
-    getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &val,&len);
-    LOGD("Default socket recv buffer is %d bytes", val);
+    int recvBufferSize=0;
+    socklen_t len=sizeof(recvBufferSize);
+    getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
+    LOGD("Default socket recv buffer is %d bytes", recvBufferSize);
 
-    /*val = 30 * 1000 * 500 / 8;
-    setsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, (char *) &val, sizeof(val));
-    len = sizeof(val);
-    getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, (char *) &val, &len);
-    LOGD("Current socket recv buffer is %d bytes", val);*/
-
+    if(WANTED_RCVBUF_SIZE>recvBufferSize){
+        recvBufferSize=WANTED_RCVBUF_SIZE;
+        if(setsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &WANTED_RCVBUF_SIZE,len)) {
+            LOGD("Cannot increase buffer size to %d bytes", WANTED_RCVBUF_SIZE);
+        }
+        getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
+        LOGD("Wanted %d Set %d", WANTED_RCVBUF_SIZE,recvBufferSize);
+    }
     //
     setCPUPriority(mCPUPriority,mName);
     struct sockaddr_in myaddr;

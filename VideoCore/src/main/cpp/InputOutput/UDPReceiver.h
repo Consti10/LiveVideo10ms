@@ -22,9 +22,11 @@ public:
      * @param port : The port to listen on
      * @param CPUPriority: The priority the receiver thread will run with
      * @param onDataReceivedCallback: called every time new data is received
-     * @param buffsize: TODO test ?
+     * @param WANTED_RCVBUF_SIZE: The buffer allocated by the OS might not be sufficient to buffer incoming data when receiving at a high data rate
+     * If @param WANTED_RCVBUF_SIZE is bigger than the size allocated by the OS a bigger buffer is requested, but it is not
+     * guaranteed that the size is actually increased. Use 0 to leave tha buffer size untouched
      */
-    UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t buffsize);
+    UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE=0);
     /**
      * Register a callback that is called once and contains the IP address of the first received packet's sender
      */
@@ -46,7 +48,7 @@ private:
     SOURCE_IP_CALLBACK onSourceIP= nullptr;
     const int mPort;
     const int mCPUPriority;
-    const size_t RECV_BUFF_SIZE;
+    const size_t WANTED_RCVBUF_SIZE;
     const std::string mName;
     ///We need this reference to stop the receiving thread
     int mSocket;
