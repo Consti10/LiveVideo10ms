@@ -47,7 +47,8 @@ private:
     std::unique_ptr<GroundRecorderRAW> mGroundRecorder;
     std::unique_ptr<GroundRecorderMP4> mMP4GroundRecorder;
     //40 MBit/s video / 0.2 (200ms out of 1000ms)
-    static constexpr const size_t  WANTED_RCVBUF_SIZE=0; //5 MB should be plenty
+    //Use default for now ?
+    static constexpr const size_t  WANTED_UDP_RCVBUF_SIZE=0; //5 MB should be plenty
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

@@ -112,7 +112,7 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
             mVideoReceiver=std::make_unique<UDPReceiver>(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,[this,useRTP](const uint8_t* data,size_t data_length) {
                 onNewVideoData(data,data_length,useRTP,-1);
-            },UDP_RECEIVER_BUFFER_SIZE);
+            },WANTED_UDP_RCVBUF_SIZE);
             mVideoReceiver->startReceiving();
         }break;
         case FILE:{
