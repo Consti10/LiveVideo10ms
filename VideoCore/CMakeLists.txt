@@ -70,12 +70,12 @@ target_link_libraries( FFMpegVideoReceiver
 ########## Build the VideoCore native libary ##########
 #######################################################
 include_directories(src/main/cpp/Video)
-include_directories(src/main/cpp/General)
+include_directories(src/main/cpp/InputOutput)
 set(VIDEO_PATH src/main/cpp)
 add_library( VideoNative
              SHARED
-        ${VIDEO_PATH}/General/UDPReceiver.cpp
-        ${VIDEO_PATH}/General/FileReader.cpp
+        ${VIDEO_PATH}/InputOutput/UDPReceiver.cpp
+        ${VIDEO_PATH}/InputOutput/FileReader.cpp
 
         ${VIDEO_PATH}/Parser/H264Parser.cpp
         ${VIDEO_PATH}/Parser/ParseRAW.cpp

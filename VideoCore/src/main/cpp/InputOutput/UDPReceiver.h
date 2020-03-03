@@ -18,16 +18,24 @@ public:
     typedef std::function<void(const uint8_t[],size_t)> DATA_CALLBACK;
     typedef std::function<void(const std::string)> SOURCE_IP_CALLBACK;
 public:
-    //@param port : The port to listen on
-    //@param CPUPriority: The priority the receiver thread will run with
-    //@param buffsize: Too small values can result in packet loss
-    //@param onDataReceivedCallback: called every time new data is received
+    /**
+     * @param port : The port to listen on
+     * @param CPUPriority: The priority the receiver thread will run with
+     * @param buffsize: Too small values can result in packet loss
+     * @param onDataReceivedCallback: called every time new data is received
+     */
     UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t buffsize);
-    //Register a callback that is called once and contains the IP address of the first received packet's sender
+    /**
+     * Register a callback that is called once and contains the IP address of the first received packet's sender
+     */
     void registerOnSourceIPFound(const SOURCE_IP_CALLBACK& onSourceIP);
-    //Start receiver thread,which opens UDP port
+    /**
+     * Start receiver thread,which opens UDP port
+     */
     void startReceiving();
-    //Stop and join receiver thread, which closes port
+    /**
+     * Stop and join receiver thread, which closes port
+     */
     void stopReceiving();
     long getNReceivedBytes()const;
     std::string getSourceIPAddress()const;

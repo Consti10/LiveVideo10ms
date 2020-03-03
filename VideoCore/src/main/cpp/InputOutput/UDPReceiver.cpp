@@ -68,7 +68,6 @@ void UDPReceiver::receiveFromUDPLoop() {
 
     //
 
-
     setCPUPriority(mCPUPriority,mName);
     struct sockaddr_in myaddr;
     memset((uint8_t *) &myaddr, 0, sizeof(myaddr));

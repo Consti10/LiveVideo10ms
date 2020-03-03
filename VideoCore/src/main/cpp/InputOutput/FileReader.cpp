@@ -147,13 +147,10 @@ std::vector<uint8_t>
 FileReader::loadAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
     if(endsWith(path,".mp4")){
         return loadConvertMP4AssetFileIntoMemory(assetManager,path);
-    }else if(endsWith(path,".h264")){
+    }else{
         return loadRawAssetFileIntoMemory(assetManager,path);
     }
-    LOGD("Error not supported file %s",path.c_str());
-    return std::vector<uint8_t>();
 }
-
 
 void FileReader::receiveLoop() {
     nReceivedB=0;
