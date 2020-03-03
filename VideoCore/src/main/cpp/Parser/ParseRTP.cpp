@@ -43,10 +43,6 @@ typedef struct fu_header {
     uint8_t s:      1;
 } __attribute__ ((packed)) fu_header_t; /* 1 bytes */
 
-constexpr auto TAG="ParseRTP";
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-
-
 
 ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(cb){
 }
