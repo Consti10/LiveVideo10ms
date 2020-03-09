@@ -261,9 +261,9 @@ JNI_METHOD(jboolean , receivingVideoButCannotParse)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
     if(p->mVideoReceiver){
-        return (jboolean) false;
+        return (jboolean) (p->mVideoReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
     }
-    return (jboolean) (p->mVideoReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
+    return (jboolean) false;
 }
 
 JNI_METHOD(jboolean , anyVideoBytesParsedSinceLastCall)
