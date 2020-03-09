@@ -12,7 +12,7 @@
 #include <atomic>
 
 //Starts a new thread that continuously checks for new data on UDP port
-
+//once startReceiving is called
 class UDPReceiver {
 public:
     typedef std::function<void(const uint8_t[],size_t)> DATA_CALLBACK;
