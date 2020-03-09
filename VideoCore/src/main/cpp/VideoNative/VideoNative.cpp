@@ -225,7 +225,7 @@ JNI_METHOD(void, nativePassNALUData)
 (JNIEnv *env,jclass jclass1,jlong videoPlayerN,jbyteArray b,jint offset,jint length){
     jbyte *arrayP=env->GetByteArrayElements(b, nullptr);
     auto * p=(uint8_t*)arrayP;
-    native(videoPlayerN)->onNewVideoData(&p[(int) offset], length,false,true);
+    native(videoPlayerN)->onNewVideoData(&p[(int) offset], (size_t)length,false,true);
     env->ReleaseByteArrayElements(b,arrayP,0);
 }
 

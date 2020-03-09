@@ -10,7 +10,6 @@ import android.view.SurfaceView
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import android.widget.ToggleButton
 
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FieldValue
@@ -22,7 +21,6 @@ import constantin.video.core.DecodingInfo
 import constantin.video.core.External.AspectFrameLayout
 import constantin.video.core.IVideoParamsChanged
 import constantin.video.core.VideoNative.VideoNative
-import constantin.video.core.VideoPlayer
 import constantin.video.core.VideoPlayerSurfaceHolder
 
 const val ID_OS_VERSIONS : String ="OSVersions";
@@ -51,10 +49,10 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         context = this
         setContentView(R.layout.activity_video)
         //
-        val mSurfaceView = findViewById<SurfaceView>(R.id.sv_video)
-        mSurfaceView.holder.addCallback(this)
-        mVideoPlayer= VideoPlayerSurfaceHolder(this,this);
-        mSurfaceView.holder.addCallback(mVideoPlayer)
+        val surfaceView = findViewById<SurfaceView>(R.id.sv_video)
+        surfaceView.holder.addCallback(this)
+        mVideoPlayer= VideoPlayerSurfaceHolder(this,surfaceView,this);
+
         mAspectFrameLayout = findViewById(R.id.afl_video)
         mTextViewStatistics=findViewById(R.id.tv_decoding_stats)
         //Find the toggle button. If user taps on it, the toggle button itself

@@ -3,6 +3,7 @@ package constantin.video.core;
 import android.content.Context;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import constantin.video.core.IVideoParamsChanged;
 import constantin.video.core.VideoPlayer;
@@ -10,14 +11,15 @@ import constantin.video.core.VideoPlayer;
 /**
  * In contrast to VideoPlayerSurfaceTexture, here the lifecycle is tied to the SurfaceHolder backing a android SurfaceView
  * Since the surface is created / destroyed when pausing / resuming the app there is no need
- * for a Lifecycle Observer
+ * for a Lifecycle Observer or in other words the LifecycleObserver is replaced by the SurfaceHolder.Callback
  */
 public class VideoPlayerSurfaceHolder implements SurfaceHolder.Callback{
 
     private final VideoPlayer videoPlayer;
 
-    public VideoPlayerSurfaceHolder(final Context context, final IVideoParamsChanged iVideoParamsChanged){
+    public VideoPlayerSurfaceHolder(final Context context, final SurfaceView surfaceView, final IVideoParamsChanged iVideoParamsChanged){
         videoPlayer=new VideoPlayer(context,iVideoParamsChanged);
+        surfaceView.getHolder().addCallback(this);
     }
 
     @Override
