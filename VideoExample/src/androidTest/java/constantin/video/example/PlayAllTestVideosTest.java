@@ -73,14 +73,10 @@ public class PlayAllTestVideosTest {
     @Test
     public void playAllTestVideosTest() {
         writeVideoSource(VideoNative.VS_SOURCE_ASSETS);
-        selectVideoFilename(0);
-        testPlayVideo();
-        selectVideoFilename(1);
-        testPlayVideo();
-        selectVideoFilename(2);
-        testPlayVideo();
-        selectVideoFilename(3);
-        testPlayVideo();
+        for(int i=0;i<7;i++){
+            selectVideoFilename(i);
+            testPlayVideo();
+        }
     }
 
 }
