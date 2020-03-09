@@ -1,17 +1,14 @@
 package constantin.video.core;
 
+
 import android.graphics.SurfaceTexture;
 import android.view.Surface;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
-
-import constantin.video.core.ISurfaceTextureAvailable;
-import constantin.video.core.IVideoParamsChanged;
 import constantin.video.core.VideoNative.VideoNative;
-import constantin.video.core.VideoPlayer;
+
 
 /**
  * When using a OpenGL texture & android SurfaceTexture for video playback
