@@ -115,7 +115,6 @@ void UDPReceiver::receiveFromUDPLoop() {
             }else{
                 onDataReceivedCallback(buff->data(), (size_t)message_length);
             }
-
             nReceivedBytes+=message_length;
             //The source ip stuff
             const char* p=inet_ntoa(source.sin_addr);
