@@ -17,17 +17,18 @@ class KeyFrameFinder{
 private:
     std::vector<uint8_t> CSD0;
     std::vector<uint8_t> CSD1;
+    static constexpr const auto TAG="KeyFrameFinder";
 public:
     void saveIfKeyFrame(const NALU &nalu){
         if(nalu.data_length<=0)return;
         if(nalu.isSPS()){
             CSD0.resize(nalu.data_length);
             memcpy(CSD0.data(),nalu.data,(size_t )nalu.data_length);
-            MDebug::log("KeyFrameFinder","SPS found");
+            MDebug::log("SPS found",TAG);
         }else if(nalu.isPPS()){
             CSD1.resize(nalu.data_length);
             memcpy(CSD1.data(),nalu.data,(size_t )nalu.data_length);
-            MDebug::log("KeyFrameFinder","PPS found");
+            MDebug::log("PPS found",TAG);
         }
     }
     bool allKeyFramesAvailable(){

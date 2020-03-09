@@ -24,7 +24,7 @@ public:
      * @param onDataReceivedCallback: called every time new data is received
      * @param WANTED_RCVBUF_SIZE: The buffer allocated by the OS might not be sufficient to buffer incoming data when receiving at a high data rate
      * If @param WANTED_RCVBUF_SIZE is bigger than the size allocated by the OS a bigger buffer is requested, but it is not
-     * guaranteed that the size is actually increased. Use 0 to leave tha buffer size untouched
+     * guaranteed that the size is actually increased. Use 0 to leave the buffer size untouched
      */
     UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE=0);
     /**
