@@ -13,7 +13,6 @@
 #include <SettingsN.hpp>
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
-#include "GroundRecorderMP4.hpp"
 
 class VideoNative{
 public:
@@ -45,7 +44,7 @@ public:
     std::atomic<bool> latestVideoRatioChanged;
 private:
     std::unique_ptr<GroundRecorderRAW> mGroundRecorder;
-    std::unique_ptr<GroundRecorderMP4> mMP4GroundRecorder;
+    //std::unique_ptr<GroundRecorderMP4> mMP4GroundRecorder;
     //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 1 second
     //5 MB should be plenty !
     static constexpr const size_t  WANTED_UDP_RCVBUF_SIZE=1024*1024*5;

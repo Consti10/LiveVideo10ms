@@ -40,9 +40,9 @@ void VideoNative::onNewNALU(const NALU& nalu){
     if(mGroundRecorder){
         mGroundRecorder->writeData(nalu.data,nalu.data_length);
     }
-    if(mMP4GroundRecorder){
-        mMP4GroundRecorder->writeData(nalu);
-    }
+    //if(mMP4GroundRecorder){
+    //   mMP4GroundRecorder->writeData(nalu);
+    //}
 }
 
 
@@ -85,7 +85,7 @@ void VideoNative::removeConsumers(){
         mLowLagDecoder.reset();
     }
     mGroundRecorder.reset();
-    mMP4GroundRecorder.reset();
+    //mMP4GroundRecorder.reset();
     if(window!=nullptr){
         //Don't forget to release the window, does not matter if the decoder has been created or not
         ANativeWindow_release(window);
