@@ -41,8 +41,7 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void resume(){
-        videoPlayer.prepare(null);
-        videoPlayer.addAndStartReceiver();
+        videoPlayer.addAndStartReceiver(null);
         mThread=new Thread(this);
         mThread.setName("TestReceiverVideo");
         mThread.start();

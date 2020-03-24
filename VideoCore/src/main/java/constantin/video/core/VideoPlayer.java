@@ -37,17 +37,18 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     //when streaming this data will be available at some point in future
     //Therefore we don't allocate the MediaCodec resources yet
     //They will be allocated in the native feedDecoder thread once possible
-    public void prepare(Surface surface){
-        VideoNative.nativeAddConsumers(nativeVideoPlayer,surface);
-    }
+    //public void prepare(Surface surface){
+    //    VideoNative.nativeAddConsumers(nativeVideoPlayer,surface);
+    //}
 
     //Depending on the selected Settings, this starts either
     //a) Receiving RAW over UDP
     //b) Receiving RTP over UDP
     //c) Receiving Data from a resource file (Assets)
     //d) Receiving Data from a file in the phone file system
-    public void addAndStartReceiver(){
-        VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
+    public void addAndStartReceiver(Surface surface){
+        //VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
+        VideoNative.nativeStart(nativeVideoPlayer,surface,context.getAssets());
         if(mVideoParamsChanged !=null){
             final INativeVideoParamsChanged interfaceVideoParamsChanged=this;
             Log.d(TAG,"Starting timer");
@@ -72,14 +73,15 @@ public class VideoPlayer implements INativeVideoParamsChanged {
             timer.purge();
             Log.d(TAG,"Stopped timer");
         }
-        VideoNative.nativeStopReceiver(nativeVideoPlayer);
-        release();
+        //VideoNative.nativeStopReceiver(nativeVideoPlayer);
+        //release();
+        VideoNative.nativeStop(nativeVideoPlayer);
     }
 
     //Call this to free resources
-    private void release(){
-        VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
-    }
+    //private void release(){
+        //VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
+    //}
 
     public long getNativeInstance(){
         return nativeVideoPlayer;

@@ -25,8 +25,7 @@ public class VideoPlayerSurfaceHolder implements SurfaceHolder.Callback{
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         final Surface surface=holder.getSurface();
-        videoPlayer.prepare(surface);
-        videoPlayer.addAndStartReceiver();
+        videoPlayer.addAndStartReceiver(surface);
     }
 
     @Override

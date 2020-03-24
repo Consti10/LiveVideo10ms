@@ -21,6 +21,7 @@ private:
     */
     void createOpenFileIfNeeded(){
         if(!ofstream.is_open()){
+
             ofstream.open (filename.c_str());
         }
     }

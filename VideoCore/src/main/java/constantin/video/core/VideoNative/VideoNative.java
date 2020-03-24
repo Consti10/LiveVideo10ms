@@ -21,12 +21,15 @@ public class VideoNative {
     //Consumers are currently
     //1) The LowLag decoder (if Surface!=null)
     //2) The GroundRecorderRAW (if enableGroundRecording=true)
-    public static native void nativeAddConsumers(long nativeInstance, Surface surface);
-    public static native void nativeRemoveConsumers(long videoPlayerN);
+    //public static native void nativeAddConsumers(long nativeInstance, Surface surface);
+    //public static native void nativeRemoveConsumers(long videoPlayerN);
 
     public static native void nativePassNALUData(long nativeInstance,byte[] b,int offset,int size);
-    public static native void nativeStartReceiver(long nativeInstance, AssetManager assetManager);
-    public static native void nativeStopReceiver(long nativeInstance);
+    //public static native void nativeStartReceiver(long nativeInstance, AssetManager assetManager);
+    //public static native void nativeStopReceiver(long nativeInstance);
+
+    public static native void nativeStart(long nativeInstance,Surface surface,AssetManager assetManager);
+    public static native void nativeStop(long nativeInstance);
 
     /**
      * Debugging/ Testing only

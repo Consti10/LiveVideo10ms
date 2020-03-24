@@ -209,14 +209,17 @@ JNI_METHOD(void, finalize)
     delete (p);
 }
 
-JNI_METHOD(void, nativeAddConsumers)
-(JNIEnv * env, jclass unused,jlong videoPlayerN,jobject surface) {
+JNI_METHOD(void, nativeStart)
+(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject surface,jobject assetManager){
     native(videoPlayerN)->addConsumers(env,surface);
+    AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
+    native(videoPlayerN)->startReceiver(env, mgr);
 }
 
-JNI_METHOD(void, nativeRemoveConsumers)
-(JNIEnv *env,jclass jclass1, jlong videoPlayerN){
+JNI_METHOD(void, nativeStop)
+(JNIEnv * env,jclass jclass1,jlong videoPlayerN){
     native(videoPlayerN)->removeConsumers();
+    native(videoPlayerN)->stopReceiver();
 }
 
 //This function is only called when the data for the video is coming from a file.
@@ -229,16 +232,6 @@ JNI_METHOD(void, nativePassNALUData)
     env->ReleaseByteArrayElements(b,arrayP,0);
 }
 
-JNI_METHOD(void, nativeStartReceiver)
-(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject assetManager){
-    AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
-    native(videoPlayerN)->startReceiver(env, mgr);
-}
-
-JNI_METHOD(void, nativeStopReceiver)
-(JNIEnv * env,jclass jclass1,jlong videoPlayerN){
-    native(videoPlayerN)->stopReceiver();
-}
 
 JNI_METHOD(jstring , getVideoInfoString)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
