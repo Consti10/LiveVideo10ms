@@ -70,8 +70,8 @@ target_link_libraries( FFMpegVideoReceiver
 ########## Build the VideoCore native libary ##########
 #######################################################
 include_directories(src/main/cpp/Video)
-set(IO_PATH ../../VideoTelemetryShared/InputOutput)
-set(HELPER_PATH ../../VideoTelemetryShared/Helper)
+set(IO_PATH ../VideoTelemetryShared/InputOutput)
+set(HELPER_PATH ../VideoTelemetryShared/Helper)
 include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
 
