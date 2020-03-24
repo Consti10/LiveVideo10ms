@@ -1,6 +1,6 @@
 
 #include "LowLagDecoder.h"
-#include "../Helper/CPUPriority.hpp"
+#include <CPUPriority.hpp>
 #include <unistd.h>
 #include <sstream>
 

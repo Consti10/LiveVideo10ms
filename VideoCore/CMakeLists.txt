@@ -71,6 +71,8 @@ target_link_libraries( FFMpegVideoReceiver
 #######################################################
 include_directories(src/main/cpp/Video)
 include_directories(src/main/cpp/InputOutput)
+include_directories(src/main/cpp/Helper)
+
 set(VIDEO_PATH src/main/cpp)
 add_library( VideoNative
              SHARED

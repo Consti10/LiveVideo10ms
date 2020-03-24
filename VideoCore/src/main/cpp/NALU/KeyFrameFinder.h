@@ -7,7 +7,7 @@
 
 #include "NALU.hpp"
 #include <vector>
-#include <../Helper/MDebug.hpp>
+#include <MDebug.hpp>
 
 //Takes a continuous stream of NALUs and save SPS / PPS data
 //For later use

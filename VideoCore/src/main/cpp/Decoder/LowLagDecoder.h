@@ -14,7 +14,7 @@
 #include <atomic>
 
 #include "../NALU/NALU.hpp"
-#include "../Helper/TimeHelper.hpp"
+#include <TimeHelper.hpp>
 #include "../NALU/KeyFrameFinder.h"
 
 struct DecodingInfo{

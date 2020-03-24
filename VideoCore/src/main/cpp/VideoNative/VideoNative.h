@@ -10,7 +10,7 @@
 #include "GroundRecorderRAW.hpp"
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
-#include "../Helper/SettingsN.hpp"
+#include <SettingsN.hpp>
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
 #include "GroundRecorderMP4.hpp"
