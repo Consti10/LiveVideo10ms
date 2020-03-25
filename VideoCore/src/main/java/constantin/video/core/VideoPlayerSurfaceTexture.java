@@ -56,7 +56,7 @@ public class VideoPlayerSurfaceTexture implements LifecycleObserver, ISurfaceTex
                 //only create the Surface for later use. The next onResume() event will re-start the video
                 mVideoSurface=new Surface(surfaceTexture);
                 if(reference.parent.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)){
-                    videoPlayer.addAndStartReceiver(mVideoSurface);
+                    videoPlayer.addAndStartDecoderReceiver(mVideoSurface);
                 }
             }
         });
@@ -65,14 +65,14 @@ public class VideoPlayerSurfaceTexture implements LifecycleObserver, ISurfaceTex
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void resume(){
         if(mVideoSurface!=null){
-            videoPlayer.addAndStartReceiver(mVideoSurface);
+            videoPlayer.addAndStartDecoderReceiver(mVideoSurface);
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     private void pause(){
         if(mVideoSurface!=null){
-            videoPlayer.stopAndRemovePlayerReceiver();
+            videoPlayer.stopAndRemoveReceiverDecoder();
         }
     }
 

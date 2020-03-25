@@ -5,6 +5,7 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <android/asset_manager_jni.h>
+#include <FileHelper.hpp>
 
 constexpr auto TAG="VideoNative";
 #define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
@@ -16,7 +17,8 @@ constexpr auto CPU_PRIORITY_DECODER_OUTPUT (-16);     //needs low latency and do
 VideoNative::VideoNative(JNIEnv* env,jobject context,const char* DIR) :
     mParser{std::bind(&VideoNative::onNewNALU, this, std::placeholders::_1)},
     mSettingsN(env,context,"pref_video",true),
-    GROUND_RECORDING_DIRECTORY(DIR){
+    GROUND_RECORDING_DIRECTORY(DIR),
+    mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY){
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
@@ -36,13 +38,7 @@ void VideoNative::onNewNALU(const NALU& nalu){
     if(mLowLagDecoder){
         mLowLagDecoder->interpretNALU(nalu);
     }
-    //same as get!=nullptr
-    if(mGroundRecorder){
-        mGroundRecorder->writeData(nalu.data,nalu.data_length);
-    }
-    //if(mMP4GroundRecorder){
-    //   mMP4GroundRecorder->writeData(nalu);
-    //}
+    mGroundRecorderFPV.writePacketIfStarted(nalu.data,nalu.data_length,GroundRecorderFPV::PACKET_TYPE_H264);
 }
 
 
@@ -70,13 +66,10 @@ void VideoNative::addConsumers(JNIEnv* env,jobject surface) {
     //Add Ground recorder if enabled
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
-    if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
-    //if(false){
-        const std::string groundRecordingFlename=GroundRecorderRAW::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"h264");
-        //MLOGD("Filename%s",groundRecordingFlename.c_str());
-         mGroundRecorder=std::make_unique<GroundRecorderRAW>(groundRecordingFlename);
+    //if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
+    if(true){
+         mGroundRecorderFPV.start();
     }
-    //mMP4GroundRecorder=new GroundRecorderMP4(GROUND_RECORDING_DIRECTORY);
 }
 
 void VideoNative::removeConsumers(){
@@ -84,8 +77,7 @@ void VideoNative::removeConsumers(){
         mLowLagDecoder->waitForShutdownAndDelete();
         mLowLagDecoder.reset();
     }
-    mGroundRecorder.reset();
-    //mMP4GroundRecorder.reset();
+    mGroundRecorderFPV.stop();
     if(window!=nullptr){
         //Don't forget to release the window, does not matter if the decoder has been created or not
         ANativeWindow_release(window);
@@ -211,8 +203,8 @@ JNI_METHOD(void, finalize)
 
 JNI_METHOD(void, nativeStart)
 (JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject surface,jobject assetManager){
-    native(videoPlayerN)->addConsumers(env,surface);
     AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
+    native(videoPlayerN)->addConsumers(env,surface);
     native(videoPlayerN)->startReceiver(env, mgr);
 }
 

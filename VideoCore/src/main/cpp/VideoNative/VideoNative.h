@@ -11,6 +11,7 @@
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
 #include <SettingsN.hpp>
+#include <GroundRecorderFPV.hpp>
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
 
@@ -43,8 +44,7 @@ public:
     VideoRatio latestVideoRatio;
     std::atomic<bool> latestVideoRatioChanged;
 private:
-    std::unique_ptr<GroundRecorderRAW> mGroundRecorder;
-    //std::unique_ptr<GroundRecorderMP4> mMP4GroundRecorder;
+    GroundRecorderFPV mGroundRecorderFPV;
     //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 1 second
     //5 MB should be plenty !
     static constexpr const size_t  WANTED_UDP_RCVBUF_SIZE=1024*1024*5;

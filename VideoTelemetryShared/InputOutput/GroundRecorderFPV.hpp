@@ -10,19 +10,28 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
+#include "FileHelper.hpp"
 
 class GroundRecorderFPV{
 private:
-    const std::string filename;
+    const std::string DIRECTORY;
+    //Make sure only one thread writes to file at the time
     std::mutex mMutexFileAccess;
+    bool started=false;
     /**
     * only as soon as we actually write data the file is created
     * to not pollute the file system with empty files
     */
     void createOpenFileIfNeeded(){
         if(!ofstream.is_open()){
-
-            ofstream.open (filename.c_str());
+            const std::string groundRecordingFlename=FileHelper::findUnusedFilename(DIRECTORY,"fpv");
+            ofstream.open (groundRecordingFlename.c_str());
+        }
+    }
+    void closeFileIfOpened(){
+        if(ofstream.is_open()){
+            ofstream.flush();
+            ofstream.close();
         }
     }
 public:
@@ -38,16 +47,21 @@ public:
         unsigned int timestamp;
     }__attribute__((packed)) StreamPacket;
 public:
-    GroundRecorderFPV(std::string s):filename(s) {}
-    ~GroundRecorderFPV(){
-        if(ofstream.is_open()){
-            ofstream.flush();
-            ofstream.close();
-        }
-    }
-    void writePacket(const uint8_t *packet,const size_t packet_length,const uint8_t packet_type) {
-        //Make sure only one thread writes to file at the time
+    GroundRecorderFPV(std::string s):DIRECTORY(s) {}
+    void start(){
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
+        started=true;
+    }
+    void stop(){
+        std::lock_guard<std::mutex> lock(mMutexFileAccess);
+        started=false;
+        closeFileIfOpened();
+    }
+    //Only write data if started and data_length>0
+    void writePacketIfStarted(const uint8_t *packet,const size_t packet_length,const uint8_t packet_type) {
+        std::lock_guard<std::mutex> lock(mMutexFileAccess);
+        if(!started)return;
+        if(packet_length==0)return;
         createOpenFileIfNeeded();
         StreamPacket streamPacket{(unsigned int)packet_length,0};
         streamPacket.packet_type=packet_type;

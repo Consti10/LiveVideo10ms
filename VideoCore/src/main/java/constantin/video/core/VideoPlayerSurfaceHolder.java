@@ -5,9 +5,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import constantin.video.core.IVideoParamsChanged;
-import constantin.video.core.VideoPlayer;
-
 /**
  * In contrast to VideoPlayerSurfaceTexture, here the lifecycle is tied to the SurfaceHolder backing a android SurfaceView
  * Since the surface is created / destroyed when pausing / resuming the app there is no need
@@ -25,7 +22,7 @@ public class VideoPlayerSurfaceHolder implements SurfaceHolder.Callback{
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         final Surface surface=holder.getSurface();
-        videoPlayer.addAndStartReceiver(surface);
+        videoPlayer.addAndStartDecoderReceiver(surface);
     }
 
     @Override
@@ -36,7 +33,7 @@ public class VideoPlayerSurfaceHolder implements SurfaceHolder.Callback{
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        videoPlayer.stopAndRemovePlayerReceiver();
+        videoPlayer.stopAndRemoveReceiverDecoder();
     }
 
 }

@@ -1,13 +1,11 @@
 package constantin.video.core;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.ComponentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -41,7 +39,7 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void resume(){
-        videoPlayer.addAndStartReceiver(null);
+        videoPlayer.addAndStartDecoderReceiver(null);
         mThread=new Thread(this);
         mThread.setName("TestReceiverVideo");
         mThread.start();
@@ -51,7 +49,7 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
     private void pause(){
         mThread.interrupt();
         try {mThread.join();} catch (InterruptedException e) {e.printStackTrace();}
-        videoPlayer.stopAndRemovePlayerReceiver();
+        videoPlayer.stopAndRemoveReceiverDecoder();
     }
 
     //to have as less work on the UI thread and GPU, we check if the content of the string has changed

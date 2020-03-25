@@ -33,21 +33,12 @@ public class VideoPlayer implements INativeVideoParamsChanged {
         mVideoParamsChanged=iVideoParamsChanged;
     }
 
-    //We cannot initialize the Decoder until we have SPS and PPS data -
-    //when streaming this data will be available at some point in future
-    //Therefore we don't allocate the MediaCodec resources yet
-    //They will be allocated in the native feedDecoder thread once possible
-    //public void prepare(Surface surface){
-    //    VideoNative.nativeAddConsumers(nativeVideoPlayer,surface);
-    //}
-
     //Depending on the selected Settings, this starts either
     //a) Receiving RAW over UDP
     //b) Receiving RTP over UDP
     //c) Receiving Data from a resource file (Assets)
     //d) Receiving Data from a file in the phone file system
-    public void addAndStartReceiver(Surface surface){
-        //VideoNative.nativeStartReceiver(nativeVideoPlayer,context.getAssets());
+    public void addAndStartDecoderReceiver(Surface surface){
         VideoNative.nativeStart(nativeVideoPlayer,surface,context.getAssets());
         if(mVideoParamsChanged !=null){
             final INativeVideoParamsChanged interfaceVideoParamsChanged=this;
@@ -67,21 +58,14 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     //Stop the Receiver
     //Stop the Decoder
     //Free resources
-    public void stopAndRemovePlayerReceiver(){
+    public void stopAndRemoveReceiverDecoder(){
         if(mVideoParamsChanged !=null){
             timer.cancel();
             timer.purge();
             Log.d(TAG,"Stopped timer");
         }
-        //VideoNative.nativeStopReceiver(nativeVideoPlayer);
-        //release();
         VideoNative.nativeStop(nativeVideoPlayer);
     }
-
-    //Call this to free resources
-    //private void release(){
-        //VideoNative.nativeRemoveConsumers(nativeVideoPlayer);
-    //}
 
     public long getNativeInstance(){
         return nativeVideoPlayer;

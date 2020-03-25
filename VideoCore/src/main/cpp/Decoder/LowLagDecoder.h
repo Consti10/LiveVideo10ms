@@ -58,6 +58,9 @@ public:
     //@param window: must be a valid ANativeWindow
     //@param checkOutputThreadCpuPrio the CPU priority the check output buffer thread will run on
     //@param SW use SW or HW decoder
+    //We cannot initialize the Decoder until we have SPS and PPS data -
+    //when streaming this data will be available at some point in future
+    //Therefore we don't allocate the MediaCodec resources here
     LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
