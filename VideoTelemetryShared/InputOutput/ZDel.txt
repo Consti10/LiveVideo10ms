@@ -1,0 +1,79 @@
+ /**
+     * Append whole content of vector1 to vector0, why is there no cpp standard for that ?!
+     */
+    static inline void vector_append(std::vector<uint8_t>& destination,const std::vector<uint8_t>& source){
+        //vector0.insert(vector0.end(),vector1.begin(),vector1.end());
+        const auto vector0InitialSize=destination.size();
+        destination.resize(vector0InitialSize+source.size());
+        memcpy(&destination.data()[vector0InitialSize],source.data(),source.size());
+    }
+    /**
+     *  the ndk insert() gives warnings with IntelliJ and does not work with vector+array
+     */
+    template<size_t S>
+    static inline void vector_append2(std::vector<uint8_t>& destination,const std::array<uint8_t,S>& source,const size_t sourceSize){
+        //vector0.insert(vector0.end(),vector1.begin(),vector1.begin()+vector1Size);
+        const auto vector0InitialSize=destination.size();
+        destination.resize(vector0InitialSize+sourceSize);
+        memcpy(&destination.data()[vector0InitialSize],source.data(),sourceSize);
+    }
+
+ /**
+   * convert the asset file specified at path from .mp4 into a raw .h264 bitstream
+   * then return as one big data buffer
+   */
+    /*static std::vector<uint8_t>
+    loadConvertMP4AssetFileIntoMemory(AAssetManager *assetManager, const std::string &path){
+        //Use MediaExtractor to parse .mp4 file
+        AAsset* asset = AAssetManager_open(assetManager,path.c_str(), 0);
+        off_t start, length;
+        auto fd=AAsset_openFileDescriptor(asset,&start,&length);
+        if(fd<0){
+            LOGD("ERROR AAsset_openFileDescriptor %d",fd);
+            return std::vector<uint8_t>();
+        }
+        AMediaExtractor* extractor=AMediaExtractor_new();
+        auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,start,length);
+        if(mediaStatus!=AMEDIA_OK){
+            LOGD("Error open File %s,mediaStatus: %d",path.c_str(),mediaStatus);
+            AMediaExtractor_delete(extractor);
+            AAsset_close(asset);
+        }
+        const auto trackCount=AMediaExtractor_getTrackCount(extractor);
+        //This will save all data as RAW
+        //SPS/PPS in the beginning, rest afterwards
+        std::vector<uint8_t> rawData;
+        rawData.reserve((unsigned)length);
+        for(size_t i=0;i<trackCount;i++){
+            AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
+            const char* s;
+            AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
+            LOGD("Track is %s",s);
+            if(std::string(s).compare("video/avc")==0){
+                const auto mediaStatus=AMediaExtractor_selectTrack(extractor,i);
+                auto tmp=getBufferFromMediaFormat("csd-0",format);
+                vector_append(rawData,tmp);
+                tmp=getBufferFromMediaFormat("csd-1",format);
+                vector_append(rawData,tmp);
+                LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
+                break;
+            }
+            AMediaFormat_delete(format);
+        }
+        //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
+        const auto sampleBuffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
+        while(true){
+            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
+            if(sampleSize<=0){
+                break;
+            }
+            const auto flags=AMediaExtractor_getSampleFlags(extractor);
+            //LOGD("Read sample %d flags %d",(int)sampleSize,flags);
+            vector_append2(rawData,(*sampleBuffer),(size_t)sampleSize);
+            AMediaExtractor_advance(extractor);
+        }
+        AMediaExtractor_delete(extractor);
+        AAsset_close(asset);
+        LOGD("The entire file content (asset,mp4) is in memory %d",(int)rawData.size());
+        return rawData;
+    }*/
