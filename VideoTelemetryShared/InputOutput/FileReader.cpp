@@ -52,7 +52,6 @@ void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
     passDataInChunks(data.data(),data.size());
 }
 
-
 std::vector<uint8_t>
 FileReader::loadAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
     if(endsWith(path,".mp4")){

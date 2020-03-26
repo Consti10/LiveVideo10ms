@@ -35,7 +35,7 @@ public:
     H264Parser mParser;
     std::unique_ptr<LowLagDecoder> mLowLagDecoder;
     std::unique_ptr<FFMpegVideoReceiver> mFFMpegVideoReceiver;
-    std::unique_ptr<UDPReceiver> mVideoReceiver;
+    std::unique_ptr<UDPReceiver> mUDPReceiver;
     std::unique_ptr<FileReader> mFileReceiver;
     long nNALUsAtLastCall=0;
 public:
@@ -45,7 +45,7 @@ public:
     std::atomic<bool> latestVideoRatioChanged;
 private:
     GroundRecorderFPV mGroundRecorderFPV;
-    //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 1 second
+    //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms
     //5 MB should be plenty !
     static constexpr const size_t  WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
 };

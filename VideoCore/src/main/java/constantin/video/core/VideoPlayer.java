@@ -107,7 +107,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     }
 
     private static String getDirectoryToSaveDataTo(){
-        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/Video/";
+        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/Test/";
         File dir = new File(ret);
         if (!dir.exists()) {
             final boolean mkdirs = dir.mkdirs();

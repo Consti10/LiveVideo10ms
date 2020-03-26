@@ -39,17 +39,17 @@ namespace FileReaderMP4{
         return ret;
     }
     /**
-     *  return size of file in bytes
+     *  Helper, return size of file in bytes
      */
     ssize_t fsize(const char *filename) {
         struct stat st;
         if (stat(filename, &st) == 0)
-            return st.st_size;
+            return (ssize_t)st.st_size;
         return -1;
     }
     /**
-     * Instead of loading mp4 file into memory, keep data in file system and pass it one by one
-     * @param assetManager if nullptr, @param FILENAME points to a file on the phone file system, else to android asset file
+     * Open mp4 file, extract data as h264 bitstream
+     * Iff @param assetManager != nullptr, @param FILENAME points to android asset file,else to a file on the phone file system
      * @param receiving termination condition (loops until receiving==false)
      */
     static void readMP4FileInChunks(AAssetManager *assetManager,const std::string &FILENAME,RAW_DATA_CALLBACK callback,std::atomic<bool>& receiving,const bool loopAtEndOfFile=true) {
@@ -146,6 +146,12 @@ namespace FileReaderMP4{
             close(fd);
         }
     }
+    /**
+     * using the method above, loads bitstream into memory as one big buffer
+     * @param assetManager
+     * @param path
+     * @return
+     */
     static std::vector<uint8_t>
     loadConvertMP4AssetFileIntoMemory(AAssetManager *assetManager, const std::string &path){
         //This will save all data as RAW

@@ -102,10 +102,10 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
-            mVideoReceiver=std::make_unique<UDPReceiver>(VS_PORT,"VideoPlayer VideoReceiver",CPU_PRIORITY_UDPRECEIVER_VIDEO,[this,useRTP](const uint8_t* data,size_t data_length) {
+            mUDPReceiver=std::make_unique<UDPReceiver>(VS_PORT, "VideoPlayer VideoReceiver", CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,useRTP](const uint8_t* data, size_t data_length) {
                 onNewVideoData(data,data_length,useRTP,-1);
-            },WANTED_UDP_RCVBUF_SIZE);
-            mVideoReceiver->startReceiving();
+            }, WANTED_UDP_RCVBUF_SIZE);
+            mUDPReceiver->startReceiving();
         }break;
         case FILE:{
             const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
@@ -144,9 +144,9 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
 }
 
 void VideoNative::stopReceiver() {
-    if(mVideoReceiver){
-        mVideoReceiver->stopReceiving();
-       mVideoReceiver.reset();
+    if(mUDPReceiver){
+        mUDPReceiver->stopReceiving();
+       mUDPReceiver.reset();
     }
     if(mFileReceiver){
         mFileReceiver->stopReading();
@@ -161,11 +161,11 @@ void VideoNative::stopReceiver() {
 
 std::string VideoNative::getInfoString(){
     std::ostringstream ostringstream1;
-    if(mVideoReceiver){
-        ostringstream1 << "Listening for video on port " << mVideoReceiver->getPort();
-        ostringstream1 << "\nReceived: " << mVideoReceiver->getNReceivedBytes() << "B"
+    if(mUDPReceiver){
+        ostringstream1 << "Listening for video on port " << mUDPReceiver->getPort();
+        ostringstream1 << "\nReceived: " << mUDPReceiver->getNReceivedBytes() << "B"
                        << " | parsed frames: "
-                       << mParser.nParsedNALUs<<" | key frames: "<<mParser.nParsedKeyFrames;
+                       << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKeyFrames;
     }else{
         ostringstream1<<"Not receiving from udp";
     }
@@ -235,18 +235,18 @@ JNI_METHOD(jstring , getVideoInfoString)
 JNI_METHOD(jboolean , anyVideoDataReceived)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
-    if(p->mVideoReceiver){
+    if(p->mUDPReceiver){
         return (jboolean) false;
     }
-    bool ret = (p->mVideoReceiver->getNReceivedBytes()  > 0);
+    bool ret = (p->mUDPReceiver->getNReceivedBytes() > 0);
     return (jboolean) ret;
 }
 
 JNI_METHOD(jboolean , receivingVideoButCannotParse)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
-    if(p->mVideoReceiver){
-        return (jboolean) (p->mVideoReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
+    if(p->mUDPReceiver){
+        return (jboolean) (p->mUDPReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
     }
     return (jboolean) false;
 }
