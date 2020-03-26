@@ -41,10 +41,12 @@ public:
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_SMARTPORT=3;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_FRSKY=4;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_EZWB=5;
+    using PACKET_TYPE=uint8_t;
+    using TIMESTAMP=unsigned int;
     typedef struct{
         unsigned int packet_length;
-        uint8_t packet_type;
-        unsigned int timestamp;
+        PACKET_TYPE packet_type;
+        TIMESTAMP timestamp;
     }__attribute__((packed)) StreamPacket;
 public:
     GroundRecorderFPV(std::string s):DIRECTORY(s) {}
@@ -58,7 +60,7 @@ public:
         closeFileIfOpened();
     }
     //Only write data if started and data_length>0
-    void writePacketIfStarted(const uint8_t *packet,const size_t packet_length,const uint8_t packet_type) {
+    void writePacketIfStarted(const uint8_t *packet,const size_t packet_length,const PACKET_TYPE packet_type) {
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
         if(!started)return;
         if(packet_length==0)return;

@@ -37,11 +37,11 @@ void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
         const ssize_t len_left=len-offset;
         if(len_left>=CHUNK_SIZE){
             nReceivedB+=CHUNK_SIZE;
-            onDataReceivedCallback(&data[offset],CHUNK_SIZE);
+            onDataReceivedCallback(&data[offset],CHUNK_SIZE,GroundRecorderFPV::PACKET_TYPE_H264);
             offset+=CHUNK_SIZE;
         }else{
             nReceivedB+=len_left;
-            onDataReceivedCallback(&data[offset],(size_t)len_left);
+            onDataReceivedCallback(&data[offset],(size_t)len_left,GroundRecorderFPV::PACKET_TYPE_H264);
             return;
         }
     }
@@ -82,7 +82,7 @@ void FileReader::readFileInChunks() {
         passDataInChunks(data, data_length);
     };
     if(endsWith(FILENAME,".mp4")) {
-        FileReaderMP4::readMP4FileInChunks(FILENAME, f, receiving);
+        FileReaderMP4::readMP4FileInChunks(nullptr,FILENAME, f, receiving);
     }else if(endsWith(FILENAME,".fpv")){
         readFpvFileInChunks();
     }else{
@@ -109,7 +109,7 @@ void FileReader::readFpvFileInChunks() {
             file.read((char*)&header,sizeof(GroundRecorderFPV::StreamPacket));
             file.read((char*)buffer->data(),header.packet_length);
             if(header.packet_type==0){
-                onDataReceivedCallback(buffer->data(),(size_t)header.packet_length);
+                onDataReceivedCallback(buffer->data(),(size_t)header.packet_length,header.packet_type);
             }
         }
         file.close();

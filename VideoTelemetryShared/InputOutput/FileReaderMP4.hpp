@@ -67,10 +67,109 @@ namespace FileReaderMP4{
         return -1;
     }
     /**
-    * convert the asset file specified at path from .mp4 into a raw .h264 bitstream
-    * then return as one big data buffer
-    */
-    static std::vector<uint8_t>
+     * Instead of loading mp4 file into memory, keep data in file system and pass it one by one
+     * @param assetManager if nullptr, @param FILENAME points to a file on the phone file system, else to android asset file
+     * @param receiving termination condition (loops until receiving==false)
+     */
+    static void readMP4FileInChunks(AAssetManager *assetManager,const std::string &FILENAME,RAW_DATA_CALLBACK callback,std::atomic<bool>& receiving,const bool loopAtEndOfFile=true) {
+        int fileOffset=0;
+        int fileSize;
+        int fd;
+        AAsset* asset= nullptr;
+        if(assetManager!= nullptr){
+            asset = AAssetManager_open(assetManager,FILENAME.c_str(), 0);
+            off_t start,size;
+            fd=AAsset_openFileDescriptor(asset,&start,&size);
+            fileOffset=start;
+            fileSize=size;
+            if(fd<0){
+                LOGD("ERROR AAsset_openFileDescriptor %d",fd);
+                return;
+            }
+        }else{
+            fileSize=fsize(FILENAME.c_str());
+            fileOffset=0;
+            if(fileSize<=0){
+                LOGD("Error file size %d",fileSize);
+                return;
+            }
+            fd = open(FILENAME.c_str(), O_RDONLY, 0666);
+            if(fd<0){
+                LOGD("Error open file: %s fp: %d",FILENAME.c_str(),fd);
+                return;
+            }
+        }
+        AMediaExtractor* extractor=AMediaExtractor_new();
+        auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,fileOffset,fileSize);
+        if(mediaStatus!=AMEDIA_OK){
+            LOGD("Error open File %s,mediaStatus: %d",FILENAME.c_str(),mediaStatus);
+            AMediaExtractor_delete(extractor);
+            if(assetManager!=nullptr){
+                AAsset_close(asset);
+            }else{
+                close(fd);
+            }
+            return;
+        }
+        const auto trackCount=AMediaExtractor_getTrackCount(extractor);
+        bool videoTrackFound=false;
+        for(size_t i=0;i<trackCount;i++){
+            AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
+            const char* s;
+            AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
+            LOGD("Track is %s",s);
+            if(std::string(s).compare("video/avc")==0){
+                mediaStatus=AMediaExtractor_selectTrack(extractor,i);
+                const auto csd0=getBufferFromMediaFormat("csd-0",format);
+                callback(csd0.data(),csd0.size());
+                const auto csd1=getBufferFromMediaFormat("csd-1",format);
+                callback(csd1.data(),csd1.size());
+                LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
+                AMediaFormat_delete(format);
+                videoTrackFound=true;
+                break;
+            }
+        }
+        if(!videoTrackFound){
+            LOGD("Cannot find video track");
+            AMediaExtractor_delete(extractor);
+            if(assetManager!=nullptr){
+                AAsset_close(asset);
+            }else{
+                close(fd);
+            }
+            return;
+        }
+        //All good, feed configuration, then load & feed data one by one
+        //Loop until done
+        //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
+        const auto sampleBuffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
+        //warning 'not updated' is no problem, since passed by reference
+        while(receiving){
+            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
+            if(sampleSize<=0){
+                if(loopAtEndOfFile){
+                    AMediaExtractor_seekTo(extractor,0, AMEDIAEXTRACTOR_SEEK_CLOSEST_SYNC);
+                    continue;
+                }else{
+                    break;
+                }
+            }
+            callback(sampleBuffer->data(),(size_t)sampleSize);
+            AMediaExtractor_advance(extractor);
+        }
+        AMediaExtractor_delete(extractor);
+        if(assetManager!=nullptr){
+            AAsset_close(asset);
+        }else{
+            close(fd);
+        }
+    }
+    /**
+   * convert the asset file specified at path from .mp4 into a raw .h264 bitstream
+   * then return as one big data buffer
+   */
+    /*static std::vector<uint8_t>
     loadConvertMP4AssetFileIntoMemory(AAssetManager *assetManager, const std::string &path){
         //Use MediaExtractor to parse .mp4 file
         AAsset* asset = AAssetManager_open(assetManager,path.c_str(), 0);
@@ -81,7 +180,12 @@ namespace FileReaderMP4{
             return std::vector<uint8_t>();
         }
         AMediaExtractor* extractor=AMediaExtractor_new();
-        AMediaExtractor_setDataSourceFd(extractor,fd,start,length);
+        auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,start,length);
+        if(mediaStatus!=AMEDIA_OK){
+            LOGD("Error open File %s,mediaStatus: %d",path.c_str(),mediaStatus);
+            AMediaExtractor_delete(extractor);
+            AAsset_close(asset);
+        }
         const auto trackCount=AMediaExtractor_getTrackCount(extractor);
         //This will save all data as RAW
         //SPS/PPS in the beginning, rest afterwards
@@ -119,89 +223,21 @@ namespace FileReaderMP4{
         AAsset_close(asset);
         LOGD("The entire file content (asset,mp4) is in memory %d",(int)rawData.size());
         return rawData;
-    }
-    /**
-     * Instead of loading mp4 file into memory, keep data in file system and pass it one by one
-     * @param FILENAME
-     * @param callback
-     * @param receiving termination condition (loops until receiving==false)
-     */
-    static void readMP4FileInChunks(const std::string &FILENAME,RAW_DATA_CALLBACK callback,std::atomic<bool>& receiving,const bool loopAtEndOfFile=true) {
-        const auto fileSize=fsize(FILENAME.c_str());
-        if(fileSize<=0){
-            LOGD("Error file size %d",(int)fileSize);
-            return;
-        }
-        const int fd = open(FILENAME.c_str(), O_RDONLY, 0666);
-        if(fd<0){
-            LOGD("Error open file: %s fp: %d",FILENAME.c_str(),fd);
-            return;
-        }
-        AMediaExtractor* extractor=AMediaExtractor_new();
-        auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,0,fileSize);
-        if(mediaStatus!=AMEDIA_OK){
-            LOGD("Error open File %s,mediaStatus: %d",FILENAME.c_str(),mediaStatus);
-            AMediaExtractor_delete(extractor);
-            close(fd);
-            return;
-        }
-        const auto trackCount=AMediaExtractor_getTrackCount(extractor);
-        bool videoTrackFound=false;
-        for(size_t i=0;i<trackCount;i++){
-            AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
-            const char* s;
-            AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
-            LOGD("Track is %s",s);
-            if(std::string(s).compare("video/avc")==0){
-                mediaStatus=AMediaExtractor_selectTrack(extractor,i);
-                const auto csd0=getBufferFromMediaFormat("csd-0",format);
-                callback(csd0.data(),csd0.size());
-                const auto csd1=getBufferFromMediaFormat("csd-1",format);
-                callback(csd1.data(),csd1.size());
-                LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
-                AMediaFormat_delete(format);
-                videoTrackFound=true;
-                break;
-            }
-        }
-        if(!videoTrackFound){
-            LOGD("Cannot find video track");
-            AMediaExtractor_delete(extractor);
-            close(fd);
-            return;
-        }
-        //All good, feed configuration, then load & feed data one by one
-        //Loop until done
-        //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
-        const auto sampleBuffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
-        //warning 'not updated' is no problem, since passed by reference
-        while(receiving){
-            const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
-            if(sampleSize<=0){
-                if(loopAtEndOfFile){
-                    AMediaExtractor_seekTo(extractor,0, AMEDIAEXTRACTOR_SEEK_CLOSEST_SYNC);
-                    continue;
-                }else{
-                    break;
-                }
-
-            }
-            callback(sampleBuffer->data(),(size_t)sampleSize);
-            AMediaExtractor_advance(extractor);
-        }
-        AMediaExtractor_delete(extractor);
-        close(fd);
-    }
-    /*static std::vector<uint8_t>
-    loadConvertMP4AssetFileIntoMemory2(AAssetManager *assetManager, const std::string &path){
+    }*/
+    static std::vector<uint8_t>
+    loadConvertMP4AssetFileIntoMemory(AAssetManager *assetManager, const std::string &path){
         //This will save all data as RAW
         //SPS/PPS in the beginning, rest afterwards
         std::atomic<bool> fill=true;
         std::vector<uint8_t> rawData;
-        readMP4FileInChunks(path, [this](const uint8_t* d,int len) {
-
+        rawData.reserve(1024*1024);
+        readMP4FileInChunks(assetManager,path, [&rawData](const uint8_t* d,int len) {
+            const auto offset=rawData.size();
+            rawData.resize(rawData.size()+len);
+            memcpy(&rawData.at(offset),d,(size_t)len);
         },fill,false);
-    }*/
+        return rawData;
+    }
 }
 
 #endif //TELEMETRY_FILEREADERMP4_HPP

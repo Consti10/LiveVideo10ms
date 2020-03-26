@@ -15,6 +15,7 @@
 #include <android/log.h>
 #include <sstream>
 #include <fstream>
+#include "GroundRecorderFPV.hpp"
 
 //Creates a new thread that 'receives' data from File and forwards data
 //Via the RAW_DATA_CALLBACK. It does not specify the type of the forwarded data -
@@ -23,7 +24,7 @@
 
 class FileReader{
 public:
-    typedef std::function<void(const uint8_t[],std::size_t)> RAW_DATA_CALLBACK;
+    typedef std::function<void(const uint8_t[],std::size_t,GroundRecorderFPV::PACKET_TYPE)> RAW_DATA_CALLBACK;
     /**
      * Does nothing until startReading is called
      * @param filename Path to file,relative to internal storage
