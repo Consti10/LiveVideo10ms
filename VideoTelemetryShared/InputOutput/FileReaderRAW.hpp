@@ -75,4 +75,5 @@ namespace FileReaderRAW {
         file.close();
     }
 }
+
 #endif //TELEMETRY_FILEREADERRAW_HPP

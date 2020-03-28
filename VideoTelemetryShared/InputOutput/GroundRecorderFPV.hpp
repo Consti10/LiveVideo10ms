@@ -72,7 +72,8 @@ public:
         //calculate the timestamp
         auto now=std::chrono::steady_clock::now();
         const TIMESTAMP timestamp=(TIMESTAMP)std::chrono::duration_cast<std::chrono::milliseconds>(now-fileCreationTime).count();
-        StreamPacket streamPacket{(unsigned int)packet_length,0};
+        StreamPacket streamPacket;
+        streamPacket.packet_length=(unsigned int)packet_length;
         streamPacket.packet_type=packet_type;
         streamPacket.timestamp=timestamp;
         ofstream.write((char*)&streamPacket,sizeof(StreamPacket));

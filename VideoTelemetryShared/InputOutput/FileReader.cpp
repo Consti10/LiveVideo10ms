@@ -14,6 +14,7 @@
 #include "GroundRecorderFPV.hpp"
 #include "FileReaderMP4.hpp"
 #include "FileReaderRAW.hpp"
+#include "FileReaderFPV.h"
 
 //We cannot use recursion due to stack pointer size limitation. -> Use loop instead.
 void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
@@ -79,41 +80,10 @@ void FileReader::readFileInChunks() {
     if(FileHelper::endsWith(FILENAME,".mp4")) {
         FileReaderMP4::readMP4FileInChunks(nullptr,FILENAME, f, receiving);
     }else if(FileHelper::endsWith(FILENAME,".fpv")){
-        readFpvFileInChunks();
+        //readFpvFileInChunks();
     }else{
         FileReaderRAW::readRawFileInChunks(FILENAME,f,receiving);
     }
 }
 
 
-void FileReader::readFpvFileInChunks() {
-    std::ifstream file (FILENAME.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
-    if (!file.is_open()) {
-        LOGD("Cannot open file %s",FILENAME.c_str());
-        return;
-    } else {
-        LOGD("Opened File %s",FILENAME.c_str());
-        file.seekg (0, std::ios::beg);
-        auto start=std::chrono::steady_clock::now();
-        const auto buffer=std::make_unique<std::array<uint8_t,1024*1024>>();
-        while (receiving) {
-            if(file.eof()){
-                file.clear();
-                file.seekg (0, std::ios::beg);
-                LOGD("RESET");
-            }
-            GroundRecorderFPV::StreamPacket header;
-            file.read((char*)&header,sizeof(GroundRecorderFPV::StreamPacket));
-            file.read((char*)buffer->data(),header.packet_length);
-            if(header.packet_type==0){
-                auto elapsed=std::chrono::steady_clock::now()-start;
-                //wait until we are at least at the time when data was received
-                while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
-                    elapsed=std::chrono::steady_clock::now()-start;
-                }
-                onDataReceivedCallback(buffer->data(),(size_t)header.packet_length,header.packet_type);
-            }
-        }
-        file.close();
-    }
-}

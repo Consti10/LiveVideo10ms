@@ -85,8 +85,6 @@ private:
      */
     void readFileInChunks();
 
-    void readFpvFileInChunks();
-
 private:
     const RAW_DATA_CALLBACK onDataReceivedCallback;
     const std::size_t CHUNK_SIZE;
