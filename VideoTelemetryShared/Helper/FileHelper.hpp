@@ -27,5 +27,8 @@ namespace FileHelper{
         filenameLong<<directory<<std::put_time(&tm, "%d-%m-%Y %H-%M-%S")<<"."<<filetype;
         return filenameLong.str();
     }
+    static bool endsWith(const std::string& str, const std::string& suffix){
+            return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+    }
 }
 #endif //LIVEVIDEO10MS_FILEHELPER_HPP

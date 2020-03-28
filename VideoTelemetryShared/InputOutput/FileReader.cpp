@@ -15,10 +15,6 @@
 #include "FileReaderMP4.hpp"
 #include "FileReaderRAW.hpp"
 
-static bool endsWith(const std::string& str, const std::string& suffix){
-    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
-}
-
 //We cannot use recursion due to stack pointer size limitation. -> Use loop instead.
 void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
     /*if(!receiving || size==0)return;
@@ -37,11 +33,11 @@ void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
         const ssize_t len_left=len-offset;
         if(len_left>=CHUNK_SIZE){
             nReceivedB+=CHUNK_SIZE;
-            onDataReceivedCallback(&data[offset],CHUNK_SIZE,GroundRecorderFPV::PACKET_TYPE_H264);
+            onDataReceivedCallback(&data[offset],CHUNK_SIZE,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
             offset+=CHUNK_SIZE;
         }else{
             nReceivedB+=len_left;
-            onDataReceivedCallback(&data[offset],(size_t)len_left,GroundRecorderFPV::PACKET_TYPE_H264);
+            onDataReceivedCallback(&data[offset],(size_t)len_left,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
             return;
         }
     }
@@ -54,7 +50,7 @@ void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
 
 std::vector<uint8_t>
 FileReader::loadAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
-    if(endsWith(path,".mp4")){
+    if(FileHelper::endsWith(path,".mp4")){
         return FileReaderMP4::loadConvertMP4AssetFileIntoMemory(assetManager,path);
     }else{
         return FileReaderRAW::loadRawAssetFileIntoMemory(assetManager,path);
@@ -80,9 +76,9 @@ void FileReader::readFileInChunks() {
     const auto f = [this](const uint8_t *data, size_t data_length) {
         passDataInChunks(data, data_length);
     };
-    if(endsWith(FILENAME,".mp4")) {
+    if(FileHelper::endsWith(FILENAME,".mp4")) {
         FileReaderMP4::readMP4FileInChunks(nullptr,FILENAME, f, receiving);
-    }else if(endsWith(FILENAME,".fpv")){
+    }else if(FileHelper::endsWith(FILENAME,".fpv")){
         readFpvFileInChunks();
     }else{
         FileReaderRAW::readRawFileInChunks(FILENAME,f,receiving);
@@ -98,16 +94,23 @@ void FileReader::readFpvFileInChunks() {
     } else {
         LOGD("Opened File %s",FILENAME.c_str());
         file.seekg (0, std::ios::beg);
+        auto start=std::chrono::steady_clock::now();
         const auto buffer=std::make_unique<std::array<uint8_t,1024*1024>>();
         while (receiving) {
             if(file.eof()){
                 file.clear();
                 file.seekg (0, std::ios::beg);
+                LOGD("RESET");
             }
             GroundRecorderFPV::StreamPacket header;
             file.read((char*)&header,sizeof(GroundRecorderFPV::StreamPacket));
             file.read((char*)buffer->data(),header.packet_length);
             if(header.packet_type==0){
+                auto elapsed=std::chrono::steady_clock::now()-start;
+                //wait until we are at least at the time when data was received
+                while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
+                    elapsed=std::chrono::steady_clock::now()-start;
+                }
                 onDataReceivedCallback(buffer->data(),(size_t)header.packet_length,header.packet_type);
             }
         }

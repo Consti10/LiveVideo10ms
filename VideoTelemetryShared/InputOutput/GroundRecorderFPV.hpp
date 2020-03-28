@@ -27,6 +27,7 @@ private:
         if(!ofstream.is_open()){
             const std::string groundRecordingFlename=FileHelper::findUnusedFilename(DIRECTORY,"fpv");
             ofstream.open (groundRecordingFlename.c_str());
+            fileCreationTime=std::chrono::steady_clock::now();
         }
     }
     void closeFileIfOpened(){
@@ -35,8 +36,9 @@ private:
             ofstream.close();
         }
     }
+    std::chrono::steady_clock::time_point fileCreationTime;
 public:
-    static constexpr uint8_t PACKET_TYPE_H264=0;
+    static constexpr uint8_t PACKET_TYPE_VIDEO_H264=0;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_LTM=1;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_MAVLINK=2;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_SMARTPORT=3;
@@ -48,6 +50,7 @@ public:
         unsigned int packet_length;
         PACKET_TYPE packet_type;
         TIMESTAMP timestamp;
+        uint8_t placeholder[8];//8 bytes as placeholder for future use
     }__attribute__((packed)) StreamPacket;
 public:
     GroundRecorderFPV(std::string s):DIRECTORY(s) {}
@@ -66,8 +69,12 @@ public:
         if(!started)return;
         if(packet_length==0)return;
         createOpenFileIfNeeded();
+        //calculate the timestamp
+        auto now=std::chrono::steady_clock::now();
+        const TIMESTAMP timestamp=(TIMESTAMP)std::chrono::duration_cast<std::chrono::milliseconds>(now-fileCreationTime).count();
         StreamPacket streamPacket{(unsigned int)packet_length,0};
         streamPacket.packet_type=packet_type;
+        streamPacket.timestamp=timestamp;
         ofstream.write((char*)&streamPacket,sizeof(StreamPacket));
         ofstream.write((char*)packet,packet_length);
     }
