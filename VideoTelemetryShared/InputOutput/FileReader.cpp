@@ -49,41 +49,21 @@ void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
     passDataInChunks(data.data(),data.size());
 }
 
-std::vector<uint8_t>
-FileReader::loadAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
-    if(FileHelper::endsWith(path,".mp4")){
-        return FileReaderMP4::loadConvertMP4AssetFileIntoMemory(assetManager,path);
-    }else{
-        return FileReaderRAW::loadRawAssetFileIntoMemory(assetManager,path);
-    }
-}
-
 void FileReader::receiveLoop() {
     nReceivedB=0;
-    if(assetManager!= nullptr){
-        //load once into memory, then loop (repeating) until done
-        const auto data= loadAssetFileIntoMemory(assetManager, FILENAME);
-        while(receiving){
-            passDataInChunks(data);
-        }
-    }else{
-        //load and pass small chunks one by one, reset to beginning of file when done
-        readFileInChunks();
-    }
-}
-
-void FileReader::readFileInChunks() {
-    //std::bind(&FileReader::passDataInChunks, this, std::placeholders::_1,std::placeholders::_2)
     const auto f = [this](const uint8_t *data, size_t data_length) {
         passDataInChunks(data, data_length);
     };
     if(FileHelper::endsWith(FILENAME,".mp4")) {
-        FileReaderMP4::readMP4FileInChunks(nullptr,FILENAME, f, receiving);
+        FileReaderMP4::readMP4FileInChunks(assetManager,FILENAME, f, receiving);
     }else if(FileHelper::endsWith(FILENAME,".fpv")){
-        //readFpvFileInChunks();
+        FileReaderFPV::readFpvFileInChunks(FILENAME, [this](const uint8_t *data, size_t data_length) {
+            passDataInChunks(data, data_length);
+        },receiving);
     }else{
         FileReaderRAW::readRawFileInChunks(FILENAME,f,receiving);
     }
 }
+
 
 

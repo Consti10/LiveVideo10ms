@@ -71,20 +71,6 @@ private:
     void passDataInChunks(const uint8_t data[],const size_t size);
     void passDataInChunks(const std::vector<uint8_t>& data);
 
-    /**
-     * Depending on the file type, either parse data or leave it untouched
-     * Make sure to only call this on small files,else the application might run out of memory
-     * @assetManager: valid ndk asset manager
-     * @path: path to asset.  If path ends with .mp4 -> convert, else leave untouched
-     */
-    static std::vector<uint8_t> loadAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path);
-
-    /**
-     * instead of loading whole file into memory, pass data one by one.
-     * MP4 is parsed, everything else is untouched
-     */
-    void readFileInChunks();
-
 private:
     const RAW_DATA_CALLBACK onDataReceivedCallback;
     const std::size_t CHUNK_SIZE;

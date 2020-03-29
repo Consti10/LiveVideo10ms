@@ -55,7 +55,7 @@ namespace FileReaderRAW {
      */
     static void readRawAssetInChunks(AAssetManager *assetManager, const std::string &PATH,const RAW_DATA_CALLBACK callback,
                                      std::atomic<bool> &receiving,const bool loopAtEndOfFile){
-        AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(), 0);
+        AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
             LOGD("Cannot open Asset:%s",PATH.c_str());
             return;
