@@ -226,7 +226,6 @@ JNI_METHOD(void, nativePassNALUData)
     env->ReleaseByteArrayElements(b,arrayP,0);
 }
 
-
 JNI_METHOD(jstring , getVideoInfoString)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoNative* p=native(testReceiverN);
