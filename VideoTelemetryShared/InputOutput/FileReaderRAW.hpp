@@ -77,6 +77,15 @@ namespace FileReaderRAW {
         AAsset_close(asset);
     }
 
+    static void readRawInChunks(AAssetManager *assetManager, const std::string &PATH,const RAW_DATA_CALLBACK callback,
+                                std::atomic<bool> &receiving){
+        if(assetManager!=nullptr){
+            readRawAssetInChunks(assetManager,PATH,callback,receiving,true);
+        }else{
+            readRawFileInChunks(PATH,callback,receiving);
+        }
+    }
+
     static std::vector<uint8_t>
     loadRawAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
         AAsset *asset = AAssetManager_open(assetManager, path.c_str(), 0);

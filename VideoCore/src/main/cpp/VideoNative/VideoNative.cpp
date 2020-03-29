@@ -110,7 +110,9 @@ void VideoNative::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         case FILE:{
             const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
             mFileReceiver=std::make_unique<FileReader>(filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
-                onNewVideoData(data,data_length,false,-1);
+                if(packetType==GroundRecorderFPV::PACKET_TYPE_VIDEO_H264){
+                    onNewVideoData(data,data_length,false,-1);
+                }
             },1024);
             mFileReceiver->startReading();
         }break;
