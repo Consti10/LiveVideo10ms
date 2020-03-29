@@ -17,7 +17,7 @@
 #include "FileReaderFPV.h"
 
 //We cannot use recursion due to stack pointer size limitation. -> Use loop instead.
-void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
+void FileReader::passDataInChunks(const uint8_t data[],const size_t size,GroundRecorderFPV::PACKET_TYPE packetType) {
     /*if(!receiving || size==0)return;
     if(size>CHUNK_SIZE){
         nReceivedB+=CHUNK_SIZE;
@@ -44,24 +44,30 @@ void FileReader::passDataInChunks(const uint8_t data[],const size_t size) {
     }
 }
 
-void FileReader::passDataInChunks(const std::vector<uint8_t> &data) {
-    LOGD("passDataInChunks %d",(int)data.size());
-    passDataInChunks(data.data(),data.size());
+void FileReader::passDataInChunks(const std::vector<uint8_t> &data,GroundRecorderFPV::PACKET_TYPE packetType) {
+    passDataInChunks(data.data(),data.size(),packetType);
 }
 
 void FileReader::receiveLoop() {
     nReceivedB=0;
-    const auto f = [this](const uint8_t *data, size_t data_length) {
-        passDataInChunks(data, data_length);
-    };
     if(FileHelper::endsWith(FILENAME,".mp4")) {
-        FileReaderMP4::readMP4FileInChunks(assetManager,FILENAME, f, receiving);
+        FileReaderMP4::readMP4FileInChunks(assetManager,FILENAME,[this](const uint8_t *data, size_t data_length) {
+            passDataInChunks(data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
+            nReceivedB+=data_length;
+        }, receiving);
     }else if(FileHelper::endsWith(FILENAME,".fpv")){
-        FileReaderFPV::readFpvFileInChunks(FILENAME, [this](const uint8_t *data, size_t data_length) {
-            passDataInChunks(data, data_length);
+        FileReaderFPV::readFpvFileInChunks(FILENAME, [this](const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
+            passDataInChunks(data, data_length,packetType);
+            nReceivedB+=data_length;
+        },receiving);
+    }else if(FileHelper::endsWith(FILENAME,".h264")){
+        //raw video ends with .h264
+        FileReaderRAW::readRawFileInChunks(FILENAME,[this](const uint8_t *data, size_t data_length) {
+            passDataInChunks(data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
+            nReceivedB+=data_length;
         },receiving);
     }else{
-        FileReaderRAW::readRawFileInChunks(FILENAME,f,receiving);
+        //Telemetry ends with .ltm, .mavlink usw
     }
 }
 

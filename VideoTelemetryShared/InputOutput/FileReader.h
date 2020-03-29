@@ -68,9 +68,8 @@ private:
      * Pass all data divided in parts of data of size==CHUNK_SIZE
      * Returns when all data has been passed or stopReceiving is called
      */
-    void passDataInChunks(const uint8_t data[],const size_t size);
-    void passDataInChunks(const std::vector<uint8_t>& data);
-
+    void passDataInChunks(const uint8_t data[],const size_t size,GroundRecorderFPV::PACKET_TYPE packetType);
+    void passDataInChunks(const std::vector<uint8_t>& data,GroundRecorderFPV::PACKET_TYPE packetType);
 private:
     const RAW_DATA_CALLBACK onDataReceivedCallback;
     const std::size_t CHUNK_SIZE;
