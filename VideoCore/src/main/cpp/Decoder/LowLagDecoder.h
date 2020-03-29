@@ -76,7 +76,7 @@ private:
     //Set Decoder.configured to true on success
     void configureStartDecoder(const NALU& sps,const NALU& pps);
     //Feed nullptr to indicate EOS.
-    //Else,wait for input buffer to become avalable before feeding NALU
+    //Else,wait for input buffer to become available before feeding NALU
     void feedDecoder(const NALU* nalu);
     //Runs until EOS arrives at output buffer
     void checkOutputLoop();
