@@ -11,7 +11,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import constantin.video.core.VideoNative.VideoNative;
+import constantin.video.core.VideoPlayer.VideoPlayer;
 
 //creates a new thread that -in between onResume() / onPause()
 //constantly reads from videoPlayer and updates the appropriate ui elements
@@ -78,11 +78,11 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
             //if the receivedVideoDataTV is !=null, we should update its content with the
             //number of received bytes usw
             if(receivedVideoDataTV !=null){
-                final String s= VideoNative.getVideoInfoString(videoPlayer.getNativeInstance());
-                updateViewIfStringChanged(activity,receivedVideoDataTV,s,!VideoNative.anyVideoDataReceived(videoPlayer.getNativeInstance()));
+                final String s= VideoPlayer.getVideoInfoString(videoPlayer.getNativeInstance());
+                updateViewIfStringChanged(activity,receivedVideoDataTV,s,!VideoPlayer.anyVideoDataReceived(videoPlayer.getNativeInstance()));
             }
             if(button!=null){
-                final boolean currentlyReceivingData=VideoNative.anyVideoBytesParsedSinceLastCall(videoPlayer.getNativeInstance());
+                final boolean currentlyReceivingData=VideoPlayer.anyVideoBytesParsedSinceLastCall(videoPlayer.getNativeInstance());
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -97,7 +97,7 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
             //Every 3.5s we check if we are receiving video data, but cannot parse the data. Probably the user did mix up
             //rtp and raw. Make a warning toast
             if(System.currentTimeMillis()-lastCheckMS>=3500){
-                final boolean errorVideo=VideoNative.receivingVideoButCannotParse(videoPlayer.getNativeInstance());
+                final boolean errorVideo=VideoPlayer.receivingVideoButCannotParse(videoPlayer.getNativeInstance());
                 lastCheckMS =System.currentTimeMillis();
                 if(errorVideo){
                     activity.runOnUiThread(new Runnable() {

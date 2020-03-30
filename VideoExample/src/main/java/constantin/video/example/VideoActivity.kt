@@ -20,7 +20,7 @@ import com.google.firebase.firestore.SetOptions
 import constantin.video.core.DecodingInfo
 import constantin.video.core.External.AspectFrameLayout
 import constantin.video.core.IVideoParamsChanged
-import constantin.video.core.VideoNative.VideoNative
+import constantin.video.core.VideoPlayer.VideoPlayer
 import constantin.video.core.VideoPlayerSurfaceHolder
 
 const val ID_OS_VERSIONS : String ="OSVersions";
@@ -90,7 +90,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     private fun writeTestResult() {
         if (mDecodingInfo != null && mDecodingInfo!!.nNALUSFeeded > 120) {
             val db = FirebaseFirestore.getInstance()
-            val mTestResult=TestResultDecodingInfoConstructor.create(VS_SOURCE,(if (VS_SOURCE == VideoNative.VS_SOURCE.ASSETS.ordinal)
+            val mTestResult=TestResultDecodingInfoConstructor.create(VS_SOURCE,(if (VS_SOURCE == VideoPlayer.VS_SOURCE.ASSETS.ordinal)
                 VS_ASSETS_FILENAME_TEST_ONLY
             else
                 "Unknown")!!,mDecodingInfo!!);

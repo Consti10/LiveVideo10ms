@@ -1,55 +1,19 @@
-package constantin.video.core.VideoNative;
+package constantin.video.core.VideoPlayer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.view.Surface;
 
 import java.io.File;
+
 import constantin.video.core.R;
+
 import static android.content.Context.MODE_PRIVATE;
 
-public class VideoNative {
-    static {
-        System.loadLibrary("VideoNative");
-    }
-    public static native long initialize(Context context, String groundRecordingDirectory);
-    public static native void finalize(long nativeVideoPlayer);
-    //Consumers are currently
-    //1) The LowLag decoder (if Surface!=null)
-    //2) The GroundRecorderRAW (if enableGroundRecording=true)
-    //public static native void nativeAddConsumers(long nativeInstance, Surface surface);
-    //public static native void nativeRemoveConsumers(long videoPlayerN);
-
-    public static native void nativePassNALUData(long nativeInstance,byte[] b,int offset,int size);
-    //public static native void nativeStartReceiver(long nativeInstance, AssetManager assetManager);
-    //public static native void nativeStopReceiver(long nativeInstance);
-
-    public static native void nativeStart(long nativeInstance,Surface surface,AssetManager assetManager);
-    public static native void nativeStop(long nativeInstance);
-
-    /**
-     * Debugging/ Testing only
-     */
-    public static native String getVideoInfoString(long nativeInstance);
-    public static native boolean anyVideoDataReceived(long nativeInstance);
-    public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
-    public static native boolean receivingVideoButCannotParse(long nativeInstance);
-
-    //call this via java to run the callback(s)
-    //TODO: Use message queue from cpp for performance
-    public static native <T extends INativeVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
-
-    public static final int VS_SOURCE_UDP=0;
-    public static final int VS_SOURCE_FILE=1;
-    public static final int VS_SOURCE_ASSETS =2;
-    public static final int VS_SOURCE_FFMPEG_URL=3;
-    public static final int VS_SOURCE_EXTERNAL=4;
-    public enum VS_SOURCE{UDP,FILE,ASSETS,FFMPEG,EXTERNAL}
-
+//Provides conv
+public class VideoSettings {
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
@@ -58,16 +22,16 @@ public class VideoNative {
         return tempFile.exists();
     }
 
-    public static VS_SOURCE getVS_SOURCE(final Context context){
+    public static VideoPlayer.VS_SOURCE getVS_SOURCE(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         final int val=sharedPreferences.getInt(context.getString(R.string.VS_SOURCE),0);
-        VS_SOURCE ret=VS_SOURCE.values()[val];
+        VideoPlayer.VS_SOURCE ret= VideoPlayer.VS_SOURCE.values()[val];
         sharedPreferences.getInt(context.getString(R.string.VS_SOURCE),0);
         return ret;
     }
 
     @SuppressLint("ApplySharedPref")
-    public static void setVS_SOURCE(final Context context, final VS_SOURCE val){
+    public static void setVS_SOURCE(final Context context, final VideoPlayer.VS_SOURCE val){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         sharedPreferences.edit().putInt(context.getString(R.string.VS_SOURCE),val.ordinal()).commit();
     }
@@ -104,5 +68,15 @@ public class VideoNative {
             pref_video.edit().putString(context.getString(R.string.VS_PLAYBACK_FILENAME),
                     getDirectory()+"Video/"+"filename.h264").commit();
         }
+    }
+
+    public static String getDirectoryToSaveDataTo(){
+        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/Test/";
+        File dir = new File(ret);
+        if (!dir.exists()) {
+            final boolean mkdirs = dir.mkdirs();
+            //System.out.println("mkdirs res"+mkdirs);
+        }
+        return ret;
     }
 }

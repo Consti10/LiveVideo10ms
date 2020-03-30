@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
-import constantin.video.core.VideoNative.VideoNative;
+
+import constantin.video.core.VideoPlayer.VideoSettings;
+import constantin.video.core.VideoPlayer.VideoPlayer;
 
 
 /**
@@ -25,9 +27,9 @@ public class VideoPlayerSurfaceTexture implements LifecycleObserver, ISurfaceTex
     private Surface mVideoSurface;
 
     public VideoPlayerSurfaceTexture(final AppCompatActivity parent, final IVideoParamsChanged vpc, final String assetsFilename){
-        VideoNative.setVS_SOURCE(parent, VideoNative.VS_SOURCE.ASSETS);
-        VideoNative.setVS_ASSETS_FILENAME_TEST_ONLY(parent,assetsFilename);
-        VideoNative.setVS_FILE_ONLY_LIMIT_FPS(parent,40);
+        VideoSettings.setVS_SOURCE(parent, VideoPlayer.VS_SOURCE.ASSETS);
+        VideoSettings.setVS_ASSETS_FILENAME_TEST_ONLY(parent,assetsFilename);
+        VideoSettings.setVS_FILE_ONLY_LIMIT_FPS(parent,40);
         this.parent=parent;
         videoPlayer=new VideoPlayer(parent,vpc);
         parent.getLifecycle().addObserver(this);

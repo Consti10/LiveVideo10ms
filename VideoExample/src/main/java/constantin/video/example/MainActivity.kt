@@ -21,7 +21,7 @@ import java.util.Arrays
 
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
-import constantin.video.core.VideoNative.VideoNative
+import constantin.video.core.VideoPlayer.VideoSettings
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var spinnerVideoTestFileFromAssets: Spinner?=null;
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         checkAndRequestPermissions()
-        VideoNative.initializePreferences(this, false)
+        VideoSettings.initializePreferences(this, false)
         context = this
 
         spinnerVideoTestFileFromAssets = findViewById<Spinner>(R.id.s_videoFileSelector)

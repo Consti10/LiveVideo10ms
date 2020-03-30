@@ -177,7 +177,7 @@ std::string VideoNative::getInfoString(){
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
-      Java_constantin_video_core_VideoNative_VideoNative_##method_name
+      Java_constantin_video_core_VideoPlayer_VideoPlayer_##method_name
 
 inline jlong jptr(VideoNative *videoPlayerN) {
     return reinterpret_cast<intptr_t>(videoPlayerN);
@@ -189,7 +189,7 @@ inline VideoNative *native(jlong ptr) {
 
 extern "C"{
 
-JNI_METHOD(jlong, initialize)
+JNI_METHOD(jlong, nativeInitialize)
 (JNIEnv * env,jclass jclass1,jobject context,jstring groundRecordingDirectory) {
     const char *str = env->GetStringUTFChars(groundRecordingDirectory, nullptr);
     auto* p=new VideoNative(env,context,str);
@@ -197,7 +197,7 @@ JNI_METHOD(jlong, initialize)
     return jptr(p);
 }
 
-JNI_METHOD(void, finalize)
+JNI_METHOD(void, nativeFinalize)
 (JNIEnv * env, jclass jclass1,jlong videoPlayerN) {
     VideoNative* p=native(videoPlayerN);
     delete (p);

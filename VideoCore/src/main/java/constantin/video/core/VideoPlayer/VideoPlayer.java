@@ -1,6 +1,7 @@
-package constantin.video.core;
+package constantin.video.core.VideoPlayer;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Surface;
@@ -9,13 +10,20 @@ import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import constantin.video.core.VideoNative.INativeVideoParamsChanged;
-import constantin.video.core.VideoNative.VideoNative;
+import constantin.video.core.DecodingInfo;
+import constantin.video.core.IVideoParamsChanged;
 
 
 //Convenient wrapper around the native functions from VideoNative
 public class VideoPlayer implements INativeVideoParamsChanged {
     private static final String TAG="VideoPlayer";
+    public static final int VS_SOURCE_UDP=0;
+    public static final int VS_SOURCE_FILE=1;
+    public static final int VS_SOURCE_ASSETS =2;
+    public static final int VS_SOURCE_FFMPEG_URL=3;
+    public static final int VS_SOURCE_EXTERNAL=4;
+    public enum VS_SOURCE{UDP,FILE,ASSETS,FFMPEG,EXTERNAL}
+    //Members
     private final long nativeVideoPlayer;
     private IVideoParamsChanged mVideoParamsChanged;
     private final Context context;
@@ -26,7 +34,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     public VideoPlayer(final Context context,final IVideoParamsChanged iVideoParamsChanged){
         this.mVideoParamsChanged =iVideoParamsChanged;
         this.context=context;
-        nativeVideoPlayer= VideoNative.initialize(context,getDirectoryToSaveDataTo());
+        nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
     }
 
     public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged){
@@ -39,7 +47,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     //c) Receiving Data from a resource file (Assets)
     //d) Receiving Data from a file in the phone file system
     public void addAndStartDecoderReceiver(Surface surface){
-        VideoNative.nativeStart(nativeVideoPlayer,surface,context.getAssets());
+        nativeStart(nativeVideoPlayer,surface,context.getAssets());
         if(mVideoParamsChanged !=null){
             final INativeVideoParamsChanged interfaceVideoParamsChanged=this;
             Log.d(TAG,"Starting timer");
@@ -49,7 +57,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    VideoNative.nativeCallBack(interfaceVideoParamsChanged,nativeVideoPlayer);
+                    nativeCallBack(interfaceVideoParamsChanged,nativeVideoPlayer);
                 }
             },0,500);
         }
@@ -64,7 +72,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
             timer.purge();
             Log.d(TAG,"Stopped timer");
         }
-        VideoNative.nativeStop(nativeVideoPlayer);
+        nativeStop(nativeVideoPlayer);
     }
 
     public long getNativeInstance(){
@@ -100,22 +108,35 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     @Override
     protected void finalize() throws Throwable {
         try {
-            VideoNative.finalize(nativeVideoPlayer);
+            nativeFinalize(nativeVideoPlayer);
         } finally {
             super.finalize();
         }
     }
 
-    private static String getDirectoryToSaveDataTo(){
-        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/Test/";
-        File dir = new File(ret);
-        if (!dir.exists()) {
-            final boolean mkdirs = dir.mkdirs();
-            //System.out.println("mkdirs res"+mkdirs);
-        }
-        return ret;
+    //All the native binding(s)
+    static {
+        System.loadLibrary("VideoNative");
     }
+    public static native long nativeInitialize(Context context, String groundRecordingDirectory);
+    public static native void nativeFinalize(long nativeVideoPlayer);
 
+    public static native void nativePassNALUData(long nativeInstance,byte[] b,int offset,int size);
 
+    public static native void nativeStart(long nativeInstance, Surface surface, AssetManager assetManager);
+    public static native void nativeStop(long nativeInstance);
+
+    /**
+     * Debugging/ Testing only
+     */
+    public static native String getVideoInfoString(long nativeInstance);
+    public static native boolean anyVideoDataReceived(long nativeInstance);
+    public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
+    public static native boolean receivingVideoButCannotParse(long nativeInstance);
+
+    //call this via java to run the callback(s)
+    //TODO: Use message queue from cpp for performance
+    public static native <T extends INativeVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
+    //End native binding(s)
 
 }

@@ -17,7 +17,7 @@ import org.junit.Test;
 import javax.annotation.Nullable;
 
 import constantin.video.core.DecodingInfo;
-import constantin.video.core.VideoNative.VideoNative;
+import constantin.video.core.VideoPlayer.VideoPlayer.VideoNative;
 
 public class PlayTestVideosRepeated {
     private static final int WAIT_TIME_SHORT = 5*1000; //n seconds
