@@ -125,14 +125,12 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     public static native void nativeStart(long nativeInstance, Surface surface, AssetManager assetManager);
     public static native void nativeStop(long nativeInstance);
-
-    /**
-     * Debugging/ Testing only
-     */
+    //get members or other information. Some might be only usable in between (nativeStart <-> nativeStop)
     public static native String getVideoInfoString(long nativeInstance);
     public static native boolean anyVideoDataReceived(long nativeInstance);
     public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
     public static native boolean receivingVideoButCannotParse(long nativeInstance);
+    public static native long nativeGetExternalGroundRecorder(long nativeInstance);
 
     //call this via java to run the callback(s)
     //TODO: Use message queue from cpp for performance

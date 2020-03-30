@@ -257,6 +257,12 @@ JNI_METHOD(jboolean , anyVideoBytesParsedSinceLastCall)
     return (jboolean) (nalusSinceLast > 0);
 }
 
+JNI_METHOD(jlong , nativeGetExternalGroundRecorder)
+(JNIEnv *env,jclass jclass1,jlong instance) {
+    VideoPlayer* p=native(instance);
+    return (jlong) &p->mGroundRecorderFPV;
+}
+
 JNI_METHOD(void,nativeCallBack)
 (JNIEnv *env,jclass jclass1,jobject videoParamsChangedI,jlong testReceiverN){
     VideoPlayer* p=native(testReceiverN);

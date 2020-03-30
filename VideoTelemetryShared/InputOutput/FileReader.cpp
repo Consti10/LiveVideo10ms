@@ -34,11 +34,11 @@ static int isTelemetryFilename(const std::string& path){
 void FileReader::receiveLoop() {
     nReceivedB=0;
     if(FileHelper::endsWith(FILEPATH, ".mp4")) {
-        FileReaderMP4::readMP4FileInChunks(assetManager, FILEPATH, [this](const uint8_t *data, size_t data_length) {
+        FileReaderMP4::readMP4FileInChunks(assetManager,FILEPATH, [this](const uint8_t *data, size_t data_length) {
             passDataInChunks(data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
         }, receiving);
     }else if(FileHelper::endsWith(FILEPATH, ".fpv")){
-        FileReaderFPV::readFpvFileInChunks(FILEPATH, [this](const uint8_t *data, size_t data_length, GroundRecorderFPV::PACKET_TYPE packetType) {
+        FileReaderFPV::readFpvAssetOrFileInChunks(assetManager,FILEPATH, [this](const uint8_t *data, size_t data_length, GroundRecorderFPV::PACKET_TYPE packetType) {
             passDataInChunks(data, data_length,packetType);
         }, receiving);
     }else if(FileHelper::endsWith(FILEPATH, ".h264")){
