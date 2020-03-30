@@ -34,7 +34,7 @@ namespace FileReaderRAW {
             LOGD("Cannot open file %s", FILENAME.c_str());
             return;
         }
-        //LOGD("Opened File %s", FILENAME.c_str());
+        //LOGD("Opened File %s", FILEPATH.c_str());
         file.seekg(0, std::ios::beg);
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
         while (receiving) {

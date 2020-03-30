@@ -33,27 +33,27 @@ static int isTelemetryFilename(const std::string& path){
 
 void FileReader::receiveLoop() {
     nReceivedB=0;
-    if(FileHelper::endsWith(FILENAME,".mp4")) {
-        FileReaderMP4::readMP4FileInChunks(assetManager,FILENAME,[this](const uint8_t *data, size_t data_length) {
+    if(FileHelper::endsWith(FILEPATH, ".mp4")) {
+        FileReaderMP4::readMP4FileInChunks(assetManager, FILEPATH, [this](const uint8_t *data, size_t data_length) {
             passDataInChunks(data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
-        },receiving);
-    }else if(FileHelper::endsWith(FILENAME,".fpv")){
-        FileReaderFPV::readFpvFileInChunks(FILENAME, [this](const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
+        }, receiving);
+    }else if(FileHelper::endsWith(FILEPATH, ".fpv")){
+        FileReaderFPV::readFpvFileInChunks(FILEPATH, [this](const uint8_t *data, size_t data_length, GroundRecorderFPV::PACKET_TYPE packetType) {
             passDataInChunks(data, data_length,packetType);
-        },receiving);
-    }else if(FileHelper::endsWith(FILENAME,".h264")){
+        }, receiving);
+    }else if(FileHelper::endsWith(FILEPATH, ".h264")){
         //raw video ends with .h264
-        FileReaderRAW::readRawInChunks(assetManager,FILENAME,[this](const uint8_t *data, size_t data_length) {
+        FileReaderRAW::readRawInChunks(assetManager, FILEPATH, [this](const uint8_t *data, size_t data_length) {
             passDataInChunks(data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
-        },receiving);
-    }else if(isTelemetryFilename(FILENAME)!=-1) {
+        }, receiving);
+    }else if(isTelemetryFilename(FILEPATH) != -1) {
         //Telemetry ends with .ltm, .mavlink usw
-        const GroundRecorderFPV::PACKET_TYPE packetType=(uint8_t)isTelemetryFilename(FILENAME);
-        FileReaderRAW::readRawFileInChunks(FILENAME,[this,packetType](const uint8_t *data, size_t data_length) {
+        const GroundRecorderFPV::PACKET_TYPE packetType=(GroundRecorderFPV::PACKET_TYPE)isTelemetryFilename(FILEPATH);
+        FileReaderRAW::readRawInChunks(assetManager,FILEPATH, [this,packetType](const uint8_t *data, size_t data_length) {
             passDataInChunks(data, data_length,packetType);
-        },receiving);
+        }, receiving);
     }else{
-        LOGD("Error unknown filename %s",FILENAME.c_str());
+        LOGD("Error unknown filename %s", FILEPATH.c_str());
     }
 }
 

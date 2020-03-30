@@ -29,7 +29,7 @@ private:
     const RAW_DATA_CALLBACK onDataReceivedCallback;
     const std::size_t CHUNK_SIZE;
     //if assetManager!=nullptr the filename is relative to the assets directory,else normal filesystem
-    const std::string FILENAME;
+    const std::string FILEPATH;
     //Cannot make const since the functions it is called with are not marked const
     AAssetManager* assetManager;
     std::unique_ptr<std::thread> mThread;
@@ -39,21 +39,15 @@ private:
 public:
     /**
      * Does nothing until startReading is called
-     * @param filename Path to file,relative to internal storage
+     * @param assetManager use nullptr for 'normal' files, else a valid android asset manager
+     * @param path Path to file,depends on assetManager if relative to file or asset
      * @param onDataReceivedCallback callback that is called with the loaded data from the receiving thread
      * @param chunkSize Determines how big the data chunks are that are fed to the parser. The smaller the chunk size
      * The faster does the onDataReceivedCallback() return
      * Therefore allowing the file receiver to stop and exit quicker
      */
-    FileReader(const std::string filename,RAW_DATA_CALLBACK onDataReceivedCallback,std::size_t chunkSize=1024):
-            FILENAME(filename), CHUNK_SIZE(chunkSize),assetManager(nullptr),onDataReceivedCallback(onDataReceivedCallback){
-    }
-    /**
-     * Same as above, but
-     * @param filename is relative to the assets folder
-     */
-    FileReader(AAssetManager* assetManager,const std::string filename,RAW_DATA_CALLBACK onDataReceivedCallback,std::size_t chunkSize=1024):
-            FILENAME(filename), CHUNK_SIZE(chunkSize),assetManager(assetManager),onDataReceivedCallback(onDataReceivedCallback){
+    FileReader(AAssetManager* assetManager, const std::string PATH, RAW_DATA_CALLBACK onDataReceivedCallback, std::size_t chunkSize=1024):
+            assetManager(assetManager), FILEPATH(PATH), CHUNK_SIZE(chunkSize), onDataReceivedCallback(onDataReceivedCallback){
     }
     /**
      * Create and start the receiving thread, which will run until stopReading() is called.

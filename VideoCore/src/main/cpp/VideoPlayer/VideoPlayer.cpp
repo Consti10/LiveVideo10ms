@@ -107,22 +107,19 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             }, WANTED_UDP_RCVBUF_SIZE);
             mUDPReceiver->startReceiving();
         }break;
-        case FILE:{
-            const std::string filename=mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            mFileReceiver=std::make_unique<FileReader>(filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
-                if(packetType==GroundRecorderFPV::PACKET_TYPE_VIDEO_H264){
-                    onNewVideoData(data,data_length,false,-1);
+        case FILE:
+        case ASSETS: {
+            const bool useAsset=VS_SOURCE==ASSETS;
+            const std::string filename = useAsset ?  mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264") :
+                    mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
+            mFileReceiver = std::make_unique<FileReader>(useAsset ? assetManager : nullptr,filename, [this, VS_FILE_ONLY_LIMIT_FPS](
+                    const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
+                if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
+                    onNewVideoData(data, data_length, false, -1);
                 }
-            },1024);
+            }, 1024);
             mFileReceiver->startReading();
-        }break;
-        case ASSETS:{
-            const std::string filename=mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264");
-            mFileReceiver=std::make_unique<FileReader>(assetManager,filename,[this,VS_FILE_ONLY_LIMIT_FPS](const uint8_t* data,size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
-                onNewVideoData(data,data_length,false,VS_FILE_ONLY_LIMIT_FPS);
-            },1024);
-            mFileReceiver->startReading();
-        }break;
+        }
         case VIA_FFMPEG_URL:{
             MLOGD("Started with SOURCE=TEST360");
             const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);

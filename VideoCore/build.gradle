@@ -37,6 +37,7 @@ android {
             jniLibs.srcDirs = ['libs/ffmpeg/lib']
         }
     }
+    ndkVersion = '21.0.6113669'
 }
 
 dependencies {

@@ -23,8 +23,8 @@
 #include "GroundRecorderFPV.hpp"
 
 namespace FileReaderFPV{
+    static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;
     typedef std::function<void(const uint8_t[], unsigned int,GroundRecorderFPV::PACKET_TYPE)> MY_CALLBACK;
-
     static void readFpvFileInChunks(const std::string &FILENAME,MY_CALLBACK callback,std::atomic<bool>& receiving) {
         std::ifstream file (FILENAME.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
         if (!file.is_open()) {
@@ -34,7 +34,7 @@ namespace FileReaderFPV{
             LOGD("Opened File %s",FILENAME.c_str());
             file.seekg (0, std::ios::beg);
             auto start=std::chrono::steady_clock::now();
-            const auto buffer=std::make_unique<std::array<uint8_t,1024*1024>>();
+            const auto buffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
             while (receiving) {
                 if(file.eof()){
                     file.clear();
