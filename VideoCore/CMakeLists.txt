@@ -85,7 +85,7 @@ add_library( VideoNative
         ${VIDEO_PATH}/Parser/ParseRAW.cpp
         ${VIDEO_PATH}/Parser/ParseRTP.cpp
         ${VIDEO_PATH}/Decoder/LowLagDecoder.cpp
-        ${VIDEO_PATH}/VideoNative/VideoNative.cpp)
+        ${VIDEO_PATH}/VideoPlayer/VideoPlayer.cpp)
 
 target_link_libraries( VideoNative
         FFMpegVideoReceiver

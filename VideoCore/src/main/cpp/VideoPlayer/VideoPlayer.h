@@ -15,9 +15,9 @@
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
 
-class VideoNative{
+class VideoPlayer{
 public:
-    VideoNative(JNIEnv * env,jobject context,const char* DIR);
+    VideoPlayer(JNIEnv * env, jobject context, const char* DIR);
     void onNewVideoData(const uint8_t* data,const std::size_t data_length,const bool isRTPData,const int limitFPS);
     void addConsumers(JNIEnv* env,jobject surface);
     void removeConsumers();
