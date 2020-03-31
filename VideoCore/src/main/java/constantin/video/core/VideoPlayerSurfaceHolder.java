@@ -23,6 +23,7 @@ public class VideoPlayerSurfaceHolder implements SurfaceHolder.Callback{
 
     public long GetExternalGroundRecorder(){
         return VideoPlayer.nativeGetExternalGroundRecorder(videoPlayer.getNativeInstance());
+        //return 0;
     }
 
     @Override

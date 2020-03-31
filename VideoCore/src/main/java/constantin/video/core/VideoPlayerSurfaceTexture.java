@@ -43,6 +43,7 @@ public class VideoPlayerSurfaceTexture implements LifecycleObserver, ISurfaceTex
 
     public long GetExternalGroundRecorder(){
         return VideoPlayer.nativeGetExternalGroundRecorder(videoPlayer.getNativeInstance());
+        //return 0;
     }
 
     public void setIVideoParamsChanged(final IVideoParamsChanged vpc){
