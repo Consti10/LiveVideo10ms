@@ -49,7 +49,10 @@ namespace FileReaderFPV{
             file.read((char*)buffer->data(),header.packet_length);
             const int bytesRead=file.gcount();
             if(bytesRead!=header.packet_length){
+                file.clear();
+                file.seekg (0, std::ios::beg);
                 LOGD("Error, file was written wrong");
+                continue;
             }
             if(header.packet_type==0){
                 auto elapsed=std::chrono::steady_clock::now()-start;
