@@ -120,6 +120,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             }, 1024);
             mFileReceiver->startReading();
         }
+        break;
         case VIA_FFMPEG_URL:{
             MLOGD("Started with SOURCE=TEST360");
             const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
@@ -139,6 +140,9 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             //Data is being received somewhere else and passed trough-init nothing.
             MLOGD("Started with SOURCE=EXTERNAL");
         }break;
+        default:
+            MLOGD("Error unknown VS_SOURCE");
+            break;
     }
 }
 
