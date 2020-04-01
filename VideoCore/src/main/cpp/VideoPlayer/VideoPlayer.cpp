@@ -66,8 +66,8 @@ void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
     //Add Ground recorder if enabled
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
-    //if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
-    if(true){
+    if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
+    //if(true){
          mGroundRecorderFPV.start();
     }
 }

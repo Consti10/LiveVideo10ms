@@ -57,8 +57,8 @@ namespace FileReaderFPV{
                 while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
                     elapsed=std::chrono::steady_clock::now()-start;
                 }
-                callback(buffer->data(),header.packet_length,header.packet_type);
             }
+            callback(buffer->data(),header.packet_length,header.packet_type);
         }
         file.close();
     }
