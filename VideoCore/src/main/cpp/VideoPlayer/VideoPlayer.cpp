@@ -117,7 +117,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
                 if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
                     onNewVideoData(data, data_length, false, -1);
                 }
-            }, 1024);
+            },false, 1024);
             mFileReceiver->startReading();
         }
         break;

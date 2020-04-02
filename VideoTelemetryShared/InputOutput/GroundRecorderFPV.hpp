@@ -13,6 +13,9 @@
 #include "FileHelper.hpp"
 #include <chrono>
 
+/**
+ * Thread-safe class for writing a .fpv ground recording file
+ */
 class GroundRecorderFPV{
 private:
     const std::string DIRECTORY;
@@ -54,6 +57,8 @@ public:
     }__attribute__((packed)) StreamPacket;
 public:
     GroundRecorderFPV(std::string s):DIRECTORY(s) {}
+    //It is okay to call start() multiple times
+    //only in the 'started' state data is written to the ground recording file
     void start(){
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
         started=true;

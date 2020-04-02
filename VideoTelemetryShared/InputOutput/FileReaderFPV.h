@@ -7,7 +7,6 @@
 
 #include <android/asset_manager.h>
 #include <vector>
-#include <chrono>
 #include <string>
 #include <thread>
 #include <android/log.h>
@@ -24,7 +23,7 @@
 
 namespace FileReaderFPV{
     static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;
-    typedef std::function<void(const uint8_t[], unsigned int,GroundRecorderFPV::PACKET_TYPE)> MY_CALLBACK;
+    typedef std::function<void(const uint8_t[],const GroundRecorderFPV::StreamPacket)> MY_CALLBACK;
 
     static void readFpvFileInChunks(const std::string &FILENAME,MY_CALLBACK callback,std::atomic<bool>& receiving) {
         std::ifstream file (FILENAME.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
@@ -34,7 +33,6 @@ namespace FileReaderFPV{
         }
         //LOGD("Opened File %s",FILENAME.c_str());
         file.seekg (0, std::ios::beg);
-        auto start=std::chrono::steady_clock::now();
         const auto buffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
         while (receiving) {
             GroundRecorderFPV::StreamPacket header;
@@ -54,14 +52,7 @@ namespace FileReaderFPV{
                 LOGD("Error, file was written wrong");
                 continue;
             }
-            if(header.packet_type==0){
-                auto elapsed=std::chrono::steady_clock::now()-start;
-                //wait until we are at least at the time when data was received
-                while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
-                    elapsed=std::chrono::steady_clock::now()-start;
-                }
-            }
-            callback(buffer->data(),header.packet_length,header.packet_type);
+            callback(buffer->data(),header);
         }
         file.close();
     }
@@ -75,7 +66,6 @@ namespace FileReaderFPV{
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
         AAsset_seek(asset, 0, SEEK_SET);
-        auto start=std::chrono::steady_clock::now();
         while(receiving) {
             GroundRecorderFPV::StreamPacket header;
             //If reading the header fails,we have reached the EOF
@@ -91,14 +81,7 @@ namespace FileReaderFPV{
                 AAsset_seek(asset, 0, SEEK_SET);
                 continue;
             }
-            if(header.packet_type==0){
-                auto elapsed=std::chrono::steady_clock::now()-start;
-                //wait until we are at least at the time when data was received
-                while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
-                    elapsed=std::chrono::steady_clock::now()-start;
-                }
-            }
-            callback(buffer->data(),header.packet_length,header.packet_type);
+            callback(buffer->data(),header);
         }
         AAsset_close(asset);
     }

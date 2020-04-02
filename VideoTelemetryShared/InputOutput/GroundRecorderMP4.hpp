@@ -13,6 +13,7 @@
 #include "../NALU/KeyFrameFinder.h"
 
 //TODO work in progress
+//DEPRECATED
 
 class GroundRecorderMP4 {
 public:
