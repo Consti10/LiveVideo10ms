@@ -17,7 +17,7 @@ import org.junit.Test;
 import javax.annotation.Nullable;
 
 import constantin.video.core.DecodingInfo;
-import constantin.video.core.VideoPlayer.VideoPlayer.VideoNative;
+import constantin.video.core.VideoPlayer.VideoPlayer;
 
 public class PlayTestVideosRepeated {
     private static final int WAIT_TIME_SHORT = 5*1000; //n seconds
@@ -71,7 +71,7 @@ public class PlayTestVideosRepeated {
 
     @Test
     public void playAllTestVideosTest() {
-        writeVideoSource(VideoNative.VS_SOURCE_ASSETS);
+        writeVideoSource(VideoPlayer.VS_SOURCE_ASSETS);
         //Alternating, play x264 test video ,rpi cam, webcam
         for(int i=0;i<N_ITERATIONS;i++){
             selectVideoFilename(0);

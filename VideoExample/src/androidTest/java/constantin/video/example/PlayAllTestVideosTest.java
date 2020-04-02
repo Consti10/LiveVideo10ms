@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import javax.annotation.Nullable;
 
 import constantin.video.core.DecodingInfo;
-import constantin.video.core.VideoPlayer.VideoPlayer.VideoNative;
+import constantin.video.core.VideoPlayer.VideoPlayer;
 
 
 @LargeTest
@@ -72,7 +72,7 @@ public class PlayAllTestVideosTest {
 
     @Test
     public void playAllTestVideosTest() {
-        writeVideoSource(VideoNative.VS_SOURCE_ASSETS);
+        writeVideoSource(VideoPlayer.VS_SOURCE_ASSETS);
         for(int i=0;i<7;i++){
             selectVideoFilename(i);
             testPlayVideo();
