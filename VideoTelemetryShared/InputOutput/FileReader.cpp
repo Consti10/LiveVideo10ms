@@ -68,6 +68,10 @@ void FileReader::receiveLoop() {
         const GroundRecorderFPV::PACKET_TYPE packetType=(GroundRecorderFPV::PACKET_TYPE)isTelemetryFilename(FILEPATH);
         FileReaderRAW::readRawInChunks(assetManager,FILEPATH, [this,packetType](const uint8_t *data, size_t data_length) {
             passDataInChunks(data, data_length,packetType);
+            try{
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }catch (...){
+            }
         }, receiving);
     }else{
         LOGD("Error unknown filename %s", FILEPATH.c_str());
