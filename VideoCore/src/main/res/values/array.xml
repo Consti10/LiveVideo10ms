@@ -33,6 +33,11 @@
         <item>STEREO</item>
         <item>360 Insta 1</item>
         <item>360 Insta 2</item>
+        <item>X4</item>
+        <item>X5</item>
+        <item>X6</item>
+        <item>X7</item>
+        <item>X8</item>
     </string-array>
 
     <string-array name="valuesVS_VIDEO_VIEW_TYPE" >
@@ -40,6 +45,11 @@
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
     </string-array>
 
 </resources>
