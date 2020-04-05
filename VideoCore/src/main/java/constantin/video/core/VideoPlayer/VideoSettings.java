@@ -47,9 +47,24 @@ public class VideoSettings {
         sharedPreferences.edit().putInt(context.getString(R.string.VS_FILE_ONLY_LIMIT_FPS),limitFPS).commit();
     }
 
-    private static String getDirectory(){
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/";
+    public static String getVS_PLAYBACK_FILENAME(final Context context){
+        final String tmp=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE).
+                getString(context.getString(R.string.VS_PLAYBACK_FILENAME),context.getString(R.string.VS_PLAYBACK_FILENAME_DEFAULT_VALUE));
+        return tmp;
     }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setVS_PLAYBACK_FILENAME(final Context context, final String pathAndFilename){
+        context.getSharedPreferences("pref_video",Context.MODE_PRIVATE).edit().
+                putString(context.getString(R.string.VS_PLAYBACK_FILENAME),pathAndFilename).commit();
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void setVS_GROUND_RECORDING(final Context context,final boolean enable){
+        context.getSharedPreferences("pref_video",Context.MODE_PRIVATE).edit().
+                putBoolean(context.getString(R.string.VS_GROUND_RECORDING),enable).commit();
+    }
+
 
     //0=normal
     //1=stereo
@@ -66,12 +81,12 @@ public class VideoSettings {
         final String filename=pref_video.getString(context.getString(R.string.VS_PLAYBACK_FILENAME),context.getString(R.string.VS_PLAYBACK_FILENAME_DEFAULT_VALUE));
         if(filename.equals(context.getString(R.string.VS_PLAYBACK_FILENAME_DEFAULT_VALUE))){
             pref_video.edit().putString(context.getString(R.string.VS_PLAYBACK_FILENAME),
-                    getDirectory()+"Video/"+"filename.h264").commit();
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/"+"Video/"+"filename.fpv").commit();
         }
     }
 
     public static String getDirectoryToSaveDataTo(){
-        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/Test/";
+        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/VideoTelemetry/";
         File dir = new File(ret);
         if (!dir.exists()) {
             final boolean mkdirs = dir.mkdirs();

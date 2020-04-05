@@ -66,10 +66,11 @@ void FileReader::receiveLoop() {
     }else if(isTelemetryFilename(FILEPATH) != -1) {
         //Telemetry ends with .ltm, .mavlink usw
         const GroundRecorderFPV::PACKET_TYPE packetType=(GroundRecorderFPV::PACKET_TYPE)isTelemetryFilename(FILEPATH);
-        FileReaderRAW::readRawInChunks(assetManager,FILEPATH, [this,packetType](const uint8_t *data, size_t data_length) {
+        const int waitTimeMS=packetType==GroundRecorderFPV::PACKET_TYPE_TELEMETRY_LTM ? 50 : 10;
+        FileReaderRAW::readRawInChunks(assetManager,FILEPATH, [this,packetType,waitTimeMS](const uint8_t *data, size_t data_length) {
             passDataInChunks(data, data_length,packetType);
             try{
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(std::chrono::milliseconds(waitTimeMS));
             }catch (...){
             }
         }, receiving);
