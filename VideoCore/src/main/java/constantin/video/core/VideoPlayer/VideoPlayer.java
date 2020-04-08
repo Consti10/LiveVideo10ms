@@ -102,7 +102,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
         if(mVideoParamsChanged !=null){
             mVideoParamsChanged.onDecodingInfoChanged(decodingInfo);
         }
-        Log.d(TAG,"onDecodingInfoChanged"+decodingInfo.toString());
+        //Log.d(TAG,"onDecodingInfoChanged"+decodingInfo.toString());
     }
 
     @Override

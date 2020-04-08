@@ -57,7 +57,7 @@ void FileReader::receiveLoop() {
                 }
             }
             passDataInChunks(data,header.packet_length,header.packet_type);
-        }, receiving);
+        }, receiving,false);
     }else if(FileHelper::endsWith(FILEPATH, ".h264")){
         //raw video ends with .h264
         FileReaderRAW::readRawInChunks(assetManager, FILEPATH, [this](const uint8_t *data, size_t data_length) {
@@ -66,13 +66,8 @@ void FileReader::receiveLoop() {
     }else if(isTelemetryFilename(FILEPATH) != -1) {
         //Telemetry ends with .ltm, .mavlink usw
         const GroundRecorderFPV::PACKET_TYPE packetType=(GroundRecorderFPV::PACKET_TYPE)isTelemetryFilename(FILEPATH);
-        const int waitTimeMS=packetType==GroundRecorderFPV::PACKET_TYPE_TELEMETRY_LTM ? 50 : 10;
-        FileReaderRAW::readRawInChunks(assetManager,FILEPATH, [this,packetType,waitTimeMS](const uint8_t *data, size_t data_length) {
+        FileReaderRAW::readRawInChunks(assetManager,FILEPATH, [this,packetType](const uint8_t *data, size_t data_length) {
             passDataInChunks(data, data_length,packetType);
-            try{
-                std::this_thread::sleep_for(std::chrono::milliseconds(waitTimeMS));
-            }catch (...){
-            }
         }, receiving);
     }else{
         LOGD("Error unknown filename %s", FILEPATH.c_str());

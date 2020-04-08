@@ -27,8 +27,7 @@ namespace FileReaderRAW {
     /**
      * Open raw file and pass its data one by one in Chunks until @param receiving==false
      */
-    static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,
-                                    std::atomic<bool> &receiving) {
+    static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::atomic<bool> &receiving) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
             LOGD("Cannot open file %s", FILENAME.c_str());
@@ -54,7 +53,7 @@ namespace FileReaderRAW {
      * Same as above, but for asset file
      */
     static void readRawAssetInChunks(AAssetManager *assetManager, const std::string &PATH,const RAW_DATA_CALLBACK callback,
-                                     std::atomic<bool> &receiving,const bool loopAtEndOfFile){
+                                     const std::atomic<bool> &receiving,const bool loopAtEndOfFile){
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
             LOGD("Cannot open Asset:%s",PATH.c_str());
@@ -78,7 +77,7 @@ namespace FileReaderRAW {
     }
 
     static void readRawInChunks(AAssetManager *assetManager, const std::string &PATH,const RAW_DATA_CALLBACK callback,
-                                std::atomic<bool> &receiving){
+                                const std::atomic<bool> &receiving){
         if(assetManager!=nullptr){
             readRawAssetInChunks(assetManager,PATH,callback,receiving,true);
         }else{
