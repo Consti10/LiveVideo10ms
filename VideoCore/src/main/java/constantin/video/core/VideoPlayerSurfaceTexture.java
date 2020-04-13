@@ -53,7 +53,6 @@ public class VideoPlayerSurfaceTexture implements LifecycleObserver, ISurfaceTex
     //This one is called by the OpenGL Thread !
     @Override
     public void onSurfaceTextureAvailable(final SurfaceTexture surfaceTexture) {
-        final VideoPlayerSurfaceTexture reference=this;
         //To avoid race conditions always start and stop the Video player on the UI thread
         parent.runOnUiThread(new Runnable() {
             @Override
@@ -62,7 +61,7 @@ public class VideoPlayerSurfaceTexture implements LifecycleObserver, ISurfaceTex
                 //(which is possible because the callback was originally not invoked on the UI thread )
                 //only create the Surface for later use. The next onResume() event will re-start the video
                 mVideoSurface=new Surface(surfaceTexture);
-                if(reference.parent.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)){
+                if(VideoPlayerSurfaceTexture.this.parent.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)){
                     videoPlayer.addAndStartDecoderReceiver(mVideoSurface);
                 }
             }

@@ -47,6 +47,7 @@ public:
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_SMARTPORT=3;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_FRSKY=4;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_EZWB=5;
+    static constexpr uint8_t PACKET_TYPE_TELEMETRY_ANDROD_GPS=6;
     using PACKET_TYPE=uint8_t;
     using TIMESTAMP=unsigned int;
     typedef struct{
