@@ -18,7 +18,8 @@
 class VideoPlayer{
 public:
     VideoPlayer(JNIEnv * env, jobject context, const char* DIR);
-    void onNewVideoData(const uint8_t* data,const std::size_t data_length,const bool isRTPData,const int limitFPS);
+    enum VIDEO_DATA_TYPE{RAW,RTP,DJI};
+    void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType,const int limitFPS);
     void addConsumers(JNIEnv* env,jobject surface);
     void removeConsumers();
     void startReceiver(JNIEnv *env, AAssetManager *assetManager);
@@ -31,6 +32,8 @@ private:
     SettingsN mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
+    std::array<uint8_t,1024*1024> tmpBuff;
+    int tmpBuffSize=0;
 public:
     H264Parser mParser;
     std::unique_ptr<LowLagDecoder> mLowLagDecoder;

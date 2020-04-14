@@ -22,13 +22,19 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
-void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_length, const bool isRTPData, const int maxFPS=-1){
+void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType,const int maxFPS=-1){
     mParser.setLimitFPS(maxFPS);
     //MLOGD("onNewVideoData %d",data_length);
-    if(isRTPData){
-        mParser.parse_rtp_h264_stream(data,data_length);
-    }else{
-        mParser.parse_raw_h264_stream(data,data_length);
+    switch(videoDataType){
+        case VIDEO_DATA_TYPE::RAW:
+            mParser.parse_raw_h264_stream(data,data_length);
+            break;
+        case VIDEO_DATA_TYPE::RTP:
+            mParser.parse_rtp_h264_stream(data,data_length);
+            break;
+        case VIDEO_DATA_TYPE::DJI:
+            mParser.parseDjiLiveVideoData(data,data_length);
+            break;
     }
 }
 
@@ -103,7 +109,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
             mUDPReceiver=std::make_unique<UDPReceiver>(VS_PORT, "VideoPlayer VideoReceiver", CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,useRTP](const uint8_t* data, size_t data_length) {
-                onNewVideoData(data,data_length,useRTP,-1);
+                onNewVideoData(data,data_length,useRTP ? VIDEO_DATA_TYPE::RTP : VIDEO_DATA_TYPE::RAW,-1);
             }, WANTED_UDP_RCVBUF_SIZE);
             mUDPReceiver->startReceiving();
         }break;
@@ -115,7 +121,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             mFileReceiver = std::make_unique<FileReader>(useAsset ? assetManager : nullptr,filename, [this, VS_FILE_ONLY_LIMIT_FPS](
                     const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
                 if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
-                    onNewVideoData(data, data_length, false, -1);
+                    onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW, -1);
                 }
             },false, 1024);
             mFileReceiver->startReading();
@@ -130,7 +136,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
             //MLOGD("url:%s",url.c_str());
             mFFMpegVideoReceiver=std::make_unique<FFMpegVideoReceiver>(url,0,[this](uint8_t* data,int data_length) {
-                onNewVideoData(data,(size_t)data_length,false,-1);
+                onNewVideoData(data,(size_t)data_length,VIDEO_DATA_TYPE::RAW,-1);
             },[this](const NALU& nalu) {
                 onNewNALU(nalu);
             });
@@ -223,7 +229,7 @@ JNI_METHOD(void, nativePassNALUData)
 (JNIEnv *env,jclass jclass1,jlong videoPlayerN,jbyteArray b,jint offset,jint length){
     jbyte *arrayP=env->GetByteArrayElements(b, nullptr);
     auto * p=(uint8_t*)arrayP;
-    native(videoPlayerN)->onNewVideoData(&p[(int) offset], (size_t)length,false,true);
+    native(videoPlayerN)->onNewVideoData(&p[(int) offset], (size_t)length,VideoPlayer::VIDEO_DATA_TYPE::DJI,-1);
     env->ReleaseByteArrayElements(b,arrayP,0);
 }
 
