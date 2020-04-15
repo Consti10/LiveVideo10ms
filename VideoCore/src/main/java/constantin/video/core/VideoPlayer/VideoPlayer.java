@@ -46,30 +46,23 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     //d) Receiving Data from a file in the phone file system
     public void addAndStartDecoderReceiver(Surface surface){
         nativeStart(nativeVideoPlayer,surface,context.getAssets());
-        if(mVideoParamsChanged !=null){
-            final INativeVideoParamsChanged interfaceVideoParamsChanged=this;
-            Log.d(TAG,"Starting timer");
-            //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
-            //TODO: proper queue, but how to do synchronization in java ndk ?!
-            timer=new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    nativeCallBack(interfaceVideoParamsChanged,nativeVideoPlayer);
-                }
-            },0,500);
-        }
+        //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
+        //TODO: proper queue, but how to do synchronization in java ndk ?!
+        timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                nativeCallBack(VideoPlayer.this,nativeVideoPlayer);
+            }
+        },0,500);
     }
 
     //Stop the Receiver
     //Stop the Decoder
     //Free resources
     public void stopAndRemoveReceiverDecoder(){
-        if(mVideoParamsChanged !=null){
-            timer.cancel();
-            timer.purge();
-            Log.d(TAG,"Stopped timer");
-        }
+        timer.cancel();
+        timer.purge();
         nativeStop(nativeVideoPlayer);
     }
 
