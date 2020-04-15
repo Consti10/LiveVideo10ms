@@ -54,7 +54,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
             public void run() {
                 nativeCallBack(VideoPlayer.this,nativeVideoPlayer);
             }
-        },0,500);
+        },0,200);
     }
 
     //Stop the Receiver
