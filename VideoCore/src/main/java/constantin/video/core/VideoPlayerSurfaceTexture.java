@@ -3,13 +3,14 @@ package constantin.video.core;
 
 import android.graphics.SurfaceTexture;
 import android.view.Surface;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import constantin.video.core.VideoPlayer.VideoSettings;
 import constantin.video.core.VideoPlayer.VideoPlayer;
+import constantin.video.core.VideoPlayer.VideoSettings;
 
 
 /**

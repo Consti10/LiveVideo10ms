@@ -2,11 +2,9 @@ package constantin.video.core.VideoPlayer;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Surface;
 
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 

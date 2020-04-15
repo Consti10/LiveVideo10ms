@@ -1,7 +1,5 @@
 package constantin.video.example
 
-import androidx.appcompat.app.AppCompatActivity
-
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
@@ -12,13 +10,12 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
-
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jaredrummler.android.device.DeviceName
-
 import java.text.DecimalFormat
-import java.util.ArrayList
+import java.util.*
 
 
 @SuppressLint("SetTextI18n")

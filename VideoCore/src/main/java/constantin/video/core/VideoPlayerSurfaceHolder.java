@@ -16,14 +16,16 @@ public class VideoPlayerSurfaceHolder implements SurfaceHolder.Callback{
 
     private final VideoPlayer videoPlayer;
 
-    public VideoPlayerSurfaceHolder(final Context context, final SurfaceView surfaceView, final IVideoParamsChanged iVideoParamsChanged){
-        videoPlayer=new VideoPlayer(context,iVideoParamsChanged);
+    public VideoPlayerSurfaceHolder(final Context context, final SurfaceView surfaceView){
+        videoPlayer=new VideoPlayer(context,null);
         surfaceView.getHolder().addCallback(this);
     }
 
     public long GetExternalGroundRecorder(){
         return VideoPlayer.nativeGetExternalGroundRecorder(videoPlayer.getNativeInstance());
-        //return 0;
+    }
+    public void setIVideoParamsChanged(final IVideoParamsChanged vpc){
+        videoPlayer.setIVideoParamsChanged(vpc);
     }
 
     @Override
