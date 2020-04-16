@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import javax.annotation.Nullable;
 
 import constantin.video.core.DecodingInfo;
-import constantin.video.core.VideoPlayer.VideoPlayer;
+import constantin.video.core.video_player.VideoPlayer;
 
 
 @LargeTest

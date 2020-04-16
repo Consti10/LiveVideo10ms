@@ -1,4 +1,4 @@
-package constantin.video.core.VideoPlayer;
+package constantin.video.core.video_player;
 
 //These methods are called by the native code.
 //See also IVideoParamsChanged

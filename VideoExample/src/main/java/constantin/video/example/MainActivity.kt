@@ -17,7 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
-import constantin.video.core.VideoPlayer.VideoSettings
+import constantin.video.core.video_player.VideoSettings
 import java.util.*
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {

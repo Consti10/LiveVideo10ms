@@ -5,7 +5,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import constantin.video.core.VideoPlayer.VideoPlayer;
+import constantin.video.core.video_player.VideoPlayer;
 
 public class VideoPlayerSurfaceHolder implements SurfaceHolder.Callback{
 

@@ -184,7 +184,7 @@ std::string VideoPlayer::getInfoString(){
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
-      Java_constantin_video_core_VideoPlayer_VideoPlayer_##method_name
+      Java_constantin_video_core_video_1player_VideoPlayer_##method_name
 
 inline jlong jptr(VideoPlayer *videoPlayerN) {
     return reinterpret_cast<intptr_t>(videoPlayerN);

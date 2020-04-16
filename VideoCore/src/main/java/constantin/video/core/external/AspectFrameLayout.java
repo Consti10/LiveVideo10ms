@@ -1,4 +1,4 @@
-package constantin.video.core.External;
+package constantin.video.core.external;
 
 import android.content.Context;
 import android.util.AttributeSet;

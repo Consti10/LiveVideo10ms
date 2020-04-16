@@ -18,11 +18,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
 import constantin.video.core.DecodingInfo
-import constantin.video.core.External.AspectFrameLayout
 import constantin.video.core.IVideoParamsChanged
-import constantin.video.core.VideoPlayer.VideoPlayer
-import constantin.video.core.VideoPlayer.VideoSettings
+import constantin.video.core.video_player.VideoSettings
 import constantin.video.core.VideoPlayerSurfaceHolder
+import constantin.video.core.external.AspectFrameLayout
 
 const val ID_OS_VERSIONS : String ="OSVersions";
 const val ID_BUILD_MODEL : String ="BuildModel";

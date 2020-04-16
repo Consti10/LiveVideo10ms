@@ -10,7 +10,7 @@
     android:background="@android:color/black"
     tools:context=".VideoActivity">
 
-    <constantin.video.core.External.AspectFrameLayout
+    <constantin.video.core.external.AspectFrameLayout
         android:id="@+id/afl_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"/>
 
-    </constantin.video.core.External.AspectFrameLayout>
+    </constantin.video.core.external.AspectFrameLayout>
 
     <Button
         android:layout_width="50dp"

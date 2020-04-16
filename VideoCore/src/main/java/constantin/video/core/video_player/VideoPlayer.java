@@ -1,8 +1,7 @@
-package constantin.video.core.VideoPlayer;
+package constantin.video.core.video_player;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.util.Log;
 import android.view.Surface;
 
 import androidx.annotation.Nullable;
