@@ -14,6 +14,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 //Provides conv
 public class VideoSettings {
+    public enum VS_SOURCE{UDP,FILE,ASSETS,FFMPEG,EXTERNAL}
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
@@ -22,16 +23,16 @@ public class VideoSettings {
         return tempFile.exists();
     }
 
-    public static VideoPlayer.VS_SOURCE getVS_SOURCE(final Context context){
+    public static VS_SOURCE getVS_SOURCE(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         final int val=sharedPreferences.getInt(context.getString(R.string.VS_SOURCE),0);
-        VideoPlayer.VS_SOURCE ret= VideoPlayer.VS_SOURCE.values()[val];
+        VS_SOURCE ret= VS_SOURCE.values()[val];
         sharedPreferences.getInt(context.getString(R.string.VS_SOURCE),0);
         return ret;
     }
 
     @SuppressLint("ApplySharedPref")
-    public static void setVS_SOURCE(final Context context, final VideoPlayer.VS_SOURCE val){
+    public static void setVS_SOURCE(final Context context, final VS_SOURCE val){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);
         sharedPreferences.edit().putInt(context.getString(R.string.VS_SOURCE),val.ordinal()).commit();
     }

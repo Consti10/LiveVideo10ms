@@ -15,13 +15,6 @@ import constantin.video.core.IVideoParamsChanged;
 //Convenient wrapper around the native functions from VideoNative
 public class VideoPlayer implements INativeVideoParamsChanged {
     private static final String TAG="VideoPlayer";
-    public static final int VS_SOURCE_UDP=0;
-    public static final int VS_SOURCE_FILE=1;
-    public static final int VS_SOURCE_ASSETS =2;
-    public static final int VS_SOURCE_FFMPEG_URL=3;
-    public static final int VS_SOURCE_EXTERNAL=4;
-    public enum VS_SOURCE{UDP,FILE,ASSETS,FFMPEG,EXTERNAL}
-    //Members
     private final long nativeVideoPlayer;
     private IVideoParamsChanged mVideoParamsChanged;
     private final Context context;

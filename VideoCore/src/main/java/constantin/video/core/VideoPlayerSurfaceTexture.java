@@ -28,7 +28,7 @@ public class VideoPlayerSurfaceTexture implements LifecycleObserver, ISurfaceTex
     private Surface mVideoSurface;
 
     public VideoPlayerSurfaceTexture(final AppCompatActivity parent, final IVideoParamsChanged vpc, final String assetsFilename){
-        VideoSettings.setVS_SOURCE(parent, VideoPlayer.VS_SOURCE.ASSETS);
+        VideoSettings.setVS_SOURCE(parent, VideoSettings.VS_SOURCE.ASSETS);
         VideoSettings.setVS_ASSETS_FILENAME_TEST_ONLY(parent,assetsFilename);
         VideoSettings.setVS_FILE_ONLY_LIMIT_FPS(parent,40);
         this.parent=parent;
