@@ -5,6 +5,8 @@ import android.content.res.AssetManager;
 import android.util.Log;
 import android.view.Surface;
 
+import androidx.annotation.Nullable;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,7 +24,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     //Setup as much as possible without creating the decoder
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
-    public VideoPlayer(final Context context,final IVideoParamsChanged iVideoParamsChanged){
+    public VideoPlayer(final Context context,@Nullable final IVideoParamsChanged iVideoParamsChanged){
         this.mVideoParamsChanged =iVideoParamsChanged;
         this.context=context;
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
@@ -30,6 +32,10 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged){
         mVideoParamsChanged=iVideoParamsChanged;
+    }
+
+    public long getExternalGroundRecorder(){
+        return nativeGetExternalGroundRecorder(nativeVideoPlayer);
     }
 
     //Depending on the selected Settings, this starts either

@@ -9,6 +9,7 @@ import android.graphics.SurfaceTexture;
  */
 public interface ISurfaceTextureAvailable{
     /**
+     * Called by the OpenGL thread
      *@param surfaceTexture: A valid surface texture created by the OpenGL thread
      */
     public void onSurfaceTextureAvailable(final SurfaceTexture surfaceTexture);
