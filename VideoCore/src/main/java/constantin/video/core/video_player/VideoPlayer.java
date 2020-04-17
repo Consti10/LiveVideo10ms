@@ -36,7 +36,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     public long getExternalGroundRecorder(){
         return nativeGetExternalGroundRecorder(nativeVideoPlayer);
     }
-    public long GetExternalFilePlayer(){
+    public long getExternalFilePlayer(){
         return nativeGetExternalFileReader(nativeVideoPlayer);
     }
 

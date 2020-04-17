@@ -119,12 +119,12 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const bool useAsset=VS_SOURCE==ASSETS;
             const std::string filename = useAsset ?  mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264") :
                     mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            mFileReceiver.addCallBack(
-                    [this](const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
-                        if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
-                            onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW, -1);
-                        }
-                    });
+            const auto cb=[this](const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
+                if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
+                    onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW, -1);
+                }
+            };
+            mFileReceiver.setCallBack(0,cb);
             mFileReceiver.startReading(useAsset ? assetManager : nullptr,filename);
         }
         break;

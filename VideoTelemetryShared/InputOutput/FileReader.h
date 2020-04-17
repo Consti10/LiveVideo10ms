@@ -14,6 +14,7 @@
 #include <android/log.h>
 #include <sstream>
 #include <fstream>
+#include <array>
 #include "GroundRecorderFPV.hpp"
 
 //Creates a new thread that 'receives' data from File and forwards data
@@ -25,8 +26,8 @@ class FileReader{
 public:
     typedef std::function<void(const uint8_t[],std::size_t,GroundRecorderFPV::PACKET_TYPE)> RAW_DATA_CALLBACK;
 private:
-    // This one is to also forward data to telemetry receiver when using .fpv file
-    std::vector<const RAW_DATA_CALLBACK>  onDataReceivedCallbacks;
+    // The second callback is to also forward data to telemetry receiver when using .fpv file
+    std::array<RAW_DATA_CALLBACK,2>  onDataReceivedCallbacks;
     const std::size_t CHUNK_SIZE;
     //if assetManager!=nullptr the filename is relative to the assets directory,else normal filesystem
     std::string FILEPATH;
@@ -58,8 +59,8 @@ public:
         receiving=true;
         mThread=std::make_unique<std::thread>([this]{this->receiveLoop();} );
     }
-    void addCallBack(const RAW_DATA_CALLBACK cb){
-        onDataReceivedCallbacks.push_back(cb);
+    void setCallBack(const int idx,const RAW_DATA_CALLBACK cb){
+        onDataReceivedCallbacks.at(idx)=cb;
     }
     /**
      * After this call returns it is guaranteed that no more data will be fed trough the callback
