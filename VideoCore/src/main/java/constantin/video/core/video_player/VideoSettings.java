@@ -15,6 +15,7 @@ import static android.content.Context.MODE_PRIVATE;
 //Provides conv
 public class VideoSettings {
     public enum VS_SOURCE{UDP,FILE,ASSETS,FFMPEG,EXTERNAL}
+    public static final int VIDEO_MODE_2D_MONOSCOPIC=0;
 
     public static boolean PLAYBACK_FLE_EXISTS(final Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video", MODE_PRIVATE);

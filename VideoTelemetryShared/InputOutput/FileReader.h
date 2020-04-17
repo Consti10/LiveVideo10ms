@@ -9,7 +9,6 @@
 #include <vector>
 #include <chrono>
 #include <string>
-
 #include <media/NdkMediaExtractor.h>
 #include <thread>
 #include <android/log.h>
@@ -26,10 +25,11 @@ class FileReader{
 public:
     typedef std::function<void(const uint8_t[],std::size_t,GroundRecorderFPV::PACKET_TYPE)> RAW_DATA_CALLBACK;
 private:
-    const RAW_DATA_CALLBACK onDataReceivedCallback;
+    // This one is to also forward data to telemetry receiver when using .fpv file
+    std::vector<const RAW_DATA_CALLBACK>  onDataReceivedCallbacks;
     const std::size_t CHUNK_SIZE;
     //if assetManager!=nullptr the filename is relative to the assets directory,else normal filesystem
-    const std::string FILEPATH;
+    std::string FILEPATH;
     //Cannot make const since the functions it is called with are not marked const
     AAssetManager* assetManager;
     std::unique_ptr<std::thread> mThread;
@@ -41,27 +41,35 @@ private:
 public:
     /**
      * Does nothing until startReading is called
-     * @param assetManager use nullptr for 'normal' files, else a valid android asset manager
-     * @param path Path to file,depends on assetManager if relative to file or asset
      * @param onDataReceivedCallback callback that is called with the loaded data from the receiving thread
      * @param chunkSize Determines how big the data chunks are that are fed to the parser. The smaller the chunk size
      * The faster does the onDataReceivedCallback() return
      * Therefore allowing the file receiver to stop and exit quicker
      */
-    FileReader(AAssetManager* assetManager, const std::string PATH, RAW_DATA_CALLBACK onDataReceivedCallback,bool syncOnTelemetry, std::size_t chunkSize=1024):
-            assetManager(assetManager), FILEPATH(PATH), CHUNK_SIZE(chunkSize), onDataReceivedCallback(onDataReceivedCallback),syncOnTelemetry(syncOnTelemetry){
+    FileReader(bool syncOnTelemetry, std::size_t chunkSize=1024):
+            CHUNK_SIZE(chunkSize),syncOnTelemetry(syncOnTelemetry){
     }
     /**
      * Create and start the receiving thread, which will run until stopReading() is called.
+     * @param assetManager use nullptr for 'normal' files, else a valid android asset manager
+     * @param FILEPATH Path to file,depends on assetManager if relative to file or asset
      */
-    void startReading(){
+    void startReading(AAssetManager* assetManager,const std::string FILEPATH){
+        this->assetManager=assetManager;
+        this->FILEPATH=FILEPATH;
         receiving=true;
         mThread=std::make_unique<std::thread>([this]{this->receiveLoop();} );
     }
+    void addCallBack(const RAW_DATA_CALLBACK cb){
+        onDataReceivedCallbacks.push_back(cb);
+    }
     /**
-     * After stopReading() it is guaranteed that no more data will be fed trough the callback
+     * After this call returns it is guaranteed that no more data will be fed trough the callback
      */
-    void stopReading(){
+    void stopReadingIfStarted(){
+        if(receiving== false){
+            return;
+        }
         receiving=false;
         if(mThread->joinable()){
             mThread->join();

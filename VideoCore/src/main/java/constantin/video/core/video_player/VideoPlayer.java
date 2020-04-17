@@ -36,6 +36,9 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     public long getExternalGroundRecorder(){
         return nativeGetExternalGroundRecorder(nativeVideoPlayer);
     }
+    public long GetExternalFilePlayer(){
+        return nativeGetExternalFileReader(nativeVideoPlayer);
+    }
 
     //Depending on the selected Settings, this starts either
     //a) Receiving RAW over UDP
@@ -120,6 +123,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
     public static native boolean receivingVideoButCannotParse(long nativeInstance);
     public static native long nativeGetExternalGroundRecorder(long nativeInstance);
+    public static native long nativeGetExternalFileReader(long nativeInstance);
 
     //call this via java to run the callback(s)
     //TODO: Use message queue from cpp for performance

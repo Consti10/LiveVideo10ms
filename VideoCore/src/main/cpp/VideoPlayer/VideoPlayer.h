@@ -32,20 +32,19 @@ private:
     SettingsN mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
-    std::array<uint8_t,1024*1024> tmpBuff;
-    int tmpBuffSize=0;
 public:
     H264Parser mParser;
     std::unique_ptr<LowLagDecoder> mLowLagDecoder;
     std::unique_ptr<FFMpegVideoReceiver> mFFMpegVideoReceiver;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
-    std::unique_ptr<FileReader> mFileReceiver;
     long nNALUsAtLastCall=0;
 public:
     DecodingInfo latestDecodingInfo;
     std::atomic<bool> latestDecodingInfoChanged;
     VideoRatio latestVideoRatio;
     std::atomic<bool> latestVideoRatioChanged;
+    // These are shared with telemetry receiver when recording / reading from .fpv files
+    FileReader mFileReceiver;
     GroundRecorderFPV mGroundRecorderFPV;
 private:
     //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms

@@ -93,11 +93,15 @@ void FileReader::passDataInChunks(const uint8_t *data, const size_t size,
         const ssize_t len_left=len-offset;
         if(len_left>=CHUNK_SIZE){
             nReceivedB+=CHUNK_SIZE;
-            onDataReceivedCallback(&data[offset],CHUNK_SIZE,packetType);
+            for(const RAW_DATA_CALLBACK& cb: onDataReceivedCallbacks){
+                cb(&data[offset],CHUNK_SIZE,packetType);
+            }
             offset+=CHUNK_SIZE;
         }else{
             nReceivedB+=len_left;
-            onDataReceivedCallback(&data[offset],(size_t)len_left,packetType);
+            for(const RAW_DATA_CALLBACK& cb: onDataReceivedCallbacks){
+                cb(&data[offset],(size_t)len_left,packetType);
+            }
             return;
         }
     }

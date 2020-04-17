@@ -18,7 +18,8 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
     mSettingsN(env,context,"pref_video",true),
     GROUND_RECORDING_DIRECTORY(DIR),
-    mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY){
+    mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
+    mFileReceiver(false, 1024){
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
@@ -118,13 +119,13 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const bool useAsset=VS_SOURCE==ASSETS;
             const std::string filename = useAsset ?  mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264") :
                     mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            mFileReceiver = std::make_unique<FileReader>(useAsset ? assetManager : nullptr,filename, [this, VS_FILE_ONLY_LIMIT_FPS](
-                    const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
-                if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
-                    onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW, -1);
-                }
-            },false, 1024);
-            mFileReceiver->startReading();
+            mFileReceiver.addCallBack(
+                    [this](const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
+                        if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
+                            onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW, -1);
+                        }
+                    });
+            mFileReceiver.startReading(useAsset ? assetManager : nullptr,filename);
         }
         break;
         case VIA_FFMPEG_URL:{
@@ -155,12 +156,9 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
 void VideoPlayer::stopReceiver() {
     if(mUDPReceiver){
         mUDPReceiver->stopReceiving();
-       mUDPReceiver.reset();
+        mUDPReceiver.reset();
     }
-    if(mFileReceiver){
-        mFileReceiver->stopReading();
-        mFileReceiver.reset();
-    }
+    mFileReceiver.stopReadingIfStarted();
     if(mFFMpegVideoReceiver){
         mFFMpegVideoReceiver->shutdown_callback();
         mFFMpegVideoReceiver->stop_playing();
@@ -271,6 +269,11 @@ JNI_METHOD(jlong , nativeGetExternalGroundRecorder)
 (JNIEnv *env,jclass jclass1,jlong instance) {
     VideoPlayer* p=native(instance);
     return (jlong) &p->mGroundRecorderFPV;
+}
+JNI_METHOD(jlong , nativeGetExternalFileReader)
+(JNIEnv *env,jclass jclass1,jlong instance) {
+    VideoPlayer* p=native(instance);
+    return (jlong) &p->mFileReceiver;
 }
 
 JNI_METHOD(void,nativeCallBack)
