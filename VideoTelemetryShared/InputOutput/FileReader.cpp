@@ -42,19 +42,10 @@ void FileReader::receiveLoop() {
         const auto start=std::chrono::steady_clock::now();
         FileReaderFPV::readFpvAssetOrFileInChunks(assetManager,FILEPATH, [this,start](const uint8_t *data,const GroundRecorderFPV::StreamPacket header) {
             //sync the timestamp when data was received with the timestamp from file
-            if(header.packet_type==0 && !syncOnTelemetry){
-                auto elapsed=std::chrono::steady_clock::now()-start;
-                //wait until we are at least at the time when data was received
-                while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
-                    elapsed=std::chrono::steady_clock::now()-start;
-                }
-            }
-            if(header.packet_type>GroundRecorderFPV::PACKET_TYPE_VIDEO_H264 && header.packet_type<GroundRecorderFPV::PACKET_TYPE_TELEMETRY_EZWB && syncOnTelemetry){
-                auto elapsed=std::chrono::steady_clock::now()-start;
-                //wait until we are at least at the time when data was received
-                while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
-                    elapsed=std::chrono::steady_clock::now()-start;
-                }
+            auto elapsed=std::chrono::steady_clock::now()-start;
+            //wait until we are at least at the time when data was received
+            while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
+                elapsed=std::chrono::steady_clock::now()-start;
             }
             passDataInChunks(data,header.packet_length,header.packet_type);
         }, receiving,false);

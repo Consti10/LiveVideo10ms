@@ -36,8 +36,6 @@ private:
     std::atomic<bool> receiving;
     int nReceivedB=0;
     void receiveLoop();
-    //if true, the receiving thread waits for the right time with .fpv type files on telemetry
-    const bool syncOnTelemetry;
 public:
     /**
      * Does nothing until startReading is called
@@ -46,8 +44,8 @@ public:
      * The faster does the onDataReceivedCallback() return
      * Therefore allowing the file receiver to stop and exit quicker
      */
-    FileReader(bool syncOnTelemetry, std::size_t chunkSize=1024):
-            CHUNK_SIZE(chunkSize),syncOnTelemetry(syncOnTelemetry){
+    FileReader(std::size_t chunkSize=1024):
+            CHUNK_SIZE(chunkSize){
     }
     /**
      * Create and start the receiving thread, which will run until stopReading() is called.

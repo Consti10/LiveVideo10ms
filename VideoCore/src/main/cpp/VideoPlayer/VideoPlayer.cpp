@@ -19,7 +19,7 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mSettingsN(env,context,"pref_video",true),
     GROUND_RECORDING_DIRECTORY(DIR),
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
-    mFileReceiver(false, 1024){
+    mFileReceiver(1024){
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
