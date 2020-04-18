@@ -119,7 +119,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const bool useAsset=VS_SOURCE==ASSETS;
             const std::string filename = useAsset ?  mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264") :
                     mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
-            if(FileHelper::endsWith(filename, ".h264")){
+            if(!FileHelper::endsWith(filename, ".fpv")){
                 mParser.setLimitFPS(VS_FILE_ONLY_LIMIT_FPS);
             }
             const auto cb=[this](const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
