@@ -20,8 +20,8 @@ import com.google.firebase.firestore.SetOptions
 import constantin.video.core.DecodingInfo
 import constantin.video.core.IVideoParamsChanged
 import constantin.video.core.video_player.VideoSettings
-import constantin.video.core.VideoPlayerSurfaceHolder
 import constantin.video.core.external.AspectFrameLayout
+import constantin.video.core.video_player.VideoPlayer
 
 const val ID_OS_VERSIONS : String ="OSVersions";
 const val ID_BUILD_MODEL : String ="BuildModel";
@@ -30,15 +30,14 @@ const val ID_BUILD_MANUFACTURER : String = "BuildManufacturer";
 
 class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsChanged {
     private val TAG = this::class.java.simpleName
-    private var context: Context? = null
-    private var mAspectFrameLayout: AspectFrameLayout? = null
+    private lateinit var context: Context;
+    private lateinit var mAspectFrameLayout: AspectFrameLayout;
     //private var mVideoPlayer: VideoPlayer? = null
-    private var mVideoPlayer: VideoPlayerSurfaceHolder?=null
-    private var mTextViewStatistics : TextView?=null;
+    private lateinit var mVideoPlayer: VideoPlayer;
+    private lateinit var mTextViewStatistics : TextView;
 
     var mDecodingInfo: DecodingInfo? = null
         private set
-    internal var lastLogMS = System.currentTimeMillis()
     private var VS_SOURCE: Int = 0
     private var VS_ASSETS_FILENAME_TEST_ONLY: String? = ""
     private val DECODING_INFO: String ="DecodingInfo2";
@@ -51,8 +50,8 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         //
         val surfaceView = findViewById<SurfaceView>(R.id.sv_video)
         surfaceView.holder.addCallback(this)
-        mVideoPlayer= VideoPlayerSurfaceHolder(this,surfaceView);
-        mVideoPlayer!!.setIVideoParamsChanged(this)
+        mVideoPlayer= VideoPlayer(this,this)
+        surfaceView!!.holder.addCallback(mVideoPlayer.configure1())
 
         mAspectFrameLayout = findViewById(R.id.afl_video)
         mTextViewStatistics=findViewById(R.id.tv_decoding_stats)
@@ -60,11 +59,11 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         //is disabled and the view showing decoding stats is enabled
         val toggleButton=findViewById<Button>(R.id.tb_show_decoding_info);
         toggleButton.setOnClickListener{
-            mTextViewStatistics!!.visibility= View.VISIBLE;
+            mTextViewStatistics.visibility= View.VISIBLE;
             toggleButton.visibility=View.INVISIBLE;
         }
-        mTextViewStatistics!!.setOnClickListener{
-            mTextViewStatistics!!.visibility= View.INVISIBLE;
+        mTextViewStatistics.setOnClickListener{
+            mTextViewStatistics.visibility= View.INVISIBLE;
             toggleButton.visibility=View.VISIBLE;
         }
     }
