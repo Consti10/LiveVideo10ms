@@ -19,7 +19,7 @@ class VideoPlayer{
 public:
     VideoPlayer(JNIEnv * env, jobject context, const char* DIR);
     enum VIDEO_DATA_TYPE{RAW,RTP,DJI};
-    void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType,const int limitFPS);
+    void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType);
     void addConsumers(JNIEnv* env,jobject surface);
     void removeConsumers();
     void startReceiver(JNIEnv *env, AAssetManager *assetManager);

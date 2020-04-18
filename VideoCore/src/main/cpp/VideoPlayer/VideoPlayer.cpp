@@ -23,8 +23,7 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
-void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType,const int maxFPS=-1){
-    mParser.setLimitFPS(maxFPS);
+void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType){
     //MLOGD("onNewVideoData %d",data_length);
     switch(videoDataType){
         case VIDEO_DATA_TYPE::RAW:
@@ -94,6 +93,7 @@ void VideoPlayer::removeConsumers(){
 
 void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
     mSettingsN.replaceJNI(env);
+    mParser.setLimitFPS(-1); //Default: Real time !
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
     const int VS_FILE_ONLY_LIMIT_FPS=mSettingsN.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS,60);
 
@@ -110,7 +110,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
             mUDPReceiver=std::make_unique<UDPReceiver>(VS_PORT, "VideoPlayer VideoReceiver", CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,useRTP](const uint8_t* data, size_t data_length) {
-                onNewVideoData(data,data_length,useRTP ? VIDEO_DATA_TYPE::RTP : VIDEO_DATA_TYPE::RAW,-1);
+                onNewVideoData(data,data_length,useRTP ? VIDEO_DATA_TYPE::RTP : VIDEO_DATA_TYPE::RAW);
             }, WANTED_UDP_RCVBUF_SIZE);
             mUDPReceiver->startReceiving();
         }break;
@@ -119,9 +119,12 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             const bool useAsset=VS_SOURCE==ASSETS;
             const std::string filename = useAsset ?  mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264") :
                     mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
+            if(FileHelper::endsWith(filename, ".h264")){
+                mParser.setLimitFPS(VS_FILE_ONLY_LIMIT_FPS);
+            }
             const auto cb=[this](const uint8_t *data, size_t data_length,GroundRecorderFPV::PACKET_TYPE packetType) {
                 if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
-                    onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW, -1);
+                    onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW);
                 }
             };
             mFileReceiver.setCallBack(0,cb);
@@ -137,7 +140,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
             //MLOGD("url:%s",url.c_str());
             mFFMpegVideoReceiver=std::make_unique<FFMpegVideoReceiver>(url,0,[this](uint8_t* data,int data_length) {
-                onNewVideoData(data,(size_t)data_length,VIDEO_DATA_TYPE::RAW,-1);
+                onNewVideoData(data,(size_t)data_length,VIDEO_DATA_TYPE::RAW);
             },[this](const NALU& nalu) {
                 onNewNALU(nalu);
             });
@@ -227,7 +230,7 @@ JNI_METHOD(void, nativePassNALUData)
 (JNIEnv *env,jclass jclass1,jlong videoPlayerN,jbyteArray b,jint offset,jint length){
     jbyte *arrayP=env->GetByteArrayElements(b, nullptr);
     auto * p=(uint8_t*)arrayP;
-    native(videoPlayerN)->onNewVideoData(&p[(int) offset], (size_t)length,VideoPlayer::VIDEO_DATA_TYPE::DJI,-1);
+    native(videoPlayerN)->onNewVideoData(&p[(int) offset], (size_t)length,VideoPlayer::VIDEO_DATA_TYPE::DJI);
     env->ReleaseByteArrayElements(b,arrayP,0);
 }
 
