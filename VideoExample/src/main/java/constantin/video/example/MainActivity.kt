@@ -17,20 +17,22 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
+import constantin.video.core.RequestPermissionHelper
 import constantin.video.core.video_player.VideoSettings
 import java.util.*
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
-    private var spinnerVideoTestFileFromAssets: Spinner?=null;
-    private var context: Context?=null;
-    private val missingPermission = ArrayList<String>()
-
+    private lateinit var spinnerVideoTestFileFromAssets: Spinner;
+    private lateinit var context: Context;
+    private val permissionHelper=RequestPermissionHelper(
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+    );
 
     @SuppressLint("ApplySharedPref")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        checkAndRequestPermissions()
+        permissionHelper.checkAndRequestPermissions(this)
         VideoSettings.initializePreferences(this, false)
         context = this
 
@@ -38,11 +40,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val adapter = ArrayAdapter.createFromResource(this,
                 R.array.video_test_files, android.R.layout.simple_spinner_item)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerVideoTestFileFromAssets!!.adapter = adapter
+        spinnerVideoTestFileFromAssets.adapter = adapter
         //
         val startVideoActivity = findViewById<Button>(R.id.b_startVideoActivity)
         startVideoActivity.setOnClickListener {
-            val selectedTestFile = spinnerVideoTestFileFromAssets!!.selectedItemPosition
+            val selectedTestFile = spinnerVideoTestFileFromAssets.selectedItemPosition
             val preferences = getSharedPreferences("pref_video", Context.MODE_PRIVATE)
             preferences.edit().putString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), ASSETS_TEST_VIDEO_FILE_NAMES[selectedTestFile]).commit()
             val intentVideoActivity = Intent()
@@ -61,51 +63,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onResume() {
-        spinnerVideoTestFileFromAssets!!.isEnabled =
+        spinnerVideoTestFileFromAssets.isEnabled =
                 getSharedPreferences("pref_video", Context.MODE_PRIVATE).getInt(getString(R.string.VS_SOURCE), 0) == 2
         super.onResume()
     }
 
-
     override fun onClick(v: View) {}
 
-    private fun checkAndRequestPermissions() {
-        missingPermission.clear()
-        for (eachPermission in REQUIRED_PERMISSION_LIST) {
-            if (ContextCompat.checkSelfPermission(this, eachPermission) != PackageManager.PERMISSION_GRANTED) {
-                missingPermission.add(eachPermission)
-            }
-        }
-        if (!missingPermission.isEmpty()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val asArray = missingPermission.toTypedArray()
-                Log.d("PermissionManager", "Request: " + Arrays.toString(asArray))
-                ActivityCompat.requestPermissions(this, asArray, REQUEST_PERMISSION_CODE)
-            }
-        }
-    }
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        // Check for granted permission and remove from missing list
-        if (requestCode == REQUEST_PERMISSION_CODE) {
-            for (i in grantResults.indices.reversed()) {
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    missingPermission.remove(permissions[i])
-                }
-            }
-        }
-        if (!missingPermission.isEmpty()) {
-            checkAndRequestPermissions()
-        }
-
+        permissionHelper.onRequestPermissionsResult(requestCode,permissions,grantResults)
     }
 
     public companion object {
-        private val REQUIRED_PERMISSION_LIST = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
-        private val REQUEST_PERMISSION_CODE = 12345
         public val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("x264/testVideo.h264", "rpi_cam/rpi.h264","webcam/720p_usb.h264","360/insta_interference.h264",
                 "360/insta_webbn_1_shortened.h264","360/insta_webbn_2.h264","360/insta_mjpeg_test.mp4"
                 //,"360/insta_mjpeg_test.h264")
