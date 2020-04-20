@@ -1,8 +1,6 @@
 package constantin.video.example;
 
-
-//Open and close the video activity repeatedly fast which should not
-//but currently can result in crashes
+// Play all the test vides for N_ITERATIONS times
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,10 +16,11 @@ import javax.annotation.Nullable;
 
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.video_player.VideoPlayer;
+import constantin.video.core.video_player.VideoSettings;
 
 public class PlayTestVideosRepeated {
     private static final int WAIT_TIME_SHORT = 5*1000; //n seconds
-    private static final int N_ITERATIONS=10;
+    private static final int N_ITERATIONS=1;
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -36,10 +35,9 @@ public class PlayTestVideosRepeated {
                     "android.permission.INTERNET");
 
 
-    private void writeVideoSource(final int videoSource){
+    private void writeVideoSource(final VideoSettings.VS_SOURCE videoSource){
         final Context context=mActivityTestRule.getActivity();
-        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
-        sharedPreferences.edit().putInt(context.getString(R.string.VS_SOURCE),videoSource).commit();
+        VideoSettings.setVS_SOURCE(context,videoSource);
     }
 
     //Dang, I cannot get the Spinner work with an Espresso test
@@ -71,15 +69,13 @@ public class PlayTestVideosRepeated {
 
     @Test
     public void playAllTestVideosTest() {
-        writeVideoSource(VideoPlayer.VS_SOURCE_ASSETS);
+        writeVideoSource(VideoSettings.VS_SOURCE.ASSETS);
         //Alternating, play x264 test video ,rpi cam, webcam
         for(int i=0;i<N_ITERATIONS;i++){
-            selectVideoFilename(0);
-            testPlayVideo();
-            selectVideoFilename(1);
-            testPlayVideo();
-            selectVideoFilename(2);
-            testPlayVideo();
+            for(int j=0;j<7;j++){
+                selectVideoFilename(j);
+                testPlayVideo();
+            }
         }
     }
 
