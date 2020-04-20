@@ -98,7 +98,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         return;
     }
     AMediaCodec_start(decoder.codec);
-    mCheckOutputThread=new std::thread([this] { this->checkOutputLoop(); });
+    mCheckOutputThread=new std::thread(&LowLagDecoder::checkOutputLoop,this);
     decoder.configured=true;
 }
 
@@ -141,7 +141,6 @@ void LowLagDecoder::checkOutputLoop() {
             decoderProducedUnknown=true;
             continue;
         }
-        //Recalculate the
         //every 2 seconds recalculate the current fps and bitrate
         const auto now=steady_clock::now();
         const auto delta=now-decodingInfo.lastCalculation;
