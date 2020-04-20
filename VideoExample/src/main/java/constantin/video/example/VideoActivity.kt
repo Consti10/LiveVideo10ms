@@ -50,7 +50,8 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         //
         val surfaceView = findViewById<SurfaceView>(R.id.sv_video)
         surfaceView.holder.addCallback(this)
-        mVideoPlayer= VideoPlayer(this,this)
+        mVideoPlayer= VideoPlayer(this)
+        mVideoPlayer.setIVideoParamsChanged(this)
         surfaceView!!.holder.addCallback(mVideoPlayer.configure1())
 
         mAspectFrameLayout = findViewById(R.id.afl_video)

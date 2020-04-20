@@ -49,7 +49,7 @@ namespace FileReaderMP4{
     }
     /**
      * Open mp4 file, extract data as h264 bitstream
-     * Iff @param assetManager != nullptr, @param FILENAME points to android asset file,else to a file on the phone file system
+     * If @param assetManager != nullptr, @param FILENAME points to android asset file,else to a file on the phone file system
      * @param receiving termination condition (loops until receiving==false)
      */
     static void readMP4FileInChunks(AAssetManager *assetManager,const std::string &FILENAME,RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate,const bool loopAtEndOfFile=true) {
