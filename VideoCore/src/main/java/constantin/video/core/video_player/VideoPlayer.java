@@ -31,8 +31,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     //Setup as much as possible without creating the decoder
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
-    public VideoPlayer(final Context context,@Nullable final IVideoParamsChanged iVideoParamsChanged){
-        this.mVideoParamsChanged =iVideoParamsChanged;
+    public VideoPlayer(final Context context){
         this.context=context;
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
     }

@@ -28,7 +28,7 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
 
     public <T extends Activity & LifecycleOwner> TestReceiverVideo(final T parent){
         this.activity=parent;
-        videoPlayer=new VideoPlayer(activity,null);
+        videoPlayer=new VideoPlayer(activity);
         parent.getLifecycle().addObserver(this);
     }
 

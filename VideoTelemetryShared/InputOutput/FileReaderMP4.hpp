@@ -52,7 +52,7 @@ namespace FileReaderMP4{
      * Iff @param assetManager != nullptr, @param FILENAME points to android asset file,else to a file on the phone file system
      * @param receiving termination condition (loops until receiving==false)
      */
-    static void readMP4FileInChunks(AAssetManager *assetManager,const std::string &FILENAME,RAW_DATA_CALLBACK callback,const std::atomic<bool>& receiving,const bool loopAtEndOfFile=true) {
+    static void readMP4FileInChunks(AAssetManager *assetManager,const std::string &FILENAME,RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate,const bool loopAtEndOfFile=true) {
         int fileOffset=0;
         int fileSize;
         int fd;
@@ -126,7 +126,7 @@ namespace FileReaderMP4{
         //We cannot allocate such a big object on the stack, so we need to wrap into unique ptr
         const auto sampleBuffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
         //warning 'not updated' is no problem, since passed by reference
-        while(receiving){
+        while(shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout){
             const auto sampleSize=AMediaExtractor_readSampleData(extractor,sampleBuffer->data(),sampleBuffer->size());
             if(sampleSize<=0){
                 if(loopAtEndOfFile){
@@ -156,14 +156,15 @@ namespace FileReaderMP4{
     loadConvertMP4AssetFileIntoMemory(AAssetManager *assetManager, const std::string &path){
         //This will save all data as RAW
         //SPS/PPS in the beginning, rest afterwards
-        std::atomic<bool> fill=true;
+        std::promise<void> exitSignal;
+        std::future<void> futureObj = exitSignal.get_future();
         std::vector<uint8_t> rawData;
         rawData.reserve(1024*1024);
         readMP4FileInChunks(assetManager,path, [&rawData](const uint8_t* d,int len) {
             const auto offset=rawData.size();
             rawData.resize(rawData.size()+len);
             memcpy(&rawData.at(offset),d,(size_t)len);
-        },fill,false);
+        },futureObj,false);
         return rawData;
     }
 }

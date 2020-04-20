@@ -15,6 +15,7 @@
 #include <sstream>
 #include <fstream>
 #include <array>
+#include <future>
 #include "GroundRecorderFPV.hpp"
 
 //Creates a new thread that 'receives' data from File and forwards data
@@ -34,9 +35,11 @@ private:
     //Cannot make const since the functions it is called with are not marked const
     AAssetManager* assetManager;
     std::unique_ptr<std::thread> mThread;
-    std::atomic<bool> receiving;
     int nReceivedB=0;
-    void receiveLoop();
+    void receiveLoop(std::future<void> shouldTerminate);
+    std::promise<void> exitSignal;
+    bool started=false;
+    std::mutex mMutexStartStop;
 public:
     /**
      * Does nothing until startReading is called
@@ -48,33 +51,19 @@ public:
     FileReader(std::size_t chunkSize=1024):
             CHUNK_SIZE(chunkSize){
     }
+    void setCallBack(const int idx,const RAW_DATA_CALLBACK cb){
+        onDataReceivedCallbacks.at(idx)=cb;
+    }
     /**
      * Create and start the receiving thread, which will run until stopReading() is called.
      * @param assetManager use nullptr for 'normal' files, else a valid android asset manager
      * @param FILEPATH Path to file,depends on assetManager if relative to file or asset
      */
-    void startReading(AAssetManager* assetManager,const std::string FILEPATH){
-        this->assetManager=assetManager;
-        this->FILEPATH=FILEPATH;
-        receiving=true;
-        mThread=std::make_unique<std::thread>([this]{this->receiveLoop();} );
-    }
-    void setCallBack(const int idx,const RAW_DATA_CALLBACK cb){
-        onDataReceivedCallbacks.at(idx)=cb;
-    }
+    void startReading(AAssetManager* assetManager,const std::string FILEPATH);
     /**
      * After this call returns it is guaranteed that no more data will be fed trough the callback
      */
-    void stopReadingIfStarted(){
-        if(receiving== false){
-            return;
-        }
-        receiving=false;
-        if(mThread->joinable()){
-            mThread->join();
-        }
-        mThread.reset();
-    }
+    void stopReadingIfStarted();
     int getNReceivedBytes(){
         return nReceivedB;
     }
@@ -83,7 +72,9 @@ private:
      * Pass all data divided in parts of data of size==CHUNK_SIZE
      * Returns when all data has been passed or stopReceiving is called
      */
-    void passDataInChunks(const uint8_t data[],const size_t size,GroundRecorderFPV::PACKET_TYPE packetType);
+    void splitDataInChunks(const std::future<void>& shouldTerminate,const uint8_t data[],const size_t size,GroundRecorderFPV::PACKET_TYPE packetType);
+    // Call all callbacks if not null
+    void passChunk(const uint8_t data[],const size_t size,GroundRecorderFPV::PACKET_TYPE packetType);
 };
 
 #endif //FPV_VR_FILERECEIVER_H

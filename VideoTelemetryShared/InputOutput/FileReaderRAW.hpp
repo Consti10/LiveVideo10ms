@@ -27,7 +27,7 @@ namespace FileReaderRAW {
     /**
      * Open raw file and pass its data one by one in Chunks until @param receiving==false
      */
-    static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::atomic<bool> &receiving) {
+    static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
             LOGD("Cannot open file %s", FILENAME.c_str());
@@ -36,7 +36,7 @@ namespace FileReaderRAW {
         //LOGD("Opened File %s", FILEPATH.c_str());
         file.seekg(0, std::ios::beg);
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
-        while (receiving) {
+        while (shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout) {
             if (file.eof()) {
                 file.clear();
                 file.seekg(0, std::ios::beg);
@@ -53,7 +53,7 @@ namespace FileReaderRAW {
      * Same as above, but for asset file
      */
     static void readRawAssetInChunks(AAssetManager *assetManager, const std::string &PATH,const RAW_DATA_CALLBACK callback,
-                                     const std::atomic<bool> &receiving,const bool loopAtEndOfFile){
+                                     const std::future<void>& shouldTerminate,const bool loopAtEndOfFile){
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
             LOGD("Cannot open Asset:%s",PATH.c_str());
@@ -61,7 +61,7 @@ namespace FileReaderRAW {
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
         AAsset_seek(asset, 0, SEEK_SET);
-        while(receiving){
+        while(shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout){
             const auto len = AAsset_read(asset,buffer->data(),MAX_NALU_BUFF_SIZE);
             if(len>0){
                 callback(buffer.get()->data(),(size_t)len);
@@ -77,11 +77,11 @@ namespace FileReaderRAW {
     }
 
     static void readRawInChunks(AAssetManager *assetManager, const std::string &PATH,const RAW_DATA_CALLBACK callback,
-                                const std::atomic<bool> &receiving){
+                                const std::future<void>& shouldTerminate){
         if(assetManager!=nullptr){
-            readRawAssetInChunks(assetManager,PATH,callback,receiving,true);
+            readRawAssetInChunks(assetManager,PATH,callback,shouldTerminate,true);
         }else{
-            readRawFileInChunks(PATH,callback,receiving);
+            readRawFileInChunks(PATH,callback,shouldTerminate);
         }
     }
 
@@ -107,14 +107,15 @@ namespace FileReaderRAW {
     */
     static std::vector<uint8_t>
     loadRawAssetFileIntoMemory2(AAssetManager *assetManager, const std::string &path) {
-        std::atomic<bool> fill=true;
+        std::promise<void> exitSignal;
+        std::future<void> futureObj = exitSignal.get_future();
         std::vector<uint8_t> rawData;
         rawData.reserve(1024*1024);
         readRawAssetInChunks(assetManager,path, [&rawData](const uint8_t* d,int len) {
             const auto offset=rawData.size();
             rawData.resize(rawData.size()+len);
             memcpy(&rawData.at(offset),d,(size_t)len);
-        },fill,false);
+        },futureObj,false);
         LOGD("The entire file content (asset,raw) is in memory %d", (int) rawData.size());
         return rawData;
     }

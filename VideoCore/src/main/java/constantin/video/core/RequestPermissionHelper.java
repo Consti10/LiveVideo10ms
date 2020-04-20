@@ -1,5 +1,7 @@
 package constantin.video.core;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -23,17 +25,37 @@ public class RequestPermissionHelper implements ActivityCompat.OnRequestPermissi
     private final String[] REQUIRED_PERMISSION_LIST;
     private final List<String> missingPermission = new ArrayList<>();
     private static final int REQUEST_PERMISSION_CODE = 12345;
-    private AppCompatActivity activity;
+    // This will be called once all permissions are granted. Called every time checkAndRequestPermissions is called
+    private final IOnPermissionsGranted iOnPermissionsGranted;
+    private Activity activity;
     private int nRequests=0;
 
     public RequestPermissionHelper(final String[] requiredPermissionsList){
         REQUIRED_PERMISSION_LIST=requiredPermissionsList;
+        iOnPermissionsGranted=null;
+    }
+
+    public RequestPermissionHelper(final String[] requiredPermissionsList,final IOnPermissionsGranted iOnPermissionsGranted){
+        REQUIRED_PERMISSION_LIST=requiredPermissionsList;
+        this.iOnPermissionsGranted=iOnPermissionsGranted;
+    }
+
+    /**
+     * @return true if all permissions are granted, false otherwise
+     */
+    public boolean allPermissionsGranted(final Activity activity){
+        for (final String permission : REQUIRED_PERMISSION_LIST) {
+            if (ContextCompat.checkSelfPermission(activity,permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
      * Call this on onCreate
      */
-    public void checkAndRequestPermissions(final AppCompatActivity activity){
+    public void checkAndRequestPermissions(final Activity activity){
         this.activity=activity;
         missingPermission.clear();
         for (final String permission : REQUIRED_PERMISSION_LIST) {
@@ -44,7 +66,10 @@ public class RequestPermissionHelper implements ActivityCompat.OnRequestPermissi
                 missingPermission.add(permission);
             }
         }
-        if (!missingPermission.isEmpty()) {
+        if(missingPermission.isEmpty()){
+            // All permissions are granted - notify if needed
+            if(iOnPermissionsGranted!=null)iOnPermissionsGranted.onPermissionsGranted();
+        }else{
             nRequests++;
             if(nRequests==1){
                 // First time just request permissions
@@ -95,5 +120,9 @@ public class RequestPermissionHelper implements ActivityCompat.OnRequestPermissi
         if (!missingPermission.isEmpty()) {
             checkAndRequestPermissions(activity);
         }
+    }
+
+    public interface IOnPermissionsGranted{
+        public void onPermissionsGranted();
     }
 }

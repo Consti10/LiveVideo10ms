@@ -25,7 +25,7 @@ namespace FileReaderFPV{
     static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;
     typedef std::function<void(const uint8_t[],const GroundRecorderFPV::StreamPacket)> MY_CALLBACK;
 
-    static void readFpvFileInChunks(const std::string &FILENAME,MY_CALLBACK callback,const std::atomic<bool>& receiving,const bool loopAtEOF) {
+    static void readFpvFileInChunks(const std::string &FILENAME,MY_CALLBACK callback, const std::future<void>& shouldTerminate,const bool loopAtEOF) {
         std::ifstream file (FILENAME.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
         if (!file.is_open()) {
             LOGD("Cannot open file %s", FILENAME.c_str());
@@ -34,7 +34,7 @@ namespace FileReaderFPV{
         //LOGD("Opened File %s",FILENAME.c_str());
         file.seekg (0, std::ios::beg);
         const auto buffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
-        while (receiving) {
+        while(shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout){
             GroundRecorderFPV::StreamPacket header;
             file.read((char*)&header,sizeof(GroundRecorderFPV::StreamPacket));
             std::streamsize dataSize = file.gcount();
@@ -62,7 +62,7 @@ namespace FileReaderFPV{
     }
 
 
-    static void readFpvAssetFileInChunks(AAssetManager* assetManager,const std::string &PATH,MY_CALLBACK callback,const std::atomic<bool>& receiving,const bool loopAtEOF) {
+    static void readFpvAssetFileInChunks(AAssetManager* assetManager,const std::string &PATH,MY_CALLBACK callback,const std::future<void>& shouldTerminate,const bool loopAtEOF) {
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
             LOGD("Cannot open Asset:%s",PATH.c_str());
@@ -70,7 +70,7 @@ namespace FileReaderFPV{
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
         AAsset_seek(asset, 0, SEEK_SET);
-        while(receiving) {
+        while(shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout){
             GroundRecorderFPV::StreamPacket header;
             //If reading the header fails,we have reached the EOF
             const auto len = AAsset_read(asset,&header,sizeof(GroundRecorderFPV::StreamPacket));
@@ -94,11 +94,11 @@ namespace FileReaderFPV{
         AAsset_close(asset);
     }
 
-    static void readFpvAssetOrFileInChunks(AAssetManager* assetManager,const std::string &PATH,MY_CALLBACK callback,const std::atomic<bool>& receiving,const bool loopAtEOF){
+    static void readFpvAssetOrFileInChunks(AAssetManager* assetManager,const std::string &PATH,MY_CALLBACK callback,const std::future<void>& shouldTerminate,const bool loopAtEOF){
         if(assetManager==nullptr){
-            readFpvFileInChunks(PATH,callback,receiving,loopAtEOF);
+            readFpvFileInChunks(PATH,callback,shouldTerminate,loopAtEOF);
         }else{
-            readFpvAssetFileInChunks(assetManager,PATH,callback,receiving,loopAtEOF);
+            readFpvAssetFileInChunks(assetManager,PATH,callback,shouldTerminate,loopAtEOF);
         }
     }
 }
