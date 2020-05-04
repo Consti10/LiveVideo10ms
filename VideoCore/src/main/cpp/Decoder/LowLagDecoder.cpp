@@ -71,6 +71,9 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
     }else {
         decoder.codec = AMediaCodec_createDecoderByType("video/avc");
+        //decoder.codec = AMediaCodec_createDecoderByType("video/mjpeg");
+        //const std::string s=(decoder.codec== nullptr ? "No" : "YES");
+        //MDebug::log("Created decoder"+s);
         //char* name;
         //AMediaCodec_getName(decoder.codec,&name);
         //MLOGD("Created decoder %s",name);
