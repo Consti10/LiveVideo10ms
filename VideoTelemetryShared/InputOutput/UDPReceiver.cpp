@@ -64,7 +64,7 @@ void UDPReceiver::receiveFromUDPLoop() {
         LOGD("Wanted %d Set %d", WANTED_RCVBUF_SIZE,recvBufferSize);
     }
     //
-    setCPUPriority(mCPUPriority,mName);
+    CPUPriority::setCPUPriority(mCPUPriority,mName.c_str());
     struct sockaddr_in myaddr;
     memset((uint8_t *) &myaddr, 0, sizeof(myaddr));
     myaddr.sin_family = AF_INET;

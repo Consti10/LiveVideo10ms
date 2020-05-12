@@ -10,9 +10,6 @@
 constexpr auto TAG="VideoNative";
 #define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
-constexpr auto CPU_PRIORITY_UDPRECEIVER_VIDEO=(-16);  //needs low latency and does not use the cpu that much
-constexpr auto CPU_PRIORITY_DECODER_OUTPUT (-16);     //needs low latency and does not use the cpu that much
-
 
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
@@ -57,7 +54,7 @@ void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
     const bool VS_USE_SW_DECODER=mSettingsN.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
-        mLowLagDecoder=std::make_unique<LowLagDecoder>(window,CPU_PRIORITY_DECODER_OUTPUT,VS_USE_SW_DECODER);
+        mLowLagDecoder=std::make_unique<LowLagDecoder>(window, FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT, VS_USE_SW_DECODER);
         mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
             const bool changed=!(ratio==this->latestVideoRatio);
             this->latestVideoRatio=ratio;
@@ -109,7 +106,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
-            mUDPReceiver=std::make_unique<UDPReceiver>(VS_PORT, "VideoPlayer VideoReceiver", CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,useRTP](const uint8_t* data, size_t data_length) {
+            mUDPReceiver=std::make_unique<UDPReceiver>(VS_PORT, "VideoPlayer VideoReceiver", FPV_VR_PRIORITY::CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,useRTP](const uint8_t* data, size_t data_length) {
                 onNewVideoData(data,data_length,useRTP ? VIDEO_DATA_TYPE::RTP : VIDEO_DATA_TYPE::RAW);
             }, WANTED_UDP_RCVBUF_SIZE);
             mUDPReceiver->startReceiving();

@@ -106,7 +106,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
 }
 
 void LowLagDecoder::checkOutputLoop() {
-    setCPUPriority(mCheckOutputThreadCPUPriority,"DecoderCheckOutput");
+    CPUPriority::setCPUPriority(mCheckOutputThreadCPUPriority,"DecoderCheckOutput");
     AMediaCodecBufferInfo info;
     bool decoderSawEOS=false;
     bool decoderProducedUnknown=false;
