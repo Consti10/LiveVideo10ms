@@ -65,16 +65,24 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
             splitDataInChunks(shouldTerminate,data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
         },shouldTerminate);
     }else if(FileHelper::endsWith(FILEPATH, ".fpv")){
-        const auto start=std::chrono::steady_clock::now();
-        FileReaderFPV::readFpvAssetOrFileInChunks(assetManager,FILEPATH, [this,start,&shouldTerminate](const uint8_t *data,const GroundRecorderFPV::StreamPacket header) {
+        auto start=std::chrono::steady_clock::now();
+        const bool loopAtEOF=assetManager!=nullptr;
+        GroundRecorderFPV::TIMESTAMP lastPacketTimestamp=0;
+        FileReaderFPV::readFpvAssetOrFileInChunks(assetManager,FILEPATH, [this,&start,&shouldTerminate,&lastPacketTimestamp](const uint8_t *data,const GroundRecorderFPV::StreamPacket header) {
+            // the timestamp is guaranteed to be strictly increasing. If it is not, this probably means we reached
+            // EOF and are looping. Reset start time in this case
+            if(header.timestamp<lastPacketTimestamp){
+                start=std::chrono::steady_clock::now();
+            }
             //sync the timestamp when data was received with the timestamp from file
             auto elapsed=std::chrono::steady_clock::now()-start;
+            lastPacketTimestamp=header.timestamp;
             //wait until we are at least at the time when data was received
             while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
                 elapsed=std::chrono::steady_clock::now()-start;
             }
             splitDataInChunks(shouldTerminate,data,header.packet_length,header.packet_type);
-        },shouldTerminate,false);
+        },shouldTerminate,loopAtEOF);
     }else if(FileHelper::endsWith(FILEPATH, ".h264")){
         //raw video ends with .h264
         FileReaderRAW::readRawInChunks(assetManager, FILEPATH, [this,&shouldTerminate](const uint8_t *data, size_t data_length) {
@@ -127,5 +135,11 @@ void FileReader::passChunk(const uint8_t data[],const size_t size,GroundRecorder
 }
 
 
-
+/*nPackets++;
+LOGD("N packets %d",nPackets);
+if(nPackets<5200 || nPackets>6000){
+   //return;
+}else{
+   splitDataInChunks(shouldTerminate,data,header.packet_length,header.packet_type);
+}*/
 
