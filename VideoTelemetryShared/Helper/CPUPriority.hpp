@@ -77,7 +77,7 @@ namespace FPV_VR_PRIORITY{
     constexpr int CPU_PRIORITY_UVC_FRAME_CALLBACK=-16; //needs low latency but uses CPU a lot (decoding)
     // These are much lower
     constexpr int CPU_PRIORITY_GLRENDERER_MONO=-4; //only shows the OSD not video
-    constexpr int CPU_PRIORITY_UDPRECEIVER_TELEMETRY=-4;
+    constexpr int CPU_PRIORITY_UDPRECEIVER_TELEMETRY=-4; //not as important as video but also needs almost no CPU processing time
     constexpr int CPU_PRIORITY_UDPSENDER_HEADTRACKING=-4;
 }
 
