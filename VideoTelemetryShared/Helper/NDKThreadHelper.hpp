@@ -16,7 +16,7 @@ namespace JThread{
         jmethodID jmGetPriority=env->GetMethodID(jcThread,"getPriority","()I");
         jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
         jint currentThreadPriority=env->CallIntMethod(joCurrentThread,jmGetPriority);
-        LOGD("printThreadPriority %d",currentThreadPriority);
+        LOG::D("printThreadPriority %d",currentThreadPriority);
     }
     static void setThreadPriority(JNIEnv* env,int wantedPriority){
         jclass jcThread = env->FindClass("java/lang/Thread");
@@ -41,7 +41,7 @@ namespace JProcess{
         jmethodID jmMyTid=env->GetStaticMethodID(jcProcess,"myTid","()I");
         jint myTid=env->CallStaticIntMethod(jcProcess,jmMyTid);
         jint currentPrio=env->CallStaticIntMethod(jcProcess,jmGetThreadPriority,(jint)myTid);
-        LOGD("printProcessThreadPriority %d",currentPrio);
+        LOG::D("printProcessThreadPriority %d",currentPrio);
     }
 }
 

@@ -181,7 +181,7 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
             }else{
                 const NALU& nalu=*naluP;
                 if(nalu.data_length>inputBufferSize){
-                    LOGD("Nalu too big %d",nalu.data_length);
+                    LOG::D("Nalu too big %d",nalu.data_length);
                     return;
                 }
                 std::memcpy(buf, nalu.data,(size_t)nalu.data_length);

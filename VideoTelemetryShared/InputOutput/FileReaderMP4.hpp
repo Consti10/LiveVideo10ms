@@ -64,26 +64,26 @@ namespace FileReaderMP4{
             fileOffset=start;
             fileSize=size;
             if(fd<0){
-                LOGD("ERROR AAsset_openFileDescriptor %d",fd);
+                LOG::D("ERROR AAsset_openFileDescriptor %d",fd);
                 return;
             }
         }else{
             fileSize=fsize(FILENAME.c_str());
             fileOffset=0;
             if(fileSize<=0){
-                LOGD("Error file size %d",fileSize);
+                LOG::D("Error file size %d",fileSize);
                 return;
             }
             fd = open(FILENAME.c_str(), O_RDONLY, 0666);
             if(fd<0){
-                LOGD("Error open file: %s fp: %d",FILENAME.c_str(),fd);
+                LOG::D("Error open file: %s fp: %d",FILENAME.c_str(),fd);
                 return;
             }
         }
         AMediaExtractor* extractor=AMediaExtractor_new();
         auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,fileOffset,fileSize);
         if(mediaStatus!=AMEDIA_OK){
-            LOGD("Error open File %s,mediaStatus: %d",FILENAME.c_str(),mediaStatus);
+            LOG::D("Error open File %s,mediaStatus: %d",FILENAME.c_str(),mediaStatus);
             AMediaExtractor_delete(extractor);
             if(assetManager!=nullptr){
                 AAsset_close(asset);
@@ -98,21 +98,21 @@ namespace FileReaderMP4{
             AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
             const char* s;
             AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
-            LOGD("Track is %s",s);
+            LOG::D("Track is %s",s);
             if(std::string(s).compare("video/avc")==0){
                 mediaStatus=AMediaExtractor_selectTrack(extractor,i);
                 const auto csd0=getBufferFromMediaFormat("csd-0",format);
                 callback(csd0.data(),csd0.size());
                 const auto csd1=getBufferFromMediaFormat("csd-1",format);
                 callback(csd1.data(),csd1.size());
-                LOGD("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
+                LOG::D("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
                 AMediaFormat_delete(format);
                 videoTrackFound=true;
                 break;
             }
         }
         if(!videoTrackFound){
-            LOGD("Cannot find video track");
+            LOG::D("Cannot find video track");
             AMediaExtractor_delete(extractor);
             if(assetManager!=nullptr){
                 AAsset_close(asset);

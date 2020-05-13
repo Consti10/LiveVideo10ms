@@ -95,7 +95,7 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
             splitDataInChunks(shouldTerminate,data, data_length,packetType);
         },shouldTerminate);
     }else{
-        LOGD("Error unknown filename %s", FILEPATH.c_str());
+        LOG::D("Error unknown filename %s", FILEPATH.c_str());
     }
 }
 

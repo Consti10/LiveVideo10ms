@@ -8,8 +8,24 @@
 #include "android/log.h"
 #include <string.h>
 
-#define TAG_MDEBUG "MDebug"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG_MDEBUG, __VA_ARGS__)
+//#define TAG_MDEBUG "MDebug"
+//#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG_MDEBUG, __VA_ARGS__)
+
+namespace LOG{
+    static constexpr auto DEFAULT_TAG="NoTag";
+    static void D(const char* fmt,...) {
+        va_list argptr;
+        va_start(argptr, fmt);
+        __android_log_vprint(ANDROID_LOG_DEBUG,DEFAULT_TAG,fmt,argptr);
+        va_end(argptr);
+    }
+    static void E(const char* fmt,...) {
+        va_list argptr;
+        va_start(argptr, fmt);
+        __android_log_vprint(ANDROID_LOG_ERROR,DEFAULT_TAG,fmt,argptr);
+        va_end(argptr);
+    }
+}
 
 class MDebug{
 public:

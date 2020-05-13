@@ -30,7 +30,7 @@ namespace FileReaderRAW {
     static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
-            LOGD("Cannot open file %s", FILENAME.c_str());
+            LOG::D("Cannot open file %s", FILENAME.c_str());
             return;
         }
         //LOGD("Opened File %s", FILEPATH.c_str());
@@ -56,7 +56,7 @@ namespace FileReaderRAW {
                                      const std::future<void>& shouldTerminate,const bool loopAtEndOfFile){
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
-            LOGD("Cannot open Asset:%s",PATH.c_str());
+            LOG::D("Cannot open Asset:%s",PATH.c_str());
             return;
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
@@ -89,7 +89,7 @@ namespace FileReaderRAW {
     loadRawAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
         AAsset *asset = AAssetManager_open(assetManager, path.c_str(), 0);
         if (!asset) {
-            LOGD("Error asset not found:%s", path.c_str());
+            LOG::D("Error asset not found:%s", path.c_str());
             return std::vector<uint8_t>();
         }
         const size_t size = (size_t) AAsset_getLength(asset);
@@ -97,7 +97,7 @@ namespace FileReaderRAW {
         std::vector<uint8_t> rawData(size);
         const auto len = AAsset_read(asset, rawData.data(), size);
         AAsset_close(asset);
-        LOGD("The entire file content (asset,raw) is in memory %d", (int) rawData.size());
+        LOG::D("The entire file content (asset,raw) is in memory %d", (int) rawData.size());
         return rawData;
     }
 
@@ -116,7 +116,7 @@ namespace FileReaderRAW {
             rawData.resize(rawData.size()+len);
             memcpy(&rawData.at(offset),d,(size_t)len);
         },futureObj,false);
-        LOGD("The entire file content (asset,raw) is in memory %d", (int) rawData.size());
+        LOG::D("The entire file content (asset,raw) is in memory %d", (int) rawData.size());
         return rawData;
     }
 }

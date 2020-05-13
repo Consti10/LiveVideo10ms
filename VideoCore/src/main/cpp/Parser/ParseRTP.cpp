@@ -54,12 +54,12 @@ void ParseRTP::reset(){
 void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
     //12 rtp header bytes and 1 nalu_header_t type byte
         if(data_len<=13){
-            LOGD("Not enough rtp data");
+            LOG::D("Not enough rtp data");
             return;
         }
         //
         //const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
-        //LOGD("Sequence number %d",(int)rtp_header->sequence);
+        //LOG::D("Sequence number %d",(int)rtp_header->sequence);
 
         const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[12];
 
@@ -116,7 +116,7 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             nalu_data_length=0;
             //LOGV("full nalu");
         }else{
-            LOGD("header:%d",(int)nalu_header->type);
+            LOG::D("header:%d",(int)nalu_header->type);
         }
 }
 

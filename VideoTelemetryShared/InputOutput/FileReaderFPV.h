@@ -28,10 +28,10 @@ namespace FileReaderFPV{
     static void readFpvFileInChunks(const std::string &FILENAME,MY_CALLBACK callback, const std::future<void>& shouldTerminate,const bool loopAtEOF) {
         std::ifstream file (FILENAME.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
         if (!file.is_open()) {
-            LOGD("Cannot open file %s", FILENAME.c_str());
+            LOG::D("Cannot open file %s", FILENAME.c_str());
             return;
         }
-        //LOGD("Opened File %s",FILENAME.c_str());
+        //LOG::D("Opened File %s",FILENAME.c_str());
         file.seekg (0, std::ios::beg);
         const auto buffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
         while(shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout){
@@ -42,7 +42,7 @@ namespace FileReaderFPV{
                 if(loopAtEOF){
                     file.clear();
                     file.seekg (0, std::ios::beg);
-                    LOGD("RESET");
+                    LOG::D("RESET");
                     continue;
                 }else{
                     break;
@@ -53,7 +53,7 @@ namespace FileReaderFPV{
             if(bytesRead!=header.packet_length){
                 file.clear();
                 file.seekg (0, std::ios::beg);
-                LOGD("Error, file was written wrong");
+                LOG::D("Error, file was written wrong");
                 continue;
             }
             callback(buffer->data(),header);
@@ -65,7 +65,7 @@ namespace FileReaderFPV{
     static void readFpvAssetFileInChunks(AAssetManager* assetManager,const std::string &PATH,MY_CALLBACK callback,const std::future<void>& shouldTerminate,const bool loopAtEOF) {
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
-            LOGD("Cannot open Asset:%s",PATH.c_str());
+            LOG::D("Cannot open Asset:%s",PATH.c_str());
             return;
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
@@ -77,7 +77,7 @@ namespace FileReaderFPV{
             if(len!=sizeof(GroundRecorderFPV::StreamPacket)){
                 if(loopAtEOF){
                     AAsset_seek(asset, 0, SEEK_SET);
-                    LOGD("RESET");
+                    LOG::D("RESET");
                     continue;
                 }else{
                     break;
@@ -85,7 +85,7 @@ namespace FileReaderFPV{
             }
             const auto len2 = AAsset_read(asset,buffer->data(),header.packet_length);
             if(len2!=header.packet_length){
-                LOGD("Error, file was written wrong");
+                LOG::D("Error, file was written wrong");
                 AAsset_seek(asset, 0, SEEK_SET);
                 continue;
             }
