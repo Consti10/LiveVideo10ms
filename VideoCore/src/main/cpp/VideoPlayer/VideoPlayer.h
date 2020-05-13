@@ -32,6 +32,7 @@ private:
     SettingsN mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
+    JavaVM* javaVm;
 public:
     H264Parser mParser;
     std::unique_ptr<LowLagDecoder> mLowLagDecoder;

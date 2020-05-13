@@ -18,7 +18,9 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     GROUND_RECORDING_DIRECTORY(DIR),
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
     mFileReceiver(1024){
-    NDKThreadHelper::test(env);
+    env->GetJavaVM(&javaVm);
+    //NDKTHREADHELPERTEST::test(env);
+    NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,-11,"LOL");
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
@@ -56,7 +58,7 @@ void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
     const bool VS_USE_SW_DECODER=mSettingsN.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
-        mLowLagDecoder=std::make_unique<LowLagDecoder>(window, FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT, VS_USE_SW_DECODER);
+        mLowLagDecoder=std::make_unique<LowLagDecoder>(javaVm,window, FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT, VS_USE_SW_DECODER);
         mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
             const bool changed=!(ratio==this->latestVideoRatio);
             this->latestVideoRatio=ratio;

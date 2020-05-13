@@ -61,7 +61,7 @@ public:
     //We cannot initialize the Decoder until we have SPS and PPS data -
     //when streaming this data will be available at some point in future
     //Therefore we don't allocate the MediaCodec resources here
-    LowLagDecoder(ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
+    LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
@@ -104,6 +104,7 @@ private:
     AvgCalculator decodingTime_us;
     //Every n ms re-calculate the Decoding info
     static const constexpr int DECODING_INFO_RECALCULATION_INTERVAL_MS=1000;
+    JavaVM* javaVm;
 private:
     static constexpr uint8_t SPS_X264[31]{
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,192,90,128,128,128,160,0,0,125,32,0,29,76,17,227,6,73

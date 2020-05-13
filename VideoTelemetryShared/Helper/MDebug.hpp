@@ -13,10 +13,22 @@
 
 namespace LOG{
     static constexpr auto DEFAULT_TAG="NoTag";
+    static void D(const char* TAG,const char* fmt,...){
+        va_list argptr;
+        va_start(argptr, fmt);
+        __android_log_vprint(ANDROID_LOG_DEBUG,TAG,fmt,argptr);
+        va_end(argptr);
+    }
     static void D(const char* fmt,...) {
         va_list argptr;
         va_start(argptr, fmt);
         __android_log_vprint(ANDROID_LOG_DEBUG,DEFAULT_TAG,fmt,argptr);
+        va_end(argptr);
+    }
+    static void E(const char* TAG,const char* fmt,...) {
+        va_list argptr;
+        va_start(argptr, fmt);
+        __android_log_vprint(ANDROID_LOG_ERROR,TAG,fmt,argptr);
         va_end(argptr);
     }
     static void E(const char* fmt,...) {

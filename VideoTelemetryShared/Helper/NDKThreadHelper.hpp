@@ -10,13 +10,12 @@
 
 // Java Thread utility methods
 namespace JThread{
-    static void printThreadPriority(JNIEnv* env){
+    static int getThreadPriority(JNIEnv* env){
         jclass jcThread = env->FindClass("java/lang/Thread");
         jmethodID jmCurrentThread=env->GetStaticMethodID(jcThread,"currentThread","()Ljava/lang/Thread;");
         jmethodID jmGetPriority=env->GetMethodID(jcThread,"getPriority","()I");
         jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
-        jint currentThreadPriority=env->CallIntMethod(joCurrentThread,jmGetPriority);
-        LOG::D("printThreadPriority %d",currentThreadPriority);
+        return (int)env->CallIntMethod(joCurrentThread,jmGetPriority);
     }
     static void setThreadPriority(JNIEnv* env,int wantedPriority){
         jclass jcThread = env->FindClass("java/lang/Thread");
@@ -24,6 +23,9 @@ namespace JThread{
         jmethodID jmSetPriority=env->GetMethodID(jcThread,"setPriority","(I)V");
         jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
         env->CallVoidMethod(joCurrentThread,jmSetPriority,(jint)wantedPriority);
+    }
+    static void printThreadPriority(JNIEnv* env){
+        LOG::D("JThread","printThreadPriority %d",getThreadPriority(env));
     }
 }
 // Java android.os.Process utility methods (not java/lang/Process !)
@@ -35,16 +37,17 @@ namespace JProcess{
         env->CallStaticVoidMethod(jcProcess,jmSetThreadPriority,(jint)wantedPriority);
     }
     // calls android.os.Process.getThreadPriority(android.os.Process.myTid())
-    static void printThreadPriority(JNIEnv* env){
+    static int getThreadPriority(JNIEnv* env){
         jclass jcProcess = env->FindClass("android/os/Process");
         jmethodID jmGetThreadPriority=env->GetStaticMethodID(jcProcess,"getThreadPriority","(I)I");
         jmethodID jmMyTid=env->GetStaticMethodID(jcProcess,"myTid","()I");
         jint myTid=env->CallStaticIntMethod(jcProcess,jmMyTid);
-        jint currentPrio=env->CallStaticIntMethod(jcProcess,jmGetThreadPriority,(jint)myTid);
-        LOG::D("printProcessThreadPriority %d",currentPrio);
+        return (int)env->CallStaticIntMethod(jcProcess,jmGetThreadPriority,(jint)myTid);
+    }
+    static void printThreadPriority(JNIEnv* env){
+        LOG::D("JProcess","printThreadPriority %d",getThreadPriority(env));
     }
 }
-
 
 namespace NDKThreadHelper{
     static JNIEnv* attachThread(JavaVM* jvm){
@@ -59,47 +62,56 @@ namespace NDKThreadHelper{
     static void detachThread(JavaVM* jvm){
         jvm->DetachCurrentThread();
     }
-
     // If the current thread is already bound to the Java VM only call JProcess::setThreadPriority
     // If no Java VM is attached (e.g. the thread was created via ndk std::thread or equivalent)
     // attach the java vm, set priority and then DETACH again
-    static void attachAndSetProcessThreadPriority(JavaVM* vm,int wantedPriority){
+    static void attachAndSetProcessThreadPriority(JavaVM* vm,int wantedPriority,const char* TAG="Unknown"){
         JNIEnv* env=nullptr;
         vm->GetEnv((void**)&env,JNI_VERSION_1_6);
         bool detachWhenDone=false;
         if(env== nullptr){
+            LOG::D(TAG,"Attaching thread");
             env=attachThread(vm);
             detachWhenDone=true;
         }
+        const int currentPriority=JProcess::getThreadPriority(env);
         JProcess::setThreadPriority(env, wantedPriority);
+        const int newPriority=JProcess::getThreadPriority(env);
+        if(newPriority==wantedPriority){
+            LOG::D(TAG,"Successfully set priority from %d to %d",currentPriority,wantedPriority);
+        }else{
+            LOG::D(TAG,"Cannot set priority from %d to %d is %d instead",currentPriority,wantedPriority,newPriority);
+        }
         if(detachWhenDone){
             detachThread(vm);
         }
     }
+}
+
+namespace NDKTHREADHELPERTEST{
     // attach java VM, set Thread priority & print it.
     // Then detach, reattach JVM and print thread priority
     static void doSomething(JavaVM* jvm) {
-        JNIEnv* env=attachThread(jvm);
+        JNIEnv* env=NDKThreadHelper::attachThread(jvm);
         JThread::printThreadPriority(env);
         JThread::setThreadPriority(env,5);
         JThread::printThreadPriority(env);
-        detachThread(jvm);
-        env=attachThread(jvm);
+        NDKThreadHelper::detachThread(jvm);
+        env=NDKThreadHelper::attachThread(jvm);
         JThread::printThreadPriority(env);
-        detachThread(jvm);
+        NDKThreadHelper::detachThread(jvm);
     }
     // same as doSomething() but uses ProcessThreadPriority
     static void doSomething2(JavaVM* jvm,int prio) {
-        JNIEnv* env=attachThread(jvm);
+        JNIEnv* env=NDKThreadHelper::attachThread(jvm);
         JProcess::printThreadPriority(env);
         JProcess::setThreadPriority(env, prio);
         JProcess::printThreadPriority(env);
-        detachThread(jvm);
-        env=attachThread(jvm);
+        NDKThreadHelper::detachThread(jvm);
+        env=NDKThreadHelper::attachThread(jvm);
         JProcess::printThreadPriority(env);
-        detachThread(jvm);
+        NDKThreadHelper::detachThread(jvm);
     }
-
     static void test(JNIEnv* env){
         JavaVM* jvm;
         env->GetJavaVM(&jvm);

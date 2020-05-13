@@ -1,6 +1,7 @@
 
 #include "LowLagDecoder.h"
 #include <CPUPriority.hpp>
+#include <NDKThreadHelper.hpp>
 #include <unistd.h>
 #include <sstream>
 
@@ -19,8 +20,8 @@ constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 
 using namespace std::chrono;
 
-LowLagDecoder::LowLagDecoder(ANativeWindow* window,const int checkOutputThreadCpuPrio,bool SW):
-        mCheckOutputThreadCPUPriority(checkOutputThreadCpuPrio),SW(SW){
+LowLagDecoder::LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,const int checkOutputThreadCpuPrio,bool SW):
+        mCheckOutputThreadCPUPriority(checkOutputThreadCpuPrio),SW(SW),javaVm(javaVm){
     decoder.window=window;
     decoder.configured=false;
 }
@@ -106,7 +107,8 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
 }
 
 void LowLagDecoder::checkOutputLoop() {
-    CPUPriority::setCPUPriority(mCheckOutputThreadCPUPriority,"DecoderCheckOutput");
+    CPUPriority::setCPUPriority(-12,"DecoderCheckOutput");
+    NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,mCheckOutputThreadCPUPriority,"DecoderCheckOutput");
     AMediaCodecBufferInfo info;
     bool decoderSawEOS=false;
     bool decoderProducedUnknown=false;
