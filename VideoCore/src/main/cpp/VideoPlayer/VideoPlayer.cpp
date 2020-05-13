@@ -58,7 +58,7 @@ void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
     const bool VS_USE_SW_DECODER=mSettingsN.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface!= nullptr){
         window=ANativeWindow_fromSurface(env,surface);
-        mLowLagDecoder=std::make_unique<LowLagDecoder>(javaVm,window, FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT, VS_USE_SW_DECODER);
+        mLowLagDecoder=std::make_unique<LowLagDecoder>(javaVm,window,VS_USE_SW_DECODER);
         mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
             const bool changed=!(ratio==this->latestVideoRatio);
             this->latestVideoRatio=ratio;

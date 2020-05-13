@@ -69,7 +69,7 @@ namespace CPUPriority{
     }
     // If the current priority == wanted priority do nothing
     // Else, set the wanted priority and log Error / Success
-    static const void setCPUPriority(const int wantedPriority, const char* caller){
+    /*static const void setCPUPriority(const int wantedPriority, const char* caller){
         const int currentPriority=getCurrentProcessPriority();
         if(currentPriority == wantedPriority)return;
         int which = PRIO_PROCESS;
@@ -81,7 +81,7 @@ namespace CPUPriority{
         }else{
             CPULOGD("SUCCESS Set thread priority to:%d from %d in %s pid %d", wantedPriority, currentPriority, caller,(int)pid);
         }
-    }
+    }*/
 
     static const void printX(){
         int ret;

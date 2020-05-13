@@ -61,7 +61,7 @@ public:
     //We cannot initialize the Decoder until we have SPS and PPS data -
     //when streaming this data will be available at some point in future
     //Therefore we don't allocate the MediaCodec resources here
-    LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,int checkOutputThreadCpuPrio,bool SW=false);
+    LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,bool SW=false);
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
@@ -87,7 +87,6 @@ private:
     void printAvgLog();
     int mWidth,mHeight;
     std::thread* mCheckOutputThread= nullptr;
-    const int mCheckOutputThreadCPUPriority;
     const bool SW;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)
     Decoder decoder;

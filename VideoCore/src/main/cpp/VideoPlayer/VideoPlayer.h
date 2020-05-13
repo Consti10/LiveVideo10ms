@@ -50,7 +50,7 @@ public:
 private:
     //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms
     //5 MB should be plenty !
-    static constexpr const size_t  WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
+    static constexpr const size_t WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H
