@@ -19,8 +19,6 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
     mFileReceiver(1024){
     env->GetJavaVM(&javaVm);
-    //NDKTHREADHELPERTEST::test(env);
-    NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,-11,"LOL");
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
