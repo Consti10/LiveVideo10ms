@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <jni.h>
 #include <android/log.h>
 #include <iostream>
 #include <thread>
@@ -26,7 +27,7 @@ public:
      * If @param WANTED_RCVBUF_SIZE is bigger than the size allocated by the OS a bigger buffer is requested, but it is not
      * guaranteed that the size is actually increased. Use 0 to leave tha buffer size untouched
      */
-    UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE=0);
+    UDPReceiver(JavaVM* javaVm,int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE=0);
     /**
      * Register a callback that is called once and contains the IP address of the first received packet's sender
      */
@@ -60,6 +61,7 @@ private:
     //https://en.wikipedia.org/wiki/User_Datagram_Protocol
     //65,507 bytes (65,535 − 8 byte UDP header − 20 byte IP header).
     static constexpr const size_t UDP_PACKET_MAX_SIZE=65507;
+    JavaVM* javaVm;
 };
 
 #endif // FPV_VR_UDPRECEIVER_H

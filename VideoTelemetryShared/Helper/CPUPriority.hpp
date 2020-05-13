@@ -69,7 +69,7 @@ namespace CPUPriority{
     }
     // If the current priority == wanted priority do nothing
     // Else, set the wanted priority and log Error / Success
-    /*static const void setCPUPriority(const int wantedPriority, const char* caller){
+    static const void setCPUPriorityXXX(const int wantedPriority, const char* caller){
         const int currentPriority=getCurrentProcessPriority();
         if(currentPriority == wantedPriority)return;
         int which = PRIO_PROCESS;
@@ -81,7 +81,7 @@ namespace CPUPriority{
         }else{
             CPULOGD("SUCCESS Set thread priority to:%d from %d in %s pid %d", wantedPriority, currentPriority, caller,(int)pid);
         }
-    }*/
+    }
 
     static const void printX(){
         int ret;
@@ -130,10 +130,10 @@ namespace FPV_VR_PRIORITY{
 namespace TEST_CPU_PRIO{
     static void setThreadPriorityContiniously(const int prio,const char* name) {
         while (true){
-            CPUPriority::setCPUPriority(prio,name);
+            CPUPriority::setCPUPriorityXXX(prio,name);
         }
     }
-    static void test(){
+    static void testXXX(){
         std::thread* thread1=new std::thread(setThreadPriorityContiniously,1,"Thread 1");
         std::thread* thread2=new std::thread(setThreadPriorityContiniously,2,"Thread 2");
     }

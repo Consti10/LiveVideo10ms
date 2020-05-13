@@ -1,6 +1,7 @@
 
 #include "UDPReceiver.h"
 #include <CPUPriority.hpp>
+#include <NDKThreadHelper.hpp>
 #include <arpa/inet.h>
 #include <vector>
 #include <sstream>
@@ -9,8 +10,8 @@
 #define TAG "UDPReceiver"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
-UDPReceiver::UDPReceiver(int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
-        mPort(port),mName(name),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback){
+UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
+        mPort(port),mName(name),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback),javaVm(javaVm){
 }
 
 void UDPReceiver::registerOnSourceIPFound(const SOURCE_IP_CALLBACK& onSourceIP) {
@@ -63,8 +64,7 @@ void UDPReceiver::receiveFromUDPLoop() {
         getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
         LOGD("Wanted %d Set %d", WANTED_RCVBUF_SIZE,recvBufferSize);
     }
-    //
-    CPUPriority::setCPUPriority(mCPUPriority,mName.c_str());
+    NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,mCPUPriority,mName.c_str());
     struct sockaddr_in myaddr;
     memset((uint8_t *) &myaddr, 0, sizeof(myaddr));
     myaddr.sin_family = AF_INET;

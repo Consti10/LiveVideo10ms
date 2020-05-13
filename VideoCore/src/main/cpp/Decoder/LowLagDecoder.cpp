@@ -107,7 +107,6 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
 }
 
 void LowLagDecoder::checkOutputLoop() {
-    CPUPriority::setCPUPriority(-12,"DecoderCheckOutput");
     NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT,"DecoderCheckOutput");
     AMediaCodecBufferInfo info;
     bool decoderSawEOS=false;
