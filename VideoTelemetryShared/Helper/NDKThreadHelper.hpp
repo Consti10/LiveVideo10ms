@@ -62,6 +62,17 @@ namespace NDKThreadHelper{
     static void detachThread(JavaVM* jvm){
         jvm->DetachCurrentThread();
     }
+    // Thread needs to be bound to Java VM
+    static void setProcessThreadPriority(JNIEnv* env,int wantedPriority,const char* TAG="Unknown"){
+        const int currentPriority=JProcess::getThreadPriority(env);
+        JProcess::setThreadPriority(env, wantedPriority);
+        const int newPriority=JProcess::getThreadPriority(env);
+        if(newPriority==wantedPriority){
+            LOG::D(TAG,"Successfully set priority from %d to %d",currentPriority,wantedPriority);
+        }else{
+            LOG::D(TAG,"Cannot set priority from %d to %d is %d instead",currentPriority,wantedPriority,newPriority);
+        }
+    }
     // If the current thread is already bound to the Java VM only call JProcess::setThreadPriority
     // If no Java VM is attached (e.g. the thread was created via ndk std::thread or equivalent)
     // attach the java vm, set priority and then DETACH again
@@ -74,14 +85,7 @@ namespace NDKThreadHelper{
             env=attachThread(vm);
             detachWhenDone=true;
         }
-        const int currentPriority=JProcess::getThreadPriority(env);
-        JProcess::setThreadPriority(env, wantedPriority);
-        const int newPriority=JProcess::getThreadPriority(env);
-        if(newPriority==wantedPriority){
-            LOG::D(TAG,"Successfully set priority from %d to %d",currentPriority,wantedPriority);
-        }else{
-            LOG::D(TAG,"Cannot set priority from %d to %d is %d instead",currentPriority,wantedPriority,newPriority);
-        }
+        setProcessThreadPriority(env,wantedPriority,TAG);
         if(detachWhenDone){
             detachThread(vm);
         }
