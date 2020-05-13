@@ -10,6 +10,7 @@
 constexpr auto TAG="VideoNative";
 #define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
+#include <NDKThreadHelper.hpp>
 
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
@@ -17,6 +18,7 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     GROUND_RECORDING_DIRECTORY(DIR),
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
     mFileReceiver(1024){
+    NDKThreadHelper::test(env);
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)

@@ -12,16 +12,20 @@
 #include <pthread.h>
 //#include <MDebug.hpp>
 
-#define TAG_CPUPRIO "CPUPriority"
-#define CPULOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG_CPUPRIO, __VA_ARGS__)
-
 // This namespace contains helper to set specific CPU thread priorities to deal
 // With scheduling in a multi-threaded application
 namespace CPUPriority{
-    /*static constexpr auto TAG="CPUPriority";
-    template<class... Args>
+
+    static constexpr auto TAG="CPUPriority";
+    static void CPULOGD(const char* fmt,...) {
+        va_list argptr;
+        va_start(argptr, fmt);
+        __android_log_vprint(ANDROID_LOG_DEBUG, TAG,fmt,argptr);
+        va_end(argptr);
+    }
+    /*template<class... Args>
     static void CPULOGD(const Args&... args) {
-        __android_log_print(ANDROID_LOG_DEBUG, TAG,args...);
+        __android_log_print(ANDROID_LOG_DEBUG, TAG,(const char*)args...);
     }*/
 
     constexpr int ANDROID_PRIORITY_LOWEST         =  19;
@@ -73,12 +77,41 @@ namespace CPUPriority{
         int ret = setpriority(which, (id_t)pid, wantedPriority);
         const int currentPriorityAfterSet=getCurrentProcessPriority();
         if(ret!=0 || currentPriorityAfterSet != wantedPriority){
-            CPULOGD("ERROR set thread priority to:%d from %d in %s", wantedPriority, currentPriority, caller);
+            CPULOGD("ERROR set thread priority to:%d from %d in %s pid %d", wantedPriority, currentPriority, caller,(int)pid);
         }else{
-            CPULOGD("SUCCESS Set thread priority to:%d from %d in %s", wantedPriority, currentPriority, caller);
+            CPULOGD("SUCCESS Set thread priority to:%d from %d in %s pid %d", wantedPriority, currentPriority, caller,(int)pid);
         }
     }
+
+    static const void printX(){
+        int ret;
+        // We'll operate on the currently running thread.
+        pthread_t this_thread = pthread_self();
+
+        // struct sched_param is used to store the scheduling priority
+        struct sched_param params;
+        auto errror=sched_getparam(this_thread,&params);
+        CPULOGD("sched_getparam returns %d",errror);
+
+        // We'll set the priority to the maximum.
+        /*CPULOGD("Scheduler is %d",sched_getscheduler(this_thread));
+
+        params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+
+        CPULOGD("Trying to set thread realtime prio = %d ",params.sched_priority);
+
+        // Attempt to set thread real-time priority to the SCHED_FIFO policy
+        ret = pthread_setschedparam(this_thread, SCHED_FIFO, &params);
+        if (ret != 0) {
+            // Print the error
+            CPULOGD("Unsuccessful in setting thread realtime prio");
+            return;
+        }
+        sched_getparam()*/
+    }
 }
+
+
 
 // All these values are for FPV_VR - remember that this file is duplicated so be carefully when changing values
 namespace FPV_VR_PRIORITY{
@@ -93,26 +126,18 @@ namespace FPV_VR_PRIORITY{
     constexpr int CPU_PRIORITY_UDPSENDER_HEADTRACKING=-4;
 }
 
-/*static const void printX(){
-        int ret;
-        // We'll operate on the currently running thread.
-        pthread_t this_thread = pthread_self();
-
-        // struct sched_param is used to store the scheduling priority
-        struct sched_param params;
-        // We'll set the priority to the maximum.
-        CPULOGD("Scheduler is %d",sched_getscheduler(this_thread));
-
-        params.sched_priority = sched_get_priority_max(SCHED_FIFO);
-
-        CPULOGD("Trying to set thread realtime prio = %d ",params.sched_priority);
-
-        // Attempt to set thread real-time priority to the SCHED_FIFO policy
-        ret = pthread_setschedparam(this_thread, SCHED_FIFO, &params);
-        if (ret != 0) {
-            // Print the error
-            CPULOGD("Unsuccessful in setting thread realtime prio");
-            return;
+#include <thread>
+namespace TEST_CPU_PRIO{
+    static void setThreadPriorityContiniously(const int prio,const char* name) {
+        while (true){
+            CPUPriority::setCPUPriority(prio,name);
         }
-    }*/
+    }
+    static void test(){
+        std::thread* thread1=new std::thread(setThreadPriorityContiniously,1,"Thread 1");
+        std::thread* thread2=new std::thread(setThreadPriorityContiniously,2,"Thread 2");
+    }
+}
+
+
 #endif //FPV_VR_CPUPRIORITIES_H

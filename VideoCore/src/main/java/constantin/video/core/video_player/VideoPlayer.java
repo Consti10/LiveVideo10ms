@@ -3,6 +3,7 @@ package constantin.video.core.video_player;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.SurfaceTexture;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
@@ -13,6 +14,7 @@ import java.util.TimerTask;
 
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.IVideoParamsChanged;
+import constantin.video.core.ThreadPriorityTester;
 import constantin.video.core.gl.ISurfaceAvailable;
 
 
@@ -34,6 +36,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     public VideoPlayer(final Context context){
         this.context=context;
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
+        //ThreadPriorityTester.test2();
     }
 
     public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged){
