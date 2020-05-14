@@ -43,6 +43,7 @@ typedef struct fu_header {
     uint8_t s:      1;
 } __attribute__ ((packed)) fu_header_t; /* 1 bytes */
 
+#define MLOG LOG2("ParseRTP")
 
 ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(cb){
 }
@@ -54,7 +55,7 @@ void ParseRTP::reset(){
 void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
     //12 rtp header bytes and 1 nalu_header_t type byte
         if(data_len<=13){
-            LOG::D("Not enough rtp data");
+            MLOG<<"Not enough rtp data";
             return;
         }
         //
@@ -116,7 +117,7 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             nalu_data_length=0;
             //LOGV("full nalu");
         }else{
-            LOG::D("header:%d",(int)nalu_header->type);
+            MLOG<<"header:"<<nalu_header->type;
         }
 }
 

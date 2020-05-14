@@ -24,6 +24,7 @@
  * Namespace that holds utility functions for reading MP4 files
  */
 namespace FileReaderMP4{
+    constexpr auto TAG="FileReaderMP4";
     static constexpr const size_t MAX_NALU_BUFF_SIZE=1024*1024;
     typedef std::function<void(const uint8_t[],std::size_t)> RAW_DATA_CALLBACK;
     /**
@@ -64,26 +65,26 @@ namespace FileReaderMP4{
             fileOffset=start;
             fileSize=size;
             if(fd<0){
-                LOG::D("ERROR AAsset_openFileDescriptor %d",fd);
+                LOGE(TAG)<<"AAsset_openFileDescriptor "<<fd;
                 return;
             }
         }else{
             fileSize=fsize(FILENAME.c_str());
             fileOffset=0;
             if(fileSize<=0){
-                LOG::D("Error file size %d",fileSize);
+                LOGE(TAG)<<"file size "<<fileSize;
                 return;
             }
             fd = open(FILENAME.c_str(), O_RDONLY, 0666);
             if(fd<0){
-                LOG::D("Error open file: %s fp: %d",FILENAME.c_str(),fd);
+                LOGE(TAG)<<"open file: "<<FILENAME<<" "<<fd;
                 return;
             }
         }
         AMediaExtractor* extractor=AMediaExtractor_new();
         auto mediaStatus=AMediaExtractor_setDataSourceFd(extractor,fd,fileOffset,fileSize);
         if(mediaStatus!=AMEDIA_OK){
-            LOG::D("Error open File %s,mediaStatus: %d",FILENAME.c_str(),mediaStatus);
+            LOGE(TAG)<<"Error open File "<<FILENAME<<" mediaStatus: "<<mediaStatus;
             AMediaExtractor_delete(extractor);
             if(assetManager!=nullptr){
                 AAsset_close(asset);
@@ -98,21 +99,21 @@ namespace FileReaderMP4{
             AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
             const char* s;
             AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
-            LOG::D("Track is %s",s);
+            LOG2()<<"Track is"<<s;
             if(std::string(s).compare("video/avc")==0){
                 mediaStatus=AMediaExtractor_selectTrack(extractor,i);
                 const auto csd0=getBufferFromMediaFormat("csd-0",format);
                 callback(csd0.data(),csd0.size());
                 const auto csd1=getBufferFromMediaFormat("csd-1",format);
                 callback(csd1.data(),csd1.size());
-                LOG::D("Video track found %d %s",mediaStatus, AMediaFormat_toString(format));
+                LOG2()<<"Video track found "<<mediaStatus<<" "<<AMediaFormat_toString(format);
                 AMediaFormat_delete(format);
                 videoTrackFound=true;
                 break;
             }
         }
         if(!videoTrackFound){
-            LOG::D("Cannot find video track");
+            LOG2()<<"Cannot find video track";
             AMediaExtractor_delete(extractor);
             if(assetManager!=nullptr){
                 AAsset_close(asset);

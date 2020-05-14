@@ -25,7 +25,7 @@ namespace JThread{
         env->CallVoidMethod(joCurrentThread,jmSetPriority,(jint)wantedPriority);
     }
     static void printThreadPriority(JNIEnv* env){
-        LOG::D("JThread","printThreadPriority %d",getThreadPriority(env));
+        LOG2("JThread")<<"printThreadPriority "<<getThreadPriority(env);
     }
 }
 // Java android.os.Process utility methods (not java/lang/Process !)
@@ -45,11 +45,12 @@ namespace JProcess{
         return (int)env->CallStaticIntMethod(jcProcess,jmGetThreadPriority,(jint)myTid);
     }
     static void printThreadPriority(JNIEnv* env){
-        LOG::D("JProcess","printThreadPriority %d",getThreadPriority(env));
+        LOG2("JProcess")<<"printThreadPriority "<<getThreadPriority(env);
     }
 }
 
 namespace NDKThreadHelper{
+    static constexpr auto TAG="NDKThreadHelper";
     static JNIEnv* attachThread(JavaVM* jvm){
         JNIEnv* myNewEnv;
         JavaVMAttachArgs args;
@@ -68,9 +69,9 @@ namespace NDKThreadHelper{
         JProcess::setThreadPriority(env, wantedPriority);
         const int newPriority=JProcess::getThreadPriority(env);
         if(newPriority==wantedPriority){
-            LOG::D(TAG,"Successfully set priority from %d to %d",currentPriority,wantedPriority);
+            LOG2(TAG)<<"Successfully set priority from "<<currentPriority<<" to"<<wantedPriority;
         }else{
-            LOG::D(TAG,"Cannot set priority from %d to %d is %d instead",currentPriority,wantedPriority,newPriority);
+            LOG2(TAG)<<"Cannot set priority from "<<currentPriority<<" to "<<wantedPriority<<" is "<<newPriority<<" instead";
         }
     }
     // If the current thread is already bound to the Java VM only call JProcess::setThreadPriority
@@ -81,7 +82,7 @@ namespace NDKThreadHelper{
         vm->GetEnv((void**)&env,JNI_VERSION_1_6);
         bool detachWhenDone=false;
         if(env== nullptr){
-            LOG::D(TAG,"Attaching thread");
+            LOG2(TAG)<<"Attaching thread";
             env=attachThread(vm);
             detachWhenDone=true;
         }

@@ -24,11 +24,11 @@ public:
         if(nalu.isSPS()){
             CSD0.resize(nalu.data_length);
             memcpy(CSD0.data(),nalu.data,(size_t )nalu.data_length);
-            MDebug::log("SPS found",TAG);
+            LOG2(TAG)<<"SPS found";
         }else if(nalu.isPPS()){
             CSD1.resize(nalu.data_length);
             memcpy(CSD1.data(),nalu.data,(size_t )nalu.data_length);
-            MDebug::log("PPS found",TAG);
+            LOG2(TAG)<<"PPS found";
         }
     }
     bool allKeyFramesAvailable(){

@@ -12,8 +12,7 @@ constexpr const auto TAG="LowLagDecoder";
 #include <h264_stream.h>
 #include <vector>
 
-
-#define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
+#define MLOGD LOG2("LowLagDecoder")
 constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
 constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 
@@ -83,7 +82,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     AMediaFormat* format=AMediaFormat_new();
     AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/avc");
     const auto videoWH= sps.getVideoWidthHeightSPS();
-    MLOGD("XYZ %d %d",videoWH[0],videoWH[1]);
+    MLOGD<<"Video W:"<<videoWH[0]<<" H:"<<videoWH[1];
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
     //AVCProfileBaseline==1
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
@@ -96,7 +95,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
     AMediaFormat_delete(format);
     if (decoder.codec== nullptr) {
-        MLOGD("Cannot configure decoder");
+        MLOGD<<"Cannot configure decoder";
         //set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
         mKeyFrameFinder.reset();
         return;
@@ -124,7 +123,7 @@ void LowLagDecoder::checkOutputLoop() {
             decodingTime_us.add((long)deltaDecodingTime);
             nDecodedFrames.add(1);
             if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
-                MLOGD("Decoder saw EOS");
+                MLOGD<<"Decoder saw EOS";
                 decoderSawEOS=true;
                 continue;
             }
@@ -135,13 +134,13 @@ void LowLagDecoder::checkOutputLoop() {
             if(onDecoderRatioChangedCallback!= nullptr && mWidth!=0 && mHeight!=0){
                 onDecoderRatioChangedCallback({mWidth,mHeight});
             }
-            MLOGD("AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED %d %d %s",mWidth,mHeight,AMediaFormat_toString(format));
+            MLOGD<<"AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED "<<mWidth<<" "<<mHeight<<" "<<AMediaFormat_toString(format);
         } else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
-            MLOGD("AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED");
+            MLOGD<<"AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED";
         } else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
             //LOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER");
         } else {
-            MLOGD("dequeueOutputBuffer idx: %d .Exit.",(int)index);
+            MLOGD<<"dequeueOutputBuffer idx: "<<(int)index<<" .Exit.";
             decoderProducedUnknown=true;
             continue;
         }
@@ -162,7 +161,7 @@ void LowLagDecoder::checkOutputLoop() {
             }
         }
     }
-    MLOGD("Exit CheckOutputLoop");
+    MLOGD<<"Exit CheckOutputLoop";
 }
 
 void LowLagDecoder::feedDecoder(const NALU* naluP){
@@ -182,7 +181,7 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
             }else{
                 const NALU& nalu=*naluP;
                 if(nalu.data_length>inputBufferSize){
-                    LOG::D("Nalu too big %d",nalu.data_length);
+                    MLOGD<<"Nalu too big"<<nalu.data_length;
                     return;
                 }
                 std::memcpy(buf, nalu.data,(size_t)nalu.data_length);
@@ -200,12 +199,12 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
             //just try again. But if we had no success in the last 1 second,log a warning and return
             const int deltaMS=(int)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-now).count();
             if(deltaMS>1000){
-                MLOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second %d. return.",deltaMS);
+                MLOGD<<"AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "<<deltaMS<<". return.";
                 return;
             }
         }else{
             //Something went wrong. But we will feed the next NALU soon anyways
-            MLOGD("dequeueInputBuffer idx %d return.",(int)index);
+            MLOGD<<"dequeueInputBuffer idx "<<(int)index<<"return.";
             return;
         }
     }
@@ -257,7 +256,7 @@ void LowLagDecoder::printAvgLog() {
             "\nN NALUS:"<<decodingInfo.nNALU
             <<" | N NALUES feeded:" <<decodingInfo.nNALUSFeeded<<" | N Decoded Frames:"<<nDecodedFrames.getAbsolute()<<
             "\nFPS:"<<decodingInfo.currentFPS;
-    MLOGD("%s",frameLog.str().c_str());
+    MLOGD<<frameLog.str();
 #endif
 
     /*std::stringstream properties;

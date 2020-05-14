@@ -21,6 +21,7 @@
  * Namespace with utility functions for reading RAW files
  */
 namespace FileReaderRAW {
+    constexpr auto TAG="FileReaderRAW";
     static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;
     typedef std::function<void(const uint8_t[], std::size_t)> RAW_DATA_CALLBACK;
 
@@ -30,7 +31,7 @@ namespace FileReaderRAW {
     static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
-            LOG::D("Cannot open file %s", FILENAME.c_str());
+            LOG2()<<"Cannot open file "<<FILENAME;
             return;
         }
         //LOGD("Opened File %s", FILEPATH.c_str());
@@ -56,7 +57,7 @@ namespace FileReaderRAW {
                                      const std::future<void>& shouldTerminate,const bool loopAtEndOfFile){
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
-            LOG::D("Cannot open Asset:%s",PATH.c_str());
+            LOGE(TAG)<<"Cannot open Asset:"<<PATH;
             return;
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
@@ -89,7 +90,7 @@ namespace FileReaderRAW {
     loadRawAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
         AAsset *asset = AAssetManager_open(assetManager, path.c_str(), 0);
         if (!asset) {
-            LOG::D("Error asset not found:%s", path.c_str());
+            LOGE(TAG)<<"Error asset not found:"<<path;
             return std::vector<uint8_t>();
         }
         const size_t size = (size_t) AAsset_getLength(asset);
@@ -97,7 +98,7 @@ namespace FileReaderRAW {
         std::vector<uint8_t> rawData(size);
         const auto len = AAsset_read(asset, rawData.data(), size);
         AAsset_close(asset);
-        LOG::D("The entire file content (asset,raw) is in memory %d", (int) rawData.size());
+        LOG2(TAG)<<"The entire file content (asset,raw) is in memory "<<rawData.size();
         return rawData;
     }
 
@@ -116,7 +117,7 @@ namespace FileReaderRAW {
             rawData.resize(rawData.size()+len);
             memcpy(&rawData.at(offset),d,(size_t)len);
         },futureObj,false);
-        LOG::D("The entire file content (asset,raw) is in memory %d", (int) rawData.size());
+        LOG2(TAG)<<"The entire file content (asset,raw) is in memory"<<rawData.size();
         return rawData;
     }
 }
