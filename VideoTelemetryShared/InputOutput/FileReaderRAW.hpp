@@ -15,7 +15,7 @@
 #include <android/log.h>
 #include <sstream>
 #include <fstream>
-#include <MDebug.hpp>
+#include <AndroidLogger.hpp>
 
 /**
  * Namespace with utility functions for reading RAW files
@@ -31,7 +31,7 @@ namespace FileReaderRAW {
     static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
-            LOG2()<<"Cannot open file "<<FILENAME;
+            LOGE(TAG)<<"Cannot open file "<<FILENAME;
             return;
         }
         //LOGD("Opened File %s", FILEPATH.c_str());
@@ -98,7 +98,7 @@ namespace FileReaderRAW {
         std::vector<uint8_t> rawData(size);
         const auto len = AAsset_read(asset, rawData.data(), size);
         AAsset_close(asset);
-        LOG2(TAG)<<"The entire file content (asset,raw) is in memory "<<rawData.size();
+        LOGD(TAG)<<"The entire file content (asset,raw) is in memory "<<rawData.size();
         return rawData;
     }
 
@@ -117,7 +117,7 @@ namespace FileReaderRAW {
             rawData.resize(rawData.size()+len);
             memcpy(&rawData.at(offset),d,(size_t)len);
         },futureObj,false);
-        LOG2(TAG)<<"The entire file content (asset,raw) is in memory"<<rawData.size();
+        LOGD(TAG)<<"The entire file content (asset,raw) is in memory"<<rawData.size();
         return rawData;
     }
 }

@@ -10,7 +10,6 @@
 #include <android/log.h>
 #include <sched.h>
 #include <pthread.h>
-//#include <MDebug.hpp>
 
 // This namespace contains helper to set specific CPU thread priorities to deal
 // With scheduling in a multi-threaded application

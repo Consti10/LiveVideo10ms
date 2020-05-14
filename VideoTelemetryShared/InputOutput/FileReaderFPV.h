@@ -43,7 +43,7 @@ namespace FileReaderFPV{
                 if(loopAtEOF){
                     file.clear();
                     file.seekg (0, std::ios::beg);
-                    LOG2(TAG)<<"RESET";
+                    LOGD(TAG)<<"RESET";
                     continue;
                 }else{
                     break;
@@ -78,7 +78,7 @@ namespace FileReaderFPV{
             if(len!=sizeof(GroundRecorderFPV::StreamPacket)){
                 if(loopAtEOF){
                     AAsset_seek(asset, 0, SEEK_SET);
-                    LOG2(TAG)<<"RESET";
+                    LOGD(TAG)<<"RESET";
                     continue;
                 }else{
                     break;

@@ -12,7 +12,7 @@ constexpr const auto TAG="LowLagDecoder";
 #include <h264_stream.h>
 #include <vector>
 
-#define MLOGD LOG2("LowLagDecoder")
+#define MLOGD LOGD("LowLagDecoder")
 constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
 constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 

@@ -18,7 +18,7 @@
 #include <memory>
 #include <android/asset_manager.h>
 #include <media/NdkMediaExtractor.h>
-#include <MDebug.hpp>
+#include <AndroidLogger.hpp>
 
 /**
  * Namespace that holds utility functions for reading MP4 files
@@ -99,21 +99,21 @@ namespace FileReaderMP4{
             AMediaFormat* format= AMediaExtractor_getTrackFormat(extractor,i);
             const char* s;
             AMediaFormat_getString(format,AMEDIAFORMAT_KEY_MIME,&s);
-            LOG2()<<"Track is"<<s;
+            LOGD(TAG)<<"Track is"<<s;
             if(std::string(s).compare("video/avc")==0){
                 mediaStatus=AMediaExtractor_selectTrack(extractor,i);
                 const auto csd0=getBufferFromMediaFormat("csd-0",format);
                 callback(csd0.data(),csd0.size());
                 const auto csd1=getBufferFromMediaFormat("csd-1",format);
                 callback(csd1.data(),csd1.size());
-                LOG2()<<"Video track found "<<mediaStatus<<" "<<AMediaFormat_toString(format);
+                LOGD(TAG)<<"Video track found "<<mediaStatus<<" "<<AMediaFormat_toString(format);
                 AMediaFormat_delete(format);
                 videoTrackFound=true;
                 break;
             }
         }
         if(!videoTrackFound){
-            LOG2()<<"Cannot find video track";
+            LOGE(TAG)<<"Cannot find video track";
             AMediaExtractor_delete(extractor);
             if(assetManager!=nullptr){
                 AAsset_close(asset);
