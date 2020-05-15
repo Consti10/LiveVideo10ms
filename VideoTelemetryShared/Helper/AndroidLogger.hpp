@@ -9,6 +9,14 @@
 #include <string.h>
 #include <sstream>
 
+// remove any old c style definitions that might have slip trough some header files
+#ifdef LOGD
+#undef LOGD
+#endif
+#ifdef LOGE
+#undef LOGE
+#endif
+
 // See https://medium.com/@geierconstantinabc/best-way-to-log-in-android-native-code-c-style-7461005610f6
 // Handles logging in all my android studio projects with native code
 // inspired by https://android.googlesource.com/platform/system/core/+/refs/heads/master/base/include/android-base/logging.h

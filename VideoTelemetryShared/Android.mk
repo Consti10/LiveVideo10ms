@@ -1,0 +1,4 @@
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/Helper
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/InputOutput

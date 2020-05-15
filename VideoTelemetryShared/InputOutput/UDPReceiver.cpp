@@ -7,8 +7,9 @@
 #include <sstream>
 #include <array>
 
-#define TAG "UDPReceiver"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
+constexpr auto TAG="UDPReceiver";
+#define MLOGD LOGD(TAG)
+#define MLOGE LOGE(TAG)
 
 UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
         mPort(port),mName(name),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback),javaVm(javaVm){
@@ -54,15 +55,15 @@ void UDPReceiver::receiveFromUDPLoop() {
     int recvBufferSize=0;
     socklen_t len=sizeof(recvBufferSize);
     getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
-    LOGD("Default socket recv buffer is %d bytes", recvBufferSize);
+    MLOGD<<"Default socket recv buffer is "<<recvBufferSize<<"bytes";
 
     if(WANTED_RCVBUF_SIZE>recvBufferSize){
         recvBufferSize=WANTED_RCVBUF_SIZE;
         if(setsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &WANTED_RCVBUF_SIZE,len)) {
-            LOGD("Cannot increase buffer size to %d bytes", WANTED_RCVBUF_SIZE);
+            MLOGD<<"Cannot increase buffer size to "<<WANTED_RCVBUF_SIZE<<"bytes";
         }
         getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
-        LOGD("Wanted %d Set %d", WANTED_RCVBUF_SIZE,recvBufferSize);
+        MLOGD<<"Wanted "<<WANTED_RCVBUF_SIZE<<" Set "<<recvBufferSize;
     }
     NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,mCPUPriority,mName.c_str());
     struct sockaddr_in myaddr;
@@ -71,7 +72,7 @@ void UDPReceiver::receiveFromUDPLoop() {
     myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myaddr.sin_port = htons(mPort);
     if (bind(mSocket, (struct sockaddr *) &myaddr, sizeof(myaddr)) == -1) {
-        LOGD("Error binding Port; %d", mPort);
+        MLOGE<<"Error binding Port; "<<mPort;
         return;
     }
     //wrap into unique pointer to avoid running out of stack
@@ -108,7 +109,7 @@ void UDPReceiver::receiveFromUDPLoop() {
                             allInAscendingOrder=false;
                         }
                     }
-                    LOGD("Seq numbers. In order %d  In ascending order %d values : %s",(int)allInOrder,(int)allInAscendingOrder,ss.str().c_str());
+                    MLOGD<<"Seq numbers. In order "<<allInOrder<<"  In ascending order "<<allInAscendingOrder<<" values : "<<ss.str();
                     sequenceNumbers.resize(0);
                 }
                 onDataReceivedCallback(&buff->data()[1], (size_t)message_length);
@@ -127,7 +128,7 @@ void UDPReceiver::receiveFromUDPLoop() {
             }
         }else{
             if(errno != EWOULDBLOCK) {
-                LOGD("Error on recvfrom. errno=%d %s", errno, strerror(errno));
+                MLOGE<<"Error on recvfrom. errno="<<errno<<" "<<strerror(errno);
             }
         }
     }
