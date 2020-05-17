@@ -51,11 +51,11 @@ public:
     using PACKET_TYPE=uint8_t;
     using TIMESTAMP_MS=unsigned int;
     // Each time I write raw data to the file it is prefixed by this header
-    // giving info about how to interpret the raw data
+    // giving info about how to interpret the raw data and its size
     typedef struct{
         unsigned int packet_length;
         PACKET_TYPE packet_type;
-        // This value is in ms
+        // This value is in ms and always strictly increasing
         TIMESTAMP_MS timestamp;
         uint8_t placeholder[8];//8 bytes as placeholder for future use
     }__attribute__((packed)) StreamPacketHeader;
