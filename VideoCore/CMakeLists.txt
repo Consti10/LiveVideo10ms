@@ -76,6 +76,8 @@ set(HELPER_PATH ${V_CORE_DIR}/../VideoTelemetryShared/Helper)
 include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
 
+# Without that dummy .cpp file android studio does not properly show .hpp only source directories
+add_library(MyDummyLib SHARED ${HELPER_PATH}/ZDummy.cpp)
 
 set(VIDEO_PATH src/main/cpp)
 add_library( VideoNative

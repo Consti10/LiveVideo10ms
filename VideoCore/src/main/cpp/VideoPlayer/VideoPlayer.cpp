@@ -1,6 +1,7 @@
 
 #include "VideoPlayer.h"
-#include <CPUPriority.hpp>
+#include <AndroidThreadPrioValues.hpp>
+#include <NDKThreadHelper.hpp>
 #include "../IDV.hpp"
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
@@ -10,7 +11,6 @@
 constexpr auto TAG="VideoNative";
 #define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
-#include <NDKThreadHelper.hpp>
 
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},

@@ -49,13 +49,16 @@ public:
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_EZWB=5;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_ANDROD_GPS=6;
     using PACKET_TYPE=uint8_t;
-    using TIMESTAMP=unsigned int;
+    using TIMESTAMP_MS=unsigned int;
+    // Each time I write raw data to the file it is prefixed by this header
+    // giving info about how to interpret the raw data
     typedef struct{
         unsigned int packet_length;
         PACKET_TYPE packet_type;
-        TIMESTAMP timestamp;
+        // This value is in ms
+        TIMESTAMP_MS timestamp;
         uint8_t placeholder[8];//8 bytes as placeholder for future use
-    }__attribute__((packed)) StreamPacket;
+    }__attribute__((packed)) StreamPacketHeader;
 public:
     GroundRecorderFPV(std::string s):DIRECTORY(s) {}
     //It is okay to call start() multiple times
@@ -77,12 +80,12 @@ public:
         createOpenFileIfNeeded();
         //calculate the timestamp
         auto now=std::chrono::steady_clock::now();
-        const TIMESTAMP timestamp=(TIMESTAMP)std::chrono::duration_cast<std::chrono::milliseconds>(now-fileCreationTime).count();
-        StreamPacket streamPacket;
+        const TIMESTAMP_MS timestamp=(TIMESTAMP_MS)std::chrono::duration_cast<std::chrono::milliseconds>(now - fileCreationTime).count();
+        StreamPacketHeader streamPacket;
         streamPacket.packet_length=(unsigned int)packet_length;
         streamPacket.packet_type=packet_type;
         streamPacket.timestamp=timestamp;
-        ofstream.write((char*)&streamPacket,sizeof(StreamPacket));
+        ofstream.write((char*)&streamPacket,sizeof(StreamPacketHeader));
         ofstream.write((char*)packet,packet_length);
     }
 private:

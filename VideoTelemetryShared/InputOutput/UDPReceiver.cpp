@@ -1,6 +1,6 @@
 
 #include "UDPReceiver.h"
-#include <CPUPriority.hpp>
+#include <AndroidThreadPrioValues.hpp>
 #include <NDKThreadHelper.hpp>
 #include <arpa/inet.h>
 #include <vector>

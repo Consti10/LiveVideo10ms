@@ -24,7 +24,14 @@
 namespace FileReaderFPV{
     constexpr auto TAG="FileReaderFPV";
     static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;
-    typedef std::function<void(const uint8_t[],const GroundRecorderFPV::StreamPacket)> MY_CALLBACK;
+    // This one is passed around when reading the data.
+    typedef struct{
+        GroundRecorderFPV::PACKET_TYPE packet_type;
+        std::chrono::milliseconds timestamp;
+        uint8_t* data;
+        size_t data_length;
+    }GroundRecordingPacket;
+    typedef std::function<void(const GroundRecordingPacket&)> MY_CALLBACK;
 
     static void readFpvFileInChunks(const std::string &FILENAME,MY_CALLBACK callback, const std::future<void>& shouldTerminate,const bool loopAtEOF) {
         std::ifstream file (FILENAME.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
@@ -36,10 +43,10 @@ namespace FileReaderFPV{
         file.seekg (0, std::ios::beg);
         const auto buffer=std::make_unique<std::array<uint8_t,MAX_NALU_BUFF_SIZE>>();
         while(shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout){
-            GroundRecorderFPV::StreamPacket header;
-            file.read((char*)&header,sizeof(GroundRecorderFPV::StreamPacket));
+            GroundRecorderFPV::StreamPacketHeader header;
+            file.read((char*)&header,sizeof(GroundRecorderFPV::StreamPacketHeader));
             std::streamsize dataSize = file.gcount();
-            if(dataSize!=sizeof(GroundRecorderFPV::StreamPacket)){
+            if(dataSize!=sizeof(GroundRecorderFPV::StreamPacketHeader)){
                 if(loopAtEOF){
                     file.clear();
                     file.seekg (0, std::ios::beg);
@@ -57,7 +64,8 @@ namespace FileReaderFPV{
                 LOGE(TAG)<<"File was written wrong";
                 continue;
             }
-            callback(buffer->data(),header);
+            GroundRecordingPacket groundRecordingPacket{header.packet_type,std::chrono::milliseconds(header.timestamp),buffer->data(),header.packet_length};
+            callback(groundRecordingPacket);
         }
         file.close();
     }
@@ -72,10 +80,10 @@ namespace FileReaderFPV{
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
         AAsset_seek(asset, 0, SEEK_SET);
         while(shouldTerminate.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout){
-            GroundRecorderFPV::StreamPacket header;
+            GroundRecorderFPV::StreamPacketHeader header;
             //If reading the header fails,we have reached the EOF
-            const auto len = AAsset_read(asset,&header,sizeof(GroundRecorderFPV::StreamPacket));
-            if(len!=sizeof(GroundRecorderFPV::StreamPacket)){
+            const auto len = AAsset_read(asset,&header,sizeof(GroundRecorderFPV::StreamPacketHeader));
+            if(len!=sizeof(GroundRecorderFPV::StreamPacketHeader)){
                 if(loopAtEOF){
                     AAsset_seek(asset, 0, SEEK_SET);
                     LOGD(TAG)<<"RESET";
@@ -90,7 +98,8 @@ namespace FileReaderFPV{
                 AAsset_seek(asset, 0, SEEK_SET);
                 continue;
             }
-            callback(buffer->data(),header);
+            GroundRecordingPacket groundRecordingPacket{header.packet_type,std::chrono::milliseconds(header.timestamp),buffer->data(),header.packet_length};
+            callback(groundRecordingPacket);
         }
         AAsset_close(asset);
     }

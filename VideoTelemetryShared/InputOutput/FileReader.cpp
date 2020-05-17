@@ -70,21 +70,23 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
     }else if(FileHelper::endsWith(FILEPATH, ".fpv")){
         auto start=std::chrono::steady_clock::now();
         const bool loopAtEOF=assetManager!=nullptr;
-        GroundRecorderFPV::TIMESTAMP lastPacketTimestamp=0;
-        FileReaderFPV::readFpvAssetOrFileInChunks(assetManager,FILEPATH, [this,&start,&shouldTerminate,&lastPacketTimestamp](const uint8_t *data,const GroundRecorderFPV::StreamPacket header) {
+        std::chrono::milliseconds lastPacketTimestamp(0);
+        FileReaderFPV::readFpvAssetOrFileInChunks(assetManager,FILEPATH, [this,&start,&shouldTerminate,&lastPacketTimestamp](const FileReaderFPV::GroundRecordingPacket& packet) {
             // the timestamp is guaranteed to be strictly increasing. If it is not, this probably means we reached
             // EOF and are looping. Reset start time in this case
-            if(header.timestamp<lastPacketTimestamp){
+            if(packet.timestamp<lastPacketTimestamp){
                 start=std::chrono::steady_clock::now();
             }
             //sync the timestamp when data was received with the timestamp from file
             auto elapsed=std::chrono::steady_clock::now()-start;
-            lastPacketTimestamp=header.timestamp;
+            lastPacketTimestamp=packet.timestamp;
             //wait until we are at least at the time when data was received
-            while(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()<header.timestamp){
+            while(elapsed<packet.timestamp){
                 elapsed=std::chrono::steady_clock::now()-start;
             }
-            splitDataInChunks(shouldTerminate,data,header.packet_length,header.packet_type);
+            //const auto timeToWaitUs=(long)header.timestamp-std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+            //if(timeToWaitNS)
+            splitDataInChunks(shouldTerminate,packet.data,packet.data_length,packet.packet_type);
         },shouldTerminate,loopAtEOF);
     }else if(FileHelper::endsWith(FILEPATH, ".h264")){
         //raw video ends with .h264
@@ -93,7 +95,7 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
         },shouldTerminate);
     }else if(isTelemetryFilename(FILEPATH) != -1) {
         //Telemetry ends with .ltm, .mavlink usw
-        const GroundRecorderFPV::PACKET_TYPE packetType=(GroundRecorderFPV::PACKET_TYPE)isTelemetryFilename(FILEPATH);
+        const auto packetType=(GroundRecorderFPV::PACKET_TYPE)isTelemetryFilename(FILEPATH);
         FileReaderRAW::readRawInChunks(assetManager,FILEPATH, [this,packetType,&shouldTerminate](const uint8_t *data, size_t data_length) {
             splitDataInChunks(shouldTerminate,data, data_length,packetType);
         },shouldTerminate);

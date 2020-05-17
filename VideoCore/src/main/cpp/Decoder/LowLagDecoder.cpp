@@ -1,6 +1,6 @@
 
 #include "LowLagDecoder.h"
-#include <CPUPriority.hpp>
+#include <AndroidThreadPrioValues.hpp>
 #include <NDKThreadHelper.hpp>
 #include <unistd.h>
 #include <sstream>

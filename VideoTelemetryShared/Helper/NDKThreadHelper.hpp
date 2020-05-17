@@ -29,6 +29,7 @@ namespace JThread{
     }
 }
 // Java android.os.Process utility methods (not java/lang/Process !)
+// I think process and thread is used in the same context here
 namespace JProcess{
     // calls android.os.Process.setThreadPriority()
     static void setThreadPriority(JNIEnv* env, int wantedPriority){
@@ -93,6 +94,7 @@ namespace NDKThreadHelper{
     }
 }
 
+#include <thread>
 namespace NDKTHREADHELPERTEST{
     // attach java VM, set Thread priority & print it.
     // Then detach, reattach JVM and print thread priority
