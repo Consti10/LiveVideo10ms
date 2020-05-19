@@ -10,7 +10,7 @@
 #include "GroundRecorderRAW.hpp"
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H264Parser.h"
-#include <SettingsN.hpp>
+#include <SharedPreferences.hpp>
 #include <GroundRecorderFPV.hpp>
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
@@ -29,7 +29,7 @@ private:
     void onNewNALU(const NALU& nalu);
     //don't forget to call ANativeWindow_release() on this pointer
     ANativeWindow* window=nullptr;
-    SettingsN mSettingsN;
+    SharedPreferences mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
     JavaVM* javaVm;

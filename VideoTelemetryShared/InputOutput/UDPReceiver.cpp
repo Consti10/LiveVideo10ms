@@ -65,7 +65,7 @@ void UDPReceiver::receiveFromUDPLoop() {
         getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
         MLOGD<<"Wanted "<<WANTED_RCVBUF_SIZE<<" Set "<<recvBufferSize;
     }
-    NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,mCPUPriority,mName.c_str());
+    NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm, mCPUPriority, mName.c_str());
     struct sockaddr_in myaddr;
     memset((uint8_t *) &myaddr, 0, sizeof(myaddr));
     myaddr.sin_family = AF_INET;

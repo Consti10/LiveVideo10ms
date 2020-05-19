@@ -43,8 +43,6 @@ typedef struct fu_header {
     uint8_t s:      1;
 } __attribute__ ((packed)) fu_header_t; /* 1 bytes */
 
-#define MLOGD LOGD("ParseRTP")
-
 ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(cb){
 }
 

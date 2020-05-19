@@ -106,7 +106,9 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
 }
 
 void LowLagDecoder::checkOutputLoop() {
-    NDKThreadHelper::attachAndSetProcessThreadPriority(javaVm,FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT,"DecoderCheckOutput");
+    NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm,
+                                                          FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT,
+                                                          "DecoderCheckOutput");
     AMediaCodecBufferInfo info;
     bool decoderSawEOS=false;
     bool decoderProducedUnknown=false;
@@ -117,6 +119,11 @@ void LowLagDecoder::checkOutputLoop() {
             const int64_t nowNS=(int64_t)duration_cast<nanoseconds>(now.time_since_epoch()).count();
             const int64_t nowUS=(int64_t)duration_cast<microseconds>(now.time_since_epoch()).count();
             //the timestamp for releasing the buffer is in NS, just release as fast as possible (e.g. now)
+            //https://android.googlesource.com/platform/frameworks/av/+/master/media/ndk/NdkMediaCodec.cpp
+            //-> renderOutputBufferAndRelease which is in https://android.googlesource.com/platform/frameworks/av/+/3fdb405/media/libstagefright/MediaCodec.cpp
+            //-> Message kWhatReleaseOutputBuffer -> onReleaseOutputBuffer
+            // also https://android.googlesource.com/platform/frameworks/native/+/5c1139f/libs/gui/SurfaceTexture.cpp
+
             AMediaCodec_releaseOutputBufferAtTime(decoder.codec,(size_t)index,nowNS);
             //but the presentationTime is in US
             int64_t deltaDecodingTime=nowUS-info.presentationTimeUs;

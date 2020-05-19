@@ -8,6 +8,7 @@
 #include <jni.h>
 #include <AndroidLogger.hpp>
 
+// Workaround for issue https://github.com/android/ndk/issues/1255
 // Java Thread utility methods
 namespace JThread{
     static int getThreadPriority(JNIEnv* env){
@@ -78,7 +79,7 @@ namespace NDKThreadHelper{
     // If the current thread is already bound to the Java VM only call JProcess::setThreadPriority
     // If no Java VM is attached (e.g. the thread was created via ndk std::thread or equivalent)
     // attach the java vm, set priority and then DETACH again
-    static void attachAndSetProcessThreadPriority(JavaVM* vm,int wantedPriority,const char* TAG="Unknown"){
+    static void setProcessThreadPriorityAttachDetach(JavaVM* vm,int wantedPriority, const char* TAG= "Unknown"){
         JNIEnv* env=nullptr;
         vm->GetEnv((void**)&env,JNI_VERSION_1_6);
         bool detachWhenDone=false;

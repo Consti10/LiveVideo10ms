@@ -35,9 +35,7 @@ namespace FileReaderMP4{
         uint8_t* data;
         size_t data_size;
         AMediaFormat_getBuffer(format,name,(void**)&data,&data_size);
-        std::vector<uint8_t> ret(data_size);
-        memcpy(ret.data(),data,data_size);
-        return ret;
+        return std::vector<uint8_t>(data,data+data_size);
     }
     /**
      *  Helper, return size of file in bytes
