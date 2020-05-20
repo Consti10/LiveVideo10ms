@@ -48,7 +48,7 @@ ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(std::move(cb)){
 
 void ParseRTP::reset(){
     nalu_data_length=0;
-    nalu_data.reserve(NALU::NALU_MAXLEN);
+    //nalu_data.reserve(NALU::NALU_MAXLEN);
 }
 
 void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){

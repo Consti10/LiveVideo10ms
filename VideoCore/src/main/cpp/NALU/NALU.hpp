@@ -51,7 +51,7 @@ public:
         //check();
     };
     NALU(const std::vector<uint8_t> data,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(std::move(data)),
+            data(data),
             creationTime{creationTime}{
         //check();
     };
