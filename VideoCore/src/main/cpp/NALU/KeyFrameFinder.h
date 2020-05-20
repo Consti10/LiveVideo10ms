@@ -19,14 +19,14 @@ private:
     std::vector<uint8_t> CSD1;
 public:
     void saveIfKeyFrame(const NALU &nalu){
-        if(nalu.data_length<=0)return;
+        if(nalu.getSize()<=0)return;
         if(nalu.isSPS()){
-            CSD0.resize(nalu.data_length);
-            memcpy(CSD0.data(),nalu.data,(size_t )nalu.data_length);
+            CSD0.resize(nalu.getSize());
+            memcpy(CSD0.data(),nalu.getData(),(size_t )nalu.getSize());
             MLOGD<<"SPS found";
         }else if(nalu.isPPS()){
-            CSD1.resize(nalu.data_length);
-            memcpy(CSD1.data(),nalu.data,(size_t )nalu.data_length);
+            CSD1.resize(nalu.getSize());
+            memcpy(CSD1.data(),nalu.getData(),(size_t )nalu.getSize());
             MLOGD<<"PPS found";
         }
     }
@@ -35,11 +35,11 @@ public:
     }
     //SPS
     NALU getCSD0(){
-        return NALU(CSD0.data(),CSD0.size());
+        return NALU(CSD0);
     }
     //PPS
     NALU getCSD1(){
-        return NALU(CSD1.data(),CSD1.size());
+        return NALU(CSD1);
     }
     void setSPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
         const auto sps=getCSD0();
@@ -47,8 +47,8 @@ public:
         const auto videoWH= sps.getVideoWidthHeightSPS();
         AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
         AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-        AMediaFormat_setBuffer(format,"csd-0",sps.data,(size_t)sps.data_length);
-        AMediaFormat_setBuffer(format,"csd-1",pps.data,(size_t)pps.data_length);
+        AMediaFormat_setBuffer(format,"csd-0",sps.getData(),(size_t)sps.getSize());
+        AMediaFormat_setBuffer(format,"csd-1",pps.getData(),(size_t)pps.getSize());
     }
     void reset(){
         CSD0.resize(0);

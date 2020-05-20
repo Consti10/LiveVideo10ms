@@ -45,20 +45,37 @@ public:
     //*/
     static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
 public:
-    NALU(const uint8_t* data,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-        data(data),
-        data_length(data_length),
+    NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+    data(data1,data1+data_length),
         creationTime{creationTime}{
         //check();
     };
+    NALU(const std::vector<uint8_t> data,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(std::move(data)),
+            creationTime{creationTime}{
+        //check();
+    };
+    /*NALU(const std::vector<uint8_t> data1,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1),
+            creationTime{creationTime}{
+        //check();
+    };*/
     //void check(){
     //    __android_log_print(ANDROID_LOG_DEBUG,"NALU","check %d",data[data_length-1]);
     //}
-    const uint8_t* data;
-    const size_t data_length;
-    const std::chrono::steady_clock::time_point creationTime;
-    const uint32_t presentationTimeMS=0;
+    //const uint8_t* data;
+    //const size_t data_length;
+private:
+    const std::vector<uint8_t> data;
 public:
+    const std::chrono::steady_clock::time_point creationTime;
+public:
+    const size_t getSize()const{
+        return data.size();
+    }
+    const uint8_t* getData()const{
+        return data.data();
+    }
     bool isSPS()const{
         return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);
     }
@@ -66,7 +83,7 @@ public:
         return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
     }
     int get_nal_unit_type()const{
-        if(data_length<5)return -1;
+        if(data.size()<5)return -1;
         return data[4]&0x1f;
     }
     //not safe if data_length<=4;
@@ -75,7 +92,7 @@ public:
         return &data[4];
     }
     const ssize_t getDataSizeWithoutPrefix()const{
-        return data_length-4;
+        return data.size()-4;
     }
     static std::string get_nal_name(int nal_unit_type){
        std::string nal_unit_type_name;
@@ -117,7 +134,7 @@ public:
 
     std::string dataAsString()const{
         std::stringstream ss;
-        for(int i=0;i<data_length;i++){
+        for(int i=0;i<data.size();i++){
             ss<<(int)data[i]<<",";
         }
         return ss.str();
@@ -161,7 +178,7 @@ public:
     //    //Do manipulations to h->sps...
     //    modNALU=NALU::fromH264StreamAndFree(h,&nalu);
     //}
-    static NALU* fromH264StreamAndFree(h264_stream_t* h,const NALU* oldNALU= nullptr){
+    /*static NALU* fromH264StreamAndFree(h264_stream_t* h,const NALU* oldNALU= nullptr){
         //The write function seems to be a bit buggy, e.g. its input buffer size needs to be stupid big
         std::vector<uint8_t> tmp(1024);
         int writeRet=write_nal_unit(h,tmp.data(),1024);
@@ -174,13 +191,13 @@ public:
         uint8_t* newNaluData=new uint8_t[writeRet];
         memcpy(newNaluData,tmp.data(),(size_t)writeRet);
         if(oldNALU!= nullptr){
-            if(oldNALU->data_length!=writeRet){
-                __android_log_print(ANDROID_LOG_ERROR,"NALU","Error h264bitstream %d %d",(int)oldNALU->data_length,writeRet);
+            if(oldNALU->data.size()!=writeRet){
+                __android_log_print(ANDROID_LOG_ERROR,"NALU","Error h264bitstream %d %d",(int)oldNALU->data.size(),writeRet);
             }
             return new NALU(newNaluData,(size_t)writeRet,oldNALU->creationTime);
         }
         return new NALU(newNaluData,(size_t)writeRet);
-    }
+    }*/
 };
 
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;

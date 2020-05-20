@@ -48,6 +48,7 @@ ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(std::move(cb)){
 
 void ParseRTP::reset(){
     nalu_data_length=0;
+    nalu_data.reserve(NALU::NALU_MAXLEN);
 }
 
 void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
@@ -70,6 +71,8 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
                 nalu_data_length+=data_len-14;
                 if(cb!= nullptr){
                     NALU nalu(nalu_data.data(),nalu_data_length);
+                    //nalu_data.resize(nalu_data_length);
+                    //NALU nalu(nalu_data);
                     cb(nalu);
                 }
                 nalu_data_length=0;
@@ -110,6 +113,8 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
 
             if(cb!= nullptr){
                 NALU nalu(nalu_data.data(),nalu_data_length);
+                //nalu_data.resize(nalu_data_length);
+                //NALU nalu(nalu_data);
                 cb(nalu);
             }
             nalu_data_length=0;

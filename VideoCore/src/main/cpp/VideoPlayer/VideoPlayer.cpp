@@ -43,7 +43,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     if(mLowLagDecoder){
         mLowLagDecoder->interpretNALU(nalu);
     }
-    mGroundRecorderFPV.writePacketIfStarted(nalu.data,nalu.data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
+    mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
 }
 
 

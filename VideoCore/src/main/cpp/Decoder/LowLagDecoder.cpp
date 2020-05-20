@@ -42,13 +42,13 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     }*/
     //LOGD("%s",nalu.get_nal_name().c_str());
     decodingInfo.nNALU++;
-    nNALUBytesFed.add(nalu.data_length);
+    nNALUBytesFed.add(nalu.getSize());
     if(inputPipeClosed){
         //A feedD thread (e.g. file or udp) thread might still be running
         //But since we want to feed the EOS now we mustn't feed any more non-eos data
         return;
     }
-    if(nalu.data_length<=4){
+    if(nalu.getSize()<=4){
         //No data in NALU (e.g at the beginning of a stream)
         return;
     }
@@ -88,8 +88,8 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
     AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
     AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-    AMediaFormat_setBuffer(format,"csd-0",sps.data,(size_t)sps.data_length);
-    AMediaFormat_setBuffer(format,"csd-1",pps.data,(size_t)pps.data_length);
+    AMediaFormat_setBuffer(format,"csd-0",sps.getData(),sps.getSize());
+    AMediaFormat_setBuffer(format,"csd-1",pps.getData(),pps.getSize());
 
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
     AMediaFormat_delete(format);
@@ -185,17 +185,17 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
                 AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)0,0, AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
             }else{
                 const NALU& nalu=*naluP;
-                if(nalu.data_length>inputBufferSize){
-                    MLOGD<<"Nalu too big"<<nalu.data_length;
+                if(nalu.getSize()>inputBufferSize){
+                    MLOGD<<"Nalu too big"<<nalu.getSize();
                     return;
                 }
-                std::memcpy(buf, nalu.data,(size_t)nalu.data_length);
+                std::memcpy(buf, nalu.getData(),(size_t)nalu.getSize());
                 //this timestamp will be later used to calculate the decoding latency
                 const uint64_t presentationTimeUS=(uint64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
                 //Doing so causes garbage bug TODO investigate
                 //const auto flag=nalu.isPPS() || nalu.isSPS() ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
                 //AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, flag);
-                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS,0);
+                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.getSize(),presentationTimeUS,0);
                 waitForInputB_us.add((long)duration_cast<microseconds>(steady_clock::now()-now).count());
                 parsingTime_us.add((long)duration_cast<microseconds>(deltaParsing).count());
             }
