@@ -55,16 +55,6 @@ public:
             creationTime{creationTime}{
         //check();
     };
-    /*NALU(const std::vector<uint8_t> data1,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data1),
-            creationTime{creationTime}{
-        //check();
-    };*/
-    //void check(){
-    //    __android_log_print(ANDROID_LOG_DEBUG,"NALU","check %d",data[data_length-1]);
-    //}
-    //const uint8_t* data;
-    //const size_t data_length;
 private:
     const std::vector<uint8_t> data;
 public:
