@@ -26,7 +26,7 @@ namespace JThread{
         env->CallVoidMethod(joCurrentThread,jmSetPriority,(jint)wantedPriority);
     }
     static void printThreadPriority(JNIEnv* env){
-        LOGD("JThread")<<"printThreadPriority "<<getThreadPriority(env);
+        MLOGD<<"printThreadPriority "<<getThreadPriority(env);
     }
 }
 // Java android.os.Process utility methods (not java/lang/Process !)
@@ -47,7 +47,7 @@ namespace JProcess{
         return (int)env->CallStaticIntMethod(jcProcess,jmGetThreadPriority,(jint)myTid);
     }
     static void printThreadPriority(JNIEnv* env){
-        LOGD("JProcess")<<"printThreadPriority "<<getThreadPriority(env);
+        MLOGD<<"printThreadPriority "<<getThreadPriority(env);
     }
 }
 
@@ -71,9 +71,9 @@ namespace NDKThreadHelper{
         JProcess::setThreadPriority(env, wantedPriority);
         const int newPriority=JProcess::getThreadPriority(env);
         if(newPriority==wantedPriority){
-            LOGD(TAG)<<"Successfully set priority from "<<currentPriority<<" to"<<wantedPriority;
+            MLOGD<<"Successfully set priority from "<<currentPriority<<" to"<<wantedPriority;
         }else{
-            LOGD(TAG)<<"Cannot set priority from "<<currentPriority<<" to "<<wantedPriority<<" is "<<newPriority<<" instead";
+            MLOGD<<"Cannot set priority from "<<currentPriority<<" to "<<wantedPriority<<" is "<<newPriority<<" instead";
         }
     }
     // If the current thread is already bound to the Java VM only call JProcess::setThreadPriority
@@ -84,7 +84,7 @@ namespace NDKThreadHelper{
         vm->GetEnv((void**)&env,JNI_VERSION_1_6);
         bool detachWhenDone=false;
         if(env== nullptr){
-            LOGD(TAG)<<"Attaching thread";
+            MLOGD<<"Attaching thread";
             env=attachThread(vm);
             detachWhenDone=true;
         }

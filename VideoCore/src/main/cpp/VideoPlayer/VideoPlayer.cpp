@@ -8,8 +8,6 @@
 #include <android/asset_manager_jni.h>
 #include <FileHelper.hpp>
 
-constexpr auto TAG="VideoNative";
-#define MLOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
@@ -19,6 +17,8 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
     mFileReceiver(1024){
     env->GetJavaVM(&javaVm);
+
+    FFMPEGFileWriter::lol(GROUND_RECORDING_DIRECTORY);
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
@@ -131,7 +131,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         }
         break;
         case VIA_FFMPEG_URL:{
-            MLOGD("Started with SOURCE=TEST360");
+            MLOGD<<"Started with SOURCE=TEST360";
             const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/capture1.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
@@ -147,10 +147,10 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
         }break;
         case EXTERNAL:{
             //Data is being received somewhere else and passed trough-init nothing.
-            MLOGD("Started with SOURCE=EXTERNAL");
+            MLOGD<<"Started with SOURCE=EXTERNAL";
         }break;
         default:
-            MLOGD("Error unknown VS_SOURCE");
+            MLOGD<<"Error unknown VS_SOURCE";
             break;
     }
 }

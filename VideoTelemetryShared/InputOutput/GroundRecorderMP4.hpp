@@ -9,8 +9,7 @@
 #include <media/NdkMediaMuxer.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "../NALU/NALU.hpp"
-#include "../NALU/KeyFrameFinder.h"
+#include <FileHelper.hpp>
 
 //TODO work in progress
 //DEPRECATED
@@ -26,43 +25,35 @@ public:
         }
     }
     //
-    void writeData(const NALU& nalu) {
+    void writeData(const uint8_t* data, size_t data_length) {
         if(mMuxer== nullptr){
-            mKeyFrameFInder.saveIfKeyFrame(nalu);
-            if(mKeyFrameFInder.allKeyFramesAvailable()){
-                const std::string fn=GroundRecorderRAW::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
-                mFD = open(fn.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
-                mMuxer=AMediaMuxer_new(mFD,AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
-                AMediaFormat*format=AMediaFormat_new();
-                const auto SPS=mKeyFrameFInder.getCSD0();
-                const auto PPS=mKeyFrameFInder.getCSD1();
-                const auto videoWH= SPS.getVideoWidthHeightSPS();
-                AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/avc");
-                AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
-                AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-                AMediaFormat_setBuffer(format,"csd-0",SPS.data,(size_t)SPS.data_length);
-                AMediaFormat_setBuffer(format,"csd-1",PPS.data,(size_t)PPS.data_length);
-                AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_MAX_INPUT_SIZE,NALU::NALU_MAXLEN);
-                AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,30);
-                mTrackIndex=AMediaMuxer_addTrack(mMuxer,format);
-                //LOGD("Media Muxer track index %d",(int)mTrackIndex);
-                const auto status=AMediaMuxer_start(mMuxer);
-                //LOGD("Media Muxer status %d",status);
-                AMediaFormat_delete(format);
-                //Write SEI ?!
-                lastFeed=std::chrono::steady_clock::now();
-            }
+            const std::string fn=FileHelper::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
+            mFD = open(fn.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+            mMuxer=AMediaMuxer_new(mFD,AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
+            AMediaFormat*format=AMediaFormat_new();
+
+            AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/raw");
+            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,640);
+            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,480);
+            AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,30);
+            mTrackIndex=AMediaMuxer_addTrack(mMuxer,format);
+            //LOGD("Media Muxer track index %d",(int)mTrackIndex);
+            const auto status=AMediaMuxer_start(mMuxer);
+            MLOGD<<"Media Muxer status "<<status;
+            AMediaFormat_delete(format);
+            //Write SEI ?!
+            lastFeed=std::chrono::steady_clock::now();
         }else{
             AMediaCodecBufferInfo info;
             info.offset=0;
-            info.size=nalu.data_length;
+            info.size=data_length;
             const auto now=std::chrono::steady_clock::now();
             const auto duration=now-lastFeed;
             lastFeed=now;
             info.presentationTimeUs=std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
             //info.flags=0;
             info.flags=AMEDIACODEC_CONFIGURE_FLAG_ENCODE; //1
-            AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,nalu.data,&info);
+            AMediaMuxer_writeSampleData(mMuxer,mTrackIndex,data,&info);
         }
     }
 private:
@@ -70,7 +61,6 @@ private:
     int mFD;
     AMediaMuxer* mMuxer=nullptr;
     ssize_t mTrackIndex;
-    KeyFrameFinder mKeyFrameFInder;
     std::chrono::steady_clock::time_point lastFeed;
 };
 

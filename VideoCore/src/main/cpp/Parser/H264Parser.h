@@ -44,7 +44,7 @@ private:
     ParseRAW mParseRAW;
     ParseRTP mParseRTP;
     FrameLimiter mFrameLimiter;
-    int maxFPS;
+    int maxFPS=0;
     //First time a NALU was succesfully decoded
     //std::chrono::steady_clock::time_point timeFirstNALUArrived=std::chrono::steady_clock::time_point(0);
 };

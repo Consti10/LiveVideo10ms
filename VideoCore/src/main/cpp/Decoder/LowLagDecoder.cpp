@@ -7,12 +7,10 @@
 
 
 #define PRINT_DEBUG_INFO
-constexpr const auto TAG="LowLagDecoder";
 
 #include <h264_stream.h>
 #include <vector>
 
-#define MLOGD LOGD("LowLagDecoder")
 constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
 constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
 
@@ -64,6 +62,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
             configureStartDecoder(mKeyFrameFinder.getCSD0(),mKeyFrameFinder.getCSD1());
         }
     }
+
 }
 
 void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
@@ -123,7 +122,6 @@ void LowLagDecoder::checkOutputLoop() {
             //-> renderOutputBufferAndRelease which is in https://android.googlesource.com/platform/frameworks/av/+/3fdb405/media/libstagefright/MediaCodec.cpp
             //-> Message kWhatReleaseOutputBuffer -> onReleaseOutputBuffer
             // also https://android.googlesource.com/platform/frameworks/native/+/5c1139f/libs/gui/SurfaceTexture.cpp
-
             AMediaCodec_releaseOutputBufferAtTime(decoder.codec,(size_t)index,nowNS);
             //but the presentationTime is in US
             int64_t deltaDecodingTime=nowUS-info.presentationTimeUs;

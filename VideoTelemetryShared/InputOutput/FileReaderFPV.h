@@ -22,7 +22,6 @@
 #include "GroundRecorderFPV.hpp"
 
 namespace FileReaderFPV{
-    constexpr auto TAG="FileReaderFPV";
     static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;
     // This one is passed around when reading the data.
     typedef struct{
@@ -36,7 +35,7 @@ namespace FileReaderFPV{
     static void readFpvFileInChunks(const std::string &FILENAME,MY_CALLBACK callback, const std::future<void>& shouldTerminate,const bool loopAtEOF) {
         std::ifstream file (FILENAME.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
         if (!file.is_open()) {
-            LOGE(TAG)<<"Cannot open file "<<FILENAME;
+            MLOGE<<"Cannot open file "<<FILENAME;
             return;
         }
         //LOG::D("Opened File %s",FILENAME.c_str());
@@ -50,7 +49,7 @@ namespace FileReaderFPV{
                 if(loopAtEOF){
                     file.clear();
                     file.seekg (0, std::ios::beg);
-                    LOGD(TAG)<<"RESET";
+                    MLOGD<<"RESET";
                     continue;
                 }else{
                     break;
@@ -61,7 +60,7 @@ namespace FileReaderFPV{
             if(bytesRead!=header.packet_length){
                 file.clear();
                 file.seekg (0, std::ios::beg);
-                LOGE(TAG)<<"File was written wrong";
+                MLOGE<<"File was written wrong";
                 continue;
             }
             GroundRecordingPacket groundRecordingPacket{header.packet_type,std::chrono::milliseconds(header.timestamp),buffer->data(),header.packet_length};
@@ -74,7 +73,7 @@ namespace FileReaderFPV{
     static void readFpvAssetFileInChunks(AAssetManager* assetManager,const std::string &PATH,MY_CALLBACK callback,const std::future<void>& shouldTerminate,const bool loopAtEOF) {
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
-            LOGE(TAG)<<"Cannot open Asset: "<<PATH;
+            MLOGE<<"Cannot open Asset: "<<PATH;
             return;
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
@@ -86,7 +85,7 @@ namespace FileReaderFPV{
             if(len!=sizeof(GroundRecorderFPV::StreamPacketHeader)){
                 if(loopAtEOF){
                     AAsset_seek(asset, 0, SEEK_SET);
-                    LOGD(TAG)<<"RESET";
+                    MLOGD<<"RESET";
                     continue;
                 }else{
                     break;
@@ -94,7 +93,7 @@ namespace FileReaderFPV{
             }
             const auto len2 = AAsset_read(asset,buffer->data(),header.packet_length);
             if(len2!=header.packet_length){
-                LOGE(TAG)<<"file was written wrong";
+                MLOGE<<"file was written wrong";
                 AAsset_seek(asset, 0, SEEK_SET);
                 continue;
             }

@@ -7,9 +7,6 @@
 #include <sstream>
 #include <array>
 
-constexpr auto TAG="UDPReceiver";
-#define MLOGD LOGD(TAG)
-#define MLOGE LOGE(TAG)
 
 UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
         mPort(port),mName(name),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback),javaVm(javaVm){
@@ -45,12 +42,12 @@ void UDPReceiver::stopReceiving() {
 void UDPReceiver::receiveFromUDPLoop() {
     mSocket=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (mSocket == -1) {
-        LOGD("Error creating socket");
+        MLOGD<<"Error creating socket";
         return;
     }
     int enable = 1;
     if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0){
-        LOGD("Error setting reuse");
+        MLOGD<<"Error setting reuse";
     }
     int recvBufferSize=0;
     socklen_t len=sizeof(recvBufferSize);

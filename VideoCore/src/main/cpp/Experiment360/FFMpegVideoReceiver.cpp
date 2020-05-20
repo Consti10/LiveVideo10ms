@@ -110,6 +110,7 @@ void FFMpegVideoReceiver::run() {
         return;
     }
 
+
     // Open the codec
     if (avcodec_open2(m_codec_ctx, m_codec, 0) < 0) {
         LOGV("Error opening the decoding codec");

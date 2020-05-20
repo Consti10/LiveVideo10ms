@@ -17,11 +17,6 @@
 #undef LOGE
 #endif
 
-class Example{
-public:
-    const std::string TAG;
-    Example(std::string tag):TAG(std::move(tag)){};
-};
 // See https://medium.com/@geierconstantinabc/best-way-to-log-in-android-native-code-c-style-7461005610f6
 // Handles logging in all my android studio projects with native code
 // inspired by https://android.googlesource.com/platform/system/core/+/refs/heads/master/base/include/android-base/logging.h
@@ -79,18 +74,19 @@ namespace PrettyFunctionHelper{
 #define __CLASS_NAME__ PrettyFunctionHelper::className(__PRETTY_FUNCTION__)
 #endif
 
-// These are usefully so we don't have to write AndroidLogger(ANDROID_LOG_DEBUG,"MyTAG") every time
-static AndroidLogger LOGD(const std::string& TAG="NoTag"){
-    return AndroidLogger(ANDROID_LOG_DEBUG,TAG);
-}
-static AndroidLogger LOGE(const std::string& TAG="NoTag"){
-    return AndroidLogger(ANDROID_LOG_ERROR,TAG);
-}
 
-// When using macros we can have the class name as an tag (with pretty function workaround)
-#define MLOGD LOGD(__CLASS_NAME__)
-#define MLOGE LOGE(__CLASS_NAME__)
+// Here we use the current class name / namespace as tag (with pretty function workaround)
+// Unfortunately we can only achieve that using a 'old c-style' macro
+#define MLOGD AndroidLogger(ANDROID_LOG_DEBUG,__CLASS_NAME__)
+#define MLOGE AndroidLogger(ANDROID_LOG_ERROR,__CLASS_NAME__)
 
+// When using a custom TAG we do not need a macro. Use cpp style instead
+static AndroidLogger MLOGD2(const std::string CUSTOM_TAG){
+    return AndroidLogger(ANDROID_LOG_DEBUG,std::move(CUSTOM_TAG));
+}
+static AndroidLogger MLOGE2(const std::string CUSTOM_TAG){
+    return AndroidLogger(ANDROID_LOG_ERROR,std::move(CUSTOM_TAG));
+}
 
 // print some example LOGs
 namespace TEST_LOGGING_ON_ANDROID{

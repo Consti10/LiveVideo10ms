@@ -13,7 +13,6 @@
 
 class StringHelper{
 private:
-    static constexpr auto TAG="StringHelper";
     static const int countDigitsFast(long n){
         if(n==std::numeric_limits<long>::min()){
             return 11;
@@ -58,7 +57,7 @@ public:
         //}
         //LOGSH("val:%f maxLen:%d maxResAfterCome:%d maxPrecision:%d precision:%d result:%s",value,maxLength,maxResAfterCome,maxPrecision,precision,normalS(result).c_str());
         if(result.length()>maxLength){
-            LOGE(TAG)<<"ERROR max length";
+            MLOGE<<"ERROR max length";
             result=L"EM";
         }
         return result;
@@ -86,22 +85,22 @@ public:
         //
         std::srand(std::time(nullptr));
         int logc=0;
-        LOGD(TAG)<<"testCountDigits() start";
+        MLOGD<<"testCountDigits() start";
         for(long i=-std::numeric_limits<int>::min();i<std::numeric_limits<int>::max();i+=10000){
         //for(long i=-10000;i<10000;i+=1){
         //for(long i=-std::numeric_limits<long>::max();i>=std::numeric_limits<long>::min();i-=100000){
             int len1=countDigitsFast(i);
             int len2=countDigitsSlow(i);
             if(len1!=len2){
-                LOGE(TAG)<<"ERROR "<<i<<" "<<len1;
+                MLOGE<<"ERROR "<<i<<" "<<len1;
             }
             //i+=std::rand()%100000;
             logc++;
             if(logc>100){
-                LOGD(TAG)<<"%ld"<<i;
+                MLOGD<<"%ld"<<i;
             }
         }
-        LOGD(TAG)<<"testCountDigits() end";
+        MLOGD<<"testCountDigits() end";
     }
 
 

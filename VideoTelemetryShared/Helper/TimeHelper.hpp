@@ -57,7 +57,7 @@ public:
     MeasureExecutionTime(const std::string& tag,const std::string& functionName):functionName(functionName),tag(tag),begin(std::chrono::steady_clock::now()){}
     ~MeasureExecutionTime(){
         const auto duration=std::chrono::steady_clock::now()-begin;
-        LOGD(tag)<<"Execution time for "<<functionName<<" is "<<std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()<<"ms";
+        MLOGD<<"Execution time for "<<functionName<<" is "<<std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()<<"ms";
     }
 };
 

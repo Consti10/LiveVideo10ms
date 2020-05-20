@@ -17,9 +17,6 @@
 #include "FileReaderRAW.hpp"
 #include "FileReaderFPV.h"
 
-constexpr auto TAG="FileReader";
-#define MLOGE LOGE(TAG)
-
 //return -1 if no valid telemetry filename, else the telemetry type
 static int isTelemetryFilename(const std::string& path){
     int packetType=-1;

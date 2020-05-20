@@ -14,6 +14,7 @@
 #include <GroundRecorderFPV.hpp>
 #include "FileReader.h"
 #include "../Experiment360/FFMpegVideoReceiver.h"
+#include "../Experiment360/FFMPEGFileWriter.h"
 
 class VideoPlayer{
 public:

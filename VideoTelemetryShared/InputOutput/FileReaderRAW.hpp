@@ -31,7 +31,7 @@ namespace FileReaderRAW {
     static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
-            LOGE(TAG)<<"Cannot open file "<<FILENAME;
+            MLOGE<<"Cannot open file "<<FILENAME;
             return;
         }
         //LOGD("Opened File %s", FILEPATH.c_str());
@@ -57,7 +57,7 @@ namespace FileReaderRAW {
                                      const std::future<void>& shouldTerminate,const bool loopAtEndOfFile){
         AAsset *asset = AAssetManager_open(assetManager,PATH.c_str(),AASSET_MODE_BUFFER);
         if (!asset) {
-            LOGE(TAG)<<"Cannot open Asset:"<<PATH;
+            MLOGE<<"Cannot open Asset:"<<PATH;
             return;
         }
         const auto buffer = std::make_unique<std::array<uint8_t, MAX_NALU_BUFF_SIZE>>();
@@ -90,7 +90,7 @@ namespace FileReaderRAW {
     loadRawAssetFileIntoMemory(AAssetManager *assetManager, const std::string &path) {
         AAsset *asset = AAssetManager_open(assetManager, path.c_str(), 0);
         if (!asset) {
-            LOGE(TAG)<<"Error asset not found:"<<path;
+            MLOGE<<"Error asset not found:"<<path;
             return std::vector<uint8_t>();
         }
         const size_t size = (size_t) AAsset_getLength(asset);
@@ -98,7 +98,7 @@ namespace FileReaderRAW {
         std::vector<uint8_t> rawData(size);
         const auto len = AAsset_read(asset, rawData.data(), size);
         AAsset_close(asset);
-        LOGD(TAG)<<"The entire file content (asset,raw) is in memory "<<rawData.size();
+        MLOGD<<"The entire file content (asset,raw) is in memory "<<rawData.size();
         return rawData;
     }
 
@@ -117,7 +117,7 @@ namespace FileReaderRAW {
             rawData.resize(rawData.size()+len);
             memcpy(&rawData.at(offset),d,(size_t)len);
         },futureObj,false);
-        LOGD(TAG)<<"The entire file content (asset,raw) is in memory"<<rawData.size();
+        MLOGD<<"The entire file content (asset,raw) is in memory"<<rawData.size();
         return rawData;
     }
 }

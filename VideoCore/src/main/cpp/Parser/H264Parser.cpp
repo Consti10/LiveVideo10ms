@@ -13,7 +13,7 @@ constexpr auto TAG="H264Parser";
 
 
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
-    onNewNALU(onNewNALU),
+    onNewNALU(std::move(onNewNALU)),
     mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
     mParseRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
 }
