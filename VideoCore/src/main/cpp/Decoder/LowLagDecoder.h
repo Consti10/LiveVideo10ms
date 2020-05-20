@@ -98,9 +98,9 @@ private:
     std::chrono::steady_clock::time_point lastLog=std::chrono::steady_clock::now();
     RelativeCalculator nDecodedFrames;
     RelativeCalculator nNALUBytesFed;
-    AvgCalculator parsingTime_us;
-    AvgCalculator waitForInputB_us;
-    AvgCalculator decodingTime_us;
+    AvgCalculator parsingTime;
+    AvgCalculator waitForInputB;
+    AvgCalculator decodingTime;
     //Every n ms re-calculate the Decoding info
     static const constexpr int DECODING_INFO_RECALCULATION_INTERVAL_MS=1000;
     JavaVM* javaVm;

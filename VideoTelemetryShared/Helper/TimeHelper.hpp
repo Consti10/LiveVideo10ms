@@ -10,21 +10,25 @@
 
 class AvgCalculator{
 private:
-    long sum=0;
+    // provide us (microseconds) resolution
+    std::chrono::microseconds sum;
     long sumCount=0;
 public:
     AvgCalculator() = default;
-
-    void add(long x){
-        sum+=x;
+    void add(std::chrono::steady_clock::duration duration){
+        sum+=std::chrono::duration_cast<std::chrono::microseconds>(duration);
         sumCount++;
     }
-    long getAvg(){
+    long getAvg_us(){
         if(sumCount==0)return 0;
-        return sum/sumCount;
+        return sum.count()/sumCount;
+    }
+    // milliseconds & float is the most readable format
+    float getAvg_ms(){
+        return getAvg_us()/1000.0f;
     }
     void reset(){
-        sum=0;
+        sum=std::chrono::microseconds(0);
         sumCount=0;
     }
 };

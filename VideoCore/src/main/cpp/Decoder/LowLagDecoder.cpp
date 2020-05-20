@@ -124,8 +124,7 @@ void LowLagDecoder::checkOutputLoop() {
             // also https://android.googlesource.com/platform/frameworks/native/+/5c1139f/libs/gui/SurfaceTexture.cpp
             AMediaCodec_releaseOutputBufferAtTime(decoder.codec,(size_t)index,nowNS);
             //but the presentationTime is in US
-            int64_t deltaDecodingTime=nowUS-info.presentationTimeUs;
-            decodingTime_us.add((long)deltaDecodingTime);
+            decodingTime.add(std::chrono::microseconds(nowUS - info.presentationTimeUs));
             nDecodedFrames.add(1);
             if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
                 MLOGD<<"Decoder saw EOS";
@@ -157,9 +156,9 @@ void LowLagDecoder::checkOutputLoop() {
             decodingInfo.currentFPS=nDecodedFrames.getDeltaSinceLastCall()/(float)duration_cast<seconds>(delta).count();
             decodingInfo.currentKiloBitsPerSecond=(nNALUBytesFed.getDeltaSinceLastCall()/duration_cast<seconds>(delta).count())/1024.0f*8.0f;
             //and recalculate the avg latencies. If needed,also print the log.
-            decodingInfo.avgDecodingTime_ms=decodingTime_us.getAvg()/1000.0f;
-            decodingInfo.avgParsingTime_ms=parsingTime_us.getAvg()/1000.0f;
-            decodingInfo.avgWaitForInputBTime_ms=waitForInputB_us.getAvg()/1000.0f;
+            decodingInfo.avgDecodingTime_ms=decodingTime.getAvg_ms();
+            decodingInfo.avgParsingTime_ms=parsingTime.getAvg_ms();
+            decodingInfo.avgWaitForInputBTime_ms=waitForInputB.getAvg_ms();
             printAvgLog();
             if(onDecodingInfoChangedCallback!= nullptr){
                 onDecodingInfoChangedCallback(decodingInfo);
@@ -196,8 +195,8 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
                 //const auto flag=nalu.isPPS() || nalu.isSPS() ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
                 //AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, flag);
                 AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.getSize(),presentationTimeUS,0);
-                waitForInputB_us.add((long)duration_cast<microseconds>(steady_clock::now()-now).count());
-                parsingTime_us.add((long)duration_cast<microseconds>(deltaParsing).count());
+                waitForInputB.add(steady_clock::now() - now);
+                parsingTime.add(deltaParsing);
             }
             return;
         }else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER){
