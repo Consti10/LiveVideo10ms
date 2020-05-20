@@ -8,38 +8,35 @@
 #include "NALU.hpp"
 #include <vector>
 #include <AndroidLogger.hpp>
-
-//Takes a continuous stream of NALUs and save SPS / PPS data
-//For later use
 #include <media/NdkMediaFormat.h>
 
+// Takes a continuous stream of NALUs and save SPS / PPS data
+// For later use
 class KeyFrameFinder{
 private:
-    std::vector<uint8_t> CSD0;
-    std::vector<uint8_t> CSD1;
+    NALU* CSD0=nullptr;
+    NALU* CSD1=nullptr;
 public:
     void saveIfKeyFrame(const NALU &nalu){
         if(nalu.getSize()<=0)return;
         if(nalu.isSPS()){
-            CSD0.resize(nalu.getSize());
-            memcpy(CSD0.data(),nalu.getData(),(size_t )nalu.getSize());
+            CSD0=new NALU(nalu);
             MLOGD<<"SPS found";
         }else if(nalu.isPPS()){
-            CSD1.resize(nalu.getSize());
-            memcpy(CSD1.data(),nalu.getData(),(size_t )nalu.getSize());
+            CSD1=new NALU(nalu);
             MLOGD<<"PPS found";
         }
     }
     bool allKeyFramesAvailable(){
-        return CSD0.size()>0 && CSD1.size()>0;
+        return CSD0!=nullptr && CSD1!=nullptr;
     }
     //SPS
     NALU getCSD0(){
-        return NALU(CSD0);
+        return *CSD0;
     }
     //PPS
     NALU getCSD1(){
-        return NALU(CSD1);
+        return *CSD1;
     }
     void setSPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
         const auto sps=getCSD0();
@@ -51,8 +48,8 @@ public:
         AMediaFormat_setBuffer(format,"csd-1",pps.getData(),(size_t)pps.getSize());
     }
     void reset(){
-        CSD0.resize(0);
-        CSD1.resize(0);
+        CSD0=nullptr;
+        CSD1=nullptr;
     }
 };
 

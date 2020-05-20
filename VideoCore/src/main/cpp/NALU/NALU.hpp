@@ -24,27 +24,9 @@
 
 class NALU{
 public:
-    /*static constexpr const auto NAL_UNIT_TYPE_UNSPECIFIED =                  0;    // Unspecified
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_NON_IDR =          1;    // Coded slice of a non-IDR picture
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A = 2;    // Coded slice data partition A
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_B = 3;    // Coded slice data partition B
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_C = 4;    // Coded slice data partition C
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_IDR              = 5;    // Coded slice of an IDR picture
-    static constexpr const auto NAL_UNIT_TYPE_SEI                          = 6;    // Supplemental enhancement information (SEI)
-    static constexpr const auto NAL_UNIT_TYPE_SPS                          = 7;    // Sequence parameter set
-    static constexpr const auto NAL_UNIT_TYPE_PPS                          = 8;    // Picture parameter set
-    static constexpr const auto NAL_UNIT_TYPE_AUD                          = 9;    // Access unit delimiter
-    static constexpr const auto NAL_UNIT_TYPE_END_OF_SEQUENCE              =10;    // End of sequence
-    static constexpr const auto NAL_UNIT_TYPE_END_OF_STREAM                =11;    // End of stream
-    static constexpr const auto NAL_UNIT_TYPE_FILLER                       =12;    // Filler data
-    static constexpr const auto NAL_UNIT_TYPE_SPS_EXT                      =13;    // Sequence parameter set extension
-    // 14..18    // Reserved
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_AUX              =19;    // Coded slice of an auxiliary coded picture without partitioning
-    // 20..23    // Reserved
-    // 24..31    // Unspecified
-    //*/
     static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
-public:
+    //Copy constructor
+    NALU(const NALU& nalu):data(nalu.data),creationTime(std::chrono::steady_clock::now()){}
     NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
     data(data1,data1+data_length),
         creationTime{creationTime}{
