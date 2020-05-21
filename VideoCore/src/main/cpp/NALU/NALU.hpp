@@ -15,6 +15,7 @@
 #include <vector>
 #include <h264_stream.h>
 #include <android/log.h>
+#include <AndroidLogger.hpp>
 
 //A NALU consists of
 //a) DATA buffer
@@ -24,21 +25,29 @@
 
 class NALU{
 public:
-    static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
+    // test video white iceland: Max 1024*117. Video might not be decodable if its NALU buffers size exceed the limit
+    static constexpr const auto NALU_MAXLEN=1024*1024;
+    // Application should re-use NALU_BUFFER to avoid memory allocations
+    using NALU_BUFFER=std::array<uint8_t,NALU_MAXLEN>;
     //Copy constructor
-    NALU(const NALU& nalu):data(nalu.data),creationTime(std::chrono::steady_clock::now()){}
+    //NALU(const NALU& nalu):data(nalu.data.begin(),nalu.data.end()),creationTime(std::chrono::steady_clock::now()){
+    //    MLOGD<<"Copy is called";
+    //}
+    NALU(const NALU& nalu)= default;
     NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
     data(data1,data1+data_length),
         creationTime{creationTime}{
         //check();
     };
-    NALU(const std::vector<uint8_t> data,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data),
+    NALU(const std::vector<uint8_t> data1,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1),
             creationTime{creationTime}{
         //check();
+        //const bool equal=memcmp(data.data(),data1.data(),data.size());
+        //MLOGD<<"Size is"<<data.size()<<"Equal"<<equal;
     };
 private:
-    const std::vector<uint8_t> data;
+    std::vector<uint8_t> data;
 public:
     const std::chrono::steady_clock::time_point creationTime;
 public:
@@ -64,6 +73,7 @@ public:
         return &data[4];
     }
     const ssize_t getDataSizeWithoutPrefix()const{
+        if(data.size()<=4)return 0;
         return data.size()-4;
     }
     static std::string get_nal_name(int nal_unit_type){

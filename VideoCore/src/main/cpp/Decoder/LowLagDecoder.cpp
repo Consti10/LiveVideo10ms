@@ -200,10 +200,10 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
             }
             return;
         }else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER){
-            //just try again. But if we had no success in the last 1 second,log a warning and return
-            const int deltaMS=(int)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-now).count();
-            if(deltaMS>1000){
-                MLOGD<<"AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "<<deltaMS<<". return.";
+            //just try again. But if we had no success in the last 1 second,log a warning and return.
+            const auto elapsedTimeTryingForBuffer=std::chrono::steady_clock::now()-now;
+            if(elapsedTimeTryingForBuffer>std::chrono::seconds(1)){
+                MLOGE<<"AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "<<MyTimeHelper::R(elapsedTimeTryingForBuffer)<<"return.";
                 return;
             }
         }else{
@@ -250,6 +250,7 @@ void LowLagDecoder::printAvgLog() {
         return;
     }
     std::ostringstream frameLog;
+    frameLog<<std::fixed;
     float avgDecodingLatencySum=decodingInfo.avgParsingTime_ms+decodingInfo.avgWaitForInputBTime_ms+
             decodingInfo.avgDecodingTime_ms;
     frameLog<<"......................Decoding Latency Averages......................"<<
