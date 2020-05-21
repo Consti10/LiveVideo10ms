@@ -11,8 +11,8 @@
 #include <h264_stream.h>
 #include <vector>
 
-constexpr int BUFFER_TIMEOUT_US=20*1000; //20ms (a little bit more than 16.6ms)
-constexpr int TIME_BETWEEN_LOGS_MS=5*1000; //5s
+constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
+constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
 
 
 using namespace std::chrono;
@@ -151,7 +151,7 @@ void LowLagDecoder::checkOutputLoop() {
         //every 2 seconds recalculate the current fps and bitrate
         const auto now=steady_clock::now();
         const auto delta=now-decodingInfo.lastCalculation;
-        if(duration_cast<milliseconds>(delta).count()>DECODING_INFO_RECALCULATION_INTERVAL_MS){
+        if(delta>DECODING_INFO_RECALCULATION_INTERVAL){
             decodingInfo.lastCalculation=steady_clock::now();
             decodingInfo.currentFPS=nDecodedFrames.getDeltaSinceLastCall()/(float)duration_cast<seconds>(delta).count();
             decodingInfo.currentKiloBitsPerSecond=(nNALUBytesFed.getDeltaSinceLastCall()/duration_cast<seconds>(delta).count())/1024.0f*8.0f;
@@ -244,7 +244,7 @@ void LowLagDecoder::waitForShutdownAndDelete() {
 void LowLagDecoder::printAvgLog() {
 #ifdef PRINT_DEBUG_INFO
     auto now=steady_clock::now();
-    if(duration_cast<milliseconds>(now-lastLog).count()>TIME_BETWEEN_LOGS_MS){
+    if((now-lastLog)>TIME_BETWEEN_LOGS){
         lastLog=now;
     }else{
         return;

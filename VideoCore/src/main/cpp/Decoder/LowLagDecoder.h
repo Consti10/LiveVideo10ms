@@ -102,7 +102,7 @@ private:
     AvgCalculator waitForInputB;
     AvgCalculator decodingTime;
     //Every n ms re-calculate the Decoding info
-    static const constexpr int DECODING_INFO_RECALCULATION_INTERVAL_MS=1000;
+    static const constexpr auto DECODING_INFO_RECALCULATION_INTERVAL=std::chrono::milliseconds(1000);
     JavaVM* javaVm;
 private:
     static constexpr uint8_t SPS_X264[31]{
