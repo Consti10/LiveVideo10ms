@@ -61,6 +61,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         val toggleButton=findViewById<Button>(R.id.tb_show_decoding_info);
         toggleButton.setOnClickListener{
             mTextViewStatistics.visibility= View.VISIBLE;
+            mTextViewStatistics.bringToFront();
             toggleButton.visibility=View.INVISIBLE;
         }
         mTextViewStatistics.setOnClickListener{
