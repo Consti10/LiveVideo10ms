@@ -85,7 +85,6 @@ private:
     void closeInputPipe();
     //Debug log
     void printAvgLog();
-    int mWidth,mHeight;
     std::thread* mCheckOutputThread= nullptr;
     const bool SW;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)

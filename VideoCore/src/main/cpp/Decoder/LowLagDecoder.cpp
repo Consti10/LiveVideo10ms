@@ -24,11 +24,11 @@ LowLagDecoder::LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,bool SW):
 }
 
 void LowLagDecoder::registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC) {
-    onDecoderRatioChangedCallback=decoderRatioChangedC;
+    onDecoderRatioChangedCallback=std::move(decoderRatioChangedC);
 }
 
 void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback){
-    onDecodingInfoChangedCallback=decodingInfoChangedCallback;
+    onDecodingInfoChangedCallback=std::move(decodingInfoChangedCallback);
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
@@ -133,12 +133,13 @@ void LowLagDecoder::checkOutputLoop() {
             }
         } else if (index == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED ) {
             auto format = AMediaCodec_getOutputFormat(decoder.codec);
-            AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_WIDTH,&mWidth);
-            AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_HEIGHT,&mHeight);
-            if(onDecoderRatioChangedCallback!= nullptr && mWidth!=0 && mHeight!=0){
-                onDecoderRatioChangedCallback({mWidth,mHeight});
+            int width=0,height=0;
+            AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_WIDTH,&width);
+            AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_HEIGHT,&height);
+            if(onDecoderRatioChangedCallback!= nullptr && width != 0 && height != 0){
+                onDecoderRatioChangedCallback({width, height});
             }
-            MLOGD<<"AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED "<<mWidth<<" "<<mHeight<<" "<<AMediaFormat_toString(format);
+            MLOGD << "AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED " << width << " " << height << " " << AMediaFormat_toString(format);
         } else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
             MLOGD<<"AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED";
         } else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
