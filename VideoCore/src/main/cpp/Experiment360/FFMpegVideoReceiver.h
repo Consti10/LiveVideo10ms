@@ -34,7 +34,7 @@ private:
   uint32_t m_bufsize;
   int m_video_stream;
   bool m_shutdown;
-  std::shared_ptr<std::thread> m_thread;
+  std::unique_ptr<std::thread> m_thread;
 
   AVCodec *m_codec;
   AVCodecContext  *m_codec_ctx;
