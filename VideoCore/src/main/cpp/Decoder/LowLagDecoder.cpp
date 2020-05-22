@@ -11,6 +11,8 @@
 #include <h264_stream.h>
 #include <vector>
 
+#include <dlfcn.h>
+
 constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
 constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
 
@@ -62,7 +64,6 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
             configureStartDecoder(mKeyFrameFinder.getCSD0(),mKeyFrameFinder.getCSD1());
         }
     }
-
 }
 
 void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){

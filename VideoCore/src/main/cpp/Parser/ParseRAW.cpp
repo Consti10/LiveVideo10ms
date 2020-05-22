@@ -21,11 +21,11 @@ void ParseRAW::reset(){
     nalu_data.push_back(1);*/
 }
 
-static void test(std::vector<uint8_t> v,int size){
-    std::vector tmp(v.data(),v.data()+size);
-    v.resize(size);
-    const bool equal=std::memcmp(v.data(),tmp.data(),size);
-    MLOGD<<"Size "<<size<<" Are equal "<<equal;
+void ParseRAW::getAvailableBuffer(){
+    std::lock_guard<std::mutex> lock(mBufferMutex);
+    for(const auto buff:allocatedBuffers){
+
+    }
 }
 
 void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
@@ -66,7 +66,7 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
                         NALU nalu(lol);
                         nalu_data.resize(0);*/
                         //nalu_data.resize(naluLen);
-                        NALU nalu(nalu_data.data(),naluLen);
+                        NALU nalu(nalu_data,naluLen);
 
                         //auto x2=MLOGD;
                         //x2<<"Vector holds";

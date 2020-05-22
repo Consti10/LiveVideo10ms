@@ -24,6 +24,12 @@
 //Does NOT own the data
 
 class NALU{
+private:
+    static uint8_t* makeOwnedCopy(const uint8_t* data,size_t data_len){
+        auto ret=new uint8_t[data_len];
+        memcpy(ret,data,data_len);
+        return ret;
+    }
 public:
     // test video white iceland: Max 1024*117. Video might not be decodable if its NALU buffers size exceed the limit
     static constexpr const auto NALU_MAXLEN=1024*1024;
@@ -33,29 +39,41 @@ public:
     //NALU(const NALU& nalu):data(nalu.data.begin(),nalu.data.end()),creationTime(std::chrono::steady_clock::now()){
     //    MLOGD<<"Copy is called";
     //}
-    NALU(const NALU& nalu)= default;
+    /*NALU(const NALU& nalu)= default;
     NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
     data(data1,data1+data_length),
         creationTime{creationTime}{
-        //check();
     };
     NALU(const std::vector<uint8_t> data1,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
             data(data1),
             creationTime{creationTime}{
-        //check();
-        //const bool equal=memcmp(data.data(),data1.data(),data.size());
-        //MLOGD<<"Size is"<<data.size()<<"Equal"<<equal;
+    };*/
+    /*NALU(const NALU& nalu):data(makeOwnedCopy(nalu.getData(),nalu.getSize())),creationTime(nalu.creationTime),data_len(nalu.getSize()){}
+    NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1),data_len(data_length),creationTime{creationTime}{
+    };*/
+    NALU(const NALU& nalu):data(makeOwnedCopy(nalu.data,nalu.data_len)),owningData(true),data_len(nalu.getSize()),creationTime(nalu.creationTime){}
+    NALU(const NALU_BUFFER& data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1.data()),owningData(false),data_len(data_length),creationTime{creationTime}{
     };
+    ~NALU(){
+        if(owningData)delete[] data;
+    }
 private:
-    std::vector<uint8_t> data;
+    //const NALU_BUFFER& data;
+    const size_t data_len;
+    const uint8_t* data;
+    // Depending on the two constructor(s) a NALU either owns or does not own the NALU data
+    const bool owningData;
+    //std::vector<uint8_t> data;
 public:
     const std::chrono::steady_clock::time_point creationTime;
 public:
     const size_t getSize()const{
-        return data.size();
+        return data_len;
     }
     const uint8_t* getData()const{
-        return data.data();
+        return data;//.data();
     }
     bool isSPS()const{
         return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);
@@ -64,17 +82,17 @@ public:
         return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
     }
     int get_nal_unit_type()const{
-        if(data.size()<5)return -1;
-        return data[4]&0x1f;
+        if(getSize()<5)return -1;
+        return getData()[4]&0x1f;
     }
     //not safe if data_length<=4;
     //returns pointer to data without the 0001 prefix
     const uint8_t* getDataWithoutPrefix()const{
-        return &data[4];
+        return &getData()[4];
     }
     const ssize_t getDataSizeWithoutPrefix()const{
-        if(data.size()<=4)return 0;
-        return data.size()-4;
+        if(getSize()<=4)return 0;
+        return getSize()-4;
     }
     static std::string get_nal_name(int nal_unit_type){
        std::string nal_unit_type_name;
@@ -116,7 +134,7 @@ public:
 
     std::string dataAsString()const{
         std::stringstream ss;
-        for(int i=0;i<data.size();i++){
+        for(int i=0;i<getSize();i++){
             ss<<(int)data[i]<<",";
         }
         return ss.str();

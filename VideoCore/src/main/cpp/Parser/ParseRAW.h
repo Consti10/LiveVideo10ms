@@ -25,12 +25,16 @@ private:
     NALU::NALU_BUFFER nalu_data;
     //std::vector<uint8_t> nalu_data;
     //std::shared_ptr<NALU::NALU_BUFFER> nalu_data;
+    std::mutex mBufferMutex;
+    std::vector<NALU::NALU_BUFFER> allocatedBuffers{10};
 
     size_t nalu_data_position=4;
     int nalu_search_state=0;
     //
     std::array<uint8_t,NALU::NALU_MAXLEN> dji_data_buff;
     std::size_t dji_data_buff_size=0;
+    //
+    void getAvailableBuffer();
 };
 
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERAW_H
