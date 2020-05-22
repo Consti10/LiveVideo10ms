@@ -22,7 +22,7 @@ extern "C" {
 
 namespace FFMPEGFileWriter{
     void lol(std::string DIR) {
-        avio_open()
+
     }
 }
 
