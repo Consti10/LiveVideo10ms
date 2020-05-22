@@ -16,6 +16,8 @@
 #include <h264_stream.h>
 #include <android/log.h>
 #include <AndroidLogger.hpp>
+#include <variant>
+#include <optional>
 
 //A NALU consists of
 //a) DATA buffer
@@ -52,28 +54,29 @@ public:
     NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
             data(data1),data_len(data_length),creationTime{creationTime}{
     };*/
-    NALU(const NALU& nalu):data(makeOwnedCopy(nalu.data,nalu.data_len)),owningData(true),data_len(nalu.getSize()),creationTime(nalu.creationTime){}
+    NALU(const NALU& nalu):
+    ownedData(std::vector<uint8_t>(nalu.getData(),nalu.getData()+nalu.getSize())),
+    data(ownedData->data()),data_len(nalu.getSize()),creationTime(nalu.creationTime){}
     NALU(const NALU_BUFFER& data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data1.data()),owningData(false),data_len(data_length),creationTime{creationTime}{
+            data(data1.data()),data_len(data_length),creationTime{creationTime}{
     };
-    ~NALU(){
-        if(owningData)delete[] data;
-    }
+    ~NALU()= default;
 private:
     //const NALU_BUFFER& data;
-    const size_t data_len;
     const uint8_t* data;
-    // Depending on the two constructor(s) a NALU either owns or does not own the NALU data
-    const bool owningData;
-    //std::vector<uint8_t> data;
+    const size_t data_len;
+    // With the default constructor a NALU does not own its memory. This saves us one memcpy. However, storing a NALU after the lifetime of the
+    // Non-owned memory expired is also needed in some places, so the copy-constructor creates a copy of the non-owned data and stores it in a optional buffer
+    // WARNING: Order is important here (Initializer list)
+    const std::optional<std::vector<uint8_t>> ownedData={};
 public:
     const std::chrono::steady_clock::time_point creationTime;
 public:
-    const size_t getSize()const{
-        return data_len;
-    }
     const uint8_t* getData()const{
         return data;//.data();
+    }
+    const size_t getSize()const{
+        return data_len;
     }
     bool isSPS()const{
         return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);

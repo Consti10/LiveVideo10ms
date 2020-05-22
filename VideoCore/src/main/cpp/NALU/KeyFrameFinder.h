@@ -31,11 +31,11 @@ public:
         return CSD0!=nullptr && CSD1!=nullptr;
     }
     //SPS
-    NALU getCSD0(){
+    const NALU& getCSD0()const{
         return *CSD0;
     }
     //PPS
-    NALU getCSD1(){
+    const NALU& getCSD1()const{
         return *CSD1;
     }
     void setSPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
