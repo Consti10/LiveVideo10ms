@@ -62,13 +62,13 @@ public:
     };
     ~NALU()= default;
 private:
+    // With the default constructor a NALU does not own its memory. This saves us one memcpy. However, storing a NALU after the lifetime of the
+    // Non-owned memory expired is also needed in some places, so the copy-constructor creates a copy of the non-owned data and stores it in a optional buffer
+    // WARNING: Order is important here (Initializer list). Declare before data pointer
+    const std::optional<std::vector<uint8_t>> ownedData={};
     //const NALU_BUFFER& data;
     const uint8_t* data;
     const size_t data_len;
-    // With the default constructor a NALU does not own its memory. This saves us one memcpy. However, storing a NALU after the lifetime of the
-    // Non-owned memory expired is also needed in some places, so the copy-constructor creates a copy of the non-owned data and stores it in a optional buffer
-    // WARNING: Order is important here (Initializer list)
-    const std::optional<std::vector<uint8_t>> ownedData={};
 public:
     const std::chrono::steady_clock::time_point creationTime;
 public:
