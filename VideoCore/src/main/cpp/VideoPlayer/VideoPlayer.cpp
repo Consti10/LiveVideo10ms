@@ -18,7 +18,8 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mFileReceiver(1024){
     env->GetJavaVM(&javaVm);
 
-    FFMPEGFileWriter::lol(GROUND_RECORDING_DIRECTORY);
+    const auto filename=FileHelper::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
+    FFMPEGFileWriter::lol(filename);
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
