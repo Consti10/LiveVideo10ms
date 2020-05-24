@@ -29,6 +29,7 @@ public:
     ~AndroidLogger() {
         logBigMessage(stream.str());
     }
+    AndroidLogger(const AndroidLogger& other)=delete;
 private:
     std::stringstream stream;
     const std::string M_TAG;
