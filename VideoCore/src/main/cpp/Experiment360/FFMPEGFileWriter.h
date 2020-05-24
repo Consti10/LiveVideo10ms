@@ -96,14 +96,12 @@ private:
         av_dump_format(ifmt_ctx, 0, filename, 0);
         return 0;
     }
-    int open_output_file(const char *filename)
-    {
+    int open_output_file(const char *filename){
         AVStream *out_stream;
         AVStream *in_stream;
         AVCodecContext *dec_ctx, *enc_ctx;
         AVCodec *encoder;
         int ret;
-        unsigned int i;
 
         ofmt_ctx = NULL;
         avformat_alloc_output_context2(&ofmt_ctx, NULL, NULL, filename);
@@ -112,75 +110,75 @@ private:
             return AVERROR_UNKNOWN;
         }
 
-        for (i = 0; i < ifmt_ctx->nb_streams; i++) {
-            out_stream = avformat_new_stream(ofmt_ctx, NULL);
-            if (!out_stream) {
-                av_log(NULL, AV_LOG_ERROR, "Failed allocating output stream\n");
-                return AVERROR_UNKNOWN;
-            }
 
-            in_stream = ifmt_ctx->streams[i];
-            dec_ctx = stream_ctx[i].dec_ctx;
-
-            if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
-                /* in this example, we choose transcoding to same codec */
-                encoder = avcodec_find_encoder(dec_ctx->codec_id);
-                if (!encoder) {
-                    av_log(NULL, AV_LOG_FATAL, "Necessary encoder not found\n");
-                    return AVERROR_INVALIDDATA;
-                }
-                enc_ctx = avcodec_alloc_context3(encoder);
-                if (!enc_ctx) {
-                    av_log(NULL, AV_LOG_FATAL, "Failed to allocate the encoder context\n");
-                    return AVERROR(ENOMEM);
-                }
-
-                /* In this example, we transcode to same properties (picture size,
-                 * sample rate etc.). These properties can be changed for output
-                 * streams easily using filters */
-                if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
-                    enc_ctx->height = dec_ctx->height;
-                    enc_ctx->width = dec_ctx->width;
-                    enc_ctx->sample_aspect_ratio = dec_ctx->sample_aspect_ratio;
-                    /* take first format from list of supported formats */
-                    if (encoder->pix_fmts)
-                        enc_ctx->pix_fmt = encoder->pix_fmts[0];
-                    else
-                        enc_ctx->pix_fmt = dec_ctx->pix_fmt;
-                    /* video time_base can be set to whatever is handy and supported by encoder */
-                    enc_ctx->time_base = av_inv_q(dec_ctx->framerate);
-                }
-
-                if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER)
-                    enc_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-
-                /* Third parameter can be used to pass settings to encoder */
-                ret = avcodec_open2(enc_ctx, encoder, NULL);
-                if (ret < 0) {
-                    av_log(NULL, AV_LOG_ERROR, "Cannot open video encoder for stream #%u\n", i);
-                    return ret;
-                }
-                ret = avcodec_parameters_from_context(out_stream->codecpar, enc_ctx);
-                if (ret < 0) {
-                    av_log(NULL, AV_LOG_ERROR, "Failed to copy encoder parameters to output stream #%u\n", i);
-                    return ret;
-                }
-
-                out_stream->time_base = enc_ctx->time_base;
-                stream_ctx[i].enc_ctx = enc_ctx;
-            } else if (dec_ctx->codec_type == AVMEDIA_TYPE_UNKNOWN) {
-                av_log(NULL, AV_LOG_FATAL, "Elementary stream #%d is of unknown type, cannot proceed\n", i);
-                return AVERROR_INVALIDDATA;
-            } else {
-                /* if this stream must be remuxed */
-                ret = avcodec_parameters_copy(out_stream->codecpar, in_stream->codecpar);
-                if (ret < 0) {
-                    av_log(NULL, AV_LOG_ERROR, "Copying parameters for stream #%u failed\n", i);
-                    return ret;
-                }
-                out_stream->time_base = in_stream->time_base;
-            }
+        out_stream = avformat_new_stream(ofmt_ctx, NULL);
+        if (!out_stream) {
+            av_log(NULL, AV_LOG_ERROR, "Failed allocating output stream\n");
+            return AVERROR_UNKNOWN;
         }
+
+        in_stream = ifmt_ctx->streams[0];
+        dec_ctx = stream_ctx[0].dec_ctx;
+
+        if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+            /* in this example, we choose transcoding to same codec */
+            encoder = avcodec_find_encoder(dec_ctx->codec_id);
+            if (!encoder) {
+                av_log(NULL, AV_LOG_FATAL, "Necessary encoder not found\n");
+                return AVERROR_INVALIDDATA;
+            }
+            enc_ctx = avcodec_alloc_context3(encoder);
+            if (!enc_ctx) {
+                av_log(NULL, AV_LOG_FATAL, "Failed to allocate the encoder context\n");
+                return AVERROR(ENOMEM);
+            }
+
+            /* In this example, we transcode to same properties (picture size,
+             * sample rate etc.). These properties can be changed for output
+             * streams easily using filters */
+            if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+                enc_ctx->height = dec_ctx->height;
+                enc_ctx->width = dec_ctx->width;
+                enc_ctx->sample_aspect_ratio = dec_ctx->sample_aspect_ratio;
+                /* take first format from list of supported formats */
+                if (encoder->pix_fmts)
+                    enc_ctx->pix_fmt = encoder->pix_fmts[0];
+                else
+                    enc_ctx->pix_fmt = dec_ctx->pix_fmt;
+                /* video time_base can be set to whatever is handy and supported by encoder */
+                enc_ctx->time_base = av_inv_q(dec_ctx->framerate);
+            }
+
+            if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER)
+                enc_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
+            /* Third parameter can be used to pass settings to encoder */
+            ret = avcodec_open2(enc_ctx, encoder, NULL);
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Cannot open video encoder for stream #%u\n", 0);
+                return ret;
+            }
+            ret = avcodec_parameters_from_context(out_stream->codecpar, enc_ctx);
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Failed to copy encoder parameters to output stream #%u\n", 0);
+                return ret;
+            }
+
+            out_stream->time_base = enc_ctx->time_base;
+            stream_ctx[0].enc_ctx = enc_ctx;
+        } else if (dec_ctx->codec_type == AVMEDIA_TYPE_UNKNOWN) {
+            av_log(NULL, AV_LOG_FATAL, "Elementary stream #%d is of unknown type, cannot proceed\n",0);
+            return AVERROR_INVALIDDATA;
+        } else {
+            /* if this stream must be remuxed */
+            ret = avcodec_parameters_copy(out_stream->codecpar, in_stream->codecpar);
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Copying parameters for stream #%u failed\n", 0);
+                return ret;
+            }
+            out_stream->time_base = in_stream->time_base;
+        }
+
         av_dump_format(ofmt_ctx, 0, filename, 1);
 
         if (!(ofmt_ctx->oformat->flags & AVFMT_NOFILE)) {
