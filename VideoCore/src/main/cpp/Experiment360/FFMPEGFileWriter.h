@@ -75,7 +75,7 @@ private:
         ret = avcodec_parameters_to_context(codec_ctx, stream->codecpar);
         if (ret < 0) {
             av_log(NULL, AV_LOG_ERROR, "Failed to copy decoder parameters to input decoder context "
-                                       "for stream #%u\n", i);
+                                       "for stream #%u\n", 0);
             return ret;
         }
         /* Reencode video & audio and remux subtitles etc. */
@@ -86,7 +86,7 @@ private:
             /* Open decoder */
             ret = avcodec_open2(codec_ctx, dec, NULL);
             if (ret < 0) {
-                av_log(NULL, AV_LOG_ERROR, "Failed to open decoder for stream #%u\n", i);
+                av_log(NULL, AV_LOG_ERROR, "Failed to open decoder for stream #%u\n", 0);
                 return ret;
             }
         }
