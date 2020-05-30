@@ -4,22 +4,16 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
 import constantin.video.core.RequestPermissionHelper
 import constantin.video.core.video_player.VideoSettings
-import java.util.*
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var spinnerVideoTestFileFromAssets: Spinner;
@@ -60,6 +54,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
         findViewById<View>(R.id.b_startTethering).setOnClickListener { IsConnected.openUSBTetherSettings(context) }
         findViewById<View>(R.id.b_startViewDatabase).setOnClickListener { startActivity(Intent().setClass(context, ViewBenchmarkDataActivity::class.java)) }
+        findViewById<View>(R.id.b_startColorFormatsTester).setOnClickListener { startActivity(Intent().setClass(context, ColorFormatTester::class.java)) }
     }
 
     override fun onResume() {
