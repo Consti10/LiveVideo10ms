@@ -1,0 +1,51 @@
+// Input1: uvc_frame_t of type MJPEG (ONLY)
+// Input2: ANativeWindow_Buffer of RGBA / RGBX ONLY !!
+void decode_mjpeg_into_ANativeWindowBufferRGBX(uvc_frame_t* frame_mjpeg,const ANativeWindow_Buffer& buffer){
+    debugANativeWindowBuffer(buffer);
+    uvc_frame_t* rgba = uvc_allocate_frame(frame_mjpeg->width * frame_mjpeg->height * 4);
+    uvc_error_t result = uvc_mjpeg2rgbx(frame_mjpeg, rgba);
+    if(result!=UVC_SUCCESS){
+        CLOGD("Error MJPEG conversion %d", result);
+        uvc_free_frame(rgba);
+        return;
+    }
+    CLOGD("bytes %d actual bytes %d",(int)rgba->data_bytes,(int)rgba->actual_bytes);
+    memcpy(buffer.bits,rgba->data,rgba->data_bytes);
+    uvc_free_frame(rgba);
+}
+
+// skip the one unnecessary memcpy
+// more supported ANativeWindow_Buffer layouts
+// Log error if unsupported ANativeWindow hardware layout
+void decode_mjpeg_into_ANativeWindowBuffer2(uvc_frame_t* frame_mjpeg,const ANativeWindow_Buffer& buffer){
+    CLOGD("ANativeWindow_Buffer: W H Stride Format %d %d %d %d",buffer.width,buffer.height,buffer.stride,buffer.format);
+
+    typedef uvc_error_t (*convFunc_t)(uvc_frame_t *in, uvc_frame_t *out);
+    unsigned int BYTES_PER_PIXEL;
+    convFunc_t conversionFunction;
+    if(buffer.format==AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM || buffer.format==AHARDWAREBUFFER_FORMAT_R8G8B8X8_UNORM){
+        BYTES_PER_PIXEL=4;
+        conversionFunction=uvc_mjpeg2rgbx;
+    }else if(buffer.format==AHARDWAREBUFFER_FORMAT_R8G8B8_UNORM){
+        BYTES_PER_PIXEL=3;
+        conversionFunction=uvc_mjpeg2rgb;
+    }else if(buffer.format==AHARDWAREBUFFER_FORMAT_R5G6B5_UNORM){
+        BYTES_PER_PIXEL=2;
+        conversionFunction=uvc_mjpeg2rgb565;
+    //}else if(buffer.format==AHARDWAREBUFFER_FORMAT_Y8Cb8Cr8_420){
+    //    BYTES_PER_PIXEL=3;
+    //    conversionFunction=uvc_mjpeg2yuyv;
+    }else{
+        CLOGD("Error Unsupported format");
+        return;
+    }
+    uvc_frame_t frame_decoded;
+    frame_decoded.data=buffer.bits;
+    frame_decoded.data_bytes=frame_mjpeg->width * frame_mjpeg->height*BYTES_PER_PIXEL;
+    frame_decoded.step=buffer.stride*BYTES_PER_PIXEL;
+    uvc_error_t result = conversionFunction(frame_mjpeg, &frame_decoded);
+    if(result!=UVC_SUCCESS){
+        CLOGD("Error MJPEG conversion %d", result);
+        return;
+    }
+}

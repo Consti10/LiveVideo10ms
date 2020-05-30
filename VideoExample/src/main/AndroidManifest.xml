@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".ViewBenchmarkDataActivity"></activity>
+        <activity android:name=".ColorFormatsTester"></activity>
+        <activity android:name=".ViewBenchmarkDataActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,8 +22,8 @@
         </activity>
         <activity
             android:name=".VideoActivity"
-            android:theme="@style/MyStyleFullscreen"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@style/MyStyleFullscreen" />
     </application>
 
 </manifest>
