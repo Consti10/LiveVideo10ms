@@ -20,6 +20,8 @@
 #include <sys/stat.h>
 #include <memory>
 #include "GroundRecorderFPV.hpp"
+#include <optional>
+#include <future>
 
 namespace FileReaderFPV{
     static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;
@@ -110,5 +112,55 @@ namespace FileReaderFPV{
             readFpvAssetFileInChunks(assetManager,PATH,callback,shouldTerminate,loopAtEOF);
         }
     }
+    static bool endsWith(const std::string& str, const std::string& suffix){
+        return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+    }
+    static bool isValidFilename(const std::string& filename){
+        return endsWith(filename,".fpv");
+    }
 }
+
+class FileReaderMJPEG{
+private:
+    std::ifstream file;
+public:
+    void open(const std::string FILENAME){
+        if(!FileReaderFPV::isValidFilename(FILENAME)){
+            MLOGE<<"Not valid filename";
+            return;
+        }
+        file=std::ifstream(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+        if (!file.is_open()) {
+            MLOGE<<"Cannot open file "<<FILENAME;
+            return;
+        }
+        file.seekg(0, std::ios::beg);
+    }
+    void close(){
+        file.close();
+    }
+    std::optional<std::vector<uint8_t>> getNextMJPEGPacket(int& timestamp){
+        GroundRecorderFPV::StreamPacketHeader header;
+        file.read((char*)&header,sizeof(GroundRecorderFPV::StreamPacketHeader));
+        std::streamsize dataSize = file.gcount();
+        if(dataSize!=sizeof(GroundRecorderFPV::StreamPacketHeader)){
+            MLOGE<<"Reading header";
+            return std::nullopt;
+        }
+        if(header.packet_type!=GroundRecorderFPV::PACKET_TYPE_MJPEG_ROTG02){
+            MLOGE<<"packet type";
+            return std::nullopt;
+        }
+        std::vector<uint8_t> mjpegData(header.packet_length);
+        file.read((char*)mjpegData.data(),header.packet_length);
+        const int bytesRead=file.gcount();
+        if(bytesRead!=header.packet_length){
+            MLOGE<<" reading data";
+            return std::nullopt;
+        }
+        timestamp=header.timestamp;
+        return mjpegData;
+    }
+};
+
 #endif //LIVEVIDEO10MS_FILEREADERFPV_H

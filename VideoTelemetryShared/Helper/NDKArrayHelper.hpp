@@ -16,7 +16,6 @@
 // Only dependencies are standard libraries and the android java NDK
 //
 namespace NDKArrayHelper{
-
     // workaround from https://en.cppreference.com/w/cpp/language/if#Constexpr_If
     // To have compile time type safety
     template <typename T,typename T2>

@@ -48,6 +48,7 @@ public:
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_FRSKY=4;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_EZWB=5;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_ANDROD_GPS=6;
+    static constexpr uint8_t PACKET_TYPE_MJPEG_ROTG02=7;
     using PACKET_TYPE=uint8_t;
     using TIMESTAMP_MS=unsigned int;
     // Each time I write raw data to the file it is prefixed by this header
@@ -73,14 +74,15 @@ public:
         closeFileIfOpened();
     }
     //Only write data if started and data_length>0
-    void writePacketIfStarted(const uint8_t *packet,const size_t packet_length,const PACKET_TYPE packet_type) {
+    void writePacketIfStarted(const uint8_t *packet,const size_t packet_length,const PACKET_TYPE packet_type,int customTimeStamp=-1) {
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
         if(!started)return;
         if(packet_length==0)return;
         createOpenFileIfNeeded();
         //calculate the timestamp
         auto now=std::chrono::steady_clock::now();
-        const TIMESTAMP_MS timestamp=(TIMESTAMP_MS)std::chrono::duration_cast<std::chrono::milliseconds>(now - fileCreationTime).count();
+        const TIMESTAMP_MS timestamp=customTimeStamp!=-1 ? customTimeStamp :
+                (TIMESTAMP_MS)std::chrono::duration_cast<std::chrono::milliseconds>(now - fileCreationTime).count();
         StreamPacketHeader streamPacket;
         streamPacket.packet_length=(unsigned int)packet_length;
         streamPacket.packet_type=packet_type;

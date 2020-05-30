@@ -2,8 +2,12 @@ package constantin.video.core.video_player;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.ImageDecoder;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.Drawable;
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
@@ -11,6 +15,9 @@ import android.view.SurfaceHolder;
 
 import androidx.annotation.Nullable;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,8 +44,51 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
     public VideoPlayer(final Context context){
         this.context=context;
+        //lol();
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
         //ThreadPriorityTester.test2();
+
+        SimpleEncoder simpleEncoder=new SimpleEncoder();
+        simpleEncoder.start();
+        /*try {
+            Thread.sleep(6*1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        //simpleEncoder.stop();
+    }
+
+    static void lol(){
+        MediaCodecList mediaCodecList=new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaFormat mediaFormat=new MediaFormat();
+        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV444Flexible);
+        final String tmp=mediaCodecList.findEncoderForFormat(mediaFormat);
+        System.out.println("found enc "+tmp);
+
+        MediaCodecInfo[] codecInfos = mediaCodecList.getCodecInfos();
+        for (final MediaCodecInfo info : codecInfos) {
+            for(final String type:info.getSupportedTypes()){
+                final MediaCodecInfo.CodecCapabilities capabilities=info.getCapabilitiesForType(type);
+                for(int i=0;i<capabilities.colorFormats.length;i++){
+                    System.out.println("Codec "+type+" Supports "+capabilities.colorFormats[i]);
+                }
+            }
+        }
+
+    }
+
+    static void lol2(){
+        try {
+            MediaCodec codec=MediaCodec.createEncoderByType("video/avc");
+            MediaCodecInfo info=codec.getCodecInfo();
+            MediaCodecInfo.CodecCapabilities abilities=info.getCapabilitiesForType("video/avc");
+            for(int i=0;i<abilities.colorFormats.length;i++){
+                System.out.println("Supports "+abilities.colorFormats[i]);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged){

@@ -53,12 +53,12 @@ private:
             return ret;
         }
 
-        stream_ctx =(StreamContext*) av_mallocz_array(ifmt_ctx->nb_streams, sizeof(*stream_ctx));
-        if (!stream_ctx)
-            return AVERROR(ENOMEM);
-
+        // only 1 stream (e.g. no audio)
         MLOGD<<"N streams "<<ifmt_ctx->nb_streams;
 
+        stream_ctx =(StreamContext*) av_mallocz_array(1, sizeof(*stream_ctx));
+        if (!stream_ctx)
+            return AVERROR(ENOMEM);
 
         AVStream *stream = ifmt_ctx->streams[0];
         AVCodec *dec = avcodec_find_decoder(stream->codecpar->codec_id);
@@ -92,7 +92,6 @@ private:
         }
         stream_ctx[0].dec_ctx = codec_ctx;
 
-
         av_dump_format(ifmt_ctx, 0, filename, 0);
         return 0;
     }
@@ -102,6 +101,7 @@ private:
         AVCodecContext *dec_ctx, *enc_ctx;
         AVCodec *encoder;
         int ret;
+
 
         ofmt_ctx = NULL;
         avformat_alloc_output_context2(&ofmt_ctx, NULL, NULL, filename);
@@ -122,6 +122,11 @@ private:
 
         if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
             /* in this example, we choose transcoding to same codec */
+            MLOGD<<"dec_ctx->codec_id"<<dec_ctx->codec_id;
+            if(dec_ctx->codec_id==AV_CODEC_ID_MJPEG){
+                MLOGD<<"Is =AV_CODEC_ID_MJPEG";
+            }
+
             encoder = avcodec_find_encoder(dec_ctx->codec_id);
             if (!encoder) {
                 av_log(NULL, AV_LOG_FATAL, "Necessary encoder not found\n");
@@ -141,16 +146,23 @@ private:
                 enc_ctx->width = dec_ctx->width;
                 enc_ctx->sample_aspect_ratio = dec_ctx->sample_aspect_ratio;
                 /* take first format from list of supported formats */
-                if (encoder->pix_fmts)
+                if (encoder->pix_fmts){
                     enc_ctx->pix_fmt = encoder->pix_fmts[0];
-                else
+                }else{
                     enc_ctx->pix_fmt = dec_ctx->pix_fmt;
+                }
+                MLOGD<<"encoder->pix_fmts"<<encoder->pix_fmts[0];
+                if(encoder->pix_fmts[0]==AV_PIX_FMT_YUVJ420P){
+                    MLOGD<<"AV_PIX_FMT_YUVJ420P";
+                }
                 /* video time_base can be set to whatever is handy and supported by encoder */
                 enc_ctx->time_base = av_inv_q(dec_ctx->framerate);
             }
 
-            if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER)
+            if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER){
+                MLOGD<<"AVFMT_GLOBALHEADER";
                 enc_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+            }
 
             /* Third parameter can be used to pass settings to encoder */
             ret = avcodec_open2(enc_ctx, encoder, NULL);
@@ -166,18 +178,9 @@ private:
 
             out_stream->time_base = enc_ctx->time_base;
             stream_ctx[0].enc_ctx = enc_ctx;
-        } else if (dec_ctx->codec_type == AVMEDIA_TYPE_UNKNOWN) {
-            av_log(NULL, AV_LOG_FATAL, "Elementary stream #%d is of unknown type, cannot proceed\n",0);
-            return AVERROR_INVALIDDATA;
-        } else {
-            /* if this stream must be remuxed */
-            ret = avcodec_parameters_copy(out_stream->codecpar, in_stream->codecpar);
-            if (ret < 0) {
-                av_log(NULL, AV_LOG_ERROR, "Copying parameters for stream #%u failed\n", 0);
-                return ret;
-            }
-            out_stream->time_base = in_stream->time_base;
         }
+
+
 
         av_dump_format(ofmt_ctx, 0, filename, 1);
 
@@ -217,6 +220,7 @@ public:
                 break;
             MLOGD<<"Packet duration"<<packet.duration<<" size"<<packet.size;
             stream_index = packet.stream_index;
+            MLOGD<<"packet.stream_index"<<packet.stream_index;
             type = ifmt_ctx->streams[packet.stream_index]->codecpar->codec_type;
             av_log(NULL, AV_LOG_DEBUG, "Demuxer gave frame of stream_index %u\n",
                    stream_index);
@@ -288,6 +292,7 @@ namespace FFMPEGFileWriter{
 
         avformat_close_input(&avFormatContext);
 
+
     }
 
 
@@ -319,6 +324,14 @@ namespace FFMPEGFileWriter{
             MLOGE<<"avio_open"<<av_err2str(ret);
         }
 
+        //
+        //auto encoder = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
+        //if (!encoder) {
+        //    av_log(NULL, AV_LOG_FATAL, "Cannot find MJPEG codec");
+        //}
+        //auto encoderContext=avcodec_alloc_context3(encoder);
+        //
+
         //AVCodec * codec = nullptr;
         //avcodec_get_context_defaults3(outStrm->codec, codec);
         //outStrm->codec->coder_type = AVMEDIA_TYPE_VIDEO;
@@ -329,6 +342,10 @@ namespace FFMPEGFileWriter{
         avStream->codecpar->format=AV_PIX_FMT_YUV420P;
         avStream->codecpar->width=1280;
         avStream->codecpar->height=720;
+        avStream->time_base=AVRational{1,1};
+        avStream->sample_aspect_ratio = AVRational{1,1};
+        /* take first format from list of supported formats */
+
 
         MLOGD<<"Tag is "<<av_codec_get_tag(avOutputFormat->codec_tag,AV_CODEC_ID_MJPEG);
 

@@ -81,7 +81,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     override fun surfaceDestroyed(holder: SurfaceHolder) {}
 
     override fun onVideoRatioChanged(videoW: Int, videoH: Int) {
-        runOnUiThread { mAspectFrameLayout!!.setAspectRatio(videoW.toDouble() / videoH) }
+        runOnUiThread { mAspectFrameLayout.setAspectRatio(videoW.toDouble() / videoH) }
     }
 
     public override fun onDestroy() {
@@ -118,7 +118,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
 
     override fun onDecodingInfoChanged(decodingInfo: DecodingInfo) {
         runOnUiThread(java.lang.Runnable {
-            mTextViewStatistics!!.setText(decodingInfo.toString(true))
+            mTextViewStatistics.setText(decodingInfo.toString(true))
         })
         mDecodingInfo = decodingInfo
         /*if (System.currentTimeMillis() - lastLogMS > 5 * 1000) {
