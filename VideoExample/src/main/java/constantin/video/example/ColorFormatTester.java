@@ -9,28 +9,32 @@ import android.os.Bundle;
 import android.view.Surface;
 import android.view.TextureView;
 
+import constantin.video.core.external.AspectFrameLayout;
+import constantin.video.example.databinding.ActivityColorformatTestBinding;
+
 public class ColorFormatTester extends AppCompatActivity implements TextureView.SurfaceTextureListener {
-    private TextureView mTextureView;
-    private Thread updateSurfaceThread;
+    private ActivityColorformatTestBinding binding;
+    private Thread mUpdateSurfaceThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTextureView = new TextureView(this);
-        mTextureView.setSurfaceTextureListener(this);
-        setContentView(mTextureView);
+        binding = ActivityColorformatTestBinding.inflate(getLayoutInflater());
+        binding.tvColorTest.setSurfaceTextureListener(this);
+        setContentView(binding.getRoot());
     }
 
     @Override
     public void onSurfaceTextureAvailable(final SurfaceTexture surfaceTexture, int width, int height) {
         surfaceTexture.setDefaultBufferSize(640,480);
-        updateSurfaceThread=new Thread(new Runnable() {
+        final Surface surface=new Surface(surfaceTexture);
+        mUpdateSurfaceThread =new Thread(new Runnable() {
             @Override
             public void run() {
-                loopUpdateSurface(new Surface(surfaceTexture));
+                loopUpdateSurface(surface);
             }
         });
-        updateSurfaceThread.start();
+        mUpdateSurfaceThread.start();
     }
 
     @Override
@@ -38,9 +42,9 @@ public class ColorFormatTester extends AppCompatActivity implements TextureView.
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        updateSurfaceThread.interrupt();
+        mUpdateSurfaceThread.interrupt();
         try {
-            updateSurfaceThread.join();
+            mUpdateSurfaceThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
