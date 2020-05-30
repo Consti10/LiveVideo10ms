@@ -2,8 +2,11 @@ package constantin.video.example;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
+import android.view.Surface;
 import android.view.TextureView;
 
 public class ColorFormatTester extends AppCompatActivity implements TextureView.SurfaceTextureListener {
@@ -19,12 +22,12 @@ public class ColorFormatTester extends AppCompatActivity implements TextureView.
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        surface.setDefaultBufferSize(640,480);
+    public void onSurfaceTextureAvailable(final SurfaceTexture surfaceTexture, int width, int height) {
+        surfaceTexture.setDefaultBufferSize(640,480);
         updateSurfaceThread=new Thread(new Runnable() {
             @Override
             public void run() {
-                loopUpdateSurface();
+                loopUpdateSurface(new Surface(surfaceTexture));
             }
         });
         updateSurfaceThread.start();
@@ -48,9 +51,12 @@ public class ColorFormatTester extends AppCompatActivity implements TextureView.
     public void onSurfaceTextureUpdated(SurfaceTexture surface) { }
 
 
-    private void loopUpdateSurface(){
+    private void loopUpdateSurface(final Surface surface){
         while (!Thread.currentThread().isInterrupted()){
             System.out.println("update");
+            Canvas canvas=surface.lockCanvas(null);
+            canvas.drawColor(Color.RED);
+            surface.unlockCanvasAndPost(canvas);
         }
     }
 }
