@@ -28,13 +28,13 @@ public class AColorFormatTester extends AppCompatActivity implements TextureView
 
     @Override
     public void onSurfaceTextureAvailable(final SurfaceTexture surfaceTexture, int width, int height) {
-        surfaceTexture.setDefaultBufferSize(640*2,480*2);
+        surfaceTexture.setDefaultBufferSize(640*1,480*1);
         final Surface surface=new Surface(surfaceTexture);
         ColorFormatTester.nativeSetSurface(surface);
         mUpdateSurfaceThread =new Thread(new Runnable() {
             @Override
             public void run() {
-                loopUpdateSurface(surface);
+                loopUpdateSurface();
             }
         });
         mUpdateSurfaceThread.start();
@@ -59,7 +59,7 @@ public class AColorFormatTester extends AppCompatActivity implements TextureView
     public void onSurfaceTextureUpdated(SurfaceTexture surface) { }
 
 
-    private void loopUpdateSurface(final Surface surface){
+    private void loopUpdateSurface(){
         while (!Thread.currentThread().isInterrupted()){
             //System.out.println("update");
             //Canvas canvas=surface.lockCanvas(null);

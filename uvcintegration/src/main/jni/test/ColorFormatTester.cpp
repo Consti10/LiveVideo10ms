@@ -3,6 +3,8 @@
 //
 #include <jni.h>
 #include <android/native_window_jni.h>
+#include <android/surface_texture.h>
+#include <android/surface_texture_jni.h>
 
 #include <NDKThreadHelper.hpp>
 #include <AndroidThreadPrioValues.hpp>
@@ -17,8 +19,8 @@
 
 class ColorFormatTester{
 private:
-    static constexpr size_t WIDTH=640*2;
-    static constexpr size_t HEIGHT=480*2;
+    static constexpr size_t WIDTH=640*1;
+    static constexpr size_t HEIGHT=480*1;
 public:
     ANativeWindow* aNativeWindow=nullptr;
     void setSurface(JNIEnv* env,jobject surface){

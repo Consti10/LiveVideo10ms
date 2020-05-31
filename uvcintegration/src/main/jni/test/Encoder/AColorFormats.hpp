@@ -78,7 +78,11 @@ static_assert(ImageFormat::NV21==MediaCodecInfo::CodecCapabilities::COLOR_Format
 namespace ANativeWindowBufferHelper{
     // Helper that prints the current configuration of ANativeWindow_Buffer
     static void debugANativeWindowBuffer(const ANativeWindow_Buffer& buffer){
-        MLOGD<<"ANativeWindow_Buffer: W H "<<buffer.width<<" "<<buffer.height<<" format "<<buffer.format<<" Stride "<<buffer.stride;
+        std::stringstream ss;
+        for(size_t i=0;i<6;i++){
+            ss<<(int)buffer.reserved[i]<<" ";
+        }
+        MLOGD<<"ANativeWindow_Buffer: W H "<<buffer.width<<" "<<buffer.height<<" format "<<buffer.format<<" Stride "<<buffer.stride;//<<" reserved"<<ss.str();
     }
 }
 
