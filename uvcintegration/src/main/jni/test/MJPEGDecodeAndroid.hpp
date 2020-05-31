@@ -111,7 +111,6 @@ public:
         dinfo.dct_method = JDCT_IFAST;
         jpeg_start_decompress(&dinfo);
 
-        // libjpeg error ? - output_components is 3 ofr RGB_565 ?
         // create the array of pointers that takes stride of nativeWindowBuffer into account
         // Especially when using RGB (24 bit) stride != image height
         const unsigned int SCANLINE_LEN = ((unsigned int)nativeWindowBuffer.stride) * BYTES_PER_PIXEL;
@@ -126,7 +125,9 @@ public:
         jpeg_finish_decompress(&dinfo);
     }
 
-    void decodeToYUV422(void* jpegData, size_t jpegDataSize, APixelBuffers::YUV422Planar& out_buff){
+    // Decode a jpeg whose color format is YUV422 into the appropriate buffer
+    // No colorspace conversion(s) probably means best performance
+    void decodeRawYUV422(void* jpegData, size_t jpegDataSize, APixelBuffers::YUV422Planar& out_buff){
         assert(out_buff.WIDTH==640 && out_buff.HEIGHT==480);
         MEASURE_FUNCTION_EXECUTION_TIME
         setErrorManager();
