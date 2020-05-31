@@ -17,7 +17,7 @@
 #include <TimeHelper.hpp>
 #include <SimpleEncoder.h>
 #include <GroundRecorderFPV.hpp>
-#include <AndroidColorFormats.hpp>
+#include <AColorFormats.hpp>
 
 static constexpr const auto TAG="UVCReceiverDecoder";
 

@@ -2,8 +2,8 @@
 // Created by geier on 29/05/2020.
 //
 
-#ifndef FPV_VR_OS_LOL_HPP
-#define FPV_VR_OS_LOL_HPP
+#ifndef FPV_VR_OS_HAL_PIXEL_FORMATS_HPP
+#define FPV_VR_OS_HAL_PIXEL_FORMATS_HPP
 
 // https://android.googlesource.com/platform/hardware/libhardware/+/28147965b4f3b57893897924bdd2fc8fdc695f84/include/hardware/hardware.h
 namespace TodoRename{
@@ -48,4 +48,4 @@ namespace TodoRename{
 
 
 
-#endif //FPV_VR_OS_LOL_HPP
+#endif //FPV_VR_OS_HAL_PIXEL_FORMATS_HPP

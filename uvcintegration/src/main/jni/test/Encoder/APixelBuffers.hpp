@@ -10,10 +10,13 @@
 #include <array>
 #include <optional>
 
-// Watch out: For the data layout height comes before width !!
-// I like to use it the other way around - image data = [width][height]
-namespace MyColorSpaces{
-
+/***
+ * Helps with the most common data layout for android HW btw. pixel buffers. Use with buffers obtained by MediaCodec, Surface ( ANativeWindow ) usw
+ * WARNING: The data layout is always [HEIGHT][WIDTH] for these color formats, but since I am used to
+ * [WIDTH][HEIGHT] the data is indexed this way.
+ * INFO: Every class also has a constructors that takes a void* - when created this way the instance does not own the buffer data
+ */
+namespace APixelBuffers{
     // RGB 888 ,no special packing
     // By default, STRIDE==WIDTH
     class RGB{
@@ -48,7 +51,6 @@ namespace MyColorSpaces{
             }
         }
     };
-
     // YUV 420 either Planar or SemiPlanar (U,V packed together in pairs of 2)
     // see https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888
     template<bool PLANAR>
@@ -154,7 +156,6 @@ namespace MyColorSpaces{
     };
     using YUV422Planar = YUV422<true>;
     using YUV422SemiPlanar = YUV422<false>;
-
     //
     static void copyTo(YUV422Planar& in,YUV420SemiPlanar& out){
         assert(in.WIDTH==out.WIDTH && in.HEIGHT==out.HEIGHT);
@@ -171,7 +172,6 @@ namespace MyColorSpaces{
             }
         }
     }
-
     // from https://stackoverflow.com/questions/1737726/how-to-perform-rgb-yuv-conversion-in-c-c
     // RGB -> YUV
     #define CLIP(X) ( (X) > 255 ? 255 : (X) < 0 ? 0 : X)
@@ -184,7 +184,6 @@ namespace MyColorSpaces{
         uint8_t V=RGB2V(rgb[0],rgb[1],rgb[2]);
         return {Y,U,V};
     }
-
     static void copyTo(RGB& in,YUV420SemiPlanar& out){
         assert(in.WIDTH==out.WIDTH && in.HEIGHT==out.HEIGHT);
         const size_t WIDTH=in.WIDTH;
@@ -210,9 +209,10 @@ namespace MyColorSpaces{
 // taken from https://android.googlesource.com/platform/cts/+/3661c33/tests/tests/media/src/android/media/cts/EncodeDecodeTest.java
 // and translated to cpp
 namespace YUVFrameGenerator{
-    using namespace MyColorSpaces;
+    using namespace APixelBuffers;
     static constexpr uint8_t PURPLE_YUV[]={120, 160, 200};
 
+    // creates a purple rectangle with w=width/4 and h=height/2 that moves 1 square forward with frameIndex/8
     template<bool PLANAR>
     static void generateFrame(YUV420<PLANAR>& framebuffer,int frameIndex){
         assert(framebuffer.WIDTH % 4==0 && framebuffer.HEIGHT % 2 ==0);

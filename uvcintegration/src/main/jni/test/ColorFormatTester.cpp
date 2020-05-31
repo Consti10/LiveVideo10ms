@@ -12,7 +12,7 @@
 #include <TimeHelper.hpp>
 #include <SimpleEncoder.h>
 #include <GroundRecorderFPV.hpp>
-#include <AndroidColorFormats.hpp>
+#include <AColorFormats.hpp>
 
 class ColorFormatTester{
 private:
@@ -42,7 +42,7 @@ public:
         ANativeWindow_Buffer buffer;
         if(ANativeWindow_lock(aNativeWindow, &buffer, nullptr)==0){
             MJPEGDecodeAndroid::debugANativeWindowBuffer(buffer);
-            auto framebuffer=MyColorSpaces::YUV420SemiPlanar(buffer.bits,buffer.width,buffer.height);
+            auto framebuffer=APixelBuffers::YUV420SemiPlanar(buffer.bits, buffer.width, buffer.height);
             //framebuffer.clear(120,160,200);
             YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
             //YUVFrameGenerator::generateFrame(frameIndex,MediaCodecInfo::CodecCapabilities::COLOR_FormatYUV420Planar,(uint8_t*)buffer.bits,buffer.width*buffer.height*12 / 8);

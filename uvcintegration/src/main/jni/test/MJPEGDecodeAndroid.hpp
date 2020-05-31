@@ -13,7 +13,7 @@
 #include <AndroidLogger.hpp>
 #include <TimeHelper.hpp>
 #include <vector>
-#include <MyColorSpaces.hpp>
+#include <APixelBuffers.hpp>
 
 // Since I only need to support android it is cleaner to write my own conversion function.
 // inspired by the uvc_mjpeg_to_rgbx .. functions
@@ -130,7 +130,7 @@ public:
         jpeg_finish_decompress(&dinfo);
     }
 
-    void decodeToYUV422(void* jpegData,size_t jpegDataSize,MyColorSpaces::YUV422Planar& out_buff){
+    void decodeToYUV422(void* jpegData, size_t jpegDataSize, APixelBuffers::YUV422Planar& out_buff){
         assert(out_buff.WIDTH==640 && out_buff.HEIGHT==480);
         MEASURE_FUNCTION_EXECUTION_TIME
         setErrorManager();
@@ -159,7 +159,7 @@ public:
         jpeg_finish_decompress(&dinfo);
     }
 
-    void decodeDirect(MyColorSpaces::YUV422Planar& out_buf){
+    void decodeDirect(APixelBuffers::YUV422Planar& out_buf){
         unsigned char **yuv[3];
 
         auto y2=convertToPointers(&out_buf.Y(0,0),480,640);

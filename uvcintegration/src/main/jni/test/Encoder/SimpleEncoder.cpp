@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <FileHelper.hpp>
-#include "AndroidColorFormats.hpp"
+#include "AColorFormats.hpp"
 
 void SimpleEncoder::start() {
     running=true;
@@ -78,7 +78,7 @@ void SimpleEncoder::loopEncoder() {
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,0,frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     break;
                 }else{
-                    auto framebuffer=MyColorSpaces::YUV420SemiPlanar(buf,WIDTH,HEIGHT);
+                    auto framebuffer=APixelBuffers::YUV420SemiPlanar(buf, WIDTH, HEIGHT);
                     YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
                     frameIndex++;

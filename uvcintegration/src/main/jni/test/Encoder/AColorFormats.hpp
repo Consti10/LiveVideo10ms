@@ -5,11 +5,10 @@
 #ifndef FPV_VR_OS_ANDROIDCOLORFORMATS_HPP
 #define FPV_VR_OS_ANDROIDCOLORFORMATS_HPP
 
-#include <MyColorSpaces.hpp>
 #include <HALPixelFormats.hpp>
 
 //
-// includes color format constants ( e.g. int values )
+// includes Android color format constants ( e.g. int values )
 // In java, these constants are declared in multiple locations but often mean the same
 
 // Values taken from
