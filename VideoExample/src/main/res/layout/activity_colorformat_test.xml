@@ -8,7 +8,7 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     android:background="@android:color/black"
-    tools:context=".ColorFormatTester">
+    tools:context=".AColorFormatTester">
 
     <!--<constantin.video.core.external.AspectFrameLayout
         android:id="@+id/afl_video"

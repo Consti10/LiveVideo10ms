@@ -15,33 +15,35 @@
 namespace MyColorSpaces{
 
     // RGB 888 ,no special packing
-    template<size_t WIDTH,size_t HEIGHT> //,size_t STRIDE
+    // By default, STRIDE==WIDTH
     class RGB{
     public:
-        RGB(void* data1):data((uint8_t*)data1){}
-        RGB():ownedData(WIDTH*HEIGHT*3),data(ownedData->data()){};
+        RGB(void* data1,const size_t W,const size_t H,const size_t STRIDE1):data(data1),WIDTH(W),HEIGHT(H),STRIDE(STRIDE1){}
+        RGB(const size_t W,const size_t H):ownedData(WIDTH*HEIGHT*3),data(ownedData->data()),WIDTH(W),HEIGHT(H),STRIDE(WIDTH){};
+        const size_t WIDTH,HEIGHT;
+        const size_t STRIDE;
         std::optional<std::vector<uint8_t>> ownedData={};
-        uint8_t* data;
-        //using LOL=uint8_t(*)[HEIGHT][WIDTH][3];
+        void* data;
         uint8_t& R(size_t w,size_t h){
-            return (*static_cast<uint8_t(*)[HEIGHT][WIDTH][3]>(static_cast<void*>(data)))[h][w][0];
+            return (*static_cast<uint8_t(*)[HEIGHT][STRIDE][3]>(data))[h][w][0];
         }
         uint8_t& G(size_t w,size_t h){
-            return (*static_cast<uint8_t(*)[HEIGHT][WIDTH][3]>(static_cast<void*>(data)))[h][w][1];
+            return (*static_cast<uint8_t(*)[HEIGHT][STRIDE][3]>(data))[h][w][1];
         }
         uint8_t& B(size_t w,size_t h){
-            return (*static_cast<uint8_t(*)[HEIGHT][WIDTH][3]>(static_cast<void*>(data)))[h][w][2];
+            return (*static_cast<uint8_t(*)[HEIGHT][STRIDE][3]>(data))[h][w][2];
         }
-        void clear(const int frameIndex){
+        void drawPattern(const int frameIndex){
             constexpr uint8_t red[3]={255,0,0};
             constexpr uint8_t green[3]={0,255,0};
-            constexpr uint8_t blue[3]={0,255,0};
+            constexpr uint8_t blue[3]={0,0,255};
             const auto color= (frameIndex / 60) % 2 == 0 ? red : green;
             for(size_t w=0;w<WIDTH;w++){
                 for(size_t h=0;h<HEIGHT;h++){
-                    R(w,h)=color[0];
-                    G(w,h)=color[1];
-                    B(w,h)=color[2];
+                    const auto color2=(h/8)%2==0 ? color : blue;
+                    R(w,h)=color2[0];
+                    G(w,h)=color2[1];
+                    B(w,h)=color2[2];
                 }
             }
         }
@@ -49,10 +51,11 @@ namespace MyColorSpaces{
 
     // YUV 420 either Planar or SemiPlanar (U,V packed together in pairs of 2)
     // see https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888
-    template<size_t WIDTH,size_t HEIGHT,bool PLANAR>
+    template<bool PLANAR>
     class YUV420{
     public:
-        YUV420(void* data1):data((uint8_t*)data1){}
+        YUV420(void* data1,const size_t W,const size_t H):data((uint8_t*)data1),WIDTH(W),HEIGHT(H){}
+        const size_t WIDTH,HEIGHT;
         uint8_t* data;
         const size_t LUMA_SIZE_B=WIDTH*HEIGHT;
         const size_t HALF_WIDTH=WIDTH/2;
@@ -94,11 +97,8 @@ namespace MyColorSpaces{
             }
         }
     };
-    template<size_t WIDTH,size_t HEIGHT>
-    using YUV420Planar = YUV420<WIDTH,HEIGHT,true>;
-    template<size_t WIDTH,size_t HEIGHT>
-    using YUV420SemiPlanar = YUV420<WIDTH,HEIGHT,false>;
-
+    using YUV420Planar = YUV420<true>;
+    using YUV420SemiPlanar = YUV420<false>;
 
 
     // Y plane has full width & height
@@ -130,8 +130,6 @@ namespace MyColorSpaces{
     }__attribute__((packed));
     //
     static_assert(sizeof(YUV422Planar<640,480>)==640*480*16/8);
-    //static_assert(sizeof(YUV420SemiPlanar<640,480>)==640*480*12/8);
-    //static_assert(sizeof(YUV420SemiPlanar<640,480>)*16/12==sizeof(YUV422Planar<640,480>));
     static_assert(sizeof(YUV422SemiPlanar<640,480>)==sizeof(YUV422Planar<640,480>));
 
     //
@@ -161,8 +159,10 @@ namespace MyColorSpaces{
         return {Y,U,V};
     }
 
-    template<size_t WIDTH,size_t HEIGHT>
-    static void copyTo(RGB<WIDTH,HEIGHT>& in,YUV420SemiPlanar<WIDTH,HEIGHT>& out){
+    static void copyTo(RGB& in,YUV420SemiPlanar& out){
+        assert(in.WIDTH==out.WIDTH && in.HEIGHT==out.HEIGHT);
+        const size_t WIDTH=in.WIDTH;
+        const size_t HEIGHT=in.HEIGHT;
         for(size_t w=0;w<WIDTH;w++){
             for(size_t h=0;h<HEIGHT;h++){
                 const std::array<uint8_t,3> rgb={in.R(w,h),in.G(w,h),in.B(w,h)};

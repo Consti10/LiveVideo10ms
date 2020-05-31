@@ -81,7 +81,7 @@ namespace YUVFrameGenerator{
         constexpr size_t HALF_WIDTH= WIDTH / 2;
         constexpr size_t HALF_HEIGHT= HEIGHT / 2;
 
-        auto framebuffer=YUV420SemiPlanar<640,480>(frameData);
+        auto framebuffer=YUV420SemiPlanar(frameData,WIDTH,HEIGHT);
 
         boolean semiPlanar = isSemiPlanarYUV(colorFormat);
         // Set to zero.  In YUV this is a dull green.

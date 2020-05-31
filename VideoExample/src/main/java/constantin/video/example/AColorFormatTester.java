@@ -2,17 +2,15 @@ package constantin.video.example;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.TextureView;
 
-import constantin.video.core.external.AspectFrameLayout;
+import constantin.test.ColorFormatTester;
 import constantin.video.example.databinding.ActivityColorformatTestBinding;
 
-public class ColorFormatTester extends AppCompatActivity implements TextureView.SurfaceTextureListener {
+public class AColorFormatTester extends AppCompatActivity implements TextureView.SurfaceTextureListener {
     private ActivityColorformatTestBinding binding;
     private Thread mUpdateSurfaceThread;
 
@@ -26,8 +24,9 @@ public class ColorFormatTester extends AppCompatActivity implements TextureView.
 
     @Override
     public void onSurfaceTextureAvailable(final SurfaceTexture surfaceTexture, int width, int height) {
-        surfaceTexture.setDefaultBufferSize(640,480);
+        surfaceTexture.setDefaultBufferSize(1280,720);
         final Surface surface=new Surface(surfaceTexture);
+        ColorFormatTester.nativeSetSurface(surface);
         mUpdateSurfaceThread =new Thread(new Runnable() {
             @Override
             public void run() {
@@ -48,6 +47,7 @@ public class ColorFormatTester extends AppCompatActivity implements TextureView.
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        ColorFormatTester.nativeSetSurface(null);
         return false;
     }
 
@@ -58,9 +58,10 @@ public class ColorFormatTester extends AppCompatActivity implements TextureView.
     private void loopUpdateSurface(final Surface surface){
         while (!Thread.currentThread().isInterrupted()){
             System.out.println("update");
-            Canvas canvas=surface.lockCanvas(null);
-            canvas.drawColor(Color.RED);
-            surface.unlockCanvasAndPost(canvas);
+            //Canvas canvas=surface.lockCanvas(null);
+            //canvas.drawColor(Color.RED);
+            //surface.unlockCanvasAndPost(canvas);
+            ColorFormatTester.nativeTestUpdateSurface();
         }
     }
 }

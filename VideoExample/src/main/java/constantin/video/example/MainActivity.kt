@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
         findViewById<View>(R.id.b_startTethering).setOnClickListener { IsConnected.openUSBTetherSettings(context) }
         findViewById<View>(R.id.b_startViewDatabase).setOnClickListener { startActivity(Intent().setClass(context, ViewBenchmarkDataActivity::class.java)) }
-        findViewById<View>(R.id.b_startColorFormatsTester).setOnClickListener { startActivity(Intent().setClass(context, ColorFormatTester::class.java)) }
+        findViewById<View>(R.id.b_startColorFormatsTester).setOnClickListener { startActivity(Intent().setClass(context, AColorFormatTester::class.java)) }
     }
 
     override fun onResume() {
