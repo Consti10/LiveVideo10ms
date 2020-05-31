@@ -13,7 +13,7 @@
 #include <SimpleEncoder.h>
 #include <GroundRecorderFPV.hpp>
 #include <AColorFormats.hpp>
-#include "MJPEGDecodeAndroid.hpp"
+#include <APixelBuffers.hpp>
 
 class ColorFormatTester{
 private:
@@ -42,9 +42,10 @@ public:
     void testUpdateSurface(){
         MEASURE_FUNCTION_EXECUTION_TIME
         ANativeWindow_Buffer buffer;
+        //ARect bounds = {0, 0, 640, 480};
         if(ANativeWindow_lock(aNativeWindow, &buffer, nullptr)==0){
-            MJPEGDecodeAndroid::debugANativeWindowBuffer(buffer);
-            auto framebuffer=APixelBuffers::YUV420SemiPlanar(buffer.bits, buffer.width, buffer.height);
+            ANativeWindowBufferHelper::debugANativeWindowBuffer(buffer);
+            auto framebuffer=APixelBuffers::YUV420Planar (buffer.bits, buffer.width, buffer.height);
             //framebuffer.clear(120,160,200);
             YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
             //auto framebuffer=MyColorSpaces::RGB(buffer.bits,buffer.width,buffer.height,buffer.stride);

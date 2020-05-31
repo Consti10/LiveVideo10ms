@@ -80,14 +80,10 @@ private:
         MLOGD<<" Is "<<(int)data[dataSize-2]<<" "<<(int)data[dataSize-1];
     }
 public:
-    // Helper that prints the current configuration of ANativeWindow_Buffer
-    static void debugANativeWindowBuffer(const ANativeWindow_Buffer& buffer){
-        MLOGD<<"ANativeWindow_Buffer: W H "<<buffer.width<<" "<<buffer.height<<" format "<<buffer.format<<" Stride "<<buffer.stride;
-    }
     // Supports the most common ANativeWindow_Buffer image formats
     // No unnecessary memcpy's & correctly handle stride of ANativeWindow_Buffer
     void DecodeMJPEGtoANativeWindowBuffer(const void* jpegData, size_t jpegDataSize, const ANativeWindow_Buffer& nativeWindowBuffer){
-        debugANativeWindowBuffer(nativeWindowBuffer);
+        ANativeWindowBufferHelper::debugANativeWindowBuffer(nativeWindowBuffer);
         //printStartEnd((uint8_t*)jpegData,jpegDataSize);
         MEASURE_FUNCTION_EXECUTION_TIME
         unsigned int BYTES_PER_PIXEL;

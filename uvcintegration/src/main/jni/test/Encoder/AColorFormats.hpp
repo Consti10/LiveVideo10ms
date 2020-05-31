@@ -6,6 +6,8 @@
 #define FPV_VR_OS_ANDROIDCOLORFORMATS_HPP
 
 #include <HALPixelFormats.hpp>
+#include <android/native_window_jni.h>
+#include <AndroidLogger.hpp>
 
 //
 // includes Android color format constants ( e.g. int values )
@@ -72,6 +74,13 @@ namespace ImageFormat{
 }
 static_assert(ImageFormat::YUV_420_888 == AHARDWAREBUFFER_FORMAT_Y8Cb8Cr8_420);
 static_assert(ImageFormat::NV21==MediaCodecInfo::CodecCapabilities::COLOR_FormatYUV420SemiPlanar);
+
+namespace ANativeWindowBufferHelper{
+    // Helper that prints the current configuration of ANativeWindow_Buffer
+    static void debugANativeWindowBuffer(const ANativeWindow_Buffer& buffer){
+        MLOGD<<"ANativeWindow_Buffer: W H "<<buffer.width<<" "<<buffer.height<<" format "<<buffer.format<<" Stride "<<buffer.stride;
+    }
+}
 
 
 #endif //FPV_VR_OS_ANDROIDCOLORFORMATS_HPP

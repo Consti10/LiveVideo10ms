@@ -94,7 +94,7 @@ public:
         ANativeWindow_Buffer buffer;
         if(ANativeWindow_lock(aNativeWindow, &buffer, nullptr)==0){
             mMJPEGDecodeAndroid.DecodeMJPEGtoANativeWindowBuffer(frame_mjpeg->data, frame_mjpeg->actual_bytes,buffer);
-            MJPEGDecodeAndroid::debugANativeWindowBuffer(buffer);
+            ANativeWindowBufferHelper::debugANativeWindowBuffer(buffer);
             ANativeWindow_unlockAndPost(aNativeWindow);
         }else{
             MLOGD<<"Cannot lock window";
