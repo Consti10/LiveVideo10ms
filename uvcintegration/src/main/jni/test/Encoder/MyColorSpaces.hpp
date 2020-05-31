@@ -54,33 +54,35 @@ namespace MyColorSpaces{
     template<bool PLANAR>
     class YUV420{
     public:
-        YUV420(void* data1,const size_t W,const size_t H):data((uint8_t*)data1),WIDTH(W),HEIGHT(H){}
+        YUV420(void* data1,const size_t W,const size_t H):data(data1),WIDTH(W),HEIGHT(H){}
         const size_t WIDTH,HEIGHT;
-        uint8_t* data;
+        void* data;
         const size_t LUMA_SIZE_B=WIDTH*HEIGHT;
         const size_t HALF_WIDTH=WIDTH/2;
         const size_t HALF_HEIGHT=HEIGHT/2;
+        // No matter if planar or semiplanar, the chroma data always starts at this offset
+        void* chromaData=&static_cast<uint8_t*>(data)[LUMA_SIZE_B];
         // All these functions return a reference to the Y (U,V) value at position (w,h)
         // Since the Y plane has full resolution w can be in the range [0,WIDTH[ and h in [0,HEIGHT[
         // but the U,V plane (both in PLANAR and PACKED mode) is only in the range of [0,HALF_WIDTH[ / [0,HALF_HEIGHT[
         uint8_t& Y(size_t w,size_t h){
-            auto& tmp=*static_cast<uint8_t(*)[HEIGHT][WIDTH]>(static_cast<void*>(data));
+            auto& tmp=*static_cast<uint8_t(*)[HEIGHT][WIDTH]>(data);
             return tmp[h][w];
         }
         uint8_t& U(size_t w,size_t h){
             if constexpr (PLANAR){
-                auto& tmp=(*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH]>(static_cast<void*>(&data[LUMA_SIZE_B])));
-                return (*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH]>(static_cast<void*>(&data[LUMA_SIZE_B])))[h][w];
+                auto& tmp=(*static_cast<uint8_t(*)[2][HALF_HEIGHT][HALF_WIDTH]>(chromaData));
+                return tmp[0][h][w];
             }
-            auto& tmp=*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH][2]>(static_cast<void*>(&data[LUMA_SIZE_B]));
+            auto& tmp=*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH][2]>(chromaData);
             return tmp[h][w][0];
         }
         uint8_t& V(size_t w,size_t h){
             if constexpr (PLANAR){
-                auto& tmp=*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH]>(static_cast<void*>(&data[LUMA_SIZE_B+HALF_WIDTH*HALF_HEIGHT]));
-                return tmp[h][w];
+                auto& tmp=*static_cast<uint8_t(*)[2][HALF_HEIGHT][HALF_WIDTH]>(chromaData);
+                return tmp[1][h][w];
             }
-            auto& tmp=*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH][2]>(static_cast<void*>(&data[LUMA_SIZE_B]));
+            auto& tmp=*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH][2]>(chromaData);
             return tmp[h][w][1];
         }
         void clear(uint8_t y,uint8_t u,uint8_t v){
