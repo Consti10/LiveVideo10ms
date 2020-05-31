@@ -153,7 +153,6 @@ namespace MyColorSpaces{
     using YUV422Planar = YUV422<true>;
     using YUV422SemiPlanar = YUV422<false>;
 
-
     //
     static void copyTo(YUV422Planar& in,YUV420SemiPlanar& out){
         assert(in.WIDTH==out.WIDTH && in.HEIGHT==out.HEIGHT);
@@ -164,9 +163,9 @@ namespace MyColorSpaces{
         // copy CbCr component ( loop needed)
         // copy CbCr component ( loop needed)
         for(int i=0;i<WIDTH/2;i++){
-            for(int j=0;j<HEIGHT;j++){
-                out.U(i/2,j/2)=in.U(i,j);
-                out.V(i/2,j/2)=in.V(i,j);
+            for(int j=0;j<HEIGHT/2;j++){
+                out.U(i,j)=in.U(i,j*2);
+                out.V(i,j)=in.V(i,j*2);
             }
         }
     }
@@ -204,27 +203,6 @@ namespace MyColorSpaces{
             }
         }
     }
-
-    /*template<size_t WIDTH,size_t HEIGHT>
-    static void copyTo(const RGBA<WIDTH,HEIGHT>& in,YUV420SemiPlanar<WIDTH,HEIGHT,true>& out){
-        for(size_t w=0;w<WIDTH;w++){
-            for(size_t h=0;h<HEIGHT;h++){
-                //const uint8_t* rgb=in.planeRGB[h[w];
-                //const auto YUV=convertToYUV(rgb);
-                //out.planeY[h][w]=YUV[0];
-                //out.planeUV[h][w/2][0]=YUV[1];
-                //out.planeUV[h][w/2][1]=YUV[2];
-                out.planeY[h][w]=120;
-            }
-        }
-        for(size_t w=0;w<WIDTH/2;w++){
-            for(size_t h=0;h<HEIGHT/2;h++){
-                out.planeUV[h][w][0]=160;
-                out.planeUV[h][w][1]=200;
-            }
-        }
-    }*/
-
 
 }
 

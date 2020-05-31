@@ -129,6 +129,8 @@ void SimpleEncoder::loopEncoder() {
                     MLOGD<<"Got mjpeg"<<mjpegData->size()<<" idx"<<mjpegFrameIndex;
                     auto decodeBuffer= MyColorSpaces::YUV422Planar(640,480);
                     mjpegDecodeAndroid.decodeToYUV422(mjpegData->data(),mjpegData->size(),decodeBuffer);
+                    auto encoderBuffer=MyColorSpaces::YUV420SemiPlanar(buf,640,480);
+                    MyColorSpaces::copyTo(decodeBuffer,encoderBuffer);
                     frameTimeUs+=8*1000;
                 }
                 AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
