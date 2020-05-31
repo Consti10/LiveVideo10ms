@@ -83,7 +83,5 @@ public class UVCReceiverDecoder {
     private static native void nativeStopReceiving(long nativeInstance);
     private static native void nativeSetSurface(long nativeInstance,Surface surface);
 
-    public static native long nativeStartConvertFile(String GroundRecordingDirectory);
-    public static native long nativeStopConvertFile(long p);
 
 }

@@ -9,7 +9,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <FileHelper.hpp>
-#include "AColorFormats.hpp"
+#include <AColorFormats.hpp>
+#include <APixelBuffers.hpp>
+#include <NDKArrayHelper.hpp>
 
 void SimpleEncoder::start() {
     running=true;
@@ -156,3 +158,24 @@ void SimpleEncoder::loopEncoder() {
 }
 
 
+// ------------------------------------- Native Bindings -------------------------------------
+#define JNI_METHOD(return_type, method_name) \
+  JNIEXPORT return_type JNICALL              \
+      Java_constantin_test_SimpleEncoder_##method_name
+extern "C" {
+
+
+JNI_METHOD(jlong, nativeStartConvertFile)
+(JNIEnv *env, jclass jclass1,jstring groundRecordingDir) {
+    auto* simpleEncoder=new SimpleEncoder(NDKArrayHelper::DynamicSizeString(env,groundRecordingDir));
+    simpleEncoder->start();
+    return reinterpret_cast<intptr_t>(simpleEncoder);
+}
+
+JNI_METHOD(void, nativeStopConvertFile)
+(JNIEnv *env, jclass jclass1,jlong simpleEncoder) {
+    auto* simpleEncoder1=reinterpret_cast<SimpleEncoder*>(simpleEncoder);
+    simpleEncoder1->stop();
+    delete simpleEncoder1;
+}
+}

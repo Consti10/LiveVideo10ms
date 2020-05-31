@@ -14,7 +14,7 @@
 #include <atomic>
 #include <vector>
 #include <media/NdkMediaMuxer.h>
-#include <MJPEGDecodeAndroid.hpp>
+//#include <MJPEGDecodeAndroid.hpp>
 #include <FileReaderFPV.h>
 
 class SimpleEncoder {
@@ -29,7 +29,7 @@ private:
     size_t videoTrackIndex;
     AMediaMuxer* mediaMuxer=nullptr;
     int outputFileFD;
-    MJPEGDecodeAndroid mjpegDecodeAndroid;
+    //MJPEGDecodeAndroid mjpegDecodeAndroid;
     bool openMediaCodecEncoder(const int wantedColorFormat);
     static constexpr int32_t WIDTH = 640;
     static constexpr int32_t HEIGHT = 480;

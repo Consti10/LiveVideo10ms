@@ -18,6 +18,7 @@
 #include <SimpleEncoder.h>
 #include <GroundRecorderFPV.hpp>
 #include <AColorFormats.hpp>
+#include "MJPEGDecodeAndroid.hpp"
 
 static constexpr const auto TAG="UVCReceiverDecoder";
 
@@ -35,7 +36,7 @@ private:
     uvc_context_t *ctx=nullptr;
     uvc_device_t *dev=nullptr;
     uvc_device_handle_t *devh=nullptr;
-    boolean isStreaming=false;
+    bool isStreaming=false;
     static constexpr unsigned int VIDEO_STREAM_WIDTH=640;
     static constexpr unsigned int VIDEO_STREAM_HEIGHT=480;
     static constexpr unsigned int VIDEO_STREAM_FPS=30;
@@ -219,18 +220,5 @@ JNI_METHOD(void, nativeSetSurface)
    native(javaP)->setSurface(env,surface);
 }
 
-JNI_METHOD(jlong, nativeStartConvertFile)
-(JNIEnv *env, jclass jclass1,jstring groundRecordingDir) {
-    auto* simpleEncoder=new SimpleEncoder(NDKArrayHelper::DynamicSizeString(env,groundRecordingDir));
-    simpleEncoder->start();
-    return reinterpret_cast<intptr_t>(simpleEncoder);
-}
-
-JNI_METHOD(void, nativeStopConvertFile)
-(JNIEnv *env, jclass jclass1,jlong simpleEncoder) {
-    auto* simpleEncoder1=reinterpret_cast<SimpleEncoder*>(simpleEncoder);
-    simpleEncoder1->stop();
-    delete simpleEncoder1;
-}
 
 }

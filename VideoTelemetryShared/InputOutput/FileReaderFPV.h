@@ -22,6 +22,7 @@
 #include "GroundRecorderFPV.hpp"
 #include <optional>
 #include <future>
+#include <AndroidLogger.hpp>
 
 namespace FileReaderFPV{
     static constexpr const size_t MAX_NALU_BUFF_SIZE = 1024 * 1024;

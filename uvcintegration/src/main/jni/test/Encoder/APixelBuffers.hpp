@@ -22,7 +22,7 @@ namespace APixelBuffers{
     class RGB{
     public:
         RGB(void* data1,const size_t W,const size_t H,const size_t STRIDE1):data(data1),WIDTH(W),HEIGHT(H),STRIDE(STRIDE1){}
-        RGB(const size_t W,const size_t H):ownedData(WIDTH*HEIGHT*3),data(ownedData->data()),WIDTH(W),HEIGHT(H),STRIDE(WIDTH){};
+        RGB(const size_t W,const size_t H,const ssize_t STRIDE1=-1):ownedData(WIDTH*HEIGHT*3),data(ownedData->data()),WIDTH(W),HEIGHT(H),STRIDE(STRIDE1<0 ? WIDTH : STRIDE1){};
         const size_t WIDTH,HEIGHT;
         const size_t STRIDE;
         std::optional<std::vector<uint8_t>> ownedData={};
@@ -72,21 +72,22 @@ namespace APixelBuffers{
             auto& tmp=*static_cast<uint8_t(*)[HEIGHT][WIDTH]>(data);
             return tmp[h][w];
         }
-        uint8_t& U(size_t w,size_t h){
+        // half width (h2) and half height (h2)
+        uint8_t& U(size_t w2, size_t h2){
             if constexpr (PLANAR){
                 auto& tmp=(*static_cast<uint8_t(*)[2][HALF_HEIGHT][HALF_WIDTH]>(chromaData));
-                return tmp[0][h][w];
+                return tmp[0][h2][w2];
             }
             auto& tmp=*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH][2]>(chromaData);
-            return tmp[h][w][0];
+            return tmp[h2][w2][0];
         }
-        uint8_t& V(size_t w,size_t h){
+        uint8_t& V(size_t w2, size_t h2){
             if constexpr (PLANAR){
                 auto& tmp=*static_cast<uint8_t(*)[2][HALF_HEIGHT][HALF_WIDTH]>(chromaData);
-                return tmp[1][h][w];
+                return tmp[1][h2][w2];
             }
             auto& tmp=*static_cast<uint8_t(*)[HALF_HEIGHT][HALF_WIDTH][2]>(chromaData);
-            return tmp[h][w][1];
+            return tmp[h2][w2][1];
         }
         void clear(uint8_t y,uint8_t u,uint8_t v){
             for(size_t w=0;w<WIDTH;w++){
@@ -94,10 +95,10 @@ namespace APixelBuffers{
                     Y(w,h)=y;
                 }
             }
-            for(size_t w=0;w<HALF_WIDTH;w++){
-                for(size_t h=0;h<HALF_HEIGHT;h++){
-                    U(w,h)=u;
-                    V(w,h)=v;
+            for(size_t halfW=0; halfW < HALF_WIDTH; halfW++){
+                for(size_t halfH=0; halfH < HALF_HEIGHT; halfH++){
+                    U(halfW, halfH)=u;
+                    V(halfW, halfH)=v;
                 }
             }
         }
@@ -124,21 +125,21 @@ namespace APixelBuffers{
             auto& tmp=*static_cast<uint8_t(*)[HEIGHT][WIDTH]>(data);
             return tmp[h][w];
         }
-        uint8_t& U(size_t w,size_t h){
+        uint8_t& U(size_t w,size_t h2){
             if constexpr (PLANAR){
                 auto& tmp=(*static_cast<uint8_t(*)[2][HEIGHT][HALF_WIDTH]>(chromaData));
-                return tmp[0][h][w];
+                return tmp[0][h2][w];
             }
             auto& tmp=*static_cast<uint8_t(*)[HEIGHT][HALF_WIDTH][2]>(chromaData);
-            return tmp[h][w][0];
+            return tmp[h2][w][0];
         }
-        uint8_t& V(size_t w,size_t h){
+        uint8_t& V(size_t w,size_t h2){
             if constexpr (PLANAR){
                 auto& tmp=*static_cast<uint8_t(*)[2][HEIGHT][HALF_WIDTH]>(chromaData);
-                return tmp[1][h][w];
+                return tmp[1][h2][w];
             }
             auto& tmp=*static_cast<uint8_t(*)[HEIGHT][HALF_WIDTH][2]>(chromaData);
-            return tmp[h][w][1];
+            return tmp[h2][w][1];
         }
         void clear(uint8_t y,uint8_t u,uint8_t v){
             for(size_t w=0;w<WIDTH;w++){
@@ -163,7 +164,6 @@ namespace APixelBuffers{
         const size_t HEIGHT=in.HEIGHT;
         // copy Y component (easy)
         memcpy(out.data,in.data,WIDTH*HEIGHT);
-        // copy CbCr component ( loop needed)
         // copy CbCr component ( loop needed)
         for(int i=0;i<WIDTH/2;i++){
             for(int j=0;j<HEIGHT/2;j++){

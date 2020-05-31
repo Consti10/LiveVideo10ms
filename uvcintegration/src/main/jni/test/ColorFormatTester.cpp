@@ -13,6 +13,7 @@
 #include <SimpleEncoder.h>
 #include <GroundRecorderFPV.hpp>
 #include <AColorFormats.hpp>
+#include "MJPEGDecodeAndroid.hpp"
 
 class ColorFormatTester{
 private:
