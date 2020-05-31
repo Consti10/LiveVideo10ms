@@ -69,10 +69,10 @@ namespace APixelBuffers{
         // Since the Y plane has full resolution w can be in the range [0,WIDTH[ and h in [0,HEIGHT[
         // but the U,V plane (both in PLANAR and PACKED mode) is only in the range of [0,HALF_WIDTH[ / [0,HALF_HEIGHT[
         uint8_t& Y(size_t w,size_t h){
-            auto& tmp=*static_cast<uint8_t(*)[HEIGHT][WIDTH]>(data);
-            return tmp[h][w];
+            return (*static_cast<uint8_t(*)[HEIGHT][WIDTH]>(data))[h][w];
         }
         // half width (h2) and half height (h2)
+        // Planar means [2][..][..] and Semi-planar means [..][..][2]
         uint8_t& U(size_t w2, size_t h2){
             if constexpr (PLANAR){
                 auto& tmp=(*static_cast<uint8_t(*)[2][HALF_HEIGHT][HALF_WIDTH]>(chromaData));
