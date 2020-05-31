@@ -71,6 +71,7 @@ namespace ImageFormat{
     static constexpr int YUV_444_888=40;
 }
 static_assert(ImageFormat::YUV_420_888 == AHARDWAREBUFFER_FORMAT_Y8Cb8Cr8_420);
+static_assert(ImageFormat::NV21==MediaCodecInfo::CodecCapabilities::COLOR_FormatYUV420SemiPlanar);
 
 
 #endif //FPV_VR_OS_ANDROIDCOLORFORMATS_HPP

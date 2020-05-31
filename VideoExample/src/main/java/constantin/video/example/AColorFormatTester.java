@@ -2,7 +2,11 @@ package constantin.video.example;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Camera;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CaptureRequest;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.TextureView;
@@ -24,7 +28,7 @@ public class AColorFormatTester extends AppCompatActivity implements TextureView
 
     @Override
     public void onSurfaceTextureAvailable(final SurfaceTexture surfaceTexture, int width, int height) {
-        surfaceTexture.setDefaultBufferSize(1280,720);
+        surfaceTexture.setDefaultBufferSize(640,480);
         final Surface surface=new Surface(surfaceTexture);
         ColorFormatTester.nativeSetSurface(surface);
         mUpdateSurfaceThread =new Thread(new Runnable() {
@@ -57,11 +61,17 @@ public class AColorFormatTester extends AppCompatActivity implements TextureView
 
     private void loopUpdateSurface(final Surface surface){
         while (!Thread.currentThread().isInterrupted()){
-            System.out.println("update");
+            //System.out.println("update");
             //Canvas canvas=surface.lockCanvas(null);
             //canvas.drawColor(Color.RED);
             //surface.unlockCanvasAndPost(canvas);
             ColorFormatTester.nativeTestUpdateSurface();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
         }
     }
 }
