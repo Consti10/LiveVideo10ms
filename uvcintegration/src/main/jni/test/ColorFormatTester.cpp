@@ -17,8 +17,8 @@
 
 class ColorFormatTester{
 private:
-    static constexpr size_t WIDTH=640;
-    static constexpr size_t HEIGHT=480;
+    static constexpr size_t WIDTH=640*2;
+    static constexpr size_t HEIGHT=480*2;
 public:
     ANativeWindow* aNativeWindow=nullptr;
     void setSurface(JNIEnv* env,jobject surface){
@@ -44,7 +44,6 @@ public:
         ANativeWindow_Buffer buffer;
         if(ANativeWindow_lock(aNativeWindow, &buffer, nullptr)==0){
             MJPEGDecodeAndroid::debugANativeWindowBuffer(buffer);
-
             auto framebuffer=APixelBuffers::YUV420SemiPlanar(buffer.bits, buffer.width, buffer.height);
             //framebuffer.clear(120,160,200);
             YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
