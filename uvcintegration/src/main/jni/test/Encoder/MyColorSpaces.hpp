@@ -102,48 +102,71 @@ namespace MyColorSpaces{
     using YUV420Planar = YUV420<true>;
     using YUV420SemiPlanar = YUV420<false>;
 
-
     // Y plane has full width & height
     // U and V plane both have half width and full height
-    template<size_t WIDTH,size_t HEIGHT>
-    class YUV422Planar{
+    template<bool PLANAR>
+    class YUV422{
     public:
-        uint8_t planeY[HEIGHT][WIDTH];
-        uint8_t planeU[HEIGHT][WIDTH/2];
-        uint8_t planeV[HEIGHT][WIDTH/2];
-        std::array<uint8_t,2> getUVHalf(size_t xHalf,size_t yHalf)const{
-            // linear interpolation between y0,y1 ..
-            const auto U=planeU[yHalf*2][xHalf];
-            const auto U2=planeU[yHalf*2+1][xHalf];
-            const int diff=std::abs((int)U2-(int)U);
-            if(diff > 2){
-                //MLOGD<<"U1 "<<(int)U<<" U2 "<<(int)U2;
-            }
-            const auto V=planeV[yHalf*2][xHalf];
-            return {U,V};
+        YUV422(void* data1,const size_t W,const size_t H):data(data1),WIDTH(W),HEIGHT(H){}
+        YUV422(const size_t W,const size_t H):ownedData(W*H*16/8),data(ownedData->data()),WIDTH(W),HEIGHT(H){}
+        const size_t WIDTH,HEIGHT;
+        std::optional<std::vector<uint8_t>> ownedData={};
+        void* data;
+        const size_t LUMA_SIZE_B=WIDTH*HEIGHT;
+        const size_t HALF_WIDTH=WIDTH/2;
+        // we do not need Half height ! const size_t HALF_HEIGHT=HEIGHT/2;
+        void* chromaData=&static_cast<uint8_t*>(data)[LUMA_SIZE_B];
+        uint8_t& Y(size_t w,size_t h){
+            auto& tmp=*static_cast<uint8_t(*)[HEIGHT][WIDTH]>(data);
+            return tmp[h][w];
         }
-    }__attribute__((packed));
-    //
-    template<size_t WIDTH,size_t HEIGHT>
-    class YUV422SemiPlanar{
-    public:
-        uint8_t planeY[HEIGHT][WIDTH];
-        uint8_t planeUV[HEIGHT][WIDTH/2][2];
-    }__attribute__((packed));
-    //
-    static_assert(sizeof(YUV422Planar<640,480>)==640*480*16/8);
-    static_assert(sizeof(YUV422SemiPlanar<640,480>)==sizeof(YUV422Planar<640,480>));
+        uint8_t& U(size_t w,size_t h){
+            if constexpr (PLANAR){
+                auto& tmp=(*static_cast<uint8_t(*)[2][HEIGHT][HALF_WIDTH]>(chromaData));
+                return tmp[0][h][w];
+            }
+            auto& tmp=*static_cast<uint8_t(*)[HEIGHT][HALF_WIDTH][2]>(chromaData);
+            return tmp[h][w][0];
+        }
+        uint8_t& V(size_t w,size_t h){
+            if constexpr (PLANAR){
+                auto& tmp=*static_cast<uint8_t(*)[2][HEIGHT][HALF_WIDTH]>(chromaData);
+                return tmp[1][h][w];
+            }
+            auto& tmp=*static_cast<uint8_t(*)[HEIGHT][HALF_WIDTH][2]>(chromaData);
+            return tmp[h][w][1];
+        }
+        void clear(uint8_t y,uint8_t u,uint8_t v){
+            for(size_t w=0;w<WIDTH;w++){
+                for(size_t h=0;h<HEIGHT;h++){
+                    Y(w,h)=y;
+                }
+            }
+            for(size_t w=0;w<HALF_WIDTH;w++){
+                for(size_t h=0;h<HEIGHT;h++){
+                    U(w,h)=u;
+                    V(w,h)=v;
+                }
+            }
+        }
+    };
+    using YUV422Planar = YUV422<true>;
+    using YUV422SemiPlanar = YUV422<false>;
+
 
     //
-    static void copyTo(const YUV422Planar<640,480>& in,YUV422SemiPlanar<640,480>& out){
+    static void copyTo(YUV422Planar& in,YUV420SemiPlanar& out){
+        assert(in.WIDTH==out.WIDTH && in.HEIGHT==out.HEIGHT);
+        const size_t WIDTH=in.WIDTH;
+        const size_t HEIGHT=in.HEIGHT;
         // copy Y component (easy)
-        memcpy(out.planeY,in.planeY, sizeof(out.planeY));
+        memcpy(out.data,in.data,WIDTH*HEIGHT);
         // copy CbCr component ( loop needed)
         // copy CbCr component ( loop needed)
-        for(int i=0;i<640/2;i++){
-            for(int j=0;j<480;j++){
-                out.planeUV[j][i][0]=in.planeU[j][i];
-                out.planeUV[j][i][1]=in.planeV[j][i];
+        for(int i=0;i<WIDTH/2;i++){
+            for(int j=0;j<HEIGHT;j++){
+                out.U(i/2,j/2)=in.U(i,j);
+                out.V(i/2,j/2)=in.V(i,j);
             }
         }
     }

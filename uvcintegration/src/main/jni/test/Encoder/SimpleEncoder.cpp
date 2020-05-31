@@ -127,11 +127,8 @@ void SimpleEncoder::loopEncoder() {
                     break;
                 }else{
                     MLOGD<<"Got mjpeg"<<mjpegData->size()<<" idx"<<mjpegFrameIndex;
-                    //MyColorSpaces::YUV422Planar<WIDTH,HEIGHT> bufferYUV422{};
-                    auto& framebuffer= *static_cast<MyColorSpaces::YUV422Planar<640,480>*>(static_cast<void*>(buf));
-                    mjpegDecodeAndroid.decodeToYUV422(mjpegData->data(),mjpegData->size(),framebuffer);
-                    //auto& framebuffer= *static_cast<MyColorSpaces::YUV420SemiPlanar<640,480>*>(static_cast<void*>(buf));
-                    //MyColorSpaces::copyTo(bufferYUV422,framebuffer);
+                    auto decodeBuffer= MyColorSpaces::YUV422Planar(640,480);
+                    mjpegDecodeAndroid.decodeToYUV422(mjpegData->data(),mjpegData->size(),decodeBuffer);
                     frameTimeUs+=8*1000;
                 }
                 AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);

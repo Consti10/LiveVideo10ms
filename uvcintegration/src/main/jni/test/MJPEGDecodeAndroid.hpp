@@ -130,7 +130,8 @@ public:
         jpeg_finish_decompress(&dinfo);
     }
 
-    void decodeToYUV422(void* jpegData,size_t jpegDataSize,MyColorSpaces::YUV422Planar<640,480>& out_buff){
+    void decodeToYUV422(void* jpegData,size_t jpegDataSize,MyColorSpaces::YUV422Planar& out_buff){
+        assert(out_buff.WIDTH==640 && out_buff.HEIGHT==480);
         MEASURE_FUNCTION_EXECUTION_TIME
         setErrorManager();
         jpeg_mem_src(&dinfo,(const unsigned char*) jpegData, jpegDataSize);
@@ -158,12 +159,12 @@ public:
         jpeg_finish_decompress(&dinfo);
     }
 
-    void decodeDirect(MyColorSpaces::YUV422Planar<640,480>& out_buf){
+    void decodeDirect(MyColorSpaces::YUV422Planar& out_buf){
         unsigned char **yuv[3];
 
-        auto y2=convertToPointers(&out_buf.planeY[0][0],480,640);
-        auto u2=convertToPointers(&out_buf.planeU[0][0],480,320);
-        auto v2=convertToPointers(&out_buf.planeV[0][0],480,320);
+        auto y2=convertToPointers(&out_buf.Y(0,0),480,640);
+        auto u2=convertToPointers(&out_buf.U(0,0),480,320);
+        auto v2=convertToPointers(&out_buf.V(0,0),480,320);
 
         //jpeg_read_raw_data() returns one MCU row per call, and thus you must pass a
         //buffer of at least max_v_samp_factor*DCTSIZE scanlines

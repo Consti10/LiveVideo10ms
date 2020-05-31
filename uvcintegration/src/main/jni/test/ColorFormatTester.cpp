@@ -40,7 +40,6 @@ public:
     void testUpdateSurface(){
         MEASURE_FUNCTION_EXECUTION_TIME
         ANativeWindow_Buffer buffer;
-
         if(ANativeWindow_lock(aNativeWindow, &buffer, nullptr)==0){
             MJPEGDecodeAndroid::debugANativeWindowBuffer(buffer);
             auto framebuffer=MyColorSpaces::YUV420Planar(buffer.bits,buffer.width,buffer.height);
