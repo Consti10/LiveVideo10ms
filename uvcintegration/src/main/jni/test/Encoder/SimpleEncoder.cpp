@@ -9,17 +9,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <FileHelper.hpp>
-#include "YUVFrameGenerator.hpp"
+#include "AndroidColorFormats.hpp"
 
 void SimpleEncoder::start() {
     running=true;
     mEncoderThread=new std::thread(&SimpleEncoder::loopEncoder, this);
-}
-
-void SimpleEncoder::addBufferData(const uint8_t* data,const size_t data_len) {
-    std::lock_guard<std::mutex> lock(inputBufferDataMutex);
-    inputBufferData.resize(data_len);
-    std::memcpy(inputBufferData.data(),data,data_len);
 }
 
 void SimpleEncoder::stop() {
@@ -75,26 +69,7 @@ void SimpleEncoder::loopEncoder() {
     while(true){
         // Get input buffer if possible
         {
-            /*std::lock_guard<std::mutex> lock(inputBufferDataMutex);
-            if(!inputBufferData.empty()){
-                const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
-                if(index>0){
-                    size_t inputBufferSize;
-                    uint8_t* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
-                    MLOGD<<"Got input buffer "<<inputBufferSize;
-                    //mjpegDecodeAndroid.DecodeMJPEGtoEncoderBuffer(inputBufferData.data(),inputBufferData.size(),buf,640);
-                    MyColorSpaces::YUV422Planar<WIDTH,HEIGHT> bufferYUV422{};
-                    mjpegDecodeAndroid.decodeToYUV422(inputBufferData.data(),inputBufferData.size(),bufferYUV422);
-                    auto& framebuffer= *static_cast<MyColorSpaces::YUV420SemiPlanar<640,480>*>(static_cast<void*>(buf));
-                    MyColorSpaces::copyTo(bufferYUV422,framebuffer);
-
-                    inputBufferData.resize(0);
-                    //std::memset(buf,1,inputBufferSize);
-                    AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
-                    frameTimeUs+=8*1000;
-                }
-            }*/
-            /*const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
+            const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
             if(index>0){
                 size_t inputBufferSize;
                 void* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
@@ -103,19 +78,14 @@ void SimpleEncoder::loopEncoder() {
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,0,frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     break;
                 }else{
-                    auto framebuffer=MyColorSpaces::YUV420SemiPlanar<640,480>(buf);
-                    //framebuffer.clear(120,160,200);
-                    MyColorSpaces::RGB<640,480> rgb{};
-                    rgb.clear(0);
-                    MyColorSpaces::copyTo<640,480>(rgb,framebuffer);
-
-                    //YUVFrameGenerator::generateFrame(frameIndex,ENCODER_COLOR_FORMAT,(uint8_t*)buf,inputBufferSize);
+                    auto framebuffer=MyColorSpaces::YUV420SemiPlanar(buf,WIDTH,HEIGHT);
+                    YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
                     frameIndex++;
                     frameTimeUs+=8*1000;
                 }
-            }*/
-            const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
+            }
+            /*const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
             if(index>0){
                 size_t inputBufferSize;
                 void* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
@@ -135,7 +105,7 @@ void SimpleEncoder::loopEncoder() {
                 }
                 AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
                 frameTimeUs+=8*1000;
-            }
+            }*/
         }
         {
             AMediaCodecBufferInfo info;

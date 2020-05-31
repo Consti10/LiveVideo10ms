@@ -54,6 +54,7 @@ namespace MyColorSpaces{
     template<bool PLANAR>
     class YUV420{
     public:
+        static constexpr const size_t BITS_PER_PIXEL=12;
         YUV420(void* data1,const size_t W,const size_t H):data(data1),WIDTH(W),HEIGHT(H){}
         const size_t WIDTH,HEIGHT;
         void* data;
@@ -107,6 +108,7 @@ namespace MyColorSpaces{
     template<bool PLANAR>
     class YUV422{
     public:
+        static constexpr const size_t BITS_PER_PIXEL=16;
         YUV422(void* data1,const size_t W,const size_t H):data(data1),WIDTH(W),HEIGHT(H){}
         YUV422(const size_t W,const size_t H):ownedData(W*H*16/8),data(ownedData->data()),WIDTH(W),HEIGHT(H){}
         const size_t WIDTH,HEIGHT;
@@ -203,7 +205,47 @@ namespace MyColorSpaces{
             }
         }
     }
+}
 
+// taken from https://android.googlesource.com/platform/cts/+/3661c33/tests/tests/media/src/android/media/cts/EncodeDecodeTest.java
+// and translated to cpp
+namespace YUVFrameGenerator{
+    using namespace MyColorSpaces;
+    static constexpr uint8_t PURPLE_YUV[]={120, 160, 200};
+
+    template<bool PLANAR>
+    static void generateFrame(YUV420<PLANAR>& framebuffer,int frameIndex){
+        assert(framebuffer.WIDTH % 4==0 && framebuffer.HEIGHT % 2 ==0);
+        const size_t WIDTH=framebuffer.WIDTH;
+        const size_t HEIGHT=framebuffer.HEIGHT;
+        const size_t FRAME_BUFFER_SIZE_B= WIDTH * HEIGHT * framebuffer.BITS_PER_PIXEL / 8;
+
+        // Set to zero.  In YUV this is a dull green.
+        std::memset(framebuffer.data, 0, FRAME_BUFFER_SIZE_B);
+
+        const size_t COLORED_RECT_W= WIDTH / 4;
+        const size_t COLORED_RECT_H= HEIGHT / 2;
+
+        frameIndex = (frameIndex / 8) % 8;    // use this instead for debug -- easier to see
+        size_t startX;
+        const int startY=frameIndex<4 ? 0 : HEIGHT / 2;
+        if (frameIndex < 4) {
+            startX = frameIndex * COLORED_RECT_W;
+        } else {
+            startX = frameIndex % 4 * COLORED_RECT_W;
+        }
+        // fill the wanted area with purple color
+        for (size_t x = startX; x < startX + COLORED_RECT_W; x++) {
+            for (size_t y = startY; y < startY + COLORED_RECT_H; y++) {
+                framebuffer.Y(x, y) = PURPLE_YUV[0];
+                const bool even = (x % 2) == 0 && (y % 2) == 0;
+                if (even) {
+                    framebuffer.U(x / 2, y / 2) = PURPLE_YUV[1];
+                    framebuffer.V(x / 2, y / 2) = PURPLE_YUV[2];
+                }
+            }
+        }
+    }
 }
 
 
