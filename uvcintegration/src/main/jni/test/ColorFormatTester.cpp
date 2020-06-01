@@ -19,8 +19,9 @@
 
 class ColorFormatTester{
 private:
-    static constexpr size_t WIDTH=640*1;
-    static constexpr size_t HEIGHT=480*1;
+    const size_t WIDTH=640;
+    const size_t HEIGHT=480;
+    const int FORMAT=AHARDWAREBUFFER_FORMAT_Y8Cb8Cr8_420;
 public:
     ANativeWindow* aNativeWindow=nullptr;
     void setSurface(JNIEnv* env,jobject surface){
@@ -29,15 +30,17 @@ public:
             aNativeWindow=nullptr;
         }else{
             aNativeWindow=ANativeWindow_fromSurface(env,surface);
-            const auto WANTED_FORMAT=AHARDWAREBUFFER_FORMAT_Y8Cb8Cr8_420;
-            auto ret=ANativeWindow_setBuffersGeometry(aNativeWindow,WIDTH,HEIGHT,WANTED_FORMAT);
-            MLOGD<<"ANativeWindow_setBuffersGeometry returned "<<ret;
-            const auto ACTUAL_FORMAT=ANativeWindow_getFormat(aNativeWindow);
-            if(ACTUAL_FORMAT!=WANTED_FORMAT){
-                MLOGE<<"Actual format is "<<ACTUAL_FORMAT;
-            }else{
-                MLOGD<<"Set format to "<<ACTUAL_FORMAT;
-            }
+            setBuffersGeometry();
+        }
+    }
+    void setBuffersGeometry(){
+        auto ret=ANativeWindow_setBuffersGeometry(aNativeWindow,WIDTH,HEIGHT,FORMAT);
+        MLOGD<<"ANativeWindow_setBuffersGeometry returned "<<ret;
+        const auto actualFormat=ANativeWindow_getFormat(aNativeWindow);
+        if(actualFormat!=FORMAT){
+            MLOGE<<"Actual format is "<<actualFormat;
+        }else{
+            MLOGD<<"Set format to "<<actualFormat;
         }
     }
     int frameIndex=0;
@@ -47,11 +50,13 @@ public:
         //ARect bounds = {0, 0, WIDTH, HEIGHT};
         if(ANativeWindow_lock(aNativeWindow, &buffer, nullptr)==0){
             ANativeWindowBufferHelper::debugANativeWindowBuffer(buffer);
-            auto framebuffer=APixelBuffers::YUV420SemiPlanar(buffer.bits, buffer.width, buffer.height);
-            //framebuffer.clear(120,160,200);
-            YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
-            //auto framebuffer=MyColorSpaces::RGB(buffer.bits,buffer.width,buffer.height,buffer.stride);
-            //framebuffer.drawPattern(frameIndex);
+            if(FORMAT==AHARDWAREBUFFER_FORMAT_R8G8B8_UNORM){
+                auto framebuffer=APixelBuffers::RGB(buffer.bits,buffer.width,buffer.height,buffer.stride);
+                framebuffer.drawPattern(frameIndex);
+            }else if(FORMAT==AHARDWAREBUFFER_FORMAT_Y8Cb8Cr8_420){
+                auto framebuffer=APixelBuffers::YUV420SemiPlanar(buffer.bits, buffer.width, buffer.height);
+                YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
+            }
             ANativeWindow_unlockAndPost(aNativeWindow);
             frameIndex++;
         }else{

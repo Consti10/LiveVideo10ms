@@ -12,24 +12,37 @@
 #include <AColorFormats.hpp>
 #include <APixelBuffers.hpp>
 #include <NDKArrayHelper.hpp>
+#include <utility>
+#include <NDKThreadHelper.hpp>
 
-void SimpleEncoder::start() {
-    running=true;
-    mEncoderThread=new std::thread(&SimpleEncoder::loopEncoder, this);
-}
-
-void SimpleEncoder::stop() {
-    running=false;
-    if(mEncoderThread->joinable()){
-        mEncoderThread->join();
+SimpleEncoder::SimpleEncoder(std::string GROUND_RECORDING_DIRECTORY1) :GROUND_RECORDING_DIRECTORY(std::move(GROUND_RECORDING_DIRECTORY1)){
+    using namespace MediaCodecInfo::CodecCapabilities;
+    constexpr auto ENCODER_COLOR_FORMAT=COLOR_FormatYUV420SemiPlanar;
+    mediaCodec=openMediaCodecEncoder(ENCODER_COLOR_FORMAT);
+    if(mediaCodec== nullptr){
+        MLOGE<<"Cannot open encoder";
+        return;
     }
-    delete(mEncoderThread);
-    mEncoderThread= nullptr;
+    fileReaderMjpeg.open(INPUT_FILE);
+    AMediaCodec_start(mediaCodec);
 }
 
-bool SimpleEncoder::openMediaCodecEncoder(const int wantedColorFormat) {
+SimpleEncoder::~SimpleEncoder() {
+    if(mediaMuxer!=nullptr){
+        AMediaMuxer_stop(mediaMuxer);
+        AMediaMuxer_delete(mediaMuxer);
+        close(outputFileFD);
+        MLOGD<<"Wrote file";
+    }
+    AMediaCodec_stop(mediaCodec);
+    AMediaCodec_delete(mediaCodec);
+    fileReaderMjpeg.close();
+}
+
+
+AMediaCodec* SimpleEncoder::openMediaCodecEncoder(const int wantedColorFormat) {
     AMediaFormat* format = AMediaFormat_new();
-    mediaCodec = AMediaCodec_createEncoderByType("video/avc");
+    auto ret = AMediaCodec_createEncoderByType("video/avc");
     //mediaCodec= AMediaCodec_createCodecByName("OMX.google.h264.encoder");
 
     AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME, "video/avc");
@@ -39,44 +52,36 @@ bool SimpleEncoder::openMediaCodecEncoder(const int wantedColorFormat) {
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_FRAME_RATE, FRAME_RATE);
     AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_I_FRAME_INTERVAL,30);
 
-    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_STRIDE,640);
+    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_STRIDE,WIDTH);
     //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_STRIDE,640);
     //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_COLOR_FORMAT,)
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_COLOR_FORMAT,wantedColorFormat);
 
-    auto status=AMediaCodec_configure(mediaCodec,format, nullptr, nullptr, AMEDIACODEC_CONFIGURE_FLAG_ENCODE);
+    auto status=AMediaCodec_configure(ret,format, nullptr, nullptr, AMEDIACODEC_CONFIGURE_FLAG_ENCODE);
 
     MLOGD<<"Media format:"<<AMediaFormat_toString(format);
 
     AMediaFormat_delete(format);
     if (AMEDIA_OK != status) {
         MLOGE<<"AMediaCodec_configure returned"<<status;
-        return false;
+        return nullptr;
     }
     MLOGD<<"Opened MediaCodec";
-    return true;
+    return ret;
 }
 
 
-void SimpleEncoder::loopEncoder() {
-    using namespace MediaCodecInfo::CodecCapabilities;
-    constexpr auto ENCODER_COLOR_FORMAT=COLOR_FormatYUV420SemiPlanar;
-    openMediaCodecEncoder(ENCODER_COLOR_FORMAT);
-
-    fileReaderMjpeg.open(INPUT_FILE);
-
-    AMediaCodec_start(mediaCodec);
-    int frameTimeUs=0;
-    int frameIndex=0;
+void SimpleEncoder::loopEncoder(JNIEnv* env) {
     while(true){
         // Get input buffer if possible
         {
-            const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
+            const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,TIMEOUT_US);
             if(index>0){
                 size_t inputBufferSize;
                 void* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
                 MLOGD<<"Got input buffer "<<inputBufferSize;
-                if(!running){
+                if(JThread::isInterrupted(env)){
+                    MLOGD<<"Feeding EOS because interrupted";
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,0,frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     break;
                 }else{
@@ -111,7 +116,7 @@ void SimpleEncoder::loopEncoder() {
         }
         {
             AMediaCodecBufferInfo info;
-            const auto index=AMediaCodec_dequeueOutputBuffer(mediaCodec,&info,5*1000);
+            const auto index=AMediaCodec_dequeueOutputBuffer(mediaCodec,&info,TIMEOUT_US);
             AMediaCodec_getOutputFormat(mediaCodec);
             if(index==AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED){
                 MLOGD<<"AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED";
@@ -145,16 +150,6 @@ void SimpleEncoder::loopEncoder() {
         }
         MLOGD<<"Hi from worker";
     }
-    if(mediaMuxer!=nullptr){
-        AMediaMuxer_stop(mediaMuxer);
-        AMediaMuxer_delete(mediaMuxer);
-        close(outputFileFD);
-    }
-    AMediaCodec_stop(mediaCodec);
-
-    AMediaCodec_delete(mediaCodec);
-
-    fileReaderMjpeg.close();
 }
 
 
@@ -164,18 +159,22 @@ void SimpleEncoder::loopEncoder() {
       Java_constantin_test_SimpleEncoder_##method_name
 extern "C" {
 
-
-JNI_METHOD(jlong, nativeStartConvertFile)
+JNI_METHOD(jlong, nativeCreate)
 (JNIEnv *env, jclass jclass1,jstring groundRecordingDir) {
     auto* simpleEncoder=new SimpleEncoder(NDKArrayHelper::DynamicSizeString(env,groundRecordingDir));
-    simpleEncoder->start();
     return reinterpret_cast<intptr_t>(simpleEncoder);
 }
 
-JNI_METHOD(void, nativeStopConvertFile)
+JNI_METHOD(void, nativeDelete)
 (JNIEnv *env, jclass jclass1,jlong simpleEncoder) {
     auto* simpleEncoder1=reinterpret_cast<SimpleEncoder*>(simpleEncoder);
-    simpleEncoder1->stop();
     delete simpleEncoder1;
 }
+
+JNI_METHOD(void, nativeLoop)
+(JNIEnv *env, jclass jclass1,jlong simpleEncoder) {
+    auto* simpleEncoder1=reinterpret_cast<SimpleEncoder*>(simpleEncoder);
+    simpleEncoder1->loopEncoder(env);
+}
+
 }

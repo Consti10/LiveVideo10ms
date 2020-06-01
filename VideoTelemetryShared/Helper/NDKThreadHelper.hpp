@@ -25,6 +25,13 @@ namespace JThread{
         jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
         env->CallVoidMethod(joCurrentThread,jmSetPriority,(jint)wantedPriority);
     }
+    static bool isInterrupted(JNIEnv* env){
+        jclass jcThread = env->FindClass("java/lang/Thread");
+        jmethodID jmCurrentThread=env->GetStaticMethodID(jcThread,"currentThread","()Ljava/lang/Thread;");
+        jmethodID jmIsInterrupted=env->GetMethodID(jcThread,"isInterrupted","()Z");
+        jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
+        return (bool) env->CallBooleanMethod(joCurrentThread,jmIsInterrupted);
+    }
     static void printThreadPriority(JNIEnv* env){
         MLOGD<<"printThreadPriority "<<getThreadPriority(env);
     }
