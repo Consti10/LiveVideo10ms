@@ -14,6 +14,7 @@
 #include <TimeHelper.hpp>
 #include <vector>
 #include <APixelBuffers.hpp>
+#include <AColorFormats.hpp>
 
 // Since I only need to support android it is cleaner to write my own conversion function.
 // inspired by the uvc_mjpeg_to_rgbx .. functions

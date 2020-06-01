@@ -75,7 +75,7 @@ void SimpleEncoder::loopEncoder(JNIEnv* env) {
     while(true){
         // Get input buffer if possible
         {
-            const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,TIMEOUT_US);
+            /*const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,TIMEOUT_US);
             if(index>0){
                 size_t inputBufferSize;
                 void* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
@@ -91,8 +91,8 @@ void SimpleEncoder::loopEncoder(JNIEnv* env) {
                     frameIndex++;
                     frameTimeUs+=8*1000;
                 }
-            }
-            /*const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
+            }*/
+            const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
             if(index>0){
                 size_t inputBufferSize;
                 void* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
@@ -104,15 +104,15 @@ void SimpleEncoder::loopEncoder(JNIEnv* env) {
                     break;
                 }else{
                     MLOGD<<"Got mjpeg"<<mjpegData->size()<<" idx"<<mjpegFrameIndex;
-                    auto decodeBuffer= MyColorSpaces::YUV422Planar(640,480);
-                    mjpegDecodeAndroid.decodeToYUV422(mjpegData->data(),mjpegData->size(),decodeBuffer);
-                    auto encoderBuffer=MyColorSpaces::YUV420SemiPlanar(buf,640,480);
-                    MyColorSpaces::copyTo(decodeBuffer,encoderBuffer);
+                    auto decodeBuffer= APixelBuffers::YUV422Planar(640,480);
+                    mjpegDecodeAndroid.decodeRawYUV422(mjpegData->data(),mjpegData->size(),decodeBuffer);
+                    auto encoderBuffer=APixelBuffers::YUV420SemiPlanar(buf,640,480);
+                    APixelBuffers::copyTo(decodeBuffer,encoderBuffer);
                     frameTimeUs+=8*1000;
                 }
                 AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
                 frameTimeUs+=8*1000;
-            }*/
+            }
         }
         {
             AMediaCodecBufferInfo info;

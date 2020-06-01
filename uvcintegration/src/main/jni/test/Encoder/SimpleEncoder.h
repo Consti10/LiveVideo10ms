@@ -15,19 +15,19 @@
 #include <atomic>
 #include <vector>
 #include <media/NdkMediaMuxer.h>
-//#include <MJPEGDecodeAndroid.hpp>
+#include <MJPEGDecodeAndroid.hpp>
 #include <FileReaderFPV.h>
 
 class SimpleEncoder {
 private:
     AMediaCodec* mediaCodec{};
     const std::string GROUND_RECORDING_DIRECTORY;
-    const std::string INPUT_FILE=GROUND_RECORDING_DIRECTORY+"TestInput.fpv";
+    const std::string INPUT_FILE=GROUND_RECORDING_DIRECTORY+"TestInput2.fpv";
     FileReaderMJPEG fileReaderMjpeg;
     size_t videoTrackIndex=0;
     AMediaMuxer* mediaMuxer=nullptr;
     int outputFileFD=0;
-    //MJPEGDecodeAndroid mjpegDecodeAndroid;
+    MJPEGDecodeAndroid mjpegDecodeAndroid;
     // create and configure a new AMediaCodec
     // returns AMediaCodec on success, nullptr otherwise
     static AMediaCodec* openMediaCodecEncoder(const int wantedColorFormat);
