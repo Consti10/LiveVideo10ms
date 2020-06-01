@@ -18,11 +18,16 @@
 #include <MJPEGDecodeAndroid.hpp>
 #include <FileReaderFPV.h>
 
-class SimpleEncoder {
+// Transcode from MJPEG stream (btw. .fpv file containing MJPEG stream )
+// To .mp4 file containing .h264 encoded data
+// On success, input file is deleted
+// On error,if output file was writtend, output file is deleted
+
+class SimpleTranscoder {
 private:
     AMediaCodec* mediaCodec{};
+    const std::string INPUT_FILE;
     const std::string GROUND_RECORDING_DIRECTORY;
-    const std::string INPUT_FILE=GROUND_RECORDING_DIRECTORY+"TestInput2.fpv";
     FileReaderMJPEG fileReaderMjpeg;
     size_t videoTrackIndex=0;
     AMediaMuxer* mediaMuxer=nullptr;
@@ -36,9 +41,10 @@ private:
     static constexpr int32_t FRAME_RATE = 30;
     static constexpr int32_t BIT_RATE= 5*1024*1024;
     static constexpr int TIMEOUT_US=5*1000;
+    bool finishedEarly=false;
 public:
-    SimpleEncoder(std::string  GROUND_RECORDING_DIRECTORY1);
-    ~SimpleEncoder();
+    SimpleTranscoder(std::string INPUT_FILE, std::string  GROUND_RECORDING_DIRECTORY1);
+    ~SimpleTranscoder();
     void loopEncoder(JNIEnv* env);
     int frameTimeUs=0;
     int frameIndex=0;

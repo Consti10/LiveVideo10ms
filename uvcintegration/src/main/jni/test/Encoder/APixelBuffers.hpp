@@ -7,7 +7,6 @@
 
 #include <cstdint>
 #include <array>
-#include <array>
 #include <optional>
 
 /***

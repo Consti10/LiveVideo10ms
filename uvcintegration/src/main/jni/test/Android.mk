@@ -41,7 +41,7 @@ LOCAL_ARM_MODE := arm
 
 LOCAL_SRC_FILES := \
 		UVCReceiverDecoder.cpp \
-		Encoder/SimpleEncoder.cpp \
+		Encoder/SimpleTranscoder.cpp \
 		ColorFormatTester.cpp \
 		#$(DIR_VideoTelemetryShared)/Helper/ZDummy.cpp \
 		#$(DIR_VideoTelemetryShared)/InputOutput/ZDummy.cpp \

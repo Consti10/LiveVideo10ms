@@ -12,7 +12,7 @@
 #include <GroundRecorderRAW.hpp>
 #include <FileHelper.hpp>
 #include <TimeHelper.hpp>
-#include <SimpleEncoder.h>
+#include <SimpleTranscoder.h>
 #include <GroundRecorderFPV.hpp>
 #include <AColorFormats.hpp>
 #include <APixelBuffers.hpp>

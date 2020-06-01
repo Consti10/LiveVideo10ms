@@ -2,7 +2,7 @@
 // Created by geier on 24/05/2020.
 //
 
-#include "SimpleEncoder.h"
+#include "SimpleTranscoder.h"
 #include <AndroidLogger.hpp>
 #include <chrono>
 #include <asm/fcntl.h>
@@ -15,7 +15,7 @@
 #include <utility>
 #include <NDKThreadHelper.hpp>
 
-SimpleEncoder::SimpleEncoder(std::string GROUND_RECORDING_DIRECTORY1) :GROUND_RECORDING_DIRECTORY(std::move(GROUND_RECORDING_DIRECTORY1)){
+SimpleTranscoder::SimpleTranscoder(std::string INPUT_FILE1, std::string GROUND_RECORDING_DIRECTORY1) : INPUT_FILE(std::move(INPUT_FILE1)), GROUND_RECORDING_DIRECTORY(std::move(GROUND_RECORDING_DIRECTORY1)){
     using namespace MediaCodecInfo::CodecCapabilities;
     constexpr auto ENCODER_COLOR_FORMAT=COLOR_FormatYUV420SemiPlanar;
     mediaCodec=openMediaCodecEncoder(ENCODER_COLOR_FORMAT);
@@ -27,7 +27,7 @@ SimpleEncoder::SimpleEncoder(std::string GROUND_RECORDING_DIRECTORY1) :GROUND_RE
     AMediaCodec_start(mediaCodec);
 }
 
-SimpleEncoder::~SimpleEncoder() {
+SimpleTranscoder::~SimpleTranscoder() {
     if(mediaMuxer!=nullptr){
         AMediaMuxer_stop(mediaMuxer);
         AMediaMuxer_delete(mediaMuxer);
@@ -37,10 +37,13 @@ SimpleEncoder::~SimpleEncoder() {
     AMediaCodec_stop(mediaCodec);
     AMediaCodec_delete(mediaCodec);
     fileReaderMjpeg.close();
+    if(finishedEarly){
+
+    }
 }
 
 
-AMediaCodec* SimpleEncoder::openMediaCodecEncoder(const int wantedColorFormat) {
+AMediaCodec* SimpleTranscoder::openMediaCodecEncoder(const int wantedColorFormat) {
     AMediaFormat* format = AMediaFormat_new();
     auto ret = AMediaCodec_createEncoderByType("video/avc");
     //mediaCodec= AMediaCodec_createCodecByName("OMX.google.h264.encoder");
@@ -71,7 +74,7 @@ AMediaCodec* SimpleEncoder::openMediaCodecEncoder(const int wantedColorFormat) {
 }
 
 
-void SimpleEncoder::loopEncoder(JNIEnv* env) {
+void SimpleTranscoder::loopEncoder(JNIEnv* env) {
     while(true){
         // Get input buffer if possible
         {
@@ -99,6 +102,11 @@ void SimpleEncoder::loopEncoder(JNIEnv* env) {
                 MLOGD<<"Got input buffer "<<inputBufferSize;
                 int mjpegFrameIndex;
                 auto mjpegData= fileReaderMjpeg.getNextMJPEGPacket(mjpegFrameIndex);
+                if(JThread::isInterrupted(env)) {
+                    MLOGD<<"Transcoding was interrupted. Should delete file";
+                    mjpegData=std::nullopt;
+                    finishedEarly=true;
+                }
                 if(mjpegData==std::nullopt){
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,0,frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     break;
@@ -153,6 +161,7 @@ void SimpleEncoder::loopEncoder(JNIEnv* env) {
 }
 
 
+
 // ------------------------------------- Native Bindings -------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
@@ -160,20 +169,20 @@ void SimpleEncoder::loopEncoder(JNIEnv* env) {
 extern "C" {
 
 JNI_METHOD(jlong, nativeCreate)
-(JNIEnv *env, jclass jclass1,jstring groundRecordingDir) {
-    auto* simpleEncoder=new SimpleEncoder(NDKArrayHelper::DynamicSizeString(env,groundRecordingDir));
+(JNIEnv *env, jclass jclass1,jstring filenameSource,jstring groundRecordingDir) {
+    auto* simpleEncoder=new SimpleTranscoder(NDKArrayHelper::DynamicSizeString(env, filenameSource), NDKArrayHelper::DynamicSizeString(env, groundRecordingDir));
     return reinterpret_cast<intptr_t>(simpleEncoder);
 }
 
 JNI_METHOD(void, nativeDelete)
 (JNIEnv *env, jclass jclass1,jlong simpleEncoder) {
-    auto* simpleEncoder1=reinterpret_cast<SimpleEncoder*>(simpleEncoder);
+    auto* simpleEncoder1=reinterpret_cast<SimpleTranscoder*>(simpleEncoder);
     delete simpleEncoder1;
 }
 
 JNI_METHOD(void, nativeLoop)
 (JNIEnv *env, jclass jclass1,jlong simpleEncoder) {
-    auto* simpleEncoder1=reinterpret_cast<SimpleEncoder*>(simpleEncoder);
+    auto* simpleEncoder1=reinterpret_cast<SimpleTranscoder*>(simpleEncoder);
     simpleEncoder1->loopEncoder(env);
 }
 

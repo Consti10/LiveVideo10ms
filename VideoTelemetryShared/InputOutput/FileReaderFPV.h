@@ -127,7 +127,7 @@ private:
 public:
     void open(const std::string FILENAME){
         if(!FileReaderFPV::isValidFilename(FILENAME)){
-            MLOGE<<"Not valid filename";
+            MLOGE<<"Not valid filename"<<FILENAME;
             return;
         }
         file=std::ifstream(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
