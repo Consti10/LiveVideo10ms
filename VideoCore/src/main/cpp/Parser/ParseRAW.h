@@ -5,8 +5,9 @@
 #ifndef LIVE_VIDEO_10MS_ANDROID_PARSERAW_H
 #define LIVE_VIDEO_10MS_ANDROID_PARSERAW_H
 
-#include <cstdio>
 #include "../NALU/NALU.hpp"
+#include <cstdio>
+#include <memory>
 
 /*********************************************
  ** Parses a stream of raw h264 NALUs
@@ -21,15 +22,19 @@ public:
     void reset();
 private:
     const NALU_DATA_CALLBACK cb;
-    //std::array<uint8_t,NALU::NALU_MAXLEN> nalu_data;
-    std::vector<uint8_t> nalu_data;
-    //uint8_t* nalu_data=nullptr;
+    NALU::NALU_BUFFER nalu_data;
+    //std::vector<uint8_t> nalu_data;
+    //std::shared_ptr<NALU::NALU_BUFFER> nalu_data;
+    std::mutex mBufferMutex;
+    std::vector<NALU::NALU_BUFFER> allocatedBuffers{10};
 
     size_t nalu_data_position=4;
     int nalu_search_state=0;
     //
     std::array<uint8_t,NALU::NALU_MAXLEN> dji_data_buff;
     std::size_t dji_data_buff_size=0;
+    //
+    void getAvailableBuffer();
 };
 
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERAW_H

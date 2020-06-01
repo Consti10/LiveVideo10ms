@@ -29,6 +29,7 @@ public:
     ~AndroidLogger() {
         logBigMessage(stream.str());
     }
+    AndroidLogger(const AndroidLogger& other)=delete;
 private:
     std::stringstream stream;
     const std::string M_TAG;
@@ -62,11 +63,13 @@ AndroidLogger& operator<<(AndroidLogger&& record, T&& t) {
 // taken from https://stackoverflow.com/questions/1666802/is-there-a-class-macro-in-c
 namespace PrettyFunctionHelper{
     inline std::string className(const std::string& prettyFunction){
-        size_t colons = prettyFunction.find("::");
+        //AndroidLogger(ANDROID_LOG_DEBUG,"NoT")<<prettyFunction;
+        //size_t colons = prettyFunction.find("::");
+        size_t colons=prettyFunction.rfind("::");
         if (colons == std::string::npos)
             return "UnknownClassName";
         size_t begin = prettyFunction.substr(0,colons).rfind(" ") + 1;
-        size_t end = colons - begin;
+        size_t end = colons - begin-1;
         return prettyFunction.substr(begin,end);
     }
 }

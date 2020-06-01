@@ -38,5 +38,11 @@
         android:layout_height="wrap_content"
         android:text="View Database" />
 
+    <Button
+        android:id="@+id/b_startColorFormatsTester"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="start ColorFormat Tester" />
+
 
 </androidx.appcompat.widget.LinearLayoutCompat>

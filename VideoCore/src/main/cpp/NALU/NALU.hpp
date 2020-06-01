@@ -15,6 +15,9 @@
 #include <vector>
 #include <h264_stream.h>
 #include <android/log.h>
+#include <AndroidLogger.hpp>
+#include <variant>
+#include <optional>
 
 //A NALU consists of
 //a) DATA buffer
@@ -23,58 +26,57 @@
 //Does NOT own the data
 
 class NALU{
+private:
+    static uint8_t* makeOwnedCopy(const uint8_t* data,size_t data_len){
+        auto ret=new uint8_t[data_len];
+        memcpy(ret,data,data_len);
+        return ret;
+    }
 public:
-    /*static constexpr const auto NAL_UNIT_TYPE_UNSPECIFIED =                  0;    // Unspecified
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_NON_IDR =          1;    // Coded slice of a non-IDR picture
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A = 2;    // Coded slice data partition A
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_B = 3;    // Coded slice data partition B
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_C = 4;    // Coded slice data partition C
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_IDR              = 5;    // Coded slice of an IDR picture
-    static constexpr const auto NAL_UNIT_TYPE_SEI                          = 6;    // Supplemental enhancement information (SEI)
-    static constexpr const auto NAL_UNIT_TYPE_SPS                          = 7;    // Sequence parameter set
-    static constexpr const auto NAL_UNIT_TYPE_PPS                          = 8;    // Picture parameter set
-    static constexpr const auto NAL_UNIT_TYPE_AUD                          = 9;    // Access unit delimiter
-    static constexpr const auto NAL_UNIT_TYPE_END_OF_SEQUENCE              =10;    // End of sequence
-    static constexpr const auto NAL_UNIT_TYPE_END_OF_STREAM                =11;    // End of stream
-    static constexpr const auto NAL_UNIT_TYPE_FILLER                       =12;    // Filler data
-    static constexpr const auto NAL_UNIT_TYPE_SPS_EXT                      =13;    // Sequence parameter set extension
-    // 14..18    // Reserved
-    static constexpr const auto NAL_UNIT_TYPE_CODED_SLICE_AUX              =19;    // Coded slice of an auxiliary coded picture without partitioning
-    // 20..23    // Reserved
-    // 24..31    // Unspecified
-    //*/
-    static constexpr const auto NALU_MAXLEN=1024*1024; //test video white iceland: Max 117
-public:
+    // test video white iceland: Max 1024*117. Video might not be decodable if its NALU buffers size exceed the limit
+    static constexpr const auto NALU_MAXLEN=1024*1024;
+    // Application should re-use NALU_BUFFER to avoid memory allocations
+    using NALU_BUFFER=std::array<uint8_t,NALU_MAXLEN>;
+    //Copy constructor
+    //NALU(const NALU& nalu):data(nalu.data.begin(),nalu.data.end()),creationTime(std::chrono::steady_clock::now()){
+    //    MLOGD<<"Copy is called";
+    //}
+    /*NALU(const NALU& nalu)= default;
     NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
     data(data1,data1+data_length),
         creationTime{creationTime}{
-        //check();
     };
-    NALU(const std::vector<uint8_t> data,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(std::move(data)),
-            creationTime{creationTime}{
-        //check();
-    };
-    /*NALU(const std::vector<uint8_t> data1,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+    NALU(const std::vector<uint8_t> data1,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
             data(data1),
             creationTime{creationTime}{
-        //check();
     };*/
-    //void check(){
-    //    __android_log_print(ANDROID_LOG_DEBUG,"NALU","check %d",data[data_length-1]);
-    //}
-    //const uint8_t* data;
-    //const size_t data_length;
+    /*NALU(const NALU& nalu):data(makeOwnedCopy(nalu.getData(),nalu.getSize())),creationTime(nalu.creationTime),data_len(nalu.getSize()){}
+    NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1),data_len(data_length),creationTime{creationTime}{
+    };*/
+    NALU(const NALU& nalu):
+    ownedData(std::vector<uint8_t>(nalu.getData(),nalu.getData()+nalu.getSize())),
+    data(ownedData->data()),data_len(nalu.getSize()),creationTime(nalu.creationTime){}
+    NALU(const NALU_BUFFER& data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1.data()),data_len(data_length),creationTime{creationTime}{
+    };
+    ~NALU()= default;
 private:
-    const std::vector<uint8_t> data;
+    // With the default constructor a NALU does not own its memory. This saves us one memcpy. However, storing a NALU after the lifetime of the
+    // Non-owned memory expired is also needed in some places, so the copy-constructor creates a copy of the non-owned data and stores it in a optional buffer
+    // WARNING: Order is important here (Initializer list). Declare before data pointer
+    const std::optional<std::vector<uint8_t>> ownedData={};
+    //const NALU_BUFFER& data;
+    const uint8_t* data;
+    const size_t data_len;
 public:
     const std::chrono::steady_clock::time_point creationTime;
 public:
-    const size_t getSize()const{
-        return data.size();
-    }
     const uint8_t* getData()const{
-        return data.data();
+        return data;//.data();
+    }
+    const size_t getSize()const{
+        return data_len;
     }
     bool isSPS()const{
         return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);
@@ -83,16 +85,17 @@ public:
         return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
     }
     int get_nal_unit_type()const{
-        if(data.size()<5)return -1;
-        return data[4]&0x1f;
+        if(getSize()<5)return -1;
+        return getData()[4]&0x1f;
     }
     //not safe if data_length<=4;
     //returns pointer to data without the 0001 prefix
     const uint8_t* getDataWithoutPrefix()const{
-        return &data[4];
+        return &getData()[4];
     }
     const ssize_t getDataSizeWithoutPrefix()const{
-        return data.size()-4;
+        if(getSize()<=4)return 0;
+        return getSize()-4;
     }
     static std::string get_nal_name(int nal_unit_type){
        std::string nal_unit_type_name;
@@ -134,7 +137,7 @@ public:
 
     std::string dataAsString()const{
         std::stringstream ss;
-        for(int i=0;i<data.size();i++){
+        for(int i=0;i<getSize();i++){
             ss<<(int)data[i]<<",";
         }
         return ss.str();

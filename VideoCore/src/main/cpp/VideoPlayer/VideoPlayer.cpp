@@ -8,8 +8,6 @@
 #include <android/asset_manager_jni.h>
 #include <FileHelper.hpp>
 
-
-
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
     mSettingsN(env,context,"pref_video",true),
@@ -17,8 +15,6 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
     mFileReceiver(1024){
     env->GetJavaVM(&javaVm);
-
-    FFMPEGFileWriter::lol(GROUND_RECORDING_DIRECTORY);
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)

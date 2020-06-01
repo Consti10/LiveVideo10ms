@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:background="@android:color/black"
+    tools:context=".AColorFormatTester">
+
+    <!--<constantin.video.core.external.AspectFrameLayout
+        android:id="@+id/afl_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextureView
+            android:id="@+id/tv_color_test"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"/>
+
+    </constantin.video.core.external.AspectFrameLayout>-->
+
+    <TextureView
+        android:id="@+id/tv_color_test"
+        android:layout_width="640px"
+        android:layout_height="480px"/>
+
+
+</FrameLayout>
