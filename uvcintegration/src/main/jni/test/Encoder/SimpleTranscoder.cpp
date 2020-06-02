@@ -14,6 +14,7 @@
 #include <NDKArrayHelper.hpp>
 #include <utility>
 #include <NDKThreadHelper.hpp>
+#include <chrono>
 
 SimpleTranscoder::SimpleTranscoder(std::string TEST_FILE_DIRECTORY1,std::string INPUT_FILE_PATH1) :
 DEBUG_USE_PATTERN_INSTEAD(INPUT_FILE_PATH1.length()==0),
