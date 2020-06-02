@@ -133,10 +133,10 @@ void SimpleTranscoder::loopEncoder(JNIEnv* env) {
                 int mjpegFrameIndex;
                 auto mjpegData = fileReaderMjpeg.getNextMJPEGPacket(mjpegFrameIndex);
                 if (JThread::isInterrupted(env)) {
-                    MLOGD << "Transcoding was interrupted. Should delete file";
-                    mjpegData = std::nullopt;
+                    MLOGD<<"Transcoding was interrupted. Should delete file";
+                    mjpegData=std::nullopt;
                 }
-                if (mjpegData == std::nullopt) {
+                if (mjpegData==std::nullopt) {
                     AMediaCodec_queueInputBuffer(mediaCodec, index, 0, 0, frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     successfullyTranscodedWholeFile = true;
                     break;
