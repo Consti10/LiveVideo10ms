@@ -4,6 +4,7 @@ public class SimpleTranscoder implements Runnable {
     static{
         System.loadLibrary("UVCReceiverDecoder");
     }
+    // use empty string for activating test mode
     final String INPUT_FILE_PATH;
     public SimpleTranscoder(final String INPUT_FILE_PATH){
         this.INPUT_FILE_PATH =INPUT_FILE_PATH;

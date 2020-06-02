@@ -94,7 +94,7 @@ AMediaCodec* SimpleTranscoder::openMediaCodecEncoder(const int wantedColorFormat
 }
 
 void SimpleTranscoder::loopEncoder(JNIEnv* env) {
-    const bool PLANAR= SELECTED_ENCODER_COLOR_FORMAT= MediaCodecInfo::CodecCapabilities::COLOR_FormatYUV420Planar;
+    const bool PLANAR= (SELECTED_ENCODER_COLOR_FORMAT==MediaCodecInfo::CodecCapabilities::COLOR_FormatYUV420Planar);
     while(true){
         // Dequeue input buffer
         if(DEBUG_USE_PATTERN_INSTEAD){
