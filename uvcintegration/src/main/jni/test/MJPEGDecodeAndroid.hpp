@@ -21,18 +21,7 @@
 // Including this file adds dependency on Android and libjpeg-turbo
 // now class since then I can reuse the jpeg_decompress_struct dinfo member (and do not need to re-allocate & init)
 class MJPEGDecodeAndroid{
-public:
-    MJPEGDecodeAndroid(){
-        struct error_mgr jerr;
-        dinfo.err = jpeg_std_error(&jerr.super);
-        jerr.super.error_exit = _error_exit;
-        jpeg_create_decompress(&dinfo);
-    }
-    ~MJPEGDecodeAndroid(){
-        jpeg_destroy_decompress(&dinfo);
-    }
 private:
-   struct jpeg_decompress_struct dinfo;
     //  error handling (must be set !)
     struct error_mgr {
         struct jpeg_error_mgr super;
@@ -46,6 +35,26 @@ private:
         MLOGD<<"LIBJPEG ERROR %s"<<err_msg;
         longjmp(myerr->jmp, 1);
     }
+    // We need to set the error manager every time else it will crash (I have no idea why )
+    // https://stackoverflow.com/questions/11613040/why-does-jpeg-decompress-create-crash-without-error-message
+    void setErrorManager(){
+        struct error_mgr jerr;
+        dinfo.err = jpeg_std_error(&jerr.super);
+        jerr.super.error_exit = _error_exit;
+    }
+public:
+    MJPEGDecodeAndroid(){
+        struct error_mgr jerr;
+        dinfo.err = jpeg_std_error(&jerr.super);
+        jerr.super.error_exit = _error_exit;
+        setErrorManager();
+        jpeg_create_decompress(&dinfo);
+    }
+    ~MJPEGDecodeAndroid(){
+        jpeg_destroy_decompress(&dinfo);
+    }
+private:
+   struct jpeg_decompress_struct dinfo;
     // 'Create array with pointers to an array'
     static std::vector<uint8_t*> convertToPointers(uint8_t* array1d, size_t heightInPx, size_t scanline_width){
         std::vector<uint8_t*> ret(heightInPx);
@@ -53,13 +62,6 @@ private:
             ret[i]=array1d+i*scanline_width;
         }
         return ret;
-    }
-    // We need to set the error manager every time else it will crash (I have no idea why )
-    // https://stackoverflow.com/questions/11613040/why-does-jpeg-decompress-create-crash-without-error-message
-    void setErrorManager(){
-        struct error_mgr jerr;
-        dinfo.err = jpeg_std_error(&jerr.super);
-        jerr.super.error_exit = _error_exit;
     }
     // call this after read_header
     void debugCurrentInfo(){

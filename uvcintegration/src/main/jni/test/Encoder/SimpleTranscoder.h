@@ -26,8 +26,14 @@
 class SimpleTranscoder {
 private:
     AMediaCodec* mediaCodec{};
-    const std::string INPUT_FILE;
-    const std::string GROUND_RECORDING_DIRECTORY;
+    // in debug mode the transcoder will run until interrupted and use a test pattern as input
+    // filename is determined by the TEST_FILE_DIRECTORY
+    const bool DEBUG_USE_PATTERN_INSTEAD= true;
+    const bool DELETE_FILES_WHEN_DONE= false;
+    // only used to create new filename when in debug mode
+    const std::string TEST_FILE_DIRECTORY;
+    const std::string INPUT_FILE_PATH;
+    const std::string OUTPUT_FILE_PATH;
     FileReaderMJPEG fileReaderMjpeg;
     size_t videoTrackIndex=0;
     AMediaMuxer* mediaMuxer=nullptr;
@@ -41,9 +47,9 @@ private:
     static constexpr int32_t FRAME_RATE = 30;
     static constexpr int32_t BIT_RATE= 5*1024*1024;
     static constexpr int TIMEOUT_US=5*1000;
-    bool finishedEarly=false;
+    bool successfullyTranscodedWholeFile=false;
 public:
-    SimpleTranscoder(std::string INPUT_FILE, std::string  GROUND_RECORDING_DIRECTORY1);
+    SimpleTranscoder(std::string GROUND_RECORDING_DIRECTORY1,std::string INPUT_FILE_PATH1);
     ~SimpleTranscoder();
     void loopEncoder(JNIEnv* env);
     int frameTimeUs=0;

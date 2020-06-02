@@ -15,7 +15,12 @@
 #include <utility>
 #include <NDKThreadHelper.hpp>
 
-SimpleTranscoder::SimpleTranscoder(std::string INPUT_FILE1, std::string GROUND_RECORDING_DIRECTORY1) : INPUT_FILE(std::move(INPUT_FILE1)), GROUND_RECORDING_DIRECTORY(std::move(GROUND_RECORDING_DIRECTORY1)){
+SimpleTranscoder::SimpleTranscoder(std::string TEST_FILE_DIRECTORY1,std::string INPUT_FILE_PATH1) :
+        TEST_FILE_DIRECTORY(std::move(TEST_FILE_DIRECTORY1)),
+        INPUT_FILE_PATH(std::move(INPUT_FILE_PATH1)),
+        OUTPUT_FILE_PATH(DEBUG_USE_PATTERN_INSTEAD ? FileHelper::findUnusedFilename(TEST_FILE_DIRECTORY, ".mp4") : FileHelper::changeFileContainerFPVtoMP4(INPUT_FILE_PATH))
+{
+    MLOGD << INPUT_FILE_PATH << " " << OUTPUT_FILE_PATH << " " << TEST_FILE_DIRECTORY;
     using namespace MediaCodecInfo::CodecCapabilities;
     constexpr auto ENCODER_COLOR_FORMAT=COLOR_FormatYUV420SemiPlanar;
     mediaCodec=openMediaCodecEncoder(ENCODER_COLOR_FORMAT);
@@ -23,7 +28,7 @@ SimpleTranscoder::SimpleTranscoder(std::string INPUT_FILE1, std::string GROUND_R
         MLOGE<<"Cannot open encoder";
         return;
     }
-    fileReaderMjpeg.open(INPUT_FILE);
+    fileReaderMjpeg.open(INPUT_FILE_PATH);
     AMediaCodec_start(mediaCodec);
 }
 
@@ -37,8 +42,14 @@ SimpleTranscoder::~SimpleTranscoder() {
     AMediaCodec_stop(mediaCodec);
     AMediaCodec_delete(mediaCodec);
     fileReaderMjpeg.close();
-    if(finishedEarly){
-
+    if(DELETE_FILES_WHEN_DONE){
+        if(successfullyTranscodedWholeFile){
+            MLOGD << "Deleting input file (successfully transcoded whole file) " << INPUT_FILE_PATH;
+            std::remove(INPUT_FILE_PATH.c_str());
+        }else{
+            MLOGD<<"Deleting output file (interrupted early) "<<OUTPUT_FILE_PATH;
+            std::remove(OUTPUT_FILE_PATH.c_str());
+        }
     }
 }
 
@@ -76,9 +87,9 @@ AMediaCodec* SimpleTranscoder::openMediaCodecEncoder(const int wantedColorFormat
 
 void SimpleTranscoder::loopEncoder(JNIEnv* env) {
     while(true){
-        // Get input buffer if possible
-        {
-            /*const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,TIMEOUT_US);
+        // Dequeue input buffer
+        if(DEBUG_USE_PATTERN_INSTEAD){
+            const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,TIMEOUT_US);
             if(index>0){
                 size_t inputBufferSize;
                 void* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
@@ -94,83 +105,82 @@ void SimpleTranscoder::loopEncoder(JNIEnv* env) {
                     frameIndex++;
                     frameTimeUs+=8*1000;
                 }
-            }*/
+            }
+        }else{
             const auto index=AMediaCodec_dequeueInputBuffer(mediaCodec,5*1000);
-            if(index>0){
+            if(index>0) {
                 size_t inputBufferSize;
-                void* buf = AMediaCodec_getInputBuffer(mediaCodec,(size_t)index,&inputBufferSize);
-                MLOGD<<"Got input buffer "<<inputBufferSize;
+                void *buf = AMediaCodec_getInputBuffer(mediaCodec, (size_t) index,
+                                                       &inputBufferSize);
+                MLOGD << "Got input buffer " << inputBufferSize;
                 int mjpegFrameIndex;
-                auto mjpegData= fileReaderMjpeg.getNextMJPEGPacket(mjpegFrameIndex);
-                if(JThread::isInterrupted(env)) {
-                    MLOGD<<"Transcoding was interrupted. Should delete file";
-                    mjpegData=std::nullopt;
-                    finishedEarly=true;
+                auto mjpegData = fileReaderMjpeg.getNextMJPEGPacket(mjpegFrameIndex);
+                if (JThread::isInterrupted(env)) {
+                    MLOGD << "Transcoding was interrupted. Should delete file";
+                    mjpegData = std::nullopt;
                 }
-                if(mjpegData==std::nullopt){
-                    AMediaCodec_queueInputBuffer(mediaCodec,index,0,0,frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
+                if (mjpegData == std::nullopt) {
+                    AMediaCodec_queueInputBuffer(mediaCodec, index, 0, 0, frameTimeUs,
+                                                 AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
+                    successfullyTranscodedWholeFile = true;
                     break;
-                }else{
-                    MLOGD<<"Got mjpeg"<<mjpegData->size()<<" idx"<<mjpegFrameIndex;
-                    auto decodeBuffer= APixelBuffers::YUV422Planar(640,480);
-                    mjpegDecodeAndroid.decodeRawYUV422(mjpegData->data(),mjpegData->size(),decodeBuffer);
-                    auto encoderBuffer=APixelBuffers::YUV420SemiPlanar(buf,640,480);
-                    APixelBuffers::copyTo(decodeBuffer,encoderBuffer);
-                    frameTimeUs+=8*1000;
+                } else {
+                    MLOGD << "Got mjpeg" << mjpegData->size() << " idx" << mjpegFrameIndex;
+                    auto decodeBuffer = APixelBuffers::YUV422Planar(640, 480);
+                    mjpegDecodeAndroid.decodeRawYUV422(mjpegData->data(), mjpegData->size(),
+                                                       decodeBuffer);
+                    auto encoderBuffer = APixelBuffers::YUV420SemiPlanar(buf, 640, 480);
+                    APixelBuffers::copyTo(decodeBuffer, encoderBuffer);
+                    frameTimeUs += 8 * 1000;
                 }
-                AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
-                frameTimeUs+=8*1000;
+                AMediaCodec_queueInputBuffer(mediaCodec, index, 0, inputBufferSize, frameTimeUs, 0);
+                frameTimeUs += 8 * 1000;
             }
         }
-        {
-            AMediaCodecBufferInfo info;
-            const auto index=AMediaCodec_dequeueOutputBuffer(mediaCodec,&info,TIMEOUT_US);
-            AMediaCodec_getOutputFormat(mediaCodec);
-            if(index==AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED){
-                MLOGD<<"AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED";
-                const std::string fn=FileHelper::findUnusedFilename(GROUND_RECORDING_DIRECTORY,"mp4");
-                outputFileFD = open(fn.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
-                mediaMuxer=AMediaMuxer_new(outputFileFD, AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
-                AMediaFormat* format=AMediaCodec_getOutputFormat(mediaCodec);
-                MLOGD<<"Output format:"<<AMediaFormat_toString(format);
-                videoTrackIndex=AMediaMuxer_addTrack(mediaMuxer,format);
-                const auto status=AMediaMuxer_start(mediaMuxer);
-                MLOGD<<"Media Muxer status "<<status;
-                AMediaFormat_delete(format);
-            }else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
-                MLOGD<<"AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED";
-            }
-            if(index>0){
-                MLOGD<<"Got output buffer "<<index;
-                size_t outputBufferSize;
-                const auto* data = (const uint8_t*)AMediaCodec_getOutputBuffer(mediaCodec,(size_t)index,&outputBufferSize);
+        // Dequeue output buffer
+        AMediaCodecBufferInfo info;
+        const auto index=AMediaCodec_dequeueOutputBuffer(mediaCodec,&info,TIMEOUT_US);
+        AMediaCodec_getOutputFormat(mediaCodec);
+        if(index==AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED){
+            MLOGD<<"AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED";
+            outputFileFD = open(OUTPUT_FILE_PATH.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+            mediaMuxer=AMediaMuxer_new(outputFileFD, AMEDIAMUXER_OUTPUT_FORMAT_MPEG_4);
+            AMediaFormat* format=AMediaCodec_getOutputFormat(mediaCodec);
+            MLOGD<<"Output format:"<<AMediaFormat_toString(format);
+            videoTrackIndex=AMediaMuxer_addTrack(mediaMuxer,format);
+            const auto status=AMediaMuxer_start(mediaMuxer);
+            MLOGD<<"Media Muxer status "<<status;
+            AMediaFormat_delete(format);
+        }else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
+            MLOGD<<"AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED";
+        }
+        if(index>0){
+            MLOGD<<"Got output buffer "<<index;
+            size_t outputBufferSize;
+            const auto* data = (const uint8_t*)AMediaCodec_getOutputBuffer(mediaCodec,(size_t)index,&outputBufferSize);
 
-                AMediaMuxer_writeSampleData(mediaMuxer,videoTrackIndex,data,&info);
+            AMediaMuxer_writeSampleData(mediaMuxer,videoTrackIndex,data,&info);
 
-                AMediaCodec_releaseOutputBuffer(mediaCodec,index,false);
+            AMediaCodec_releaseOutputBuffer(mediaCodec,index,false);
 
-                if((info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) != 0){
-                    MLOGD<<" Got EOS in output";
-                    break;
-                }
-
+            if((info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) != 0){
+                MLOGD<<" Got EOS in output";
+                break;
             }
         }
         MLOGD<<"Hi from worker";
     }
 }
 
-
-
 // ------------------------------------- Native Bindings -------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
-      Java_constantin_test_SimpleEncoder_##method_name
+      Java_constantin_test_SimpleTranscoder_##method_name
 extern "C" {
 
 JNI_METHOD(jlong, nativeCreate)
-(JNIEnv *env, jclass jclass1,jstring filenameSource,jstring groundRecordingDir) {
-    auto* simpleEncoder=new SimpleTranscoder(NDKArrayHelper::DynamicSizeString(env, filenameSource), NDKArrayHelper::DynamicSizeString(env, groundRecordingDir));
+(JNIEnv *env, jclass jclass1,jstring INPUT_FILE_PATH,jstring TEST_FILE_DIRECTORY) {
+    auto* simpleEncoder=new SimpleTranscoder(NDKArrayHelper::DynamicSizeString(env, TEST_FILE_DIRECTORY),NDKArrayHelper::DynamicSizeString(env, INPUT_FILE_PATH));
     return reinterpret_cast<intptr_t>(simpleEncoder);
 }
 

@@ -168,15 +168,17 @@ public:
         uvc_exit(ctx);
         return -1;
     }
-    void stopReceiving(){
+    // return the filename of the written file on success
+    std::optional<std::string> stopReceiving(){
         if(isStreaming){
             uvc_stop_streaming(devh);
             uvc_close(devh);
             uvc_unref_device(dev);
             uvc_exit(ctx);
             isStreaming=false;
-            groundRecorderFPV.stop();
+            return groundRecorderFPV.stop();
         }
+        return std::nullopt;
     }
 };
 
@@ -212,15 +214,18 @@ JNI_METHOD(jint, nativeStartReceiving)
     const std::string usbfs=NDKArrayHelper::DynamicSizeString(env,usbfs_str);
     return native(nativeInstance)->startReceiving(vid,pid,fd,busnum,devAddr,usbfs);
 }
-JNI_METHOD(void, nativeStopReceiving)
+JNI_METHOD(jstring , nativeStopReceiving)
 (JNIEnv *env, jclass jclass1, jlong p) {
-   native(p)->stopReceiving();
+   const auto groundRecordingFilenamePath=native(p)->stopReceiving();
+   if(groundRecordingFilenamePath==std::nullopt){
+       return nullptr;
+   }
+   return env->NewStringUTF(groundRecordingFilenamePath->c_str());
 }
 
 JNI_METHOD(void, nativeSetSurface)
 (JNIEnv *env, jclass jclass1, jlong javaP,jobject surface) {
    native(javaP)->setSurface(env,surface);
 }
-
 
 }

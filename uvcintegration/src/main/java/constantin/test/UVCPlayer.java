@@ -95,7 +95,7 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
             }
         }else if(action.contentEquals(USB_DEVICE_DETACHED)){
             Log.d(TAG,"USB_DEVICE_DETACHED");
-            mUVCReceiverDecoder.stopReceiving();
+            mUVCReceiverDecoder.stopReceiving(parent);
         }else{
             Log.d(TAG,"Unknown broadcast");
         }
@@ -143,7 +143,7 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
     private void pause(){
         Log.d(TAG,"pause");
         parent.unregisterReceiver(this);
-        mUVCReceiverDecoder.stopReceiving();
+        mUVCReceiverDecoder.stopReceiving(parent);
     }
 
     // Video ratio is always the same

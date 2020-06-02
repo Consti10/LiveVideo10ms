@@ -10,6 +10,11 @@
 
     <application>
 
+        <service
+            android:name="constantin.test.TranscodeService"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 
 </manifest>

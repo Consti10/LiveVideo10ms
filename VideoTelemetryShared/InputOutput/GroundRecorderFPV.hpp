@@ -12,6 +12,7 @@
 #include <filesystem>
 #include "FileHelper.hpp"
 #include <chrono>
+#include <optional>
 
 /**
  * Thread-safe class for writing a .fpv ground recording file
@@ -22,22 +23,25 @@ private:
     //Make sure only one thread writes to file at the time
     std::mutex mMutexFileAccess;
     bool started=false;
+    std::string createdPathFilename;
     /**
     * only as soon as we actually write data the file is created
     * to not pollute the file system with empty files
     */
     void createOpenFileIfNeeded(){
         if(!ofstream.is_open()){
-            const std::string groundRecordingFlename=FileHelper::findUnusedFilename(DIRECTORY,"fpv");
-            ofstream.open (groundRecordingFlename.c_str());
+            createdPathFilename=FileHelper::findUnusedFilename(DIRECTORY,"fpv");
+            ofstream.open (createdPathFilename.c_str());
             fileCreationTime=std::chrono::steady_clock::now();
         }
     }
-    void closeFileIfOpened(){
+    std::optional<std::string> closeFileIfOpened(){
         if(ofstream.is_open()){
             ofstream.flush();
             ofstream.close();
+            return createdPathFilename;
         }
+        return std::nullopt;
     }
     std::chrono::steady_clock::time_point fileCreationTime;
 public:
@@ -57,6 +61,7 @@ public:
         unsigned int packet_length;
         PACKET_TYPE packet_type;
         // This value is in ms and always strictly increasing
+        // Usually the 0 point is the creation time of the file, except for the ROTG02
         TIMESTAMP_MS timestamp;
         uint8_t placeholder[8];//8 bytes as placeholder for future use
     }__attribute__((packed)) StreamPacketHeader;
@@ -68,10 +73,10 @@ public:
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
         started=true;
     }
-    void stop(){
+    std::optional<std::string> stop(){
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
         started=false;
-        closeFileIfOpened();
+        return closeFileIfOpened();
     }
     //Only write data if started and data_length>0
     void writePacketIfStarted(const uint8_t *packet,const size_t packet_length,const PACKET_TYPE packet_type,int customTimeStamp=-1) {

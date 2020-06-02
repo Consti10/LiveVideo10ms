@@ -30,5 +30,12 @@ namespace FileHelper{
     static bool endsWith(const std::string& str, const std::string& suffix){
             return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
     }
+    static std::string changeFileContainerFPVtoMP4(std::string inputFPV){
+        assert(endsWith(inputFPV,".fpv"));
+        const std::string originalContainerName=".fpv";
+        const std::string wantedContainerName=".mp4";
+        inputFPV.resize(inputFPV.length()-originalContainerName.length());
+        return inputFPV+wantedContainerName;
+    }
 }
 #endif //LIVEVIDEO10MS_FILEHELPER_HPP

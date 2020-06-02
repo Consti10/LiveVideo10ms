@@ -8,8 +8,11 @@
 #include <jni.h>
 #include <AndroidLogger.hpp>
 
-// Workaround for issue https://github.com/android/ndk/issues/1255
+//
+// Workaround for issue https://github.com/android/ndk/issues/1255 and more
 // Java Thread utility methods
+// Another method that has proven really usefull is the JThread::isInterrupted() method
+//
 namespace JThread{
     static int getThreadPriority(JNIEnv* env){
         jclass jcThread = env->FindClass("java/lang/Thread");
@@ -37,7 +40,8 @@ namespace JThread{
     }
 }
 // Java android.os.Process utility methods (not java/lang/Process !)
-// I think process and thread is used in the same context here
+// I think process and thread is used in the same context here but you probably want to use
+// Process.setPriority instead
 namespace JProcess{
     // calls android.os.Process.setThreadPriority()
     static void setThreadPriority(JNIEnv* env, int wantedPriority){
@@ -58,8 +62,9 @@ namespace JProcess{
     }
 }
 
+// Attach / detach JavaVM to thread
 namespace NDKThreadHelper{
-    static constexpr auto TAG="NDKThreadHelper";
+    static constexpr auto MY_DEFAULT_TAG="NDKThreadHelper";
     static JNIEnv* attachThread(JavaVM* jvm){
         JNIEnv* myNewEnv;
         JavaVMAttachArgs args;
@@ -73,25 +78,25 @@ namespace NDKThreadHelper{
         jvm->DetachCurrentThread();
     }
     // Thread needs to be bound to Java VM
-    static void setProcessThreadPriority(JNIEnv* env,int wantedPriority,const char* TAG="Unknown"){
+    static void setProcessThreadPriority(JNIEnv* env,int wantedPriority,const char* TAG=MY_DEFAULT_TAG){
         const int currentPriority=JProcess::getThreadPriority(env);
         JProcess::setThreadPriority(env, wantedPriority);
         const int newPriority=JProcess::getThreadPriority(env);
         if(newPriority==wantedPriority){
-            MLOGD<<"Successfully set priority from "<<currentPriority<<" to"<<wantedPriority;
+            MLOGD2(TAG)<<"Successfully set priority from "<<currentPriority<<" to"<<wantedPriority;
         }else{
-            MLOGD<<"Cannot set priority from "<<currentPriority<<" to "<<wantedPriority<<" is "<<newPriority<<" instead";
+            MLOGD2(TAG)<<"Cannot set priority from "<<currentPriority<<" to "<<wantedPriority<<" is "<<newPriority<<" instead";
         }
     }
     // If the current thread is already bound to the Java VM only call JProcess::setThreadPriority
     // If no Java VM is attached (e.g. the thread was created via ndk std::thread or equivalent)
     // attach the java vm, set priority and then DETACH again
-    static void setProcessThreadPriorityAttachDetach(JavaVM* vm,int wantedPriority, const char* TAG= "Unknown"){
+    static void setProcessThreadPriorityAttachDetach(JavaVM* vm,int wantedPriority, const char* TAG=MY_DEFAULT_TAG){
         JNIEnv* env=nullptr;
         vm->GetEnv((void**)&env,JNI_VERSION_1_6);
         bool detachWhenDone=false;
         if(env== nullptr){
-            MLOGD<<"Attaching thread";
+            MLOGD2(TAG)<<"Attaching thread";
             env=attachThread(vm);
             detachWhenDone=true;
         }
