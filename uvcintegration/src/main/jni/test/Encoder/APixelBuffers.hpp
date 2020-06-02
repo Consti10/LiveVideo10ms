@@ -62,6 +62,7 @@ namespace APixelBuffers{
         const size_t LUMA_SIZE_B=WIDTH*HEIGHT;
         const size_t HALF_WIDTH=WIDTH/2;
         const size_t HALF_HEIGHT=HEIGHT/2;
+        const size_t SIZE_BYTES=WIDTH*HEIGHT*BITS_PER_PIXEL/8;
         // No matter if planar or semiplanar, the chroma data always starts at this offset
         void* chromaData=&static_cast<uint8_t*>(data)[LUMA_SIZE_B];
         // All these functions return a reference to the Y (U,V) value at position (w,h)

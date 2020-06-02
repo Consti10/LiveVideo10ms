@@ -16,20 +16,30 @@
 #include <NDKThreadHelper.hpp>
 
 SimpleTranscoder::SimpleTranscoder(std::string TEST_FILE_DIRECTORY1,std::string INPUT_FILE_PATH1) :
-        TEST_FILE_DIRECTORY(std::move(TEST_FILE_DIRECTORY1)),
-        INPUT_FILE_PATH(std::move(INPUT_FILE_PATH1)),
-        OUTPUT_FILE_PATH(DEBUG_USE_PATTERN_INSTEAD ? FileHelper::findUnusedFilename(TEST_FILE_DIRECTORY, ".mp4") : FileHelper::changeFileContainerFPVtoMP4(INPUT_FILE_PATH))
+DEBUG_USE_PATTERN_INSTEAD(INPUT_FILE_PATH1.length()==0),
+TEST_FILE_DIRECTORY(std::move(TEST_FILE_DIRECTORY1)),
+INPUT_FILE_PATH(std::move(INPUT_FILE_PATH1)),
+OUTPUT_FILE_PATH(DEBUG_USE_PATTERN_INSTEAD ? FileHelper::findUnusedFilename(TEST_FILE_DIRECTORY, ".mp4") : FileHelper::changeFileContainerFPVtoMP4(INPUT_FILE_PATH))
 {
     MLOGD << INPUT_FILE_PATH << " " << OUTPUT_FILE_PATH << " " << TEST_FILE_DIRECTORY;
+    MLOGD<<"DEBUG_USE_PATTERN_INSTEAD "<<DEBUG_USE_PATTERN_INSTEAD;
+    MLOGD<<"DELETE_FILES_WHEN_DONE "<<DELETE_FILES_WHEN_DONE;
     using namespace MediaCodecInfo::CodecCapabilities;
-    constexpr auto ENCODER_COLOR_FORMAT=COLOR_FormatYUV420SemiPlanar;
-    mediaCodec=openMediaCodecEncoder(ENCODER_COLOR_FORMAT);
+    SELECTED_ENCODER_COLOR_FORMAT=COLOR_FormatYUV420SemiPlanar;
+    mediaCodec=openMediaCodecEncoder(SELECTED_ENCODER_COLOR_FORMAT);
     if(mediaCodec== nullptr){
-        MLOGE<<"Cannot open encoder";
-        return;
+        SELECTED_ENCODER_COLOR_FORMAT=COLOR_FormatYUV420Planar;
+        mediaCodec=openMediaCodecEncoder(SELECTED_ENCODER_COLOR_FORMAT);
+        if(mediaCodec== nullptr){
+            MLOGE<<"Cannot create encoder for YUV420XXX color format";
+            return;
+        }
     }
-    fileReaderMjpeg.open(INPUT_FILE_PATH);
-    AMediaCodec_start(mediaCodec);
+    if(!DEBUG_USE_PATTERN_INSTEAD){
+        fileReaderMjpeg.open(INPUT_FILE_PATH);
+    }
+    const auto mediaStatus=AMediaCodec_start(mediaCodec);
+    MLOGD<<"AMediaCodec_start returned "<<mediaStatus;
 }
 
 SimpleTranscoder::~SimpleTranscoder() {
@@ -41,7 +51,9 @@ SimpleTranscoder::~SimpleTranscoder() {
     }
     AMediaCodec_stop(mediaCodec);
     AMediaCodec_delete(mediaCodec);
-    fileReaderMjpeg.close();
+    if(!DEBUG_USE_PATTERN_INSTEAD){
+        fileReaderMjpeg.close();
+    }
     if(DELETE_FILES_WHEN_DONE){
         if(successfullyTranscodedWholeFile){
             MLOGD << "Deleting input file (successfully transcoded whole file) " << INPUT_FILE_PATH;
@@ -53,22 +65,18 @@ SimpleTranscoder::~SimpleTranscoder() {
     }
 }
 
-
 AMediaCodec* SimpleTranscoder::openMediaCodecEncoder(const int wantedColorFormat) {
     AMediaFormat* format = AMediaFormat_new();
     auto ret = AMediaCodec_createEncoderByType("video/avc");
-    //mediaCodec= AMediaCodec_createCodecByName("OMX.google.h264.encoder");
+    //auto ret= AMediaCodec_createCodecByName("OMX.google.h264.encoder");
 
     AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME, "video/avc");
-    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_HEIGHT, HEIGHT);
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_WIDTH, WIDTH);
+    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_HEIGHT, HEIGHT);
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_BIT_RATE, BIT_RATE);
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_FRAME_RATE, FRAME_RATE);
     AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_I_FRAME_INTERVAL,30);
-
     AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_STRIDE,WIDTH);
-    //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_STRIDE,640);
-    //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_COLOR_FORMAT,)
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_COLOR_FORMAT,wantedColorFormat);
 
     auto status=AMediaCodec_configure(ret,format, nullptr, nullptr, AMEDIACODEC_CONFIGURE_FLAG_ENCODE);
@@ -77,7 +85,7 @@ AMediaCodec* SimpleTranscoder::openMediaCodecEncoder(const int wantedColorFormat
 
     AMediaFormat_delete(format);
     if (AMEDIA_OK != status) {
-        MLOGE<<"AMediaCodec_configure returned"<<status;
+        MLOGE<<"AMediaCodec_configure returned"<<status<<" Error with color format "<<wantedColorFormat;
         return nullptr;
     }
     MLOGD<<"Opened MediaCodec";
@@ -99,9 +107,10 @@ void SimpleTranscoder::loopEncoder(JNIEnv* env) {
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,0,frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     break;
                 }else{
-                    auto framebuffer=APixelBuffers::YUV420SemiPlanar(buf, WIDTH, HEIGHT);
+                    auto framebuffer=APixelBuffers::YUV420SemiPlanar(buf,WIDTH, HEIGHT);
+                    assert(inputBufferSize>=framebuffer.SIZE_BYTES);
                     YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
-                    AMediaCodec_queueInputBuffer(mediaCodec,index,0,inputBufferSize,frameTimeUs,0);
+                    AMediaCodec_queueInputBuffer(mediaCodec,index,0,framebuffer.SIZE_BYTES,frameTimeUs,0);
                     frameIndex++;
                     frameTimeUs+=8*1000;
                 }
@@ -164,7 +173,7 @@ void SimpleTranscoder::loopEncoder(JNIEnv* env) {
             AMediaCodec_releaseOutputBuffer(mediaCodec,index,false);
 
             if((info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) != 0){
-                MLOGD<<" Got EOS in output";
+                MLOGD<<" Got EOS in output buffer";
                 break;
             }
         }

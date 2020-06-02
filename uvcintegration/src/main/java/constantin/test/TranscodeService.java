@@ -6,8 +6,6 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,7 +30,7 @@ public class TranscodeService extends Service {
     public static final String NOTIFICATION_CHANNEL_ID = "TranscodeServiceChannel";
     public static final int NOTIFICATION_ID=1;
     private final ArrayList<Thread> workerThreads=new ArrayList<>();
-
+    private final ArrayList<String> filePaths =new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -58,6 +56,7 @@ public class TranscodeService extends Service {
                     public void run() {
                         final boolean contained=workerThreads.remove(thisWorker);
                         System.out.println("Contained worker thread ?:"+contained);
+                        filePaths.remove(startTranscoding);
                         // update the notification
                         NotificationManagerCompat.from(getApplication()).notify(NOTIFICATION_ID,createNotification());
                         if(workerThreads.isEmpty()){
@@ -69,10 +68,11 @@ public class TranscodeService extends Service {
         });
         // Have to add thread to workers array before starting
         workerThreads.add(worker);
-        worker.start();
+        filePaths.add(startTranscoding);
         // update the notification
         NotificationManagerCompat.from(getApplication()).notify(NOTIFICATION_ID,createNotification());
-        //
+        // finally start the worker
+        worker.start();
         return START_NOT_STICKY;
     }
 
@@ -88,27 +88,19 @@ public class TranscodeService extends Service {
     }
 
     private Notification createNotification(){
-        Bitmap bmp=Bitmap.createBitmap(128,128,Bitmap.Config.RGB_565);
-        bmp.eraseColor(Color.BLUE);
+        //StringBuilder text= new StringBuilder();
+        //for(int i=0;i<workerThreads.size();i++){
+        //    text.append("Worker ").append(i);
+        //}
         StringBuilder text= new StringBuilder();
-        for(int i=0;i<workerThreads.size();i++){
-            text.append("Worker ").append(i);
+        text.append("Currently transcoding ");
+        for(final String filePath: filePaths){
+            int index = filePath.lastIndexOf("/");
+            String fileName = filePath.substring(index + 1);
+            text.append(fileName).append(" ");
         }
-        /*Drawable icon=null;
-        try {
-            icon = getApplication().getPackageManager().getApplicationIcon("constantin.fpv_vr.wifibroadcast");
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            Resources resources=getApplication().getPackageManager().getResourcesForApplication("constantin.fpv_vr.wifibroadcast");
-            resources.get
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }*/
         return new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle("Transcoder Service")
+                .setContentTitle("Transcoding ground recording")
                 .setContentText(text.toString())
                 .setSmallIcon(getApplicationInfo().icon)
                 //.setLargeIcon(bmp)
@@ -148,4 +140,8 @@ public class TranscodeService extends Service {
         ContextCompat.startForegroundService(context, serviceIntent);
     }
 
+    public static void stopTranscoding(final Context context){
+        Intent serviceIntent = new Intent(context, TranscodeService.class);
+        context.stopService(serviceIntent);
+    }
 }

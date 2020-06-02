@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import constantin.test.TranscodeService
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
 import constantin.video.core.RequestPermissionHelper
@@ -55,6 +56,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<View>(R.id.b_startTethering).setOnClickListener { IsConnected.openUSBTetherSettings(context) }
         findViewById<View>(R.id.b_startViewDatabase).setOnClickListener { startActivity(Intent().setClass(context, ViewBenchmarkDataActivity::class.java)) }
         findViewById<View>(R.id.b_startColorFormatsTester).setOnClickListener { startActivity(Intent().setClass(context, AColorFormatTester::class.java)) }
+
+        findViewById<View>(R.id.b_startTranscodeService).setOnClickListener {
+            TranscodeService.startTranscoding(context,"");
+        }
+        findViewById<View>(R.id.b_stopTranscodeService).setOnClickListener {
+            TranscodeService.stopTranscoding(context);
+        }
     }
 
     override fun onResume() {

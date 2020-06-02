@@ -22,12 +22,13 @@
 // now class since then I can reuse the jpeg_decompress_struct dinfo member (and do not need to re-allocate & init)
 class MJPEGDecodeAndroid{
 private:
+    const bool DO_NOTHING;
     //  error handling (must be set !)
     struct error_mgr {
         struct jpeg_error_mgr super;
         jmp_buf jmp;
     };
-    static void _error_exit(j_common_ptr dinfo) {
+    static void my_error_exit(j_common_ptr dinfo) {
         struct error_mgr *myerr = (struct error_mgr *) dinfo->err;
         char err_msg[1024];
         (*dinfo->err->format_message)(dinfo, err_msg);
@@ -40,17 +41,20 @@ private:
     void setErrorManager(){
         struct error_mgr jerr;
         dinfo.err = jpeg_std_error(&jerr.super);
-        jerr.super.error_exit = _error_exit;
+        jerr.super.error_exit = my_error_exit;
     }
 public:
-    MJPEGDecodeAndroid(){
+    // DO_NOTHING avoids crashing when not used
+    MJPEGDecodeAndroid(const bool DO_NOTHING1=false):DO_NOTHING(DO_NOTHING1){
+        if(DO_NOTHING)return;
         struct error_mgr jerr;
         dinfo.err = jpeg_std_error(&jerr.super);
-        jerr.super.error_exit = _error_exit;
+        jerr.super.error_exit = my_error_exit;
         setErrorManager();
         jpeg_create_decompress(&dinfo);
     }
     ~MJPEGDecodeAndroid(){
+        if(DO_NOTHING)return;
         jpeg_destroy_decompress(&dinfo);
     }
 private:
