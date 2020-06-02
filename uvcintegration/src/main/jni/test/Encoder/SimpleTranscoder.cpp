@@ -93,8 +93,8 @@ AMediaCodec* SimpleTranscoder::openMediaCodecEncoder(const int wantedColorFormat
     return ret;
 }
 
-
 void SimpleTranscoder::loopEncoder(JNIEnv* env) {
+    const bool PLANAR= SELECTED_ENCODER_COLOR_FORMAT= MediaCodecInfo::CodecCapabilities::COLOR_FormatYUV420Planar;
     while(true){
         // Dequeue input buffer
         if(DEBUG_USE_PATTERN_INSTEAD){
@@ -108,10 +108,17 @@ void SimpleTranscoder::loopEncoder(JNIEnv* env) {
                     AMediaCodec_queueInputBuffer(mediaCodec,index,0,0,frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     break;
                 }else{
-                    auto framebuffer=APixelBuffers::YUV420SemiPlanar(buf,WIDTH, HEIGHT);
-                    assert(inputBufferSize>=framebuffer.SIZE_BYTES);
-                    YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
-                    AMediaCodec_queueInputBuffer(mediaCodec,index,0,framebuffer.SIZE_BYTES,frameTimeUs,0);
+                    if(PLANAR){
+                        auto framebuffer=APixelBuffers::YUV420Planar(buf,WIDTH, HEIGHT);
+                        assert(inputBufferSize>=framebuffer.SIZE_BYTES);
+                        YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
+                        AMediaCodec_queueInputBuffer(mediaCodec,index,0,framebuffer.SIZE_BYTES,frameTimeUs,0);
+                    }else{
+                        auto framebuffer=APixelBuffers::YUV420SemiPlanar(buf,WIDTH, HEIGHT);
+                        assert(inputBufferSize>=framebuffer.SIZE_BYTES);
+                        YUVFrameGenerator::generateFrame(framebuffer,frameIndex);
+                        AMediaCodec_queueInputBuffer(mediaCodec,index,0,framebuffer.SIZE_BYTES,frameTimeUs,0);
+                    }
                     frameIndex++;
                     frameTimeUs+=8*1000;
                 }
@@ -130,15 +137,13 @@ void SimpleTranscoder::loopEncoder(JNIEnv* env) {
                     mjpegData = std::nullopt;
                 }
                 if (mjpegData == std::nullopt) {
-                    AMediaCodec_queueInputBuffer(mediaCodec, index, 0, 0, frameTimeUs,
-                                                 AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
+                    AMediaCodec_queueInputBuffer(mediaCodec, index, 0, 0, frameTimeUs,AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     successfullyTranscodedWholeFile = true;
                     break;
                 } else {
                     MLOGD << "Got mjpeg" << mjpegData->size() << " idx" << mjpegFrameIndex;
                     auto decodeBuffer = APixelBuffers::YUV422Planar(640, 480);
-                    mjpegDecodeAndroid.decodeRawYUV422(mjpegData->data(), mjpegData->size(),
-                                                       decodeBuffer);
+                    mjpegDecodeAndroid.decodeRawYUV422(mjpegData->data(), mjpegData->size(),decodeBuffer);
                     auto encoderBuffer = APixelBuffers::YUV420SemiPlanar(buf, 640, 480);
                     APixelBuffers::copyTo(decodeBuffer, encoderBuffer);
                     frameTimeUs += 8 * 1000;
