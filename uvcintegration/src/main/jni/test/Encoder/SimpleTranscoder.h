@@ -21,7 +21,7 @@
 // Transcode from MJPEG stream (btw. .fpv file containing MJPEG stream )
 // To .mp4 file containing .h264 encoded data
 // On success, input file is deleted
-// On error,if output file was writtend, output file is deleted
+// On error,if output file was written, output file is deleted
 
 class SimpleTranscoder {
 private:
