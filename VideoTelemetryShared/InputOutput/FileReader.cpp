@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <memory>
 #include <chrono>
+#include <TimeHelper.hpp>
 #include "GroundRecorderRAW.hpp"
 #include "GroundRecorderFPV.hpp"
 #include "FileReaderMP4.hpp"
@@ -80,6 +81,7 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
             //wait until we are at least at the time when data was received
             while(elapsed<packet.timestamp){
                 elapsed=std::chrono::steady_clock::now()-start;
+                TestSleep::sleep(std::chrono::milliseconds(1));
             }
             //const auto timeToWaitUs=(long)header.timestamp-std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
             //if(timeToWaitNS)

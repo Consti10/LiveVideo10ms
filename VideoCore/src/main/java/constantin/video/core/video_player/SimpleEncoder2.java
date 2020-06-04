@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class SimpleEncoder extends MediaCodec.Callback implements Runnable {
+public class SimpleEncoder2 extends MediaCodec.Callback implements Runnable {
     private Thread mThread;
     private final long start=System.currentTimeMillis();
 

@@ -44,18 +44,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
     public VideoPlayer(final Context context){
         this.context=context;
-        //lol();
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
-        //ThreadPriorityTester.test2();
-
-        SimpleEncoder simpleEncoder=new SimpleEncoder();
-        simpleEncoder.start();
-        /*try {
-            Thread.sleep(6*1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-        //simpleEncoder.stop();
     }
 
     static void lol(){

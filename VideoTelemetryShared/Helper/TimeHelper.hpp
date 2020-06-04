@@ -24,6 +24,9 @@ public:
             MLOGE<<"Negative duration "<<us<<" us";
         }
     }
+    //void addNs(long duration){
+    //    add(std::chrono::nanoseconds(duration));
+    //}
     long getAvg_us(){
         if(sumCount==0)return 0;
         return sumUs / sumCount;
@@ -90,7 +93,7 @@ public:
     MeasureExecutionTime(const std::string& tag,const std::string& functionName):functionName(functionName),tag(tag),begin(std::chrono::steady_clock::now()){}
     ~MeasureExecutionTime(){
         const auto duration=std::chrono::steady_clock::now()-begin;
-        MLOGD<<"Execution time for "<<functionName<<" is "<<std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()<<"ms";
+        MLOGD2(tag)<<"Execution time for "<<functionName<<" is "<<std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()<<"ms";
     }
 };
 
@@ -100,5 +103,16 @@ public:
 // __CLASS_NAME__ comes from AndroidLogger
 #define MEASURE_FUNCTION_EXECUTION_TIME const MeasureExecutionTime measureExecutionTime(__CLASS_NAME__,__FUNCTION__);
 
-
+#include <chrono>
+namespace TestSleep{
+    //template <class _Rep, class _Period>
+    static void sleep(const std::chrono::steady_clock::duration &duration,const bool print=false){
+        const auto before=std::chrono::steady_clock::now();
+        std::this_thread::sleep_for(duration);
+        const auto actualSleepTime=std::chrono::steady_clock::now()-before;
+        if(print){
+            MLOGD<<"Slept for "<<MyTimeHelper::R(actualSleepTime)<<" instead of "<<MyTimeHelper::R(duration);
+        }
+    }
+}
 #endif //LIVEVIDEO10MS_TIMEHELPER_HPP
