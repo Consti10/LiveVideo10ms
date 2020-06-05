@@ -48,6 +48,14 @@ public class VideoSurfaceHolder implements LifecycleObserver {
         GLES20.glGenTextures(1, videoTexture, 0);
         mGLTextureVideo = videoTexture[0];
         surfaceTexture=new SurfaceTexture(mGLTextureVideo,false);
+        /*surfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
+            @Override
+            public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                // the latency of the callback is truly horrible and cam be between 1 and 100 ms
+                long latency=System.nanoTime()-surfaceTexture.getTimestamp();
+                System.out.println("Latency is "+(latency/1000)/1000.0f);
+            }
+        });*/
         parent.runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -104,6 +104,7 @@ public:
 #define MEASURE_FUNCTION_EXECUTION_TIME const MeasureExecutionTime measureExecutionTime(__CLASS_NAME__,__FUNCTION__);
 
 #include <chrono>
+#include <thread>
 namespace TestSleep{
     //template <class _Rep, class _Period>
     static void sleep(const std::chrono::steady_clock::duration &duration,const bool print=false){
