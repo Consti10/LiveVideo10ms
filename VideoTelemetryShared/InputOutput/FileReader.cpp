@@ -60,7 +60,7 @@ void FileReader::stopReadingIfStarted() {
     started=false;
     nReceivedB=0;
 }
-
+ 
 void FileReader::receiveLoop(std::future<void> shouldTerminate) {
     nReceivedB=0;
     if(FileHelper::endsWith(FILEPATH, ".mp4")) {
