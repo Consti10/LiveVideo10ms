@@ -93,7 +93,7 @@ public:
         }
         ANativeWindow_Buffer buffer;
         if(ANativeWindow_lock(aNativeWindow, &buffer, nullptr)==0){
-            ANativeWindowBufferHelper::debugANativeWindowBuffer(buffer);
+            //ANativeWindowBufferHelper::debugANativeWindowBuffer(buffer);
             //auto framebuffer=APixelBuffers::YUV420SemiPlanar(buffer.bits, buffer.width, buffer.height);
             //YUVFrameGenerator::generateFrame(framebuffer,0);
             mMJPEGDecodeAndroid.DecodeMJPEGtoANativeWindowBuffer(frame_mjpeg->data, frame_mjpeg->actual_bytes,buffer);

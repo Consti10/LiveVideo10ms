@@ -90,9 +90,9 @@ public:
     // Supports the most common ANativeWindow_Buffer image formats
     // No unnecessary memcpy's & correctly handle stride of ANativeWindow_Buffer
     void DecodeMJPEGtoANativeWindowBuffer(const void* jpegData, size_t jpegDataSize, const ANativeWindow_Buffer& nativeWindowBuffer){
-        ANativeWindowBufferHelper::debugANativeWindowBuffer(nativeWindowBuffer);
+        //ANativeWindowBufferHelper::debugANativeWindowBuffer(nativeWindowBuffer);
         //printStartEnd((uint8_t*)jpegData,jpegDataSize);
-        MEASURE_FUNCTION_EXECUTION_TIME
+        //MEASURE_FUNCTION_EXECUTION_TIME
         unsigned int BYTES_PER_PIXEL;
         J_COLOR_SPACE wantedOutputColorspace;
         if(nativeWindowBuffer.format==AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM || nativeWindowBuffer.format==AHARDWAREBUFFER_FORMAT_R8G8B8X8_UNORM){

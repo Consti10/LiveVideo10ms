@@ -39,6 +39,18 @@ namespace ProcessPriorityHelper{
         }
     }
 
+    static void setAffinity(int core){
+        cpu_set_t  cpuset;
+        CPU_ZERO(&cpuset);       //clears the cpuset
+        CPU_SET( core, &cpuset); //set CPU x on cpuset*/
+        long err,syscallres;
+        pid_t pid=gettid();
+        syscallres=syscall(__NR_sched_setaffinity,pid, sizeof(cpuset),&cpuset);
+        if(syscallres) {
+            //PrivLOG("Error sched_setaffinity");
+        }
+    }
+
     static const void printX(){
         int ret;
         // We'll operate on the currently running thread.

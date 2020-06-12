@@ -17,6 +17,7 @@
 #include "FileReaderMP4.hpp"
 #include "FileReaderRAW.hpp"
 #include "FileReaderFPV.h"
+#include <NDKThreadHelper.hpp>
 
 //return -1 if no valid telemetry filename, else the telemetry type
 static int isTelemetryFilename(const std::string& path){
@@ -33,16 +34,17 @@ static int isTelemetryFilename(const std::string& path){
     return packetType;
 }
 
-void FileReader::startReading(AAssetManager *assetManager, const std::string FILEPATH) {
+void FileReader::startReading(AAssetManager *assetManager1, const std::string FILEPATH1) {
     std::lock_guard<std::mutex> lock(mMutexStartStop);
     if(started)
         return;
-    this->assetManager=assetManager;
-    this->FILEPATH=FILEPATH;
+    this->assetManager=assetManager1;
+    this->FILEPATH=FILEPATH1;
     started=true;
     exitSignal=std::promise<void>();
     std::future<void> futureObj = exitSignal.get_future();
     mThread=std::make_unique<std::thread>(&FileReader::receiveLoop,this,std::move(futureObj));
+    NDKThreadHelper::setName(mThread->native_handle(),"FileReader");
 }
 
 void FileReader::stopReadingIfStarted() {

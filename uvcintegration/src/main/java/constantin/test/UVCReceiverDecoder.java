@@ -66,8 +66,7 @@ public class UVCReceiverDecoder {
         final String filenamePath=nativeStopReceiving(nativeInstance);
         if(filenamePath!=null){
             System.out.println("FilenamePath "+filenamePath);
-            TranscodeService.startTranscoding(context,filenamePath);
-
+            //TODO TranscodeService.startTranscoding(context,filenamePath);
         }
         alreadyStreaming=false;
     }

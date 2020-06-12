@@ -27,6 +27,7 @@ std::string UDPReceiver::getSourceIPAddress()const {
 void UDPReceiver::startReceiving() {
     receiving=true;
     mUDPReceiverThread=std::make_unique<std::thread>([this]{this->receiveFromUDPLoop();} );
+    NDKThreadHelper::setName(mUDPReceiverThread->native_handle(),mName.c_str());
 }
 
 void UDPReceiver::stopReceiving() {

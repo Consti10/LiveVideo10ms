@@ -105,6 +105,13 @@ namespace NDKThreadHelper{
             detachThread(vm);
         }
     }
+    // set name of thread. print error on failure
+    static void setName(pthread_t pthread, const char* name){
+        auto res=pthread_setname_np(pthread,name);
+        if(res!=0){
+            MLOGE<<"Cannot set thread name "<<std::string(name)<<"§ error"<<res;
+        }
+    }
 }
 
 #include <thread>

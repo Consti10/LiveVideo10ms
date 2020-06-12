@@ -102,13 +102,13 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     }
     AMediaCodec_start(decoder.codec);
     mCheckOutputThread=new std::thread(&LowLagDecoder::checkOutputLoop,this);
+    NDKThreadHelper::setName(mCheckOutputThread->native_handle(),"LLD::CheckOutput");
     decoder.configured=true;
 }
 
 void LowLagDecoder::checkOutputLoop() {
-    NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm,
-                                                          FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT,
-                                                          "DecoderCheckOutput");
+    NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm,FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT,"DecoderCheckOutput");
+    //NDKThreadHelper::setName(std::this_thread::get_id().native)
     AMediaCodecBufferInfo info;
     bool decoderSawEOS=false;
     bool decoderProducedUnknown=false;
