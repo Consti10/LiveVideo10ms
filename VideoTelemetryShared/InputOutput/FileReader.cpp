@@ -81,7 +81,7 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
             auto elapsed=std::chrono::steady_clock::now()-start;
             lastPacketTimestamp=packet.timestamp;
             //wait until we are at least at the time when data was received
-            while(elapsed<packet.timestamp*0.5f){
+            while(elapsed<packet.timestamp){//*0.5f
                 elapsed=std::chrono::steady_clock::now()-start;
                 TestSleep::sleep(std::chrono::milliseconds(1));
             }
