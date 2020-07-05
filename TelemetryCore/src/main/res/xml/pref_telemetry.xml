@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Telemetry settings"
+    android:summary="Select your telemetry protocol and protocol-specific settings ">
+
+
+    <PreferenceCategory
+        android:title="Telemetry stream">
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/T_PROTOCOL"
+            android:title="@string/T_PROTOCOL"
+            android:summary="Select your telemetry protocol."
+            android:entries="@array/entriesTelemetryProtocol"
+            android:entryValues="@array/valuesTelemetryProtocol"
+            android:defaultValue="1"/>
+        <com.mapzen.prefsplus.EditIntPreference
+            android:key="@string/T_LTMPort"
+            android:title="@string/T_LTMPort"
+            android:defaultValue="5001"
+            android:summary="UDP Port to listen for LTM data;default:5001"/>
+        <com.mapzen.prefsplus.EditIntPreference
+            android:key="@string/T_MAVLINKPort"
+            android:title="@string/T_MAVLINKPort"
+            android:defaultValue="14550"
+            android:summary="UDP Port to listen for MAVLINK data;default:14550"/>
+        <com.mapzen.prefsplus.EditIntPreference
+            android:key="@string/T_SMARTPORTPort"
+            android:title="@string/T_SMARTPORTPort"
+            android:defaultValue="5004"
+            android:summary="UDP Port to listen for SMARTPORT data;default:5004"/>
+        <com.mapzen.prefsplus.EditIntPreference
+            android:key="@string/T_FRSKYPort"
+            android:title="@string/T_FRSKYPort"
+            android:defaultValue="5002"
+            android:summary="UDP Port to listen for FRSKY data;default:5002"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="EZ-WB status data">
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/EZWBS_Protocol"
+            android:title="@string/EZWBS_Protocol"
+            android:summary="Select your ez-wb status protocol (has to comply with your EZ-WB version). This option can be used synchronous with another telemetry source, like LTM"
+            android:entries="@array/entriesEZWBStatusProtocol"
+            android:entryValues="@array/valuesEZWBStatusProtocol"
+            android:defaultValue="1"/>
+        <com.mapzen.prefsplus.EditIntPreference
+            android:key="@string/EZWBS_Port"
+            android:title="@string/EZWBS_Port"
+            android:defaultValue="5003"
+            android:summary="UDP Port to listen for EZ-WB status data;default:5003"/>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="Telemetry protocol specific">
+        <SwitchPreference
+            android:key="@string/T_ORIGIN_POSITION_ANDROID"
+            android:title="@string/T_ORIGIN_POSITION_ANDROID"
+            android:summary="Use you smartphone gps to calculate origin data (lat,lon,alt). This is needed unless you are using LTM or MAVLINK."
+            android:defaultValue="false" />
+        <SwitchPreference
+            android:key="@string/T_MAVLINK_FLIGHTMODE_QUADCOPTER"
+            android:title="@string/T_MAVLINK_FLIGHTMODE_QUADCOPTER"
+            android:summary="Quadcopters and Planes have different flight modes in MAVLINK"
+            android:defaultValue="true" />
+        <!--<SwitchPreference
+            android:key="@string/T_LTM_FOR_INAV"
+            android:title="@string/T_LTM_FOR_INAV"
+            android:summary="Interpret altitude as signed value. Enable when using LTM with iNAV"
+            android:defaultValue="false" />-->
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="Battery settings">
+    </PreferenceCategory>
+    <com.mapzen.prefsplus.EditIntPreference
+        android:key="@string/T_BATT_CELLS_N"
+        android:title="@string/T_BATT_CELLS_N"
+        android:defaultValue="3"/>
+    <com.mapzen.prefsplus.EditFloatPreference
+        android:key="@string/T_BATT_CELLS_V_WARNING1_ORANGE"
+        android:title="@string/T_BATT_CELLS_V_WARNING1_ORANGE"
+        android:defaultValue="3.5"/>
+    <com.mapzen.prefsplus.EditFloatPreference
+        android:key="@string/T_BATT_CELLS_V_WARNING2_RED"
+        android:title="@string/T_BATT_CELLS_V_WARNING2_RED"
+        android:defaultValue="3.4"/>
+    <com.mapzen.prefsplus.EditFloatPreference
+        android:key="@string/T_BATT_CELLS_V_MAX"
+        android:title="@string/T_BATT_CELLS_V_MAX"
+        android:defaultValue="4.2"/>
+    <com.mapzen.prefsplus.EditFloatPreference
+        android:key="@string/T_BATT_CELLS_V_MIN"
+        android:title="@string/T_BATT_CELLS_V_MIN"
+        android:defaultValue="3.0"/>
+    <com.mapzen.prefsplus.EditIntPreference
+        android:key="@string/T_BATT_CAPACITY_MAH"
+        android:title="@string/T_BATT_CAPACITY_MAH"
+        android:defaultValue="2500"/>
+    <com.mapzen.prefsplus.EditIntPreference
+        android:key="@string/T_BATT_CAPACITY_MAH_USED_WARNING"
+        android:title="@string/T_BATT_CAPACITY_MAH_USED_WARNING"
+        android:defaultValue="2000"/>
+
+    <PreferenceCategory
+        android:title="Metrics">
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/T_METRIC_SPEED_HORIZONTAL"
+            android:title="@string/T_METRIC_SPEED_HORIZONTAL"
+            android:entries="@array/entriesMETRIC_SPEED"
+            android:entryValues="@array/valuesMETRIC_SPEED"
+            android:defaultValue="0"/>
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/T_METRIC_SPEED_VERTICAL"
+            android:title="@string/T_METRIC_SPEED_VERTICAL"
+            android:entries="@array/entriesMETRIC_SPEED"
+            android:entryValues="@array/valuesMETRIC_SPEED"
+            android:defaultValue="1"/>
+    </PreferenceCategory>
+
+
+
+    <PreferenceCategory
+        android:title="Advanced">
+        <com.mapzen.prefsplus.IntListPreference
+            android:key="@string/T_SOURCE"
+            android:title="@string/T_SOURCE"
+            android:entries="@array/entriesTelemetrySource"
+            android:entryValues="@array/valuesTelemetrySource"
+            android:defaultValue="0"
+            android:enabled="false"/>
+        <EditTextPreference
+            android:key="@string/T_PLAYBACK_FILENAME"
+            android:title="@string/T_PLAYBACK_FILENAME"
+            android:summary="Entered filename will be played if Source=File. Enter full path !"
+            android:defaultValue="@string/T_PLAYBACK_FILENAME_DEFAULT_VALUE"
+            android:enabled="false"/>
+        <SwitchPreference
+            android:key="@string/T_GROUND_RECORDING"
+            android:title="@string/T_GROUND_RECORDING"
+            android:summary="Record telemetry data into a file for playback"
+            android:defaultValue="false"
+            android:enabled="false"/>
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

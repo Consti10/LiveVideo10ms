@@ -1,0 +1,1 @@
+These files are used by both the parser (c not cpp) and the .cpp part (TelemetryReceiver)

@@ -1,0 +1,3 @@
+Custom telemetry protocoll to forward wifibraodcast link and air / ground pi information from OpenHD / EZ-Wifibraodcast
+Data is sent as raw data structs over UDP
+Application assumes 1 UDP packet == 1 data struct

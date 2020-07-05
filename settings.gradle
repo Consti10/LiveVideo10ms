@@ -1,1 +1,1 @@
-include  ':VideoCore', ':VideoExample', ':uvcintegration'
+include  ':VideoCore', ':VideoExample', ':uvcintegration', ':TelemetryCore', ':TelemetryExample'

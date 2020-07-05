@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="T_PLAYBACK_FILENAME_DEFAULT_VALUE">PATH/filename.format</string>
+
+</resources>

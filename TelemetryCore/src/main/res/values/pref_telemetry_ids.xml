@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    //telemetry settings
+    <string name="T_PROTOCOL">Telemetry protocol</string>
+    <string name="T_LTMPort">LTMPort</string>
+    <string name="T_FRSKYPort">FRSKYPort</string>
+    <string name="T_MAVLINKPort">MAVLINKPort</string>
+    <string name="T_SMARTPORTPort">SMARTPORTPort</string>
+    //ez-wb stream
+    <string name="EZWBS_Protocol">EZWB status protocol</string>
+    <string name="EZWBS_Port">EZWB status port</string>
+
+    <string name="T_ORIGIN_POSITION_ANDROID">T_ORIGIN_POSITION_ANDROID</string>
+    <string name="T_MAVLINK_FLIGHTMODE_QUADCOPTER">T_MAVLINK_FLIGHTMODE_QUADCOPTER</string>
+    <string name="T_LTM_FOR_INAV">T_LTM_FOR_INAV</string>
+    <string name="T_BATT_CELLS_N">T_BATT_CELLS_N</string>
+    <string name="T_BATT_CELLS_V_WARNING1_ORANGE">T_BATT_CELLS_V_WARNING1_ORANGE</string>
+    <string name="T_BATT_CELLS_V_WARNING2_RED">T_BATT_CELLS_V_WARNING2_RED</string>
+    <string name="T_BATT_CELLS_V_MAX">T_BATT_CELLS_V_MAX</string>
+    <string name="T_BATT_CELLS_V_MIN">T_BATT_CELLS_V_MIN</string>
+    <string name="T_BATT_CAPACITY_MAH">T_BATT_CAPACITY_MAH</string>
+    <string name="T_BATT_CAPACITY_MAH_USED_WARNING">T_BATT_CAPACITY_MAH_USED_WARNING</string>
+    //Metrics
+    <string name="T_METRIC_SPEED_HORIZONTAL">T_METRIC_SPEED_HORIZONTAL</string>
+    <string name="T_METRIC_SPEED_VERTICAL">T_METRIC_SPEED_VERTICAL</string>
+    //other
+    <string name="T_GROUND_RECORDING">T_GROUND_RECORDING</string>
+
+
+    //Advanced (hidden when not example build)
+    <string name="T_SOURCE">T_SOURCE</string>
+    <string name="T_PLAYBACK_FILENAME">T_PLAYBACK_FILENAME</string>
+
+</resources>

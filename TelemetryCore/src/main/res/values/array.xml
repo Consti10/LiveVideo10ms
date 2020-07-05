@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="entriesTelemetrySource" >
+        <item>UDP</item>
+        <item>FILE</item>
+        <item>ASSETS</item>
+        <item>EXTERNAL_DJI</item>
+    </string-array>
+    <string-array name="valuesTelemetrySource" >
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="entriesTelemetryProtocol" >
+        <item>NONE</item>
+        <item>LTM</item>
+        <item>MAVLINK</item>
+        <item>SMARTPORT (experimental)</item>
+        <item>FRSKY (deprecated)</item>
+    </string-array>
+    <string-array name="valuesTelemetryProtocol" >
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+
+    <string-array name="entriesEZWBStatusProtocol" >
+        <item>Disable</item>
+        <item>Version 1.6 rc6 </item>
+        <item>OpenHD 1.0.0</item>
+    </string-array>
+    <string-array name="valuesEZWBStatusProtocol" >
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="entriesMETRIC_SPEED" >
+        <item>km/h</item>
+        <item>m/s</item>
+    </string-array>
+    <string-array name="valuesMETRIC_SPEED" >
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+</resources>
