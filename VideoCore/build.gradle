@@ -39,14 +39,14 @@ android {
         }
     }
     // looks like prefab is just not ready yet ( too many compile errors for me)
-    //buildFeatures {
-    //    prefabPublishing true
-    //}
-    //prefab {
-    //    VideoNative {
-    //        headers "src/main/cpp/NALU"
-    //    }
-    //}
+    buildFeatures {
+        prefabPublishing true
+    }
+    prefab {
+        VideoNative {
+            headers "src/main/cpp/NALU"
+        }
+    }
 }
 
 dependencies {
