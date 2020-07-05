@@ -60,7 +60,7 @@ void FileReader::stopReadingIfStarted() {
     started=false;
     nReceivedB=0;
 }
- 
+
 void FileReader::receiveLoop(std::future<void> shouldTerminate) {
     nReceivedB=0;
     if(FileHelper::endsWith(FILEPATH, ".mp4")) {
@@ -81,7 +81,7 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
             auto elapsed=std::chrono::steady_clock::now()-start;
             lastPacketTimestamp=packet.timestamp;
             //wait until we are at least at the time when data was received
-            while(elapsed<packet.timestamp){//*0.5f
+            while(elapsed<packet.timestamp*0.4f){
                 elapsed=std::chrono::steady_clock::now()-start;
                 TestSleep::sleep(std::chrono::milliseconds(1));
             }

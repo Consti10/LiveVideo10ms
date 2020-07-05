@@ -20,7 +20,6 @@ android {
             abiFilters 'armeabi-v7a', 'arm64-v8a'//, 'x86', 'x86_64'
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -34,7 +33,18 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['libs/ffmpeg/lib']
+            // https://developer.android.com/studio/releases/gradle-plugin?buildsystem=cmake#cmake-imported-targets
+            // Not needed anymore
+            //jniLibs.srcDirs = ['libs/ffmpeg/lib']
+        }
+    }
+    //
+    buildFeatures {
+        prefabPublishing true
+    }
+    prefab {
+        VideoNative {
+            headers "src/main/cpp/NALU"
         }
     }
 }

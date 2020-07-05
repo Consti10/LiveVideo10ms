@@ -23,6 +23,7 @@ LowLagDecoder::LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,bool SW):
         SW(SW),javaVm(javaVm){
     decoder.window=window;
     decoder.configured=false;
+
 }
 
 void LowLagDecoder::registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC) {

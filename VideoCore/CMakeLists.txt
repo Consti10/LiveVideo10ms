@@ -16,6 +16,9 @@ add_library( avformat-lib
 add_library( avutil-lib
         SHARED
         IMPORTED )
+add_library( swresample-lib
+        SHARED
+        IMPORTED )
 set_target_properties( # Specifies the target library.
         avcodec-lib
         # Specifies the parameter you want to define.
@@ -34,6 +37,15 @@ set_target_properties( # Specifies the target library.
         PROPERTIES IMPORTED_LOCATION
         # Provides the path to the library you want to import.
         ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libavutil.so)
+# fix this ?
+set_target_properties( # Specifies the target library.
+        swresample-lib
+        # Specifies the parameter you want to define.
+        PROPERTIES IMPORTED_LOCATION
+        # Provides the path to the library you want to import.
+        ${FFMPEG_DIR}/lib/${ANDROID_ABI}/libswresample.so)
+
+
 include_directories(${FFMPEG_DIR}/include/${ANDROID_ABI}/)
 
 set(H264_BITSTREAM_DIR ${CMAKE_SOURCE_DIR}/libs/h264bitstream)
@@ -63,6 +75,9 @@ target_link_libraries( FFMpegVideoReceiver
         avcodec-lib
         avformat-lib
         avutil-lib
+        #
+        swresample-lib
+
         h264bitstream
         )
 
