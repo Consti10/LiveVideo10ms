@@ -1,4 +1,4 @@
-package constantin.telemetry.example;
+package constantin.video.example;
 
 
 import android.content.Intent;
@@ -6,21 +6,19 @@ import android.content.Intent;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import constantin.telemetry.core.ASettingsTelemetry;
 
 @LargeTest
-public class MainActivityTest {
+public class TelemetryExampleActivityTest {
     private static final int WAIT_TIME_SHORT = 5*1000; //n seconds
     private static final int N_ITERATIONS=1;
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<ATelemetryExample> mActivityTestRule = new ActivityTestRule<>(ATelemetryExample.class);
     @Rule
     public ActivityTestRule<ASettingsTelemetry> mSettingsActivityTestRule = new ActivityTestRule<>(ASettingsTelemetry.class,false,false);
 

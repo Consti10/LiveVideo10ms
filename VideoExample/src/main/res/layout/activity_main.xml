@@ -38,16 +38,15 @@
         android:layout_height="wrap_content"
         android:text="View Database" />
 
-    <Button
-        android:id="@+id/b_startColorFormatsTester"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="start ColorFormat Tester" />
-
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+        <Button
+            android:id="@+id/b_startColorFormatsTester"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="start ColorFormat Tester" />
         <Button
             android:id="@+id/b_startTranscodeService"
             android:layout_width="wrap_content"
@@ -59,6 +58,17 @@
             android:layout_height="wrap_content"
             android:text="stop T service " />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="?android:attr/listDivider" />
+    <Button
+        android:id="@+id/b_startTelemetry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Telemetry Example" />
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

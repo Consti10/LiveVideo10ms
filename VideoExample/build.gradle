@@ -12,9 +12,16 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 8
         versionName "8.0"
-
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+                arguments "-DANDROID_STL=c++_static"
+            }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -25,6 +32,11 @@ android {
     }
     viewBinding {
         enabled = true
+    }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
     }
 }
 
@@ -53,7 +65,7 @@ dependencies {
     implementation project(path: ':VideoCore')
     implementation project(path: ':uvcintegration')
 
-    //implementation project(path: ':TelemetryCore')
+    implementation project(path: ':TelemetryCore')
 
     implementation "androidx.core:core-ktx:1.3.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

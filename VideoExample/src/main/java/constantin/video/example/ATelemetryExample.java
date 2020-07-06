@@ -1,4 +1,4 @@
-package constantin.telemetry.example;
+package constantin.video.example;
 
 import android.Manifest;
 import android.content.Intent;
@@ -25,7 +25,7 @@ import constantin.telemetry.core.RequestPermissionHelper;
 import constantin.telemetry.core.TelemetrySettings;
 import constantin.telemetry.core.TestReceiverTelemetry;
 
-public class MainActivity extends AppCompatActivity {
+public class ATelemetryExample extends AppCompatActivity {
 
     private final RequestPermissionHelper requestPermissionHelper=new RequestPermissionHelper(new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_telemetry);
         requestPermissionHelper.checkAndRequestPermissions(this);
         TelemetrySettings.initializePreferences(this,false);
         Button button=findViewById(R.id.button);

@@ -146,7 +146,7 @@ void TelemetryReceiver::startReceiving(JNIEnv *env,jobject context,AAssetManager
             // If using external file receiver, start / stop is handled by the video player
             if(!isExternalFileReceiver){
                 const bool useAsset=SOURCE_TYPE==ASSETS;
-                const std::string filename = useAsset ? "testlog."+getProtocolAsString() :T_PLAYBACK_FILENAME;
+                const std::string filename = useAsset ? "telemetry/testlog."+getProtocolAsString() :T_PLAYBACK_FILENAME;
                 mFileReceiver.startReading(useAsset ? assetManager : nullptr,filename);
             }
         }break;
