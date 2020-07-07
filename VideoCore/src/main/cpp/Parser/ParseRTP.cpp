@@ -120,7 +120,7 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             nalu_data_length=0;
             //LOGV("full nalu");
         }else{
-            MLOGD<<"header:"<<nalu_header->type;
+            //MLOGD<<"header:"<<nalu_header->type;
         }
 }
 
