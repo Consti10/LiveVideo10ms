@@ -37,7 +37,7 @@ When receiving corrupted data (e.g from a lossy connection) the decoder will sti
 
 **Structure:**
 - VideoCore: contains the native code and java bindings
-- VideoExample: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s) \
+- Example: simple example app. Playback of different .h264 files stored in the 'assets folder' of the app. Includes test case(s) \
 
 **Setup Dependencies**\
 There are 2 ways to use VideoCore in your Project \
