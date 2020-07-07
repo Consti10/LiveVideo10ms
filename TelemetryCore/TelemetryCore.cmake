@@ -2,6 +2,9 @@
 # include this to build the native part
 ##########################################################################################################
 
+#cmake_minimum_required(VERSION 3.6)
+#set(V_CORE_DIR ${CMAKE_SOURCE_DIR}../../../LiveVideo10ms/VideoCore)
+
 find_library( log-lib
               log )
 
