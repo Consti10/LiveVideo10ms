@@ -2,6 +2,7 @@ package constantin.video.example;
 
 
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
@@ -40,6 +41,7 @@ public class PlayVideoTest {
 
 
     private static void validateDecodingInfo(final @Nullable DecodingInfo info){
+        Log.d("XX",info.toString());
         assert info!=null : "info!=null";
         assert info.nNALU<=0 : "nNalu<=0";
         assert info.nNALUSFeeded<=0 : "nNaluFeeded<=0";
