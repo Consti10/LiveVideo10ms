@@ -26,17 +26,22 @@
         android:layout_height="wrap_content"
         tools:ignore="HardcodedText" />
 
-    <Button
-        android:id="@+id/b_startTethering"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Tethering" />
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/b_startTethering"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start Tethering" />
 
-    <Button
-        android:id="@+id/b_startViewDatabase"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="View Database" />
+        <Button
+            android:id="@+id/b_startViewDatabase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Database" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <Button
         android:id="@+id/b_startColorFormatsTester"
