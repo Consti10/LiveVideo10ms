@@ -60,22 +60,61 @@ AndroidLogger& operator<<(AndroidLogger&& record, T&& t) {
     return record << std::forward<T>(t);
 }
 
+
 // taken from https://stackoverflow.com/questions/1666802/is-there-a-class-macro-in-c
+// also see https://gcc.gnu.org/onlinedocs/gcc/Function-Names.html
 namespace PrettyFunctionHelper{
-    inline std::string className(const std::string& prettyFunction){
+    static constexpr const auto UNKNOWN_CLASS_NAME="UnknownClassName";
+    /**
+     * @param prettyFunction as obtained by the macro __PRETTY_FUNCTION__
+     * @return a string containing the class name at the end, optionally prefixed by the namespace(s).
+     * Example return values: "MyNamespace1::MyNamespace2::MyClassName","MyNamespace1::MyClassName" "MyClassName"
+     */
+    static std::string namespaceAndClassName(const std::string& function,const std::string& prettyFunction){
         //AndroidLogger(ANDROID_LOG_DEBUG,"NoT")<<prettyFunction;
-        //size_t colons = prettyFunction.find("::");
-        size_t colons=prettyFunction.rfind("::");
-        if (colons == std::string::npos)
-            return "UnknownClassName";
-        size_t begin = prettyFunction.substr(0,colons).rfind(" ") + 1;
-        size_t end = colons - begin-1;
-        return prettyFunction.substr(begin,end);
+        // Here I assume that the 'function name' does not appear multiple times. The opposite is highly unlikely
+        const size_t len1=prettyFunction.find(function);
+        if(len1 == std::string::npos)return UNKNOWN_CLASS_NAME;
+        // The substring of len-2 contains the function return type and the "namespaceAndClass" area
+        const std::string returnTypeAndNamespaceAndClassName=prettyFunction.substr(0,len1-2);
+        // find the last empty space in the substring. The values until the first empty space are the function return type
+        // for example "void ","std::optional<std::string> ", "static std::string "
+        // See how the 3rd example return type also contains a " ".
+        // However, it is guaranteed that the area NamespaceAndClassName does not contain an empty space
+        const size_t begin1 = returnTypeAndNamespaceAndClassName.rfind(" ");
+        if(begin1 == std::string::npos)return UNKNOWN_CLASS_NAME;
+        const std::string namespaceAndClassName=returnTypeAndNamespaceAndClassName.substr(begin1+1);
+        return namespaceAndClassName;
     }
+    /**
+     * @param namespaceAndClassName value obtained by namespaceAndClassName()
+     * @return the class name only (without namespace prefix if existing)
+     */
+    static std::string className(const std::string& namespaceAndClassName){
+        const size_t end=namespaceAndClassName.rfind("::");
+        if(end!=std::string::npos){
+            return namespaceAndClassName.substr(end+2);
+        }
+        return namespaceAndClassName;
+    }
+    class Test{
+    public:
+        static std::string testMacro(std::string exampleParam=""){
+            const auto namespaceAndClassName=PrettyFunctionHelper::namespaceAndClassName(__FUNCTION__,__PRETTY_FUNCTION__);
+            //AndroidLogger(ANDROID_LOG_DEBUG,"NoT2")<<namespaceAndClassName;
+            assert(namespaceAndClassName.compare("PrettyFunctionHelper::Test") == 0);
+            const auto className=PrettyFunctionHelper::className(namespaceAndClassName);
+            //AndroidLogger(ANDROID_LOG_DEBUG,"NoT2")<<className;
+            assert(className.compare("Test") == 0);
+            return "";
+        }
+    };
+    static const std::string x=Test::testMacro("");
 }
-#ifndef __CLASS_NAME__
-#define __CLASS_NAME__ PrettyFunctionHelper::className(__PRETTY_FUNCTION__)
-#endif
+#ifndef ANDROID_LOGER_DEFINE_CUSTOM_CLASS_NAME_MACRO
+#define __NAMESPACE_AND_CLASS_NAME__ PrettyFunctionHelper::namespaceAndClassName(__FUNCTION__,__PRETTY_FUNCTION__)
+#define __CLASS_NAME__ PrettyFunctionHelper::className(__NAMESPACE_AND_CLASS_NAME__)
+#endif //ANDROID_LOGER_DEFINE_CUSTOM_CLASS_NAME_MACRO
 
 
 // Here we use the current class name / namespace as tag (with pretty function workaround)
