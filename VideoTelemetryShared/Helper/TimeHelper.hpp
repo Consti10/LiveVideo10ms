@@ -8,37 +8,127 @@
 #include <AndroidLogger.hpp>
 #include <chrono>
 
+namespace MyTimeHelper{
+    // R stands for readable. Convert a std::chrono::duration into a readable format
+    static std::string R(const std::chrono::steady_clock::duration& dur){
+        const auto durAbsolute=std::chrono::abs(dur);
+        if(durAbsolute>=std::chrono::seconds(1)){
+            // More than one second, print as decimal with ms resolution.
+            const auto ms=std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+            return std::to_string(ms/1000.0f)+"s";
+        }
+        if(durAbsolute>=std::chrono::milliseconds(1)){
+            // More than one millisecond, print as decimal with us resolution
+            const auto us=std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
+            return std::to_string(us/1000.0f)+"ms";
+        }
+        if(durAbsolute>=std::chrono::microseconds(1)){
+            // More than one microsecond, print as decimal with ns resolution
+            const auto ns=std::chrono::duration_cast<std::chrono::nanoseconds>(dur).count();
+            return std::to_string(ns/1000.0f)+"us";
+        }
+        const auto ns=std::chrono::duration_cast<std::chrono::nanoseconds>(dur).count();
+        return std::to_string(ns)+"ns";
+    }
+    static std::string ReadableNS(uint64_t nanoseconds){
+        return R(std::chrono::nanoseconds(nanoseconds));
+    }
+};
+
+// Use this class to compare many samples of the same kind
+// Saves the minimum,maximum and average of all the samples
 class AvgCalculator{
 private:
-    // provide us (microseconds) resolution
-    unsigned long sumUs=0;
-    long sumCount=0;
+    // do not forget the braces to initalize with 0
+    std::chrono::nanoseconds sum{};
+    long nSamples=0;
+    std::chrono::nanoseconds min=std::chrono::nanoseconds::max();
+    std::chrono::nanoseconds max{};
 public:
     AvgCalculator() = default;
-    void add(const std::chrono::steady_clock::duration& duration){
-        const auto us=std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
-        if(us>=0){
-            sumUs+=us;
-            sumCount++;
-        }else{
-            MLOGE<<"Negative duration "<<us<<" us";
+    // typedef duration<long long,         nano> nanoseconds;
+    // I think std::chrono::nanoseconds is a duration
+    void add(const std::chrono::nanoseconds& value){
+        if(value<std::chrono::nanoseconds(0)){
+            MLOGE<<"Cannot add negative value";
+            return;
+        }
+        sum+=value;
+        nSamples++;
+        if(value<min){
+            min=value;
+        }
+        if(value>max){
+            max=value;
         }
     }
-    //void addNs(long duration){
-    //    add(std::chrono::nanoseconds(duration));
-    //}
-    long getAvg_us(){
-        if(sumCount==0)return 0;
-        return sumUs / sumCount;
+    std::chrono::nanoseconds getAvg()const{
+        if(nSamples == 0)return std::chrono::nanoseconds(0);
+        return sum / nSamples;
     }
-    // milliseconds & float is the most readable format
+    std::chrono::nanoseconds getMin()const{
+        return min;
+    }
+    std::chrono::nanoseconds getMax()const{
+        return max;
+    }
     float getAvg_ms(){
-        return (float)getAvg_us()/1000.0f;
+        return (float)(std::chrono::duration_cast<std::chrono::microseconds>(getAvg()).count())/1000.0f;
+    }
+    long getNSamples()const{
+        return nSamples;
     }
     void reset(){
-        sumUs=0;
-        sumCount=0;
+        sum={};
+        nSamples=0;
+        min=std::chrono::nanoseconds::max();
+        max={};
     }
+    std::string getAvgReadable(const bool averageOnly=false)const{
+        std::stringstream ss;
+        if(averageOnly){
+            ss<<"avg="<<MyTimeHelper::R(getAvg());
+            return ss.str();
+        }
+        ss<<"min="<<MyTimeHelper::R(getMin())<<" max="<<MyTimeHelper::R(getMax())<<" avg="<<MyTimeHelper::R(getAvg());
+        return ss.str();
+    }
+    static AvgCalculator median(const AvgCalculator& c1,const AvgCalculator& c2){
+        AvgCalculator ret;
+        ret.add(c1.getAvg());
+        ret.add(c2.getAvg());
+        const auto min=std::min(c1.getMin(),c2.getMin());
+        const auto max=std::max(c1.getMax(),c2.getMax());
+        ret.min=min;
+        ret.max=max;
+        return ret;
+    }
+};
+
+
+class Chronometer:public AvgCalculator {
+public:
+    explicit Chronometer(std::string name="Unknown"):mName(std::move(name)){}
+    void start(){
+        startTS=std::chrono::steady_clock::now();
+    }
+    void stop(){
+        const auto now=std::chrono::steady_clock::now();
+        const auto delta=(now-startTS);
+        AvgCalculator::add(delta);
+    }
+    void printAvg(const std::chrono::steady_clock::duration& interval) {
+        const auto now=std::chrono::steady_clock::now();
+        if(now-lastLog>interval){
+            lastLog=now;
+            MLOGD2(mName)<<"Avg: "<<MyTimeHelper::R(AvgCalculator::getAvg());
+            reset();
+        }
+    }
+private:
+    const std::string mName;
+    std::chrono::steady_clock::time_point startTS;
+    std::chrono::steady_clock::time_point lastLog;
 };
 
 class RelativeCalculator{
@@ -57,30 +147,6 @@ public:
     }
     long getAbsolute(){
         return sum;
-    }
-};
-
-class MyTimeHelper{
-public:
-    // R stands for readable. Convert a std::chrono::duration into a readable format
-    static std::string R(const std::chrono::steady_clock::duration& dur){
-        if(dur>=std::chrono::seconds(1)){
-            // More than one second, print as decimal with ms resolution.
-            const auto ms=std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-            return std::to_string(ms/1000.0f)+" s ";
-        }
-        if(dur>=std::chrono::milliseconds(1)){
-            // More than one millisecond, print as decimal with us resolution
-            const auto us=std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
-            return std::to_string(us/1000.0f)+" ms ";
-        }
-        if(dur>=std::chrono::microseconds(1)){
-            // More than one microsecond, print as decimal with ns resolution
-            const auto ns=std::chrono::duration_cast<std::chrono::nanoseconds>(dur).count();
-            return std::to_string(ns/1000.0f)+" us ";
-        }
-        const auto ns=std::chrono::duration_cast<std::chrono::nanoseconds>(dur).count();
-        return std::to_string(ns)+" ns ";
     }
 };
 

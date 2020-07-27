@@ -11,7 +11,7 @@
 //
 // Workaround for issue https://github.com/android/ndk/issues/1255 and more
 // Java Thread utility methods
-// Another method that has proven really usefull is the JThread::isInterrupted() method
+// Another method that has proven really usefully is the JThread::isInterrupted() method
 //
 namespace JThread{
     static int getThreadPriority(JNIEnv* env){
