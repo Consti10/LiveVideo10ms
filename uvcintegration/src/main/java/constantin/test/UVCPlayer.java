@@ -25,10 +25,9 @@ import androidx.lifecycle.OnLifecycleEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import constantin.video.core.IVideoParamsChanged;
-import constantin.video.core.gl.ISurfaceAvailable;
+import constantin.video.core.gl.ISurfaceTextureAvailable;
 
 // Pretty complicated / not good documented code
 // Uses BroadcastReceiver to get notified when USB devices are connected / permission is granted
@@ -167,15 +166,15 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
         };
     }
 
-    public ISurfaceAvailable configure2(){
-        return new ISurfaceAvailable() {
+    public ISurfaceTextureAvailable configure2(){
+        return new ISurfaceTextureAvailable() {
             @Override
-            public void XSurfaceCreated(SurfaceTexture surfaceTexture, Surface surface) {
+            public void surfaceTextureCreated(SurfaceTexture surfaceTexture, Surface surface) {
                 mUVCReceiverDecoder.setSurface(surface);
             }
 
             @Override
-            public void XSurfaceDestroyed() {
+            public void surfaceTextureDestroyed() {
                 mUVCReceiverDecoder.setSurface(null);
             }
         };

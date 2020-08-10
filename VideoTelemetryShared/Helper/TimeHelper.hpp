@@ -72,6 +72,13 @@ public:
     std::chrono::nanoseconds getMax()const{
         return max;
     }
+    // max delta between average and min / max
+    std::chrono::nanoseconds getMaxDifferenceMinMaxAvg()const{
+        const auto deltaMin=std::chrono::abs(getAvg()-getMin());
+        const auto deltaMax=std::chrono::abs(getAvg()-getMax());
+        if(deltaMin>deltaMax)return deltaMin;
+        return deltaMax;
+    }
     float getAvg_ms(){
         return (float)(std::chrono::duration_cast<std::chrono::microseconds>(getAvg()).count())/1000.0f;
     }

@@ -23,8 +23,7 @@ import java.util.TimerTask;
 
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.IVideoParamsChanged;
-import constantin.video.core.ThreadPriorityTester;
-import constantin.video.core.gl.ISurfaceAvailable;
+import constantin.video.core.gl.ISurfaceTextureAvailable;
 
 
 /**
@@ -148,15 +147,15 @@ public class VideoPlayer implements INativeVideoParamsChanged {
      * The callback will handle the lifecycle of the video player
      * @return  Callback that should be added to VideoSurfaceHolder
      */
-    public ISurfaceAvailable configure2(){
-        return new ISurfaceAvailable() {
+    public ISurfaceTextureAvailable configure2(){
+        return new ISurfaceTextureAvailable() {
             @Override
-            public void XSurfaceCreated(SurfaceTexture surfaceTexture, Surface surface) {
+            public void surfaceTextureCreated(SurfaceTexture surfaceTexture, Surface surface) {
                 addAndStartDecoderReceiver(surface);
             }
 
             @Override
-            public void XSurfaceDestroyed() {
+            public void surfaceTextureDestroyed() {
                 stopAndRemoveReceiverDecoder();
             }
         };
