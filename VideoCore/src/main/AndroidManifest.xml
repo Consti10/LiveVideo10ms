@@ -2,15 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="constantin.video.core">
-
     <!-- Ground recording -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
+        <activity android:name="constantin.video.impl.SimpleVideoActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/MyStyleFullscreen">
+        </activity>
         <activity
-            android:name="constantin.video.core.AVideoSettings"
+            android:name=".AVideoSettings"
             android:screenOrientation="behind" />
     </application>
 

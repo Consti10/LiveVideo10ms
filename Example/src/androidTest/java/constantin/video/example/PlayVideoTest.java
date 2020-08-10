@@ -20,7 +20,7 @@ public class PlayVideoTest {
     private static final int WAIT_TIME_LONG = 10*1000; //30 seconds
 
     @Rule
-    public ActivityTestRule<VideoActivity> mVideoActivityTestRule = new ActivityTestRule<>(VideoActivity.class,false,false);
+    public ActivityTestRule<VideoActivityWithDatabase> mVideoActivityTestRule = new ActivityTestRule<>(VideoActivityWithDatabase.class,false,false);
 
     @Rule
     public GrantPermissionRule mGrantPermissionRule =

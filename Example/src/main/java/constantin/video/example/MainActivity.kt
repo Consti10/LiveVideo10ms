@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             val preferences = getSharedPreferences("pref_video", Context.MODE_PRIVATE)
             preferences.edit().putString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), ASSETS_TEST_VIDEO_FILE_NAMES[selectedTestFile]).commit()
             val intentVideoActivity = Intent()
-            intentVideoActivity.setClass(context, VideoActivity::class.java)
+            intentVideoActivity.setClass(context, VideoActivityWithDatabase::class.java)
             startActivity(intentVideoActivity)
         }
         val startSettingsActivity = findViewById<Button>(R.id.b_startSettingsActivity)

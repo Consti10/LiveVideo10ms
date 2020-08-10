@@ -15,7 +15,6 @@ import org.junit.Test;
 import javax.annotation.Nullable;
 
 import constantin.video.core.DecodingInfo;
-import constantin.video.core.video_player.VideoPlayer;
 import constantin.video.core.video_player.VideoSettings;
 
 public class PlayTestVideosRepeated {
@@ -25,7 +24,7 @@ public class PlayTestVideosRepeated {
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
     @Rule
-    public ActivityTestRule<VideoActivity> mVideoActivityTestRule = new ActivityTestRule<>(VideoActivity.class,false,false);
+    public ActivityTestRule<VideoActivityWithDatabase> mVideoActivityTestRule = new ActivityTestRule<>(VideoActivityWithDatabase.class,false,false);
 
     @Rule
     public GrantPermissionRule mGrantPermissionRule =

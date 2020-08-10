@@ -22,22 +22,17 @@ import constantin.video.core.IVideoParamsChanged
 import constantin.video.core.video_player.VideoSettings
 import constantin.video.core.external.AspectFrameLayout
 import constantin.video.core.video_player.VideoPlayer
+import constantin.video.impl.SimpleVideoActivity
 
 const val ID_OS_VERSIONS : String ="OSVersions";
 const val ID_BUILD_MODEL : String ="BuildModel";
 const val ID_BUILD_DEVICE : String ="BuildDevice";
 const val ID_BUILD_MANUFACTURER : String = "BuildManufacturer";
 
-class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsChanged {
+class VideoActivityWithDatabase : SimpleVideoActivity(),SurfaceHolder.Callback {
     private val TAG = this::class.java.simpleName
     private lateinit var context: Context;
-    private lateinit var mAspectFrameLayout: AspectFrameLayout;
-    //private var mVideoPlayer: VideoPlayer? = null
-    private lateinit var mVideoPlayer: VideoPlayer;
-    private lateinit var mTextViewStatistics : TextView;
 
-    var mDecodingInfo: DecodingInfo? = null
-        private set
     private var VS_SOURCE: Int = 0
     private var VS_ASSETS_FILENAME_TEST_ONLY: String? = ""
     private val DECODING_INFO: String ="DecodingInfo2";
@@ -46,28 +41,7 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = this
-        setContentView(R.layout.activity_video)
-        //
-        val surfaceView = findViewById<SurfaceView>(R.id.sv_video)
         surfaceView.holder.addCallback(this)
-        mVideoPlayer= VideoPlayer(this)
-        mVideoPlayer.setIVideoParamsChanged(this)
-        surfaceView!!.holder.addCallback(mVideoPlayer.configure1())
-
-        mAspectFrameLayout = findViewById(R.id.afl_video)
-        mTextViewStatistics=findViewById(R.id.tv_decoding_stats)
-        //Find the toggle button. If user taps on it, the toggle button itself
-        //is disabled and the view showing decoding stats is enabled
-        val toggleButton=findViewById<Button>(R.id.tb_show_decoding_info);
-        toggleButton.setOnClickListener{
-            mTextViewStatistics.visibility= View.VISIBLE;
-            mTextViewStatistics.bringToFront();
-            toggleButton.visibility=View.INVISIBLE;
-        }
-        mTextViewStatistics.setOnClickListener{
-            mTextViewStatistics.visibility= View.INVISIBLE;
-            toggleButton.visibility=View.VISIBLE;
-        }
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -79,10 +53,6 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {}
-
-    override fun onVideoRatioChanged(videoW: Int, videoH: Int) {
-        runOnUiThread { mAspectFrameLayout.setAspectRatio(videoW.toDouble() / videoH) }
-    }
 
     public override fun onDestroy() {
         super.onDestroy()
@@ -116,16 +86,6 @@ class VideoActivity : AppCompatActivity(), SurfaceHolder.Callback, IVideoParamsC
         }
     }
 
-    override fun onDecodingInfoChanged(decodingInfo: DecodingInfo) {
-        runOnUiThread(java.lang.Runnable {
-            mTextViewStatistics.setText(decodingInfo.toString(true))
-        })
-        mDecodingInfo = decodingInfo
-        /*if (System.currentTimeMillis() - lastLogMS > 5 * 1000) {
-            Log.d(TAG,mDecodingInfo!!.toString());
-            lastLogMS = System.currentTimeMillis()
-        }*/
-    }
 
 
 }

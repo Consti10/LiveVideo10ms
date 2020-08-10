@@ -243,7 +243,7 @@ JNI_METHOD(jstring , getVideoInfoString)
 JNI_METHOD(jboolean , anyVideoDataReceived)
 (JNIEnv *env,jclass jclass1,jlong testReceiverN) {
     VideoPlayer* p=native(testReceiverN);
-    if(p->mUDPReceiver){
+    if(p->mUDPReceiver== nullptr){
         return (jboolean) false;
     }
     bool ret = (p->mUDPReceiver->getNReceivedBytes() > 0);

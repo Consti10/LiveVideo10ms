@@ -10,6 +10,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
@@ -106,6 +107,30 @@ public final class IsConnected {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Toast.makeText(c, "enable 'USB tethering' (not wifi,but usb hotspot)", Toast.LENGTH_LONG).show();
         c.startActivity(intent);
+    }
+    // X
+    //get all Inet4Addresses that are
+    //either wifi or wifi hotspot or usb tethering
+    public static String getActiveInetAddresses(){
+        StringBuilder s= new StringBuilder();
+        try{
+            final Enumeration<NetworkInterface> networkInterfacesEnumeration=NetworkInterface.getNetworkInterfaces();
+            while (networkInterfacesEnumeration.hasMoreElements()){
+                final NetworkInterface networkInterface=networkInterfacesEnumeration.nextElement();
+                if(!networkInterface.isUp() || networkInterface.getName().contains("dummy0") || networkInterface.isLoopback()){
+                    continue;
+                }
+                final Enumeration<InetAddress> inetAddressesEnumeration=networkInterface.getInetAddresses();
+                while (inetAddressesEnumeration.hasMoreElements()){
+                    InetAddress inetAddress=inetAddressesEnumeration.nextElement();
+                    if(inetAddress instanceof Inet4Address){
+                        s.append("Interface ").append(networkInterface.getName()).append(": ").append(inetAddress.getHostAddress()).append("\n");
+                    }
+                }
+            }
+            return s.toString();
+        }catch(Exception e){e.printStackTrace();}
+        return "";
     }
 
 }

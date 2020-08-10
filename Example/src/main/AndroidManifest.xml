@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".VideoActivity"
+            android:name=".VideoActivityWithDatabase"
             android:screenOrientation="landscape"
             android:theme="@style/MyStyleFullscreen" />
     </application>
