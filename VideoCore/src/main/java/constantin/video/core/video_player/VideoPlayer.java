@@ -172,7 +172,7 @@ public class VideoPlayer implements INativeVideoParamsChanged {
         if(mVideoParamsChanged !=null){
             mVideoParamsChanged.onVideoRatioChanged(videoW,videoH);
         }
-        //System.out.println("Video W and H"+videoW+","+videoH);
+        System.out.println("Video W and H"+videoW+","+videoH);
     }
 
     // called by native code via NDK
