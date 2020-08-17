@@ -13,32 +13,49 @@
 // Java Thread utility methods
 // Another method that has proven really usefully is the JThread::isInterrupted() method
 //
-namespace JThread{
-    static int getThreadPriority(JNIEnv* env){
-        jclass jcThread = env->FindClass("java/lang/Thread");
-        jmethodID jmCurrentThread=env->GetStaticMethodID(jcThread,"currentThread","()Ljava/lang/Thread;");
-        jmethodID jmGetPriority=env->GetMethodID(jcThread,"getPriority","()I");
-        jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
+// Direct mapping from java Thread method names to c++
+//
+class JThread{
+private:
+    JNIEnv* env;
+    jclass jcThread;
+    jmethodID jmCurrentThread;
+    jmethodID jmIsInterrupted;
+    jmethodID jmGetPriority;
+    jmethodID jmSetPriority;
+    jobject joCurrentThread;
+public:
+    JThread(JNIEnv* env){
+        this->env=env;
+        jcThread = env->FindClass("java/lang/Thread");
+        jmCurrentThread=env->GetStaticMethodID(jcThread,"currentThread","()Ljava/lang/Thread;");
+        jmIsInterrupted=env->GetMethodID(jcThread,"isInterrupted","()Z");
+        jmGetPriority=env->GetMethodID(jcThread,"getPriority","()I");
+        jmSetPriority=env->GetMethodID(jcThread,"setPriority","(I)V");
+        joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
+    }
+    bool isInterrupted(){
+        return (bool) env->CallBooleanMethod(joCurrentThread,jmIsInterrupted);
+    }
+    int getPriority(){
         return (int)env->CallIntMethod(joCurrentThread,jmGetPriority);
     }
-    static void setThreadPriority(JNIEnv* env,int wantedPriority){
-        jclass jcThread = env->FindClass("java/lang/Thread");
-        jmethodID jmCurrentThread=env->GetStaticMethodID(jcThread,"currentThread","()Ljava/lang/Thread;");
-        jmethodID jmSetPriority=env->GetMethodID(jcThread,"setPriority","(I)V");
-        jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
+    void setPriority(int wantedPriority){
         env->CallVoidMethod(joCurrentThread,jmSetPriority,(jint)wantedPriority);
     }
     static bool isInterrupted(JNIEnv* env){
-        jclass jcThread = env->FindClass("java/lang/Thread");
-        jmethodID jmCurrentThread=env->GetStaticMethodID(jcThread,"currentThread","()Ljava/lang/Thread;");
-        jmethodID jmIsInterrupted=env->GetMethodID(jcThread,"isInterrupted","()Z");
-        jobject joCurrentThread=env->CallStaticObjectMethod(jcThread,jmCurrentThread);
-        return (bool) env->CallBooleanMethod(joCurrentThread,jmIsInterrupted);
+        return JThread(env).isInterrupted();
+    }
+    static int getPriority(JNIEnv* env){
+        return JThread(env).getPriority();
+    }
+    static void setPriority(JNIEnv* env, int wantedPriority){
+        JThread(env).setPriority(wantedPriority);
     }
     static void printThreadPriority(JNIEnv* env){
-        MLOGD<<"printThreadPriority "<<getThreadPriority(env);
+        MLOGD << "printThreadPriority " << getPriority(env);
     }
-}
+};
 // Java android.os.Process utility methods (not java/lang/Process !)
 // I think process and thread is used in the same context here but you probably want to use
 // Process.setPriority instead
@@ -121,7 +138,7 @@ namespace NDKTHREADHELPERTEST{
     static void doSomething(JavaVM* jvm) {
         JNIEnv* env=NDKThreadHelper::attachThread(jvm);
         JThread::printThreadPriority(env);
-        JThread::setThreadPriority(env,5);
+        JThread::setPriority(env, 5);
         JThread::printThreadPriority(env);
         NDKThreadHelper::detachThread(jvm);
         env=NDKThreadHelper::attachThread(jvm);

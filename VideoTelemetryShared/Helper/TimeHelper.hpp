@@ -124,11 +124,11 @@ public:
         const auto delta=(now-startTS);
         AvgCalculator::add(delta);
     }
-    void printAvg(const std::chrono::steady_clock::duration& interval) {
+    void printInIntervalls(const std::chrono::steady_clock::duration& interval,const bool avgOnly=true) {
         const auto now=std::chrono::steady_clock::now();
         if(now-lastLog>interval){
             lastLog=now;
-            MLOGD2(mName)<<"Avg: "<<MyTimeHelper::R(AvgCalculator::getAvg());
+            MLOGD2(mName)<<"Avg: "<<AvgCalculator::getAvgReadable(avgOnly);
             reset();
         }
     }

@@ -76,5 +76,11 @@
         android:layout_height="wrap_content"
         android:text="Start Telemetry Example" />
 
+    <Button
+        android:id="@+id/b_startGraphView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Graph View" />
+
 
 </androidx.appcompat.widget.LinearLayoutCompat>
