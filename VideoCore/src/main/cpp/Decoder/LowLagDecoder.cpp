@@ -6,16 +6,10 @@
 #include <sstream>
 
 
-#define PRINT_DEBUG_INFO
-
 #include <h264_stream.h>
 #include <vector>
 
-#include <dlfcn.h>
 #include <android/native_window_jni.h>
-
-constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
-constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
 
 using namespace std::chrono;
 
@@ -27,9 +21,8 @@ LowLagDecoder::LowLagDecoder(JNIEnv* env){
 void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
     if(surface==nullptr){
         assert(decoder.window!=nullptr);
-        mMutexInputPipe.lock();
+        std::lock_guard<std::mutex> lock(mMutexInputPipe);
         inputPipeClosed=true;
-        mMutexInputPipe.unlock();
         if(decoder.configured){
             AMediaCodec_stop(decoder.codec);
             AMediaCodec_delete(decoder.codec);
@@ -58,32 +51,23 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-    //we need this lock, since the receiving/parsing/feeding runs on its own thread, relative to the thread that creates / deletes the decoder
-    std::lock_guard<std::mutex> lock(mMutexInputPipe);
-    /*NALU* modNALU=nullptr;
-    if(nalu.isSPS()){
-        h264_stream_t* h=nalu.toH264Stream();
-        //Do manipulations to h->sps...
-        modNALU=NALU::fromH264StreamAndFree(h,&nalu);
-    }*/
     //LOGD("%s",nalu.get_nal_name().c_str());
+    //we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface
+    std::lock_guard<std::mutex> lock(mMutexInputPipe);
     decodingInfo.nNALU++;
-    nNALUBytesFed.add(nalu.getSize());
-    if(inputPipeClosed){
-        //A feedD thread (e.g. file or udp) thread might still be running
-        //But since we want to feed the EOS now we mustn't feed any more non-eos data
-        return;
-    }
     if(nalu.getSize()<=4){
         //No data in NALU (e.g at the beginning of a stream)
         return;
     }
-    if(decoder.window==nullptr){
+    nNALUBytesFed.add(nalu.getSize());
+    if(inputPipeClosed){
+        //A feedD thread (e.g. file or udp) thread might still be running
+        //even though the surface was removed. But at least we can buffer the sps/pps data
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         return;
     }
     if(decoder.configured){
-        feedDecoder(&nalu);
+        feedDecoder(nalu);
         decodingInfo.nNALUSFeeded++;
     }else{
         //store sps / pps data. As soon as enough data has been buffered to initialize the decoder,do so.
@@ -134,6 +118,43 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     decoder.configured=true;
 }
 
+void LowLagDecoder::feedDecoder(const NALU& nalu){
+    const auto now=std::chrono::steady_clock::now();
+    const auto deltaParsing=now-nalu.creationTime;
+    while(true){
+        const auto index=AMediaCodec_dequeueInputBuffer(decoder.codec,BUFFER_TIMEOUT_US);
+        if (index >=0) {
+            size_t inputBufferSize;
+            void* buf = AMediaCodec_getInputBuffer(decoder.codec,(size_t)index,&inputBufferSize);
+            if(nalu.getSize()>inputBufferSize){
+                MLOGD<<"Nalu too big"<<nalu.getSize();
+                return;
+            }
+            std::memcpy(buf, nalu.getData(),(size_t)nalu.getSize());
+            //this timestamp will be later used to calculate the decoding latency
+            const uint64_t presentationTimeUS=(uint64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
+            //Doing so causes garbage bug TODO investigate
+            //const auto flag=nalu.isPPS() || nalu.isSPS() ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
+            //AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, flag);
+            AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.getSize(),presentationTimeUS,0);
+            waitForInputB.add(steady_clock::now() - now);
+            parsingTime.add(deltaParsing);
+            return;
+        }else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER){
+            //just try again. But if we had no success in the last 1 second,log a warning and return.
+            const auto elapsedTimeTryingForBuffer=std::chrono::steady_clock::now()-now;
+            if(elapsedTimeTryingForBuffer>std::chrono::seconds(1)){
+                MLOGE<<"AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "<<MyTimeHelper::R(elapsedTimeTryingForBuffer)<<"return.";
+                return;
+            }
+        }else{
+            //Something went wrong. But we will feed the next NALU soon anyways
+            MLOGD<<"dequeueInputBuffer idx "<<(int)index<<"return.";
+            return;
+        }
+    }
+}
+
 void LowLagDecoder::checkOutputLoop() {
     NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm,FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT,"DecoderCheckOutput");
     AMediaCodecBufferInfo info;
@@ -171,8 +192,9 @@ void LowLagDecoder::checkOutputLoop() {
         } else if(index==AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED){
             MLOGD<<"AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED";
         } else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-            //LOGD("AMEDIACODEC_INFO_TRY_AGAIN_LATER");
+            //MLOGD<<"AMEDIACODEC_INFO_TRY_AGAIN_LATER";
         } else {
+            // Most like AMediaCodec_stop() was called
             MLOGD<<"dequeueOutputBuffer idx: "<<(int)index<<" .Exit.";
             decoderProducedUnknown=true;
             continue;
@@ -197,91 +219,26 @@ void LowLagDecoder::checkOutputLoop() {
     MLOGD<<"Exit CheckOutputLoop";
 }
 
-void LowLagDecoder::feedDecoder(const NALU* naluP){
-    const auto now=std::chrono::steady_clock::now();
-    const auto deltaParsing=naluP!= nullptr ? now-naluP->creationTime : std::chrono::steady_clock::duration::zero();
-    /*const bool isKeyFrame=nalu.data_length>0 &&( nalu.isSPS() || nalu.isSPS());
-    if(isKeyFrame){
-        return;
-    }*/
-    while(true){
-        const auto index=AMediaCodec_dequeueInputBuffer(decoder.codec,BUFFER_TIMEOUT_US);
-        if (index >=0) {
-            size_t inputBufferSize;
-            void* buf = AMediaCodec_getInputBuffer(decoder.codec,(size_t)index,&inputBufferSize);
-            if(naluP== nullptr){
-                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)0,0, AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
-            }else{
-                const NALU& nalu=*naluP;
-                if(nalu.getSize()>inputBufferSize){
-                    MLOGD<<"Nalu too big"<<nalu.getSize();
-                    return;
-                }
-                std::memcpy(buf, nalu.getData(),(size_t)nalu.getSize());
-                //this timestamp will be later used to calculate the decoding latency
-                const uint64_t presentationTimeUS=(uint64_t)duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
-                //Doing so causes garbage bug TODO investigate
-                //const auto flag=nalu.isPPS() || nalu.isSPS() ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
-                //AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.data_length,presentationTimeUS, flag);
-                AMediaCodec_queueInputBuffer(decoder.codec, (size_t)index, 0, (size_t)nalu.getSize(),presentationTimeUS,0);
-                waitForInputB.add(steady_clock::now() - now);
-                parsingTime.add(deltaParsing);
-            }
-            return;
-        }else if(index==AMEDIACODEC_INFO_TRY_AGAIN_LATER){
-            //just try again. But if we had no success in the last 1 second,log a warning and return.
-            const auto elapsedTimeTryingForBuffer=std::chrono::steady_clock::now()-now;
-            if(elapsedTimeTryingForBuffer>std::chrono::seconds(1)){
-                MLOGE<<"AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "<<MyTimeHelper::R(elapsedTimeTryingForBuffer)<<"return.";
-                return;
-            }
-        }else{
-            //Something went wrong. But we will feed the next NALU soon anyways
-            MLOGD<<"dequeueInputBuffer idx "<<(int)index<<"return.";
-            return;
+void LowLagDecoder::printAvgLog() {
+    if(PRINT_DEBUG_INFO){
+        auto now=steady_clock::now();
+        if((now-lastLog)>TIME_BETWEEN_LOGS){
+            lastLog=now;
+            std::ostringstream frameLog;
+            frameLog<<std::fixed;
+            float avgDecodingLatencySum=decodingInfo.avgParsingTime_ms+decodingInfo.avgWaitForInputBTime_ms+
+                                        decodingInfo.avgDecodingTime_ms;
+            frameLog<<"......................Decoding Latency Averages......................"<<
+                    "\nParsing:"<<decodingInfo.avgParsingTime_ms
+                    <<" | WaitInputBuffer:"<<decodingInfo.avgWaitForInputBTime_ms
+                    <<" | Decoding:"<<decodingInfo.avgDecodingTime_ms
+                    <<" | Decoding Latency Sum:"<<avgDecodingLatencySum<<
+                    "\nN NALUS:"<<decodingInfo.nNALU
+                    <<" | N NALUES feeded:" <<decodingInfo.nNALUSFeeded<<" | N Decoded Frames:"<<nDecodedFrames.getAbsolute()<<
+                    "\nFPS:"<<decodingInfo.currentFPS;
+            MLOGD<<frameLog.str();
         }
     }
-}
-
-void LowLagDecoder::printAvgLog() {
-#ifdef PRINT_DEBUG_INFO
-    auto now=steady_clock::now();
-    if((now-lastLog)>TIME_BETWEEN_LOGS){
-        lastLog=now;
-    }else{
-        return;
-    }
-    std::ostringstream frameLog;
-    frameLog<<std::fixed;
-    float avgDecodingLatencySum=decodingInfo.avgParsingTime_ms+decodingInfo.avgWaitForInputBTime_ms+
-            decodingInfo.avgDecodingTime_ms;
-    frameLog<<"......................Decoding Latency Averages......................"<<
-            "\nParsing:"<<decodingInfo.avgParsingTime_ms
-            <<" | WaitInputBuffer:"<<decodingInfo.avgWaitForInputBTime_ms
-            <<" | Decoding:"<<decodingInfo.avgDecodingTime_ms
-            <<" | Decoding Latency Sum:"<<avgDecodingLatencySum<<
-            "\nN NALUS:"<<decodingInfo.nNALU
-            <<" | N NALUES feeded:" <<decodingInfo.nNALUSFeeded<<" | N Decoded Frames:"<<nDecodedFrames.getAbsolute()<<
-            "\nFPS:"<<decodingInfo.currentFPS;
-    MLOGD<<frameLog.str();
-#endif
-    /*std::stringstream properties;
-    properties << "system_clock" << std::endl;
-    properties << std::chrono::system_clock::period::num << std::endl;
-    properties << std::chrono::system_clock::period::den << std::endl;
-    properties << "steady = " <<std:: boolalpha << std::chrono::system_clock::is_steady << std::endl << std::endl;
-
-    properties << "high_resolution_clock" << std::endl;
-    properties << std::chrono::high_resolution_clock::period::num << std::endl;
-    properties << std::chrono::high_resolution_clock::period::den << std::endl;
-    properties << "steady = " << std::boolalpha << std::chrono::high_resolution_clock::is_steady << std::endl << std::endl;
-
-    properties << "steady_clock" << std::endl;
-    properties << std::chrono::steady_clock::period::num << std::endl;
-    properties << std::chrono::steady_clock::period::den << std::endl;
-    properties << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl << std::endl;
-
-    LOGD("%s",properties.str().c_str());*/
 }
 
 void LowLagDecoder::resetStatistics() {

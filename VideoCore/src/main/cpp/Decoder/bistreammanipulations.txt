@@ -1,3 +1,10 @@
+  /*NALU* modNALU=nullptr;
+     if(nalu.isSPS()){
+         h264_stream_t* h=nalu.toH264Stream();
+         //Do manipulations to h->sps...
+         modNALU=NALU::fromH264StreamAndFree(h,&nalu);
+     }*/
+
  /*int s,t;
     int res=find_nal_unit(const_cast<uint8_t*>(nalu.data),nalu.data_length,&s,&t);
     LOGD("find nal %d %d %d",res,s,t);*/
@@ -84,3 +91,20 @@
             naluX=&newNALU;
 
         }*/
+         /*std::stringstream properties;
+            properties << "system_clock" << std::endl;
+            properties << std::chrono::system_clock::period::num << std::endl;
+            properties << std::chrono::system_clock::period::den << std::endl;
+            properties << "steady = " <<std:: boolalpha << std::chrono::system_clock::is_steady << std::endl << std::endl;
+
+            properties << "high_resolution_clock" << std::endl;
+            properties << std::chrono::high_resolution_clock::period::num << std::endl;
+            properties << std::chrono::high_resolution_clock::period::den << std::endl;
+            properties << "steady = " << std::boolalpha << std::chrono::high_resolution_clock::is_steady << std::endl << std::endl;
+
+            properties << "steady_clock" << std::endl;
+            properties << std::chrono::steady_clock::period::num << std::endl;
+            properties << std::chrono::steady_clock::period::den << std::endl;
+            properties << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl << std::endl;
+
+            LOGD("%s",properties.str().c_str());*/

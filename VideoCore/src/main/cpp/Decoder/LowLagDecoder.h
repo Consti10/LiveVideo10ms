@@ -61,12 +61,14 @@ public:
     //The decoder ratio callback is called every time the output format changes
     typedef std::function<void(const VideoRatio)> DECODER_RATIO_CHANGED;
 public:
-    //@param window: must be a valid ANativeWindow
-    //@param SW use SW or HW decoder
     //We cannot initialize the Decoder until we have SPS and PPS data -
     //when streaming this data will be available at some point in future
     //Therefore we don't allocate the MediaCodec resources here
     LowLagDecoder(JNIEnv* env);
+    // This call acquires or releases the output surface
+    // After acquiring the surface, the decoder will be started as soon as enough configuration data was passed to it
+    // When releasing the surface, the decoder will be stopped if running and any resources will be freed
+    // After releasing the surface it is safe for the android os to delete it
     void setOutputSurface(JNIEnv* env,jobject surface);
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
@@ -78,9 +80,8 @@ private:
     //Initialize decoder with provided SPS/PPS data.
     //Set Decoder.configured to true on success
     void configureStartDecoder(const NALU& sps,const NALU& pps);
-    //Feed nullptr to indicate EOS.
-    //Else,wait for input buffer to become available before feeding NALU
-    void feedDecoder(const NALU* nalu);
+    //Wait for input buffer to become available before feeding NALU
+    void feedDecoder(const NALU& nalu);
     //Runs until EOS arrives at output buffer or decoder is stopped
     void checkOutputLoop();
     //Debug log
@@ -112,6 +113,9 @@ private:
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,64
     };
     KeyFrameFinder mKeyFrameFinder;
+    static constexpr const bool PRINT_DEBUG_INFO=true;
+    static constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
+    static constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
 };
 
 #endif //LOW_LAG_DECODER

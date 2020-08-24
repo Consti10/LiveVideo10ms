@@ -92,8 +92,8 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     /**
      * Stop the Receiver
-     *   Stop the Decoder
-     *   Free resources
+     * Stop the Decoder
+     * Free resources
      */
     public void stopAndRemoveReceiverDecoder(){
         timer.cancel();
