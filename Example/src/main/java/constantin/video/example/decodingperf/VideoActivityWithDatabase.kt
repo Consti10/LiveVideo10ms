@@ -1,4 +1,4 @@
-package constantin.video.example
+package constantin.video.example.decodingperf
 
 import android.content.Context
 import android.os.Build
@@ -6,22 +6,15 @@ import android.os.Bundle
 import android.util.ArrayMap
 import android.util.Log
 import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
 
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FieldValue
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
-import constantin.video.core.DecodingInfo
-import constantin.video.core.IVideoParamsChanged
 import constantin.video.core.video_player.VideoSettings
-import constantin.video.core.external.AspectFrameLayout
-import constantin.video.core.video_player.VideoPlayer
+import constantin.video.example.Helper
+import constantin.video.example.R
 import constantin.video.impl.SimpleVideoActivity
 
 const val ID_OS_VERSIONS : String ="OSVersions";
@@ -62,7 +55,7 @@ class VideoActivityWithDatabase : SimpleVideoActivity(),SurfaceHolder.Callback {
     private fun writeTestResult() {
         if (mDecodingInfo != null && mDecodingInfo!!.nNALUSFeeded > 120) {
             val db = FirebaseFirestore.getInstance()
-            val mTestResult=TestResultDecodingInfoConstructor.create(VS_SOURCE,(if (VS_SOURCE == VideoSettings.VS_SOURCE.ASSETS.ordinal)
+            val mTestResult= TestResultDecodingInfoConstructor.create(VS_SOURCE,(if (VS_SOURCE == VideoSettings.VS_SOURCE.ASSETS.ordinal)
                 VS_ASSETS_FILENAME_TEST_ONLY
             else
                 "Unknown")!!,mDecodingInfo!!);
@@ -76,7 +69,7 @@ class VideoActivityWithDatabase : SimpleVideoActivity(),SurfaceHolder.Callback {
             dummyMap[ID_BUILD_MANUFACTURER] = Build.MANUFACTURER
             dummyMap[ID_BUILD_DEVICE]=Build.DEVICE
             writeBatch.set(thisDeviceReference, dummyMap, SetOptions.merge())
-            writeBatch.update(thisDeviceReference,ID_OS_VERSIONS,FieldValue.arrayUnion(Helper.getBuildVersionRelease()))
+            writeBatch.update(thisDeviceReference, ID_OS_VERSIONS,FieldValue.arrayUnion(Helper.getBuildVersionRelease()))
             val thisDeviceOsNewTestData = thisDeviceReference.collection(Helper.getBuildVersionRelease()).document()
             writeBatch.set(thisDeviceOsNewTestData, mTestResult)
             //writeBatch.update(thisDeviceOsNewTestData,mDecodingInfo!!.toMap());

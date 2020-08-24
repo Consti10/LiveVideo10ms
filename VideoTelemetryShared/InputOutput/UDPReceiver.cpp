@@ -3,17 +3,18 @@
 #include <AndroidThreadPrioValues.hpp>
 #include <NDKThreadHelper.hpp>
 #include <arpa/inet.h>
+#include <utility>
 #include <vector>
 #include <sstream>
 #include <array>
 
 
-UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
-        mPort(port),mName(name),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(onDataReceivedCallback),javaVm(javaVm){
+UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,std::string  name,int CPUPriority,DATA_CALLBACK  onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
+        mPort(port),mName(std::move(name)),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(std::move(onDataReceivedCallback)),javaVm(javaVm){
 }
 
-void UDPReceiver::registerOnSourceIPFound(const SOURCE_IP_CALLBACK& onSourceIP) {
-    this->onSourceIP=onSourceIP;
+void UDPReceiver::registerOnSourceIPFound(SOURCE_IP_CALLBACK onSourceIP1) {
+    this->onSourceIP=std::move(onSourceIP1);
 }
 
 long UDPReceiver::getNReceivedBytes()const {

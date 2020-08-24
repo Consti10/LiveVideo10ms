@@ -15,6 +15,8 @@ import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
 import constantin.video.core.RequestPermissionHelper
 import constantin.video.core.video_player.VideoSettings
+import constantin.video.example.decodingperf.VideoActivityWithDatabase
+import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var spinnerVideoTestFileFromAssets: Spinner;

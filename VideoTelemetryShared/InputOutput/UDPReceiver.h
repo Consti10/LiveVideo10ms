@@ -28,11 +28,11 @@ public:
      * If @param WANTED_RCVBUF_SIZE is bigger than the size allocated by the OS a bigger buffer is requested, but it is not
      * guaranteed that the size is actually increased. Use 0 to leave the buffer size untouched
      */
-    UDPReceiver(JavaVM* javaVm,int port,const std::string& name,int CPUPriority,const DATA_CALLBACK& onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE=0);
+    UDPReceiver(JavaVM* javaVm,int port,std::string name,int CPUPriority,DATA_CALLBACK onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE=0);
     /**
      * Register a callback that is called once and contains the IP address of the first received packet's sender
      */
-    void registerOnSourceIPFound(const SOURCE_IP_CALLBACK& onSourceIP);
+    void registerOnSourceIPFound(SOURCE_IP_CALLBACK onSourceIP1);
     /**
      * Start receiver thread,which opens UDP port
      */
@@ -54,7 +54,7 @@ private:
     const size_t WANTED_RCVBUF_SIZE;
     const std::string mName;
     ///We need this reference to stop the receiving thread
-    int mSocket;
+    int mSocket=0;
     std::string senderIP="0.0.0.0";
     std::atomic<bool> receiving=false;
     std::atomic<long> nReceivedBytes=0;

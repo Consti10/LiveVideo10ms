@@ -31,12 +31,18 @@ struct DecodingInfo{
                currentKiloBitsPerSecond==d2.currentKiloBitsPerSecond && avgParsingTime_ms==d2.avgParsingTime_ms &&
                avgWaitForInputBTime_ms==d2.avgWaitForInputBTime_ms && avgDecodingTime_ms==d2.avgDecodingTime_ms;
     }
+    bool operator !=(const DecodingInfo& d2)const{
+        return !(*this==d2);
+    }
 };
 struct VideoRatio{
-    int width;
-    int height;
+    int width=0;
+    int height=0;
     bool operator==(const VideoRatio& b)const{
         return width==b.width && height==b.height;
+    }
+    bool operator !=(const VideoRatio& b)const{
+        return !(*this==b);
     }
 };
 
@@ -56,12 +62,16 @@ public:
     typedef std::function<void(const VideoRatio)> DECODER_RATIO_CHANGED;
 public:
     //@param window: must be a valid ANativeWindow
-    //@param checkOutputThreadCpuPrio the CPU priority the check output buffer thread will run on
     //@param SW use SW or HW decoder
     //We cannot initialize the Decoder until we have SPS and PPS data -
     //when streaming this data will be available at some point in future
     //Therefore we don't allocate the MediaCodec resources here
-    LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,bool SW=false);
+    LowLagDecoder(JNIEnv* env);
+    //~LowLagDecoder(){
+    //    waitForShutdownAndDelete();
+    //}
+    void setOutputSurface(JNIEnv* env,jobject surface);
+
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
@@ -86,7 +96,7 @@ private:
     //Debug log
     void printAvgLog();
     std::thread* mCheckOutputThread= nullptr;
-    const bool SW;
+    const bool SW=false;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)
     Decoder decoder;
     DecodingInfo decodingInfo;

@@ -1,4 +1,4 @@
-package constantin.video.example
+package constantin.video.example.decodingperf
 
 
 data class TestResultDecodingInfo(

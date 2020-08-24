@@ -7,13 +7,13 @@ import java.util.Date;
 
 public class Helper {
 
-    static String getDate(){
+    public static String getDate(){
         SimpleDateFormat formatter= new SimpleDateFormat("dd.MM.yyyy");
         Date date = new Date(System.currentTimeMillis());
         return formatter.format(date);
     }
 
-    static String getTime(){
+    public static String getTime(){
         SimpleDateFormat formatter= new SimpleDateFormat("HH:mm:ss");
         Date date = new Date(System.currentTimeMillis());
         return formatter.format(date);

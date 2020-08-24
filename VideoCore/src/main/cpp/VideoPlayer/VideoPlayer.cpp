@@ -7,18 +7,31 @@
 #include <android/native_window_jni.h>
 #include <android/asset_manager_jni.h>
 #include <FileHelper.hpp>
+#include <NDKHelper.hpp>
 
 //TEST
 //#include <NdkImage.h>
 //#include <NdkImageReader.h>
 
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
+        mLowLagDecoder(env),
     mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
     mSettingsN(env,context,"pref_video",true),
     GROUND_RECORDING_DIRECTORY(DIR),
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
     mFileReceiver(1024){
     env->GetJavaVM(&javaVm);
+
+    mLowLagDecoder.registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
+        const bool changed=ratio!=this->latestVideoRatio;
+        this->latestVideoRatio=ratio;
+        latestVideoRatioChanged=changed;
+    });
+    mLowLagDecoder.registerOnDecodingInfoChangedCallback([this](const DecodingInfo info) {
+        const bool changed=info!=this->latestDecodingInfo;
+        this->latestDecodingInfo=info;
+        latestDecodingInfoChanged=changed;
+    });
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
@@ -40,9 +53,7 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
 void VideoPlayer::onNewNALU(const NALU& nalu){
     //MLOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
     //nalu.debugX();
-    if(mLowLagDecoder){
-        mLowLagDecoder->interpretNALU(nalu);
-    }
+    mLowLagDecoder.interpretNALU(nalu);
     mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
 }
 
@@ -55,18 +66,7 @@ void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
     //add decoder if surface!=nullptr
     const bool VS_USE_SW_DECODER=mSettingsN.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface!= nullptr){
-        window=ANativeWindow_fromSurface(env,surface);
-        mLowLagDecoder=std::make_unique<LowLagDecoder>(javaVm,window,VS_USE_SW_DECODER);
-        mLowLagDecoder->registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
-            const bool changed=!(ratio==this->latestVideoRatio);
-            this->latestVideoRatio=ratio;
-            latestVideoRatioChanged=changed;
-        });
-        mLowLagDecoder->registerOnDecodingInfoChangedCallback([this](const DecodingInfo info) {
-            const bool changed=!(info==this->latestDecodingInfo);
-            this->latestDecodingInfo=info;
-            latestDecodingInfoChanged=changed;
-        });
+        mLowLagDecoder.setOutputSurface(env,surface);
     }
     //Add Ground recorder if enabled
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
@@ -77,17 +77,9 @@ void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
     }
 }
 
-void VideoPlayer::removeConsumers(){
-    if(mLowLagDecoder){
-        mLowLagDecoder->waitForShutdownAndDelete();
-        mLowLagDecoder.reset();
-    }
+void VideoPlayer::removeConsumers(JNIEnv* env){
+    mLowLagDecoder.setOutputSurface(nullptr, nullptr);
     mGroundRecorderFPV.stop();
-    if(window!=nullptr){
-        //Don't forget to release the window, does not matter if the decoder has been created or not
-        ANativeWindow_release(window);
-        window=nullptr;
-    }
 }
 
 void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
@@ -168,18 +160,19 @@ void VideoPlayer::stopReceiver() {
     }
 }
 
-std::string VideoPlayer::getInfoString(){
-    std::ostringstream ostringstream1;
+std::string VideoPlayer::getInfoString()const{
+    std::stringstream ss;
     if(mUDPReceiver){
-        ostringstream1 << "Listening for video on port " << mUDPReceiver->getPort();
-        ostringstream1 << "\nReceived: " << mUDPReceiver->getNReceivedBytes() << "B"
-                       << " | parsed frames: "
-                       << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKeyFrames;
+        ss << "Listening for video on port " << mUDPReceiver->getPort();
+        ss << "\nReceived: " << mUDPReceiver->getNReceivedBytes() << "B"
+           << " | parsed frames: "
+           << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKeyFrames;
     }else{
-        ostringstream1<<"Not receiving from udp";
+        ss << "Not receiving from udp";
     }
-    return ostringstream1.str();
+    return ss.str();
 }
+
 
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
@@ -219,7 +212,7 @@ JNI_METHOD(void, nativeStart)
 
 JNI_METHOD(void, nativeStop)
 (JNIEnv * env,jclass jclass1,jlong videoPlayerN){
-    native(videoPlayerN)->removeConsumers();
+    native(videoPlayerN)->removeConsumers(env);
     native(videoPlayerN)->stopReceiver();
 }
 

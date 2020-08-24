@@ -8,6 +8,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
@@ -32,6 +33,44 @@ public class SimpleEncoder2 extends MediaCodec.Callback implements Runnable {
         try {
             mThread.join();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void lol(){
+        MediaCodecList mediaCodecList=new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaFormat mediaFormat=new MediaFormat();
+        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV444Flexible);
+        final String tmp=mediaCodecList.findEncoderForFormat(mediaFormat);
+        System.out.println("found enc "+tmp);
+
+        MediaCodecInfo[] codecInfos = mediaCodecList.getCodecInfos();
+        for (final MediaCodecInfo info : codecInfos) {
+            for(final String type:info.getSupportedTypes()){
+                final MediaCodecInfo.CodecCapabilities capabilities=info.getCapabilitiesForType(type);
+                for(int i=0;i<capabilities.colorFormats.length;i++){
+                    System.out.println("Codec "+type+" Supports "+capabilities.colorFormats[i]);
+                }
+            }
+        }
+
+
+    }
+
+    static void lol2(){
+        try {
+            MediaCodec codec=MediaCodec.createEncoderByType("video/avc");
+
+
+            codec.release();
+
+            MediaCodecInfo info=codec.getCodecInfo();
+            MediaCodecInfo.CodecCapabilities abilities=info.getCapabilitiesForType("video/avc");
+            for(int i=0;i<abilities.colorFormats.length;i++){
+                System.out.println("Supports "+abilities.colorFormats[i]);
+            }
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

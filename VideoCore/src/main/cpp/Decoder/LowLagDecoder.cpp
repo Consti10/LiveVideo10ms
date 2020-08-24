@@ -12,19 +12,29 @@
 #include <vector>
 
 #include <dlfcn.h>
+#include <android/native_window_jni.h>
 
 constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
 constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
 
-
 using namespace std::chrono;
 
-LowLagDecoder::LowLagDecoder(JavaVM* javaVm,ANativeWindow* window,bool SW):
-        SW(SW),javaVm(javaVm){
-    decoder.window=window;
-    decoder.configured=false;
-
+LowLagDecoder::LowLagDecoder(JNIEnv* env){
+    env->GetJavaVM(&javaVm);
 }
+
+void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
+    if(surface==nullptr){
+        assert(decoder.window!=nullptr);
+        waitForShutdownAndDelete();
+        ANativeWindow_release(decoder.window);
+        decoder.window=nullptr;
+    }else{
+        assert(decoder.window==nullptr);
+        decoder.window=ANativeWindow_fromSurface(env,surface);
+    }
+}
+
 
 void LowLagDecoder::registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC) {
     onDecoderRatioChangedCallback=std::move(decoderRatioChangedC);
@@ -53,6 +63,10 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     }
     if(nalu.getSize()<=4){
         //No data in NALU (e.g at the beginning of a stream)
+        return;
+    }
+    if(decoder.window==nullptr){
+        mKeyFrameFinder.saveIfKeyFrame(nalu);
         return;
     }
     if(decoder.configured){
@@ -109,7 +123,6 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
 
 void LowLagDecoder::checkOutputLoop() {
     NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm,FPV_VR_PRIORITY::CPU_PRIORITY_DECODER_OUTPUT,"DecoderCheckOutput");
-    //NDKThreadHelper::setName(std::this_thread::get_id().native)
     AMediaCodecBufferInfo info;
     bool decoderSawEOS=false;
     bool decoderProducedUnknown=false;
@@ -226,7 +239,7 @@ void LowLagDecoder::closeInputPipe() {
 
 void LowLagDecoder::waitForShutdownAndDelete() {
     closeInputPipe();
-    if(decoder.configured){
+    /*if(decoder.configured){
         //feed the EOS
         feedDecoder(nullptr);
         //if not already happened, wait for EOS to arrive at the checkOutput thread
@@ -240,6 +253,15 @@ void LowLagDecoder::waitForShutdownAndDelete() {
         AMediaCodec_delete(decoder.codec);
         mKeyFrameFinder.reset();
         decoder.configured=false;
+    }*/
+    if(decoder.configured){
+        AMediaCodec_stop(decoder.codec);
+        AMediaCodec_delete(decoder.codec);
+        mKeyFrameFinder.reset();
+        decoder.configured=false;
+        if(mCheckOutputThread->joinable()){
+            mCheckOutputThread->join();
+        }
     }
 }
 
@@ -285,6 +307,8 @@ void LowLagDecoder::printAvgLog() {
 
     LOGD("%s",properties.str().c_str());*/
 }
+
+
 
 
 

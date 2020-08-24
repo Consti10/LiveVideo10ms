@@ -22,29 +22,28 @@ public:
     enum VIDEO_DATA_TYPE{RAW,RTP,DJI};
     void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType);
     void addConsumers(JNIEnv* env,jobject surface);
-    void removeConsumers();
+    void removeConsumers(JNIEnv* env);
     void startReceiver(JNIEnv *env, AAssetManager *assetManager);
     void stopReceiver();
-    std::string getInfoString();
+    std::string getInfoString()const;
 private:
     void onNewNALU(const NALU& nalu);
-    //don't forget to call ANativeWindow_release() on this pointer
-    ANativeWindow* window=nullptr;
     SharedPreferences mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
-    JavaVM* javaVm;
+    JavaVM* javaVm=nullptr;
 public:
     H264Parser mParser;
-    std::unique_ptr<LowLagDecoder> mLowLagDecoder;
+    //std::unique_ptr<LowLagDecoder> mLowLagDecoder;
+    LowLagDecoder mLowLagDecoder;
     std::unique_ptr<FFMpegVideoReceiver> mFFMpegVideoReceiver;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
     long nNALUsAtLastCall=0;
 public:
-    DecodingInfo latestDecodingInfo;
-    std::atomic<bool> latestDecodingInfoChanged;
-    VideoRatio latestVideoRatio;
-    std::atomic<bool> latestVideoRatioChanged;
+    DecodingInfo latestDecodingInfo{};
+    std::atomic<bool> latestDecodingInfoChanged=false;
+    VideoRatio latestVideoRatio{};
+    std::atomic<bool> latestVideoRatioChanged=false;
     // These are shared with telemetry receiver when recording / reading from .fpv files
     FileReader mFileReceiver;
     GroundRecorderFPV mGroundRecorderFPV;
@@ -52,6 +51,13 @@ private:
     //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms
     //5 MB should be plenty !
     static constexpr const size_t WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
+    bool playWhenReady=false;
+public:
+    //void prepare(JNIEnv* env,jobject context);
+    //void setVideoSurface(JNIEnv* env, jobject surface);
+    //void setPlayWhenReady(const bool playWhenReady);
+private:
+    //void startPlayingIfReady(JNIEnv* env);
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

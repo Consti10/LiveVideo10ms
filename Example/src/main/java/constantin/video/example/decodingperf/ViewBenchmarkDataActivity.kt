@@ -1,4 +1,4 @@
-package constantin.video.example
+package constantin.video.example.decodingperf
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jaredrummler.android.device.DeviceName
+import constantin.video.example.Helper
+import constantin.video.example.R
 import java.text.DecimalFormat
 import java.util.*
 
