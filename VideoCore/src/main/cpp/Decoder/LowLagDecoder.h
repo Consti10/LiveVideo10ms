@@ -96,6 +96,7 @@ private:
     std::mutex mMutexInputPipe;
     DECODER_RATIO_CHANGED onDecoderRatioChangedCallback= nullptr;
     DECODING_INFO_CHANGED_CALLBACK onDecodingInfoChangedCallback= nullptr;
+    JavaVM* javaVm=nullptr;
     std::chrono::steady_clock::time_point lastLog=std::chrono::steady_clock::now();
     RelativeCalculator nDecodedFrames;
     RelativeCalculator nNALUBytesFed;
@@ -104,7 +105,9 @@ private:
     AvgCalculator decodingTime;
     //Every n ms re-calculate the Decoding info
     static const constexpr auto DECODING_INFO_RECALCULATION_INTERVAL=std::chrono::milliseconds(1000);
-    JavaVM* javaVm=nullptr;
+    static constexpr const bool PRINT_DEBUG_INFO=true;
+    static constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
+    static constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
 private:
     static constexpr uint8_t SPS_X264[31]{
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,192,90,128,128,128,160,0,0,125,32,0,29,76,17,227,6,73
@@ -113,9 +116,6 @@ private:
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,64
     };
     KeyFrameFinder mKeyFrameFinder;
-    static constexpr const bool PRINT_DEBUG_INFO=true;
-    static constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
-    static constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
 };
 
 #endif //LOW_LAG_DECODER
