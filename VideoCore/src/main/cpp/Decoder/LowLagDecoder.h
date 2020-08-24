@@ -15,7 +15,7 @@
 
 #include "../NALU/NALU.hpp"
 #include <TimeHelper.hpp>
-#include "../NALU/KeyFrameFinder.h"
+#include "../NALU/KeyFrameFinder.hpp"
 
 struct DecodingInfo{
     std::chrono::steady_clock::time_point lastCalculation=std::chrono::steady_clock::now();

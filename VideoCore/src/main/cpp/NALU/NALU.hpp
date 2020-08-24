@@ -54,9 +54,11 @@ public:
     NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
             data(data1),data_len(data_length),creationTime{creationTime}{
     };*/
+    // Copy constructor allocates new buffer for data (heavy)
     NALU(const NALU& nalu):
     ownedData(std::vector<uint8_t>(nalu.getData(),nalu.getData()+nalu.getSize())),
     data(ownedData->data()),data_len(nalu.getSize()),creationTime(nalu.creationTime){}
+    // Default constructor does not allocate a new buffer,only stores some pointer (light)
     NALU(const NALU_BUFFER& data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
             data(data1.data()),data_len(data_length),creationTime{creationTime}{
     };

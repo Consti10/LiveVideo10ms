@@ -32,6 +32,7 @@ void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
     }else{
         assert(decoder.window==nullptr);
         decoder.window=ANativeWindow_fromSurface(env,surface);
+        inputPipeClosed=false;
     }
 }
 
@@ -117,7 +118,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     }
     AMediaCodec_start(decoder.codec);
     mCheckOutputThread=new std::thread(&LowLagDecoder::checkOutputLoop,this);
-    NDKThreadHelper::setName(mCheckOutputThread->native_handle(),"LLD::CheckOutput");
+    NDKThreadHelper::setName(mCheckOutputThread->native_handle(),"LLDCheckOutput");
     decoder.configured=true;
 }
 

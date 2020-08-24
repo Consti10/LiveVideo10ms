@@ -59,6 +59,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
 
 
 void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
+    MLOGD<<"VideoPlayer::addConsumers";
     //reset the parser so the statistics start again from 0
     mParser.reset();
     //set the jni object for settings
@@ -78,6 +79,7 @@ void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
 }
 
 void VideoPlayer::removeConsumers(JNIEnv* env){
+    MLOGD<<"VideoPlayer::removeConsumers";
     mLowLagDecoder.setOutputSurface(nullptr, nullptr);
     mGroundRecorderFPV.stop();
 }
