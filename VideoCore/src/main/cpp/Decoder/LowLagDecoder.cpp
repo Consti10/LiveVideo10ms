@@ -30,6 +30,7 @@ void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
             decoder.configured=false;
             if(mCheckOutputThread->joinable()){
                 mCheckOutputThread->join();
+                mCheckOutputThread.reset();
             }
         }
         ANativeWindow_release(decoder.window);
@@ -113,7 +114,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         return;
     }
     AMediaCodec_start(decoder.codec);
-    mCheckOutputThread=new std::thread(&LowLagDecoder::checkOutputLoop,this);
+    mCheckOutputThread=std::make_unique<std::thread>(&LowLagDecoder::checkOutputLoop,this);
     NDKThreadHelper::setName(mCheckOutputThread->native_handle(),"LLDCheckOutput");
     decoder.configured=true;
 }
@@ -204,8 +205,8 @@ void LowLagDecoder::checkOutputLoop() {
         const auto delta=now-decodingInfo.lastCalculation;
         if(delta>DECODING_INFO_RECALCULATION_INTERVAL){
             decodingInfo.lastCalculation=steady_clock::now();
-            decodingInfo.currentFPS=nDecodedFrames.getDeltaSinceLastCall()/(float)duration_cast<seconds>(delta).count();
-            decodingInfo.currentKiloBitsPerSecond=(nNALUBytesFed.getDeltaSinceLastCall()/duration_cast<seconds>(delta).count())/1024.0f*8.0f;
+            decodingInfo.currentFPS=(float)nDecodedFrames.getDeltaSinceLastCall()/(float)duration_cast<seconds>(delta).count();
+            decodingInfo.currentKiloBitsPerSecond=((float)nNALUBytesFed.getDeltaSinceLastCall()/duration_cast<seconds>(delta).count())/1024.0f*8.0f;
             //and recalculate the avg latencies. If needed,also print the log.
             decodingInfo.avgDecodingTime_ms=decodingTime.getAvg_ms();
             decodingInfo.avgParsingTime_ms=parsingTime.getAvg_ms();

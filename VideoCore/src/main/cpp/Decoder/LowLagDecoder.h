@@ -87,7 +87,7 @@ private:
     //Debug log
     void printAvgLog();
     void resetStatistics();
-    std::thread* mCheckOutputThread= nullptr;
+    std::unique_ptr<std::thread> mCheckOutputThread= nullptr;
     const bool SW=false;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)
     Decoder decoder;
