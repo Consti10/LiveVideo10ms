@@ -80,7 +80,7 @@ void VideoPlayer::start(JNIEnv *env, AAssetManager *assetManager) {
 
     //Add Ground recorder if enabled
     if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
-        //if(true){
+    //if(true){
         mGroundRecorderFPV.start();
     }
 

@@ -63,12 +63,12 @@ public class TelemetryReceiver implements HomeLocation.IHomeLocationChanged, Lif
         parent.getLifecycle().addObserver(this);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     private void startReceiving(){
         startReceiving(nativeInstance,context,context.getAssets());
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private void stopReceiving(){
         stopReceiving(nativeInstance);
     }

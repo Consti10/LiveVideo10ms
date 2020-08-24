@@ -9,11 +9,17 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +37,7 @@ import constantin.video.core.gl.ISurfaceTextureAvailable;
  * Tied to the lifetime of the java instance a .cpp instance is created
  * And the native functions talk to the native instance
  */
-public class VideoPlayer implements INativeVideoParamsChanged {
+public class VideoPlayer implements INativeVideoParamsChanged{
     private static final String TAG="VideoPlayer";
     private final long nativeVideoPlayer;
     private IVideoParamsChanged mVideoParamsChanged;
@@ -41,8 +47,8 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     //Setup as much as possible without creating the decoder
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
-    public VideoPlayer(final Context context){
-        this.context=context;
+    public VideoPlayer(final Context parent){
+        this.context=parent;
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
     }
 
@@ -58,13 +64,28 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     }
 
     public void setVideoSurface(final @Nullable Surface surface){
+        verifyApplicationThread();
         nativeSetVideoSurface(nativeVideoPlayer,surface);
     }
 
-    public void start(){
+    private void start(){
+        verifyApplicationThread();
         nativeStart(nativeVideoPlayer,context.getAssets());
+        //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
+        //TODO: proper queue, but how to do synchronization in java ndk ?!
+        timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                nativeCallBack(VideoPlayer.this,nativeVideoPlayer);
+            }
+        },0,200);
     }
-    public void stop(){
+
+    private void stop(){
+        verifyApplicationThread();
+        timer.cancel();
+        timer.purge();
         nativeStop(nativeVideoPlayer);
     }
 
@@ -79,15 +100,6 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     public void addAndStartDecoderReceiver(Surface surface){
         setVideoSurface(surface);
         start();
-        //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
-        //TODO: proper queue, but how to do synchronization in java ndk ?!
-        timer=new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                nativeCallBack(VideoPlayer.this,nativeVideoPlayer);
-            }
-        },0,200);
     }
 
     /**
@@ -96,8 +108,6 @@ public class VideoPlayer implements INativeVideoParamsChanged {
      * Free resources
      */
     public void stopAndRemoveReceiverDecoder(){
-        timer.cancel();
-        timer.purge();
         stop();
         setVideoSurface(null);
     }
@@ -199,5 +209,11 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     //TODO: Use message queue from cpp for performance
     public static native <T extends INativeVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
+
+    public static void verifyApplicationThread() {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            Log.w(TAG, "Player is accessed on the wrong thread.");
+        }
+    }
 
 }
