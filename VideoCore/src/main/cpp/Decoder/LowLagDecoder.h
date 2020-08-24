@@ -67,20 +67,13 @@ public:
     //when streaming this data will be available at some point in future
     //Therefore we don't allocate the MediaCodec resources here
     LowLagDecoder(JNIEnv* env);
-    //~LowLagDecoder(){
-    //    waitForShutdownAndDelete();
-    //}
     void setOutputSurface(JNIEnv* env,jobject surface);
-
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
     //If the decoder has been configured, feed NALU. Else search for configuration data and
     //configure as soon as possible
     void interpretNALU(const NALU& nalu);
-    //close input pipe, then feed EOS input
-    //wait for EOS to arrive at output, then free all resources.
-    void waitForShutdownAndDelete();
 private:
     //Initialize decoder with provided SPS/PPS data.
     //Set Decoder.configured to true on success
@@ -88,13 +81,11 @@ private:
     //Feed nullptr to indicate EOS.
     //Else,wait for input buffer to become available before feeding NALU
     void feedDecoder(const NALU* nalu);
-    //Runs until EOS arrives at output buffer
+    //Runs until EOS arrives at output buffer or decoder is stopped
     void checkOutputLoop();
-    //when this call returns, it is guaranteed that no more data will be fed to the decoder
-    //but output buffer(s) are still polled from the queue. Use this before feeding EOS
-    void closeInputPipe();
     //Debug log
     void printAvgLog();
+    void resetStatistics();
     std::thread* mCheckOutputThread= nullptr;
     const bool SW=false;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)
@@ -112,7 +103,7 @@ private:
     AvgCalculator decodingTime;
     //Every n ms re-calculate the Decoding info
     static const constexpr auto DECODING_INFO_RECALCULATION_INTERVAL=std::chrono::milliseconds(1000);
-    JavaVM* javaVm;
+    JavaVM* javaVm=nullptr;
 private:
     static constexpr uint8_t SPS_X264[31]{
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,192,90,128,128,128,160,0,0,125,32,0,29,76,17,227,6,73

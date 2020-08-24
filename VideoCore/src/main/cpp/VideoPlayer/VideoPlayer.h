@@ -21,20 +21,35 @@ public:
     VideoPlayer(JNIEnv * env, jobject context, const char* DIR);
     enum VIDEO_DATA_TYPE{RAW,RTP,DJI};
     void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType);
-    void addConsumers(JNIEnv* env,jobject surface);
-    void removeConsumers(JNIEnv* env);
-    void startReceiver(JNIEnv *env, AAssetManager *assetManager);
-    void stopReceiver();
+    /*
+     * Set the surface the decoder can be configured with. When @param surface==nullptr
+     * It is quaranteed that the surface is not used by the decoder anymore when this call returns
+     */
+    void setVideoSurface(JNIEnv* env, jobject surface);
+    /*
+     * Start the receiver and ground recorder if enabled
+     */
+    void start(JNIEnv *env, AAssetManager *assetManager);
+    /**
+     * Stop the receiver and ground recorder if enabled
+     */
+    void stop(JNIEnv *env);
+    /*
+     * Returns a string with the current configuration for debugging
+     */
     std::string getInfoString()const;
 private:
     void onNewNALU(const NALU& nalu);
+    //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms
+    //5 MB should be plenty !
+    static constexpr const size_t WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
+    //Retreive settings from shared preferences
     SharedPreferences mSettingsN;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
     JavaVM* javaVm=nullptr;
 public:
     H264Parser mParser;
-    //std::unique_ptr<LowLagDecoder> mLowLagDecoder;
     LowLagDecoder mLowLagDecoder;
     std::unique_ptr<FFMpegVideoReceiver> mFFMpegVideoReceiver;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
@@ -47,17 +62,6 @@ public:
     // These are shared with telemetry receiver when recording / reading from .fpv files
     FileReader mFileReceiver;
     GroundRecorderFPV mGroundRecorderFPV;
-private:
-    //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms
-    //5 MB should be plenty !
-    static constexpr const size_t WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
-    bool playWhenReady=false;
-public:
-    //void prepare(JNIEnv* env,jobject context);
-    //void setVideoSurface(JNIEnv* env, jobject surface);
-    //void setPlayWhenReady(const bool playWhenReady);
-private:
-    //void startPlayingIfReady(JNIEnv* env);
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

@@ -58,37 +58,31 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
 }
 
 
-void VideoPlayer::addConsumers(JNIEnv* env, jobject surface) {
-    MLOGD<<"VideoPlayer::addConsumers";
+void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
     //reset the parser so the statistics start again from 0
     mParser.reset();
     //set the jni object for settings
     mSettingsN.replaceJNI(env);
-    //add decoder if surface!=nullptr
-    const bool VS_USE_SW_DECODER=mSettingsN.getBoolean(IDV::VS_USE_SW_DECODER);
-    if(surface!= nullptr){
+    if(surface!=nullptr){
         mLowLagDecoder.setOutputSurface(env,surface);
-    }
-    //Add Ground recorder if enabled
-    const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
-    const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
-    if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
-    //if(true){
-         mGroundRecorderFPV.start();
+    }else{
+        mLowLagDecoder.setOutputSurface(env, nullptr);
     }
 }
 
-void VideoPlayer::removeConsumers(JNIEnv* env){
-    MLOGD<<"VideoPlayer::removeConsumers";
-    mLowLagDecoder.setOutputSurface(nullptr, nullptr);
-    mGroundRecorderFPV.stop();
-}
 
-void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
+void VideoPlayer::start(JNIEnv *env, AAssetManager *assetManager) {
     mSettingsN.replaceJNI(env);
     mParser.setLimitFPS(-1); //Default: Real time !
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
     const int VS_FILE_ONLY_LIMIT_FPS=mSettingsN.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS,60);
+    const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
+
+    //Add Ground recorder if enabled
+    if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
+        //if(true){
+        mGroundRecorderFPV.start();
+    }
 
     //TODO use url instead of all these settings
     //If url starts with udp: raw h264 over udp
@@ -149,7 +143,7 @@ void VideoPlayer::startReceiver(JNIEnv *env, AAssetManager *assetManager) {
     }
 }
 
-void VideoPlayer::stopReceiver() {
+void VideoPlayer::stop(JNIEnv *env) {
     if(mUDPReceiver){
         mUDPReceiver->stopReceiving();
         mUDPReceiver.reset();
@@ -160,6 +154,7 @@ void VideoPlayer::stopReceiver() {
         mFFMpegVideoReceiver->stop_playing();
         mFFMpegVideoReceiver.reset();
     }
+    mGroundRecorderFPV.stop();
 }
 
 std::string VideoPlayer::getInfoString()const{
@@ -174,6 +169,7 @@ std::string VideoPlayer::getInfoString()const{
     }
     return ss.str();
 }
+
 
 
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
@@ -206,16 +202,19 @@ JNI_METHOD(void, nativeFinalize)
 }
 
 JNI_METHOD(void, nativeStart)
-(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject surface,jobject assetManager){
+(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject assetManager){
     AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
-    native(videoPlayerN)->addConsumers(env,surface);
-    native(videoPlayerN)->startReceiver(env, mgr);
+    native(videoPlayerN)->start(env, mgr);
 }
 
 JNI_METHOD(void, nativeStop)
 (JNIEnv * env,jclass jclass1,jlong videoPlayerN){
-    native(videoPlayerN)->removeConsumers(env);
-    native(videoPlayerN)->stopReceiver();
+    native(videoPlayerN)->stop(env);
+}
+
+JNI_METHOD(void, nativeSetVideoSurface)
+(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject surface){
+    native(videoPlayerN)->setVideoSurface(env,surface);
 }
 
 //This function is only called when the data for the video is coming from a file.

@@ -21,21 +21,33 @@ using namespace std::chrono;
 
 LowLagDecoder::LowLagDecoder(JNIEnv* env){
     env->GetJavaVM(&javaVm);
+    resetStatistics();
 }
 
 void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
     if(surface==nullptr){
         assert(decoder.window!=nullptr);
-        waitForShutdownAndDelete();
+        mMutexInputPipe.lock();
+        inputPipeClosed=true;
+        mMutexInputPipe.unlock();
+        if(decoder.configured){
+            AMediaCodec_stop(decoder.codec);
+            AMediaCodec_delete(decoder.codec);
+            mKeyFrameFinder.reset();
+            decoder.configured=false;
+            if(mCheckOutputThread->joinable()){
+                mCheckOutputThread->join();
+            }
+        }
         ANativeWindow_release(decoder.window);
         decoder.window=nullptr;
+        resetStatistics();
     }else{
         assert(decoder.window==nullptr);
         decoder.window=ANativeWindow_fromSurface(env,surface);
         inputPipeClosed=false;
     }
 }
-
 
 void LowLagDecoder::registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC) {
     onDecoderRatioChangedCallback=std::move(decoderRatioChangedC);
@@ -231,42 +243,6 @@ void LowLagDecoder::feedDecoder(const NALU* naluP){
     }
 }
 
-//when this call returns, it is guaranteed that no more data will be fed to the decoder
-//but output buffer(s) are still polled from the queue
-void LowLagDecoder::closeInputPipe() {
-    std::lock_guard<std::mutex> lock(mMutexInputPipe);
-    inputPipeClosed=true;
-}
-
-void LowLagDecoder::waitForShutdownAndDelete() {
-    closeInputPipe();
-    /*if(decoder.configured){
-        //feed the EOS
-        feedDecoder(nullptr);
-        //if not already happened, wait for EOS to arrive at the checkOutput thread
-        if(mCheckOutputThread->joinable()){
-            mCheckOutputThread->join();
-        }
-        delete(mCheckOutputThread);
-        mCheckOutputThread= nullptr;
-        //now clean up the hw decoder
-        AMediaCodec_stop(decoder.codec);
-        AMediaCodec_delete(decoder.codec);
-        mKeyFrameFinder.reset();
-        decoder.configured=false;
-    }*/
-    if(decoder.configured){
-        AMediaCodec_stop(decoder.codec);
-        AMediaCodec_delete(decoder.codec);
-        mKeyFrameFinder.reset();
-        decoder.configured=false;
-        if(mCheckOutputThread->joinable()){
-            mCheckOutputThread->join();
-        }
-    }
-}
-
-
 void LowLagDecoder::printAvgLog() {
 #ifdef PRINT_DEBUG_INFO
     auto now=steady_clock::now();
@@ -289,7 +265,6 @@ void LowLagDecoder::printAvgLog() {
             "\nFPS:"<<decodingInfo.currentFPS;
     MLOGD<<frameLog.str();
 #endif
-
     /*std::stringstream properties;
     properties << "system_clock" << std::endl;
     properties << std::chrono::system_clock::period::num << std::endl;
@@ -307,6 +282,15 @@ void LowLagDecoder::printAvgLog() {
     properties << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl << std::endl;
 
     LOGD("%s",properties.str().c_str());*/
+}
+
+void LowLagDecoder::resetStatistics() {
+    nDecodedFrames.reset();
+    nNALUBytesFed.reset();
+    parsingTime.reset();
+    waitForInputB.reset();
+    decodingTime.reset();
+    decodingInfo={};
 }
 
 

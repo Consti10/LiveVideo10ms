@@ -155,6 +155,10 @@ public:
     long getAbsolute(){
         return sum;
     }
+    void reset(){
+        sum=0;
+        sumAtLastCall=0;
+    }
 };
 
 class MeasureExecutionTime{

@@ -57,13 +57,15 @@ public class VideoPlayer implements INativeVideoParamsChanged {
         return nativeGetExternalFileReader(nativeVideoPlayer);
     }
 
-
     public void setVideoSurface(final @Nullable Surface surface){
-
+        nativeSetVideoSurface(nativeVideoPlayer,surface);
     }
 
-    public void setPlayWhenReady(final boolean playWhenReady){
-
+    public void start(){
+        nativeStart(nativeVideoPlayer,context.getAssets());
+    }
+    public void stop(){
+        nativeStop(nativeVideoPlayer);
     }
 
     /**
@@ -75,7 +77,8 @@ public class VideoPlayer implements INativeVideoParamsChanged {
      * e) External
      */
     public void addAndStartDecoderReceiver(Surface surface){
-        nativeStart(nativeVideoPlayer,surface,context.getAssets());
+        setVideoSurface(surface);
+        start();
         //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
         //TODO: proper queue, but how to do synchronization in java ndk ?!
         timer=new Timer();
@@ -95,7 +98,8 @@ public class VideoPlayer implements INativeVideoParamsChanged {
     public void stopAndRemoveReceiverDecoder(){
         timer.cancel();
         timer.purge();
-        nativeStop(nativeVideoPlayer);
+        stop();
+        setVideoSurface(null);
     }
 
     /**
@@ -181,8 +185,10 @@ public class VideoPlayer implements INativeVideoParamsChanged {
 
     public static native void nativePassNALUData(long nativeInstance,byte[] b,int offset,int size);
 
-    public static native void nativeStart(long nativeInstance, Surface surface, AssetManager assetManager);
+    public static native void nativeStart(long nativeInstance,AssetManager assetManager);
     public static native void nativeStop(long nativeInstance);
+    public static native void nativeSetVideoSurface(long nativeInstance,Surface surface);
+
     //get members or other information. Some might be only usable in between (nativeStart <-> nativeStop)
     public static native String getVideoInfoString(long nativeInstance);
     public static native boolean anyVideoDataReceived(long nativeInstance);
