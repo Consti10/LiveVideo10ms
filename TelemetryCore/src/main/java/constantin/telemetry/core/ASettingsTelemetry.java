@@ -2,16 +2,11 @@ package constantin.telemetry.core;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-/*import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;*/
+import androidx.preference.PreferenceManager;
 
 
 public class ASettingsTelemetry extends AppCompatActivity {
@@ -25,17 +20,16 @@ public class ASettingsTelemetry extends AppCompatActivity {
         if(bundle!=null){
             fragment.showAdvanced=bundle.getBoolean(EXTRA_KEY,false);
         }
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(android.R.id.content, fragment)
                 .commit();
     }
 
-    public static class MSettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+    public static class MSettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener{
         public boolean showAdvanced=false;
 
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             PreferenceManager preferenceManager=getPreferenceManager();
             preferenceManager.setSharedPreferencesName("pref_telemetry");
             addPreferencesFromResource(R.xml.pref_telemetry);

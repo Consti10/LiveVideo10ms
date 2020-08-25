@@ -1,11 +1,12 @@
 package constantin.video.core;
 
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
+
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 public class AVideoSettings extends AppCompatActivity {
     public static final String EXTRA_KEY="SHOW_ADVANCED_SETTINGS";
@@ -18,17 +19,16 @@ public class AVideoSettings extends AppCompatActivity {
         if(bundle!=null){
             fragment.showAdvanced=bundle.getBoolean(EXTRA_KEY,false);
         }
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(android.R.id.content, fragment)
                 .commit();
     }
 
-    public static class MSettingsFragment extends PreferenceFragment{
+    public static class MSettingsFragment extends PreferenceFragmentCompat {
         public boolean showAdvanced=false;
 
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             PreferenceManager preferenceManager=getPreferenceManager();
             preferenceManager.setSharedPreferencesName("pref_video");
             addPreferencesFromResource(R.xml.pref_video);
@@ -36,15 +36,15 @@ public class AVideoSettings extends AppCompatActivity {
                 Preference p1=findPreference(getString(R.string.VS_PLAYBACK_FILENAME));
                 Preference p2=findPreference(getString(R.string.VS_SOURCE));
                 Preference p3=findPreference(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY));
-				Preference p4=findPreference(getString(R.string.VS_FILE_ONLY_LIMIT_FPS));
-				Preference p5=findPreference(getString(R.string.VS_USE_SW_DECODER));
+                Preference p4=findPreference(getString(R.string.VS_FILE_ONLY_LIMIT_FPS));
+                Preference p5=findPreference(getString(R.string.VS_USE_SW_DECODER));
                 Preference p6=findPreference(getString(R.string.VS_GROUND_RECORDING));
                 p1.setEnabled(true);
                 p2.setEnabled(true);
                 p3.setEnabled(true);
-				p4.setEnabled(true);
-				p5.setEnabled(true);
-				p6.setEnabled(true);
+                p4.setEnabled(true);
+                p5.setEnabled(true);
+                p6.setEnabled(true);
             }
         }
 

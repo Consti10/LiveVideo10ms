@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
+<androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Video settings"
     android:summary="Select your video source and enable other features">
 
     <PreferenceCategory
         android:title="Video stream source/protocol">
-        <com.mapzen.prefsplus.IntListPreference
+        <com.mapzen.prefsplusx.IntListPreference
             android:key="@string/VS_PROTOCOL"
             android:title="@string/VS_PROTOCOL"
             android:summary="Default: RTP, has to comply with  EZ-WB/OpenHD. Use raw for maximum performance."
             android:entries="@array/entriesVideoStream"
             android:entryValues="@array/valuesVideoStream"
             android:defaultValue="0"/>
-        <com.mapzen.prefsplus.EditIntPreference
+        <com.mapzen.prefsplusx.EditIntPreference
             android:title="@string/VS_PORT"
             android:key="@string/VS_PORT"
             android:summary="UDP Port to receive rtp or raw h.264 NALUS (video stream) Default:5600"
             android:defaultValue="5600" />
     </PreferenceCategory>
 
-
     <PreferenceCategory
         android:title="Advanced">
-        <com.mapzen.prefsplus.IntListPreference
+        <com.mapzen.prefsplusx.IntListPreference
             android:key="@string/VS_SOURCE"
             android:title="@string/VS_SOURCE"
             android:entries="@array/entriesVIDEO_SOURCE"
@@ -41,18 +40,18 @@
             android:defaultValue="testVideo.h264"
             android:enabled="false"/>
 
-        <com.mapzen.prefsplus.EditIntPreference
+        <com.mapzen.prefsplusx.EditIntPreference
             android:key="@string/VS_FILE_ONLY_LIMIT_FPS"
             android:title="@string/VS_FILE_ONLY_LIMIT_FPS"
             android:defaultValue="60"
             android:summary="Limit FPS when playing from file/assets. Default 60fps. Select 0 for unlimited fps." />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:key="@string/VS_USE_SW_DECODER"
             android:title="@string/VS_USE_SW_DECODER"
             android:defaultValue="false"
             android:enabled="false"
             android:summary="Use SW decoder instead of HW Decoder. Usually has worse performance than HW. Default off."/>
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:key="@string/VS_GROUND_RECORDING"
             android:title="@string/VS_GROUND_RECORDING"
             android:defaultValue="false"
@@ -72,7 +71,7 @@
     <!--Decoding 360 video is the same as any other video, but fpv-vr handles the content depending on the video stream type-->
     <PreferenceCategory
         android:title="Other" >
-        <com.mapzen.prefsplus.IntListPreference
+        <com.mapzen.prefsplusx.IntListPreference
             android:key="@string/VS_VIDEO_VIEW_TYPE"
             android:title="@string/VS_VIDEO_VIEW_TYPE"
             android:entries="@array/entriesVS_VIDEO_VIEW_TYPE"
@@ -80,7 +79,7 @@
             android:defaultValue="0"
             android:enabled="true"/>
 
-        <com.mapzen.prefsplus.EditFloatPreference
+        <com.mapzen.prefsplusx.EditFloatPreference
             android:key="@string/VS_360_VIDEO_FOV"
             android:title="@string/VS_360_VIDEO_FOV"
             android:summary="FOV of 360° video"
@@ -89,4 +88,4 @@
     </PreferenceCategory>
 
 
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>
