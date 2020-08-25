@@ -2,6 +2,7 @@ package constantin.telemetry.core;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
@@ -33,6 +34,7 @@ public class ASettingsTelemetry extends AppCompatActivity {
             PreferenceManager preferenceManager=getPreferenceManager();
             preferenceManager.setSharedPreferencesName("pref_telemetry");
             addPreferencesFromResource(R.xml.pref_telemetry);
+            //Log.d("LOL",""+rootKey);
             if(showAdvanced){
                 Preference p1=findPreference(getString(R.string.T_PLAYBACK_FILENAME));
                 Preference p2=findPreference(getString(R.string.T_SOURCE));
@@ -41,16 +43,6 @@ public class ASettingsTelemetry extends AppCompatActivity {
                 p2.setEnabled(true);
                 p3.setEnabled(true);
             }
-        }
-
-        /*@Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            setPreferencesFromResource(R.xml.pref_telemetry, null);
-        }*/
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState){
-            super.onActivityCreated(savedInstanceState);
         }
 
         @Override
