@@ -34,7 +34,7 @@ allprojects {
         appcompatVersion = '1.2.0'
         materialVersion = '1.3.0-alpha02'
         constraintlayoutVersion='2.0.0'
-        androidxpreferenceVersion='1.1.0'
+        androidxpreferenceVersion='1.1.1'
         mGvrVersion = '1.180.0'
         myNdkVersion = '21.3.6528147'
     }
