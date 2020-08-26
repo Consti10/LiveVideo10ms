@@ -35,5 +35,5 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
     implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"
 
-    api 'com.github.Consti10:prefs-plus:v2.0'
+    implementation 'com.github.Consti10:prefs-plus:v3.0.0'
 }
