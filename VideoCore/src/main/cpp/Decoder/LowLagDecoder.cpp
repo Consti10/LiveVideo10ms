@@ -20,7 +20,10 @@ LowLagDecoder::LowLagDecoder(JNIEnv* env){
 
 void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
     if(surface==nullptr){
-        assert(decoder.window!=nullptr);
+        //assert(decoder.window!=nullptr);
+        if(decoder.window== nullptr){
+            return;
+        }
         std::lock_guard<std::mutex> lock(mMutexInputPipe);
         inputPipeClosed=true;
         if(decoder.configured){
@@ -62,8 +65,8 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     }
     nNALUBytesFed.add(nalu.getSize());
     if(inputPipeClosed){
-        //A feedD thread (e.g. file or udp) thread might still be running
-        //even though the surface was removed. But at least we can buffer the sps/pps data
+        //A feedD thread (e.g. file or udp) thread might be running even tough no output surface was set
+        //But at least we can buffer the sps/pps data
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         return;
     }
