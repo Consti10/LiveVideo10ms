@@ -42,7 +42,7 @@ void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface,SharedPreferenc
         decoder.window=nullptr;
         resetStatistics();
     }else{
-        // Throw warning if someone tries to set the surface without clearing it first
+        // Throw warning if th surface is set without clearing it first
         assert(decoder.window==nullptr);
         decoder.window=ANativeWindow_fromSurface(env,surface);
         inputPipeClosed=false;
