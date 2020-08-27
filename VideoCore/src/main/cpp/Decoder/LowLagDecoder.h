@@ -15,6 +15,7 @@
 
 #include "../NALU/NALU.hpp"
 #include <TimeHelper.hpp>
+#include <SharedPreferences.hpp>
 #include "../NALU/KeyFrameFinder.hpp"
 
 struct DecodingInfo{
@@ -69,7 +70,7 @@ public:
     // After acquiring the surface, the decoder will be started as soon as enough configuration data was passed to it
     // When releasing the surface, the decoder will be stopped if running and any resources will be freed
     // After releasing the surface it is safe for the android os to delete it
-    void setOutputSurface(JNIEnv* env,jobject surface);
+    void setOutputSurface(JNIEnv* env,jobject surface,SharedPreferences& videoSettings);
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
@@ -88,7 +89,7 @@ private:
     void printAvgLog();
     void resetStatistics();
     std::unique_ptr<std::thread> mCheckOutputThread= nullptr;
-    const bool SW=false;
+    bool USE_SW_DECODER_INSTEAD=false;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)
     Decoder decoder;
     DecodingInfo decodingInfo;

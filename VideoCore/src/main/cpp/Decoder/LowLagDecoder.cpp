@@ -1,5 +1,6 @@
 
 #include "LowLagDecoder.h"
+#include "../IDV.hpp"
 #include <AndroidThreadPrioValues.hpp>
 #include <NDKThreadHelper.hpp>
 #include <unistd.h>
@@ -18,7 +19,8 @@ LowLagDecoder::LowLagDecoder(JNIEnv* env){
     resetStatistics();
 }
 
-void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
+void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface,SharedPreferences& videoSettings){
+    USE_SW_DECODER_INSTEAD=videoSettings.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface==nullptr){
         //assert(decoder.window!=nullptr);
         if(decoder.window== nullptr){
@@ -40,6 +42,7 @@ void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface){
         decoder.window=nullptr;
         resetStatistics();
     }else{
+        // Throw warning if someone tries to set the surface without clearing it first
         assert(decoder.window==nullptr);
         decoder.window=ANativeWindow_fromSurface(env,surface);
         inputPipeClosed=false;
@@ -83,7 +86,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
 }
 
 void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
-    if(SW){
+    if(USE_SW_DECODER_INSTEAD){
         decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
     }else {
         decoder.codec = AMediaCodec_createDecoderByType("video/avc");

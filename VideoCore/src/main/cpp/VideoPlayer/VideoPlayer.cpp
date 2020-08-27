@@ -64,9 +64,9 @@ void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
     //set the jni object for settings
     mSettingsN.replaceJNI(env);
     if(surface!=nullptr){
-        mLowLagDecoder.setOutputSurface(env,surface);
+        mLowLagDecoder.setOutputSurface(env,surface,mSettingsN);
     }else{
-        mLowLagDecoder.setOutputSurface(env, nullptr);
+        mLowLagDecoder.setOutputSurface(env, nullptr,mSettingsN);
     }
 }
 
