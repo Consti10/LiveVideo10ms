@@ -215,7 +215,7 @@ void TelemetryReceiver::onEZWBStatusDataReceived(const uint8_t *data,const size_
     mGroundRecorder.writePacketIfStarted(data,data_length,GroundRecorderFPV::PACKET_TYPE_TELEMETRY_EZWB);
 }
 
-const int TelemetryReceiver::getNReceivedTelemetryBytes()const {
+int TelemetryReceiver::getNReceivedTelemetryBytes()const {
     return (int)(nTelemetryBytes);
 }
 
@@ -244,11 +244,11 @@ const wifibroadcast_rx_status_forward_t2& TelemetryReceiver::get_ez_wb_forward_d
 const OriginData& TelemetryReceiver::getOriginData() const {
     return originData;
 }
-const long TelemetryReceiver::getNEZWBPacketsParsingFailed()const {
+long TelemetryReceiver::getNEZWBPacketsParsingFailed()const {
     return nWIFIBRADCASTFailedPackets;
 }
 
-const int TelemetryReceiver::getBestDbm()const{
+int TelemetryReceiver::getBestDbm()const{
     //Taken from ez-wifibroadcast OSD.
     int cnt =  wifibroadcastTelemetryData.wifi_adapter_cnt;
     cnt = (cnt<=6) ? cnt : 6;
@@ -277,7 +277,7 @@ void TelemetryReceiver::setFlightTime(float timeSeconds) {
     appOSDData.flight_time_seconds=timeSeconds;
 }
 
-const TelemetryReceiver::MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) const {
+TelemetryReceiver::MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) const {
     MTelemetryValue ret = TelemetryReceiver::MTelemetryValue();
     //LOGD("Size %d",(int)sizeof(wifibroadcast_rx_status_forward_t2));
     ret.warning=0;
@@ -566,7 +566,7 @@ const TelemetryReceiver::MTelemetryValue TelemetryReceiver::getTelemetryValue(Te
     return ret;
 }
 
-const TelemetryReceiver::MTelemetryValue
+TelemetryReceiver::MTelemetryValue
 TelemetryReceiver::getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter) const {
     MTelemetryValue ret = TelemetryReceiver::MTelemetryValue();
     ret.warning=0;
@@ -587,7 +587,7 @@ TelemetryReceiver::getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter) const {
 }
 
 
-const std::string TelemetryReceiver::getStatisticsAsString()const {
+std::string TelemetryReceiver::getStatisticsAsString()const {
     std::ostringstream ostream;
     if(SOURCE_TYPE==UDP){
         if(T_Protocol!=TelemetryReceiver::NONE){
@@ -613,7 +613,7 @@ const std::string TelemetryReceiver::getStatisticsAsString()const {
     return ostream.str();
 }
 
-const std::wstring TelemetryReceiver::getMAVLINKFlightMode() const {
+std::wstring TelemetryReceiver::getMAVLINKFlightMode() const {
     std::wstring mode;
     if(MAVLINK_FLIGHTMODE_QUADCOPTER){
         switch (uav_td.FlightMode_MAVLINK) {
@@ -664,7 +664,7 @@ const std::wstring TelemetryReceiver::getMAVLINKFlightMode() const {
     return mode;
 }
 
-const std::string TelemetryReceiver::getAllTelemetryValuesAsString() const {
+std::string TelemetryReceiver::getAllTelemetryValuesAsString() const {
     std::wstringstream ss;
     for( int i = TelemetryValueIndex ::DECODER_FPS; i != TelemetryValueIndex::EZWB_RSSI_ADAPTER3; i++ ){
         const auto indx = static_cast<TelemetryValueIndex>(i);
@@ -677,7 +677,7 @@ const std::string TelemetryReceiver::getAllTelemetryValuesAsString() const {
     return converted_str;
 }
 
-const std::string TelemetryReceiver::getEZWBDataAsString()const{
+std::string TelemetryReceiver::getEZWBDataAsString()const{
     std::stringstream stringstream;
     stringstream << "damaged_block_cnt:" << wifibroadcastTelemetryData.damaged_block_cnt << "\n";
     stringstream << "lost_packet_cnt:" << wifibroadcastTelemetryData.lost_packet_cnt << "\n";
@@ -706,11 +706,11 @@ const std::string TelemetryReceiver::getEZWBDataAsString()const{
     return stringstream.str();
 }
 
-const float TelemetryReceiver::getHeading_Deg() const {
+float TelemetryReceiver::getHeading_Deg() const {
     return uav_td.Heading_Deg;
 }
 
-const float TelemetryReceiver::getCourseOG_Deg() const {
+float TelemetryReceiver::getCourseOG_Deg() const {
     return uav_td.CourseOG_Deg;
 }
 
@@ -718,7 +718,7 @@ float TelemetryReceiver::getHeadingHome_Deg() const {
     return (float)course_to(uav_td.Latitude_dDeg,uav_td.Longitude_dDeg,originData.Latitude_dDeg,originData.Longitude_dDeg);
 }
 
-const std::string TelemetryReceiver::getProtocolAsString() const {
+std::string TelemetryReceiver::getProtocolAsString() const {
     std::stringstream ss;
     switch (T_Protocol){
         case TelemetryReceiver::LTM:ss<<"ltm";break;
@@ -730,7 +730,7 @@ const std::string TelemetryReceiver::getProtocolAsString() const {
     return ss.str();
 }
 
-const std::string TelemetryReceiver::getSystemAsString() const {
+std::string TelemetryReceiver::getSystemAsString() const {
     const std::string ret=(EZWBS_Protocol==EZWB_16_rc6) ? "EZ-Wifibroadcast" : "OpenHD";
     return ret;
 }

@@ -96,19 +96,19 @@ public:
     void setHomeAndroid(double latitude, double longitude, double attitude);
     void resetNReceivedTelemetryBytes();
     //
-    const std::string getStatisticsAsString()const;
-    const std::string getProtocolAsString()const;
-    const std::string getSystemAsString()const;
-    const std::string getAllTelemetryValuesAsString()const;
-    const std::string getEZWBDataAsString()const;
-    const int getNReceivedTelemetryBytes()const;
-    const long getNEZWBPacketsParsingFailed()const;
-    const int getBestDbm()const;
+    std::string getStatisticsAsString()const;
+    std::string getProtocolAsString()const;
+    std::string getSystemAsString()const;
+    std::string getAllTelemetryValuesAsString()const;
+    std::string getEZWBDataAsString()const;
+    int getNReceivedTelemetryBytes()const;
+    long getNEZWBPacketsParsingFailed()const;
+    int getBestDbm()const;
     const UAVTelemetryData& getUAVTelemetryData()const;
     const wifibroadcast_rx_status_forward_t2& get_ez_wb_forward_data()const;
     const OriginData& getOriginData()const;
-    const float getCourseOG_Deg()const;
-    const float getHeading_Deg()const;
+    float getCourseOG_Deg()const;
+    float getHeading_Deg()const;
     float getHeadingHome_Deg()const;
 
     class MTelemetryValue{
@@ -169,9 +169,9 @@ public:
         //EZWB_RSSI_ADAPTER5,
         XXX
     };
-    const MTelemetryValue getTelemetryValue(TelemetryValueIndex index)const;
-    const MTelemetryValue getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter)const;
-    const std::wstring getMAVLINKFlightMode()const;
+    MTelemetryValue getTelemetryValue(TelemetryValueIndex index)const;
+    MTelemetryValue getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter)const;
+    std::wstring getMAVLINKFlightMode()const;
 private:
     std::unique_ptr<UDPReceiver> mTelemetryDataReceiver;
     std::unique_ptr<UDPReceiver> mEZWBDataReceiver;
