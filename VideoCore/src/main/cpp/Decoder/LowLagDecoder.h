@@ -97,6 +97,7 @@ private:
     std::mutex mMutexInputPipe;
     DECODER_RATIO_CHANGED onDecoderRatioChangedCallback= nullptr;
     DECODING_INFO_CHANGED_CALLBACK onDecodingInfoChangedCallback= nullptr;
+    // So we can temporarily attach the output thread to the vm and make ndk calls
     JavaVM* javaVm=nullptr;
     std::chrono::steady_clock::time_point lastLog=std::chrono::steady_clock::now();
     RelativeCalculator nDecodedFrames;
