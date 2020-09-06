@@ -38,7 +38,7 @@ allprojects {
         androidxpreferenceVersion='1.1.1'
         mGvrVersion = '1.180.0'
         myNdkVersion = '21.3.6528147'
-        myPrefsPlusVersion = '3.0.3'
+        myPrefsPlusVersion = '3.0.4'
     }
 }
 
