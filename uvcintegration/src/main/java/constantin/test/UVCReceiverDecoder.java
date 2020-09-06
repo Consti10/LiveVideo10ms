@@ -87,6 +87,4 @@ public class UVCReceiverDecoder {
     // return ground recording filenamePath if file was created
     private static native String nativeStopReceiving(long nativeInstance,Context context);
     private static native void nativeSetSurface(long nativeInstance,Surface surface);
-
-
 }
