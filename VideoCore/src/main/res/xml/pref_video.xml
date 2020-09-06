@@ -11,7 +11,6 @@
             android:title="@string/VS_PROTOCOL"
             android:summary="Default: RTP, has to comply with  EZ-WB/OpenHD. Use raw for maximum performance."
             android:entries="@array/entriesVideoStream"
-            android:entryValues="@array/valuesVideoStream"
             android:defaultValue="0"/>
         <com.mapzen.prefsplusx.EditIntPreference
             android:title="@string/VS_PORT"
@@ -26,7 +25,6 @@
             android:key="@string/VS_SOURCE"
             android:title="@string/VS_SOURCE"
             android:entries="@array/entriesVIDEO_SOURCE"
-            android:entryValues="@array/valuesVIDEO_SOURCE"
             android:defaultValue="0"
             android:enabled="false"/>
         <EditTextPreference
@@ -75,7 +73,6 @@
             android:key="@string/VS_VIDEO_VIEW_TYPE"
             android:title="@string/VS_VIDEO_VIEW_TYPE"
             android:entries="@array/entriesVS_VIDEO_VIEW_TYPE"
-            android:entryValues="@array/valuesVS_VIDEO_VIEW_TYPE"
             android:defaultValue="0"
             android:enabled="true"/>
 
