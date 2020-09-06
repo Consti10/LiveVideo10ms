@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FieldValue
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import constantin.video.core.DecodingInfo
 
 import constantin.video.core.video_player.VideoSettings
 import constantin.video.example.Helper
@@ -50,6 +51,10 @@ class VideoActivityWithDatabase : SimpleVideoActivity(),SurfaceHolder.Callback {
     public override fun onDestroy() {
         super.onDestroy()
         writeTestResult();
+    }
+
+    public fun getMDecodingInfo(): DecodingInfo {
+        return mDecodingInfo;
     }
 
     private fun writeTestResult() {
