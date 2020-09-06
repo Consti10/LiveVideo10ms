@@ -110,8 +110,8 @@ public class VideoSettings {
         Log.d(TAG,"Add file "+filename+" "+filePathAndName);
         ContentValues values = new ContentValues();
         //values.put(MediaStore.Video.VideoColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
-        values.put(MediaStore.Video.Media.DISPLAY_NAME, "display_name");
-        values.put(MediaStore.Video.Media.TITLE, "my_title");
+        //values.put(MediaStore.Video.Media.DISPLAY_NAME, "display_name");
+        //values.put(MediaStore.Video.Media.TITLE, "my_title");
         values.put(MediaStore.MediaColumns.MIME_TYPE, "video/fpv");
         //values.put(MediaStore.Video.Media.RELATIVE_PATH, "$Q_VIDEO_PATH/$relativePath")
         values.put(MediaStore.Video.Media.DATA,filePathAndName);

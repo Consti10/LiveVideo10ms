@@ -79,9 +79,9 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
     const int VS_FILE_ONLY_LIMIT_FPS=mSettingsN.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS,60);
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
 
-    //Add Ground recorder if enabled
-    //if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
-    if(true){
+    //Add Ground recorder if enabled and needed
+    if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
+    //if(true){
         mGroundRecorderFPV.start();
     }
 
