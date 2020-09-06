@@ -11,6 +11,7 @@
 #include <vector>
 #include <array>
 #include <AndroidLogger.hpp>
+#include <android/asset_manager_jni.h>
 
 #include <type_traits>
 
@@ -25,6 +26,11 @@ namespace NDKHelper {
                 context_class, "getAssets", "()Landroid/content/res/AssetManager;");
         jobject java_asset_mgr=env->CallObjectMethod(android_context,get_asset_manager_method);
         return java_asset_mgr;
+    }
+    // Return the AAssetManager object instead of the general 'jobject'
+    static AAssetManager* getAssetManagerFromContext2(JNIEnv* env,jobject androidContext){
+        jobject jobject1=getAssetManagerFromContext(env,androidContext);
+        return AAssetManager_fromJava(env,jobject1);
     }
 
     // Returns a java 'InputStream' instance by opening the Asset specified at path

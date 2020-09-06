@@ -169,14 +169,14 @@ public:
         return -1;
     }
     // return the filename of the written file on success
-    std::optional<std::string> stopReceiving(){
+    std::optional<std::string> stopReceiving(JNIEnv* env,jobject androidContext){
         if(isStreaming){
             uvc_stop_streaming(devh);
             uvc_close(devh);
             uvc_unref_device(dev);
             uvc_exit(ctx);
             isStreaming=false;
-            return groundRecorderFPV.stop();
+            return groundRecorderFPV.stop(env,androidContext);
         }
         return std::nullopt;
     }
@@ -215,8 +215,8 @@ JNI_METHOD(jint, nativeStartReceiving)
     return native(nativeInstance)->startReceiving(vid,pid,fd,busnum,devAddr,usbfs);
 }
 JNI_METHOD(jstring , nativeStopReceiving)
-(JNIEnv *env, jclass jclass1, jlong p) {
-   const auto groundRecordingFilenamePath=native(p)->stopReceiving();
+(JNIEnv *env, jclass jclass1, jlong p,jobject androidContext) {
+   const auto groundRecordingFilenamePath=native(p)->stopReceiving(env,androidContext);
    if(groundRecordingFilenamePath==std::nullopt){
        return nullptr;
    }

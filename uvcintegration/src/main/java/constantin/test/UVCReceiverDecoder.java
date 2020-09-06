@@ -63,7 +63,7 @@ public class UVCReceiverDecoder {
     }
 
     public void stopReceiving(final Context context){
-        final String filenamePath=nativeStopReceiving(nativeInstance);
+        final String filenamePath=nativeStopReceiving(nativeInstance,context);
         if(filenamePath!=null){
             System.out.println("FilenamePath "+filenamePath);
             //TODO TranscodeService.startTranscoding(context,filenamePath);
@@ -85,7 +85,7 @@ public class UVCReceiverDecoder {
     // returns 0 on success
     private static native int nativeStartReceiving(long nativeInstance,int venderId, int productId, int fileDescriptor, int busNum, int devAddr, String usbfs);
     // return ground recording filenamePath if file was created
-    private static native String nativeStopReceiving(long nativeInstance);
+    private static native String nativeStopReceiving(long nativeInstance,Context context);
     private static native void nativeSetSurface(long nativeInstance,Surface surface);
 
 

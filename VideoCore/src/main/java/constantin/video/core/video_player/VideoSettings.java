@@ -1,9 +1,13 @@
 package constantin.video.core.video_player;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -15,6 +19,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 //Provides conv
 public class VideoSettings {
+    private static final String TAG=VideoSettings.class.getSimpleName();
     public enum VS_SOURCE{UDP,FILE,ASSETS,FFMPEG,EXTERNAL}
     public static final int VIDEO_MODE_2D_MONOSCOPIC=0;
 
@@ -84,17 +89,37 @@ public class VideoSettings {
         final String filename=pref_video.getString(context.getString(R.string.VS_PLAYBACK_FILENAME),context.getString(R.string.VS_PLAYBACK_FILENAME_DEFAULT_VALUE));
         if(filename.equals(context.getString(R.string.VS_PLAYBACK_FILENAME_DEFAULT_VALUE))){
             pref_video.edit().putString(context.getString(R.string.VS_PLAYBACK_FILENAME),
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/"+"Video/"+"filename.fpv").commit();
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)+"/FPV_VR/"+"filename.fpv").commit();
         }
     }
 
     public static String getDirectoryToSaveDataTo(){
-        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/VideoTelemetry/";
+        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)+"/FPV_VR/";
         File dir = new File(ret);
         if (!dir.exists()) {
             final boolean mkdirs = dir.mkdirs();
             //System.out.println("mkdirs res"+mkdirs);
         }
         return ret;
+    }
+
+    // Adds a .fpv file (created via the ndk file api) to the ContentResolver such that it is
+    // indexed by the android os (displayed via the files app)
+    public static void addFpvFileToContentProvider(final Context c,final String filePathAndName){
+        final String filename="";
+        Log.d(TAG,"Add file "+filename+" "+filePathAndName);
+        ContentValues values = new ContentValues();
+        //values.put(MediaStore.Video.VideoColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
+        values.put(MediaStore.Video.Media.DISPLAY_NAME, "display_name");
+        values.put(MediaStore.Video.Media.TITLE, "my_title");
+        values.put(MediaStore.MediaColumns.MIME_TYPE, "video/fpv");
+        //values.put(MediaStore.Video.Media.RELATIVE_PATH, "$Q_VIDEO_PATH/$relativePath")
+        values.put(MediaStore.Video.Media.DATA,filePathAndName);
+        Uri uri=c.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+        if(uri!=null){
+            Log.d(TAG,"URI "+uri.toString());
+        }else{
+            Log.d(TAG,"URL is null - something went wrong");
+        }
     }
 }

@@ -83,12 +83,12 @@ public:
      * Change 22.02.2020: Also read all settings from shared preferences (before they were immutable, but this meant you
      * had to re-create the native TelemetryReceiver() every time shared preferences were changed)
      */
-    void startReceiving(JNIEnv *env,jobject context,AAssetManager* assetManager);
+    void startReceiving(JNIEnv *env,jobject androidContext);
     /**
      * Stop all telemetry receiver if they are currently running
      * Make sure startReading() and stopReading() are not called on different threads
      */
-    void stopReceiving();
+    void stopReceiving(JNIEnv* env,jobject androidContext);
     //
     void setDecodingInfo(float currentFPS, float currentKiloBitsPerSecond,float avgParsingTime_ms,float avgWaitForInputBTime_ms,float avgDecodingTime_ms);
     void setOpenGLFPS(float fps);

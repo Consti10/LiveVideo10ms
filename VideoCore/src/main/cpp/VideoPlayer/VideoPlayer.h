@@ -29,11 +29,11 @@ public:
     /*
      * Start the receiver and ground recorder if enabled
      */
-    void start(JNIEnv *env, AAssetManager *assetManager);
+    void start(JNIEnv *env,jobject androidContext);
     /**
      * Stop the receiver and ground recorder if enabled
      */
-    void stop(JNIEnv *env);
+    void stop(JNIEnv *env,jobject androidContext);
     /*
      * Returns a string with the current configuration for debugging
      */

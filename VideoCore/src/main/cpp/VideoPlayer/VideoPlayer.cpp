@@ -71,7 +71,8 @@ void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
 }
 
 
-void VideoPlayer::start(JNIEnv *env, AAssetManager *assetManager) {
+void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
+    AAssetManager *assetManager=NDKHelper::getAssetManagerFromContext2(env,androidContext);
     mSettingsN.replaceJNI(env);
     mParser.setLimitFPS(-1); //Default: Real time !
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
@@ -79,8 +80,8 @@ void VideoPlayer::start(JNIEnv *env, AAssetManager *assetManager) {
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
 
     //Add Ground recorder if enabled
-    if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
-    //if(true){
+    //if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
+    if(true){
         mGroundRecorderFPV.start();
     }
 
@@ -143,7 +144,7 @@ void VideoPlayer::start(JNIEnv *env, AAssetManager *assetManager) {
     }
 }
 
-void VideoPlayer::stop(JNIEnv *env) {
+void VideoPlayer::stop(JNIEnv *env,jobject androidContext) {
     if(mUDPReceiver){
         mUDPReceiver->stopReceiving();
         mUDPReceiver.reset();
@@ -154,7 +155,7 @@ void VideoPlayer::stop(JNIEnv *env) {
         mFFMpegVideoReceiver->stop_playing();
         mFFMpegVideoReceiver.reset();
     }
-    mGroundRecorderFPV.stop();
+    mGroundRecorderFPV.stop(env,androidContext);
 }
 
 std::string VideoPlayer::getInfoString()const{
@@ -202,14 +203,13 @@ JNI_METHOD(void, nativeFinalize)
 }
 
 JNI_METHOD(void, nativeStart)
-(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject assetManager){
-    AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
-    native(videoPlayerN)->start(env, mgr);
+(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject androidContext){
+    native(videoPlayerN)->start(env,androidContext);
 }
 
 JNI_METHOD(void, nativeStop)
-(JNIEnv * env,jclass jclass1,jlong videoPlayerN){
-    native(videoPlayerN)->stop(env);
+(JNIEnv * env,jclass jclass1,jlong videoPlayerN,jobject androidContext){
+    native(videoPlayerN)->stop(env,androidContext);
 }
 
 JNI_METHOD(void, nativeSetVideoSurface)

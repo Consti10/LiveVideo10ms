@@ -13,6 +13,7 @@
 #include "FileHelper.hpp"
 #include <chrono>
 #include <optional>
+#include <jni.h>
 
 /**
  * Thread-safe class for writing a .fpv ground recording file
@@ -35,6 +36,8 @@ private:
             fileCreationTime=std::chrono::steady_clock::now();
         }
     }
+    // If the file was created close it and return the file path of the created file
+    // Else do nothing and return std::nullopt
     std::optional<std::string> closeFileIfOpened(){
         if(ofstream.is_open()){
             ofstream.flush();
@@ -73,10 +76,14 @@ public:
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
         started=true;
     }
-    std::optional<std::string> stop(){
+    std::optional<std::string> stop(JNIEnv* env,jobject androidContext){
         std::lock_guard<std::mutex> lock(mMutexFileAccess);
         started=false;
-        return closeFileIfOpened();
+        auto ret=closeFileIfOpened();
+        if(ret!=std::nullopt){
+            GroundRecorderFPV::addFpvFileToContentProvider(env, androidContext,*ret);
+        }
+        return ret;
     }
     //Only write data if started and data_length>0
     void writePacketIfStarted(const uint8_t *packet,const size_t packet_length,const PACKET_TYPE packet_type,int customTimeStamp=-1) {
@@ -97,6 +104,13 @@ public:
     }
 private:
     std::ofstream ofstream;
+    void addFpvFileToContentProvider(JNIEnv* env,jobject androidContext,std::string filePath){
+        jclass jcVideoSettings = env->FindClass("constantin/video/core/video_player/VideoSettings");
+        assert(jcVideoSettings != nullptr);
+        jmethodID jmethodId = env->GetStaticMethodID(jcVideoSettings, "addFpvFileToContentProvider", "(Landroid/content/Context;Ljava/lang/String;)V" );
+        assert(jmethodId!=nullptr);
+        env->CallStaticVoidMethod(jcVideoSettings,jmethodId,androidContext,env->NewStringUTF(filePath.c_str()));
+    }
 };
 
 #endif //TELEMETRY_GROUNDRECORDERFPV_HPP

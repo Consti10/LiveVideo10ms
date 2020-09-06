@@ -70,7 +70,7 @@ public class VideoPlayer implements INativeVideoParamsChanged{
 
     private void start(){
         verifyApplicationThread();
-        nativeStart(nativeVideoPlayer,context.getAssets());
+        nativeStart(nativeVideoPlayer,context);
         //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
         //TODO: proper queue, but how to do synchronization in java ndk ?!
         timer=new Timer();
@@ -86,7 +86,7 @@ public class VideoPlayer implements INativeVideoParamsChanged{
         verifyApplicationThread();
         timer.cancel();
         timer.purge();
-        nativeStop(nativeVideoPlayer);
+        nativeStop(nativeVideoPlayer,context);
     }
 
     /**
@@ -143,7 +143,6 @@ public class VideoPlayer implements INativeVideoParamsChanged{
             public void surfaceTextureCreated(SurfaceTexture surfaceTexture, Surface surface) {
                 addAndStartDecoderReceiver(surface);
             }
-
             @Override
             public void surfaceTextureDestroyed() {
                 stopAndRemoveReceiverDecoder();
@@ -195,8 +194,8 @@ public class VideoPlayer implements INativeVideoParamsChanged{
 
     public static native void nativePassNALUData(long nativeInstance,byte[] b,int offset,int size);
 
-    public static native void nativeStart(long nativeInstance,AssetManager assetManager);
-    public static native void nativeStop(long nativeInstance);
+    public static native void nativeStart(long nativeInstance,Context context);
+    public static native void nativeStop(long nativeInstance,Context context);
     public static native void nativeSetVideoSurface(long nativeInstance,Surface surface);
 
     //get members or other information. Some might be only usable in between (nativeStart <-> nativeStop)

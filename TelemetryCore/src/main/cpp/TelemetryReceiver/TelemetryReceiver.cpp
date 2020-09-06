@@ -17,6 +17,7 @@
 #include <AndroidThreadPrioValues.hpp>
 #include <NDKThreadHelper.hpp>
 #include <AndroidLogger.hpp>
+#include <NDKHelper.hpp>
 
 extern "C"{
 #include "../parser_c/ltm.h"
@@ -114,7 +115,8 @@ void TelemetryReceiver::updateSettings(JNIEnv *env,jobject context) {
     wifibroadcastTelemetryData.wifi_adapter_cnt=1;
 }
 
-void TelemetryReceiver::startReceiving(JNIEnv *env,jobject context,AAssetManager* assetManager) {
+void TelemetryReceiver::startReceiving(JNIEnv *env,jobject context) {
+    AAssetManager* assetManager=NDKHelper::getAssetManagerFromContext2(env,context);
     assert(mTelemetryDataReceiver.get()==nullptr);
     assert(mEZWBDataReceiver.get()== nullptr);
     updateSettings(env,context);
@@ -156,7 +158,7 @@ void TelemetryReceiver::startReceiving(JNIEnv *env,jobject context,AAssetManager
     }
 }
 
-void TelemetryReceiver::stopReceiving() {
+void TelemetryReceiver::stopReceiving(JNIEnv* env,jobject androidContext) {
     if(mTelemetryDataReceiver){
         mTelemetryDataReceiver->stopReceiving();
         mTelemetryDataReceiver.reset();
@@ -166,7 +168,7 @@ void TelemetryReceiver::stopReceiving() {
         mEZWBDataReceiver.reset();
     }
     mFileReceiver.stopReadingIfStarted();
-    mGroundRecorder.stop();
+    mGroundRecorder.stop(env,androidContext);
 }
 
 void TelemetryReceiver::onUAVTelemetryDataReceived(const uint8_t data[],size_t data_length){
@@ -764,16 +766,15 @@ JNI_METHOD(void, deleteInstance)
 }
 
 JNI_METHOD(void, startReceiving)
-(JNIEnv *env,jclass unused,jlong testReceiverN,jobject context,jobject assetManager) {
+(JNIEnv *env,jclass unused,jlong testReceiverN,jobject androidContext) {
     TelemetryReceiver* p=native(testReceiverN);
-    AAssetManager* mgr=AAssetManager_fromJava(env,assetManager);
-    p->startReceiving(env,context,mgr);
+    p->startReceiving(env,androidContext);
 }
 
 JNI_METHOD(void, stopReceiving)
-(JNIEnv *env,jclass unused,jlong testReceiverN) {
+(JNIEnv *env,jclass unused,jlong testReceiverN,jobject androidContext) {
     TelemetryReceiver* testRecN=native(testReceiverN);
-    testRecN->stopReceiving();
+    testRecN->stopReceiving(env,androidContext);
 }
 
 JNI_METHOD(jstring , getStatisticsAsString)
