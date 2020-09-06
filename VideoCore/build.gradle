@@ -52,7 +52,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
 
     implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"
     implementation "com.github.Consti10:prefs-plus:$rootProject.myPrefsPlusVersion"
