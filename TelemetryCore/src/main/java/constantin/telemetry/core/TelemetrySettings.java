@@ -48,7 +48,7 @@ public class TelemetrySettings {
     //
     //also create directory if not already existing
     public static String getDirectoryToSaveDataTo(){
-        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/"+"VideoTelemetry/";
+        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)+"/FPV_VR/";
         File dir = new File(ret);
         if (!dir.exists()) {
             final boolean mkdirs = dir.mkdirs();

@@ -119,7 +119,7 @@ public class VideoSettings {
         if(uri!=null){
             Log.d(TAG,"URI "+uri.toString());
         }else{
-            Log.d(TAG,"URL is null - something went wrong");
+            Log.w(TAG,"URI is null - something went wrong");
         }
     }
 }
