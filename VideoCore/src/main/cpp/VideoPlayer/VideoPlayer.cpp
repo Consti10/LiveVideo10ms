@@ -97,7 +97,7 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
         case UDP:{
             const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
             const bool useRTP= mSettingsN.getInt(IDV::VS_PROTOCOL) ==0;
-            mUDPReceiver=std::make_unique<UDPReceiver>(javaVm,VS_PORT, "VideoPlayer VideoReceiver", FPV_VR_PRIORITY::CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,useRTP](const uint8_t* data, size_t data_length) {
+            mUDPReceiver=std::make_unique<UDPReceiver>(javaVm,VS_PORT, "V_UDP_R", FPV_VR_PRIORITY::CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,useRTP](const uint8_t* data, size_t data_length) {
                 onNewVideoData(data,data_length,useRTP ? VIDEO_DATA_TYPE::RTP : VIDEO_DATA_TYPE::RAW);
             }, WANTED_UDP_RCVBUF_SIZE);
             mUDPReceiver->startReceiving();

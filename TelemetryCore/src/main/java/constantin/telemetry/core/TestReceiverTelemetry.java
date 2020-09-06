@@ -40,7 +40,7 @@ public class TestReceiverTelemetry implements Runnable, LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void startUiUpdates(){
         mUpateThread =new Thread(this);
-        mUpateThread.setName("TestReceiverTelemetry");
+        mUpateThread.setName("T_TestR");
         mUpateThread.start();
     }
 

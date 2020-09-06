@@ -9,7 +9,7 @@
 #include <array>
 
 
-UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,std::string  name,int CPUPriority,DATA_CALLBACK  onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
+UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,std::string name,int CPUPriority,DATA_CALLBACK  onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
         mPort(port),mName(std::move(name)),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(std::move(onDataReceivedCallback)),javaVm(javaVm){
 }
 
