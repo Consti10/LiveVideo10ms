@@ -22,13 +22,14 @@ LOCAL_LDLIBS += -lOpenMAXAL
 #LOCAL_LDLIBS += -ljnigraphics
 
 
-DIR_VideoTelemetryShared := $(LOCAL_PATH)/../../../../../../LiveVideo10ms/VideoTelemetryShared
+#DIR_VideoTelemetryShared := $(LOCAL_PATH)/../../../../../../LiveVideo10ms/VideoTelemetryShared
+DIR_VideoTelemetryShared := $(V_CORE_DIR)/../VideoTelemetryShared
 # Android.mk doesnt work with absolute paths
 # DIR_VideoTelemetryShared := $(V_CORE_DIR)/../VideoTelemetryShared
 
-LOCAL_C_INCLUDES := $(DIR_VideoTelemetryShared)/Helper/
-LOCAL_C_INCLUDES += $(DIR_VideoTelemetryShared)/InputOutput/
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/Encoder/
+LOCAL_C_INCLUDES := $(DIR_VideoTelemetryShared)/Helper
+LOCAL_C_INCLUDES += $(DIR_VideoTelemetryShared)/InputOutput
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/Encoder
 
 # If we remove dependency of libusb here we can build both libusb and libuvc as static libraries uvc usb1.0
 # Then include libuvc as a static library here
