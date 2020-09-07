@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    ndkVersion rootProject.myNdkVersion
+    //ndkVersion rootProject.myNdkVersion
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
