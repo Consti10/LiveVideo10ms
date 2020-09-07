@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    //ndkVersion rootProject.ndkVersion
+    ndkVersion rootProject.myNdkVersion
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
@@ -36,7 +36,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
 
     implementation project(':VideoCore')
 }

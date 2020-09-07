@@ -5,7 +5,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-
+    ndkVersion rootProject.myNdkVersion
     defaultConfig {
         applicationId "constantin.video.example"
         minSdkVersion rootProject.minSdkVersion
