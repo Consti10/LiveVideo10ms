@@ -26,6 +26,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildFeatures{
+        viewBinding=true
+    }
     externalNativeBuild {
         cmake {
             path file('CMakeLists.txt')

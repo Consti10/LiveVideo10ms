@@ -14,12 +14,14 @@ import android.widget.ToggleButton;
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.IVideoParamsChanged;
 import constantin.video.core.R;
+import constantin.video.core.databinding.ActivitySimpleVideoBinding;
 import constantin.video.core.external.AspectFrameLayout;
 import constantin.video.core.video_player.VideoPlayer;
 
 // Most basic implementation of an activity that uses LiveVideo to stream or play back video
 // Into an Android Surface View
 public class SimpleVideoActivity extends AppCompatActivity implements  IVideoParamsChanged {
+    private ActivitySimpleVideoBinding binding;
     protected SurfaceView surfaceView;
     private AspectFrameLayout aspectFrameLayout;
     private VideoPlayer videoPlayer;
@@ -29,17 +31,18 @@ public class SimpleVideoActivity extends AppCompatActivity implements  IVideoPar
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_simple_video);
+        binding = ActivitySimpleVideoBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        surfaceView=findViewById(R.id.sv_video);
+        surfaceView=binding.svVideo;
 
         videoPlayer=new VideoPlayer(this);
         videoPlayer.setIVideoParamsChanged(this);
         surfaceView.getHolder().addCallback(videoPlayer.configure1());
 
-       aspectFrameLayout=findViewById(R.id.afl_video);
-       textViewStatistics=findViewById(R.id.tv_decoding_stats);
-       final Button toggleButton=findViewById(R.id.tb_show_decoding_info);
+       aspectFrameLayout=binding.aflVideo;
+       textViewStatistics=binding.tvDecodingStats;
+       final Button toggleButton=binding.tbShowDecodingInfo;
        toggleButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
