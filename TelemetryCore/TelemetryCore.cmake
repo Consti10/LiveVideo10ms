@@ -10,8 +10,8 @@ find_library( log-lib
 
 # Add IO and Helper from VideoCore - make sure to
 # set the V_CORE_DIR before including this file
-set(IO_PATH ${V_CORE_DIR}/../VideoTelemetryShared/InputOutput)
-set(HELPER_PATH ${V_CORE_DIR}/../VideoTelemetryShared/Helper)
+set(IO_PATH ${DIR_VideoTelemetryShared}/InputOutput)
+set(HELPER_PATH ${DIR_VideoTelemetryShared}/Helper)
 include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
 
