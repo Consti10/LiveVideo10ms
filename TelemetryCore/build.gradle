@@ -19,14 +19,14 @@ android {
     }
 
     // looks like prefab is just not ready yet ( too many compile errors for me)
-    //buildFeatures {
-    //    prefabPublishing true
-    //}
-    //prefab {
-    //    TelemetryReceiver {
-    //        headers "src/main/cpp/TelemetryReceiver"
-    //    }
-    //}
+    buildFeatures {
+        prefabPublishing true
+    }
+    prefab {
+        TelemetryReceiver {
+            headers "src/main/cpp/TelemetryReceiver"
+        }
+    }
 }
 
 dependencies {
