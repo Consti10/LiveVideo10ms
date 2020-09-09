@@ -3,16 +3,13 @@
 ##########################################################################################################
 
 #cmake_minimum_required(VERSION 3.6)
-#set(V_CORE_DIR ${CMAKE_SOURCE_DIR}../../../LiveVideo10ms/VideoCore)
 
 find_library( log-lib
               log )
 
-#set(DIR_VideoTelemetryShared ${V_CORE_DIR}/../VideoTelemetryShared)
 set(DIR_VideoTelemetryShared ${CMAKE_CURRENT_LIST_DIR}/../VideoTelemetryShared)
 
-# Add IO and Helper from VideoCore - make sure to
-# set the V_CORE_DIR before including this file
+# Add IO and Helper from the video/telemetry shared folder
 set(IO_PATH ${DIR_VideoTelemetryShared}/InputOutput)
 set(HELPER_PATH ${DIR_VideoTelemetryShared}/Helper)
 include_directories(${HELPER_PATH})
