@@ -8,6 +8,9 @@
 find_library( log-lib
               log )
 
+#set(DIR_VideoTelemetryShared ${V_CORE_DIR}/../VideoTelemetryShared)
+set(DIR_VideoTelemetryShared ${CMAKE_CURRENT_LIST_DIR}/../VideoTelemetryShared)
+
 # Add IO and Helper from VideoCore - make sure to
 # set the V_CORE_DIR before including this file
 set(IO_PATH ${DIR_VideoTelemetryShared}/InputOutput)
