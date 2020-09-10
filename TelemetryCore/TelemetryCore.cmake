@@ -4,6 +4,8 @@
 
 #cmake_minimum_required(VERSION 3.6)
 
+project(TelemetryCoreProject VERSION 1.0.0 LANGUAGES CXX)
+
 find_library( log-lib
               log )
 
