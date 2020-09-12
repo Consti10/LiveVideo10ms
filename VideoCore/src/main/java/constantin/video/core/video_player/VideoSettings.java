@@ -105,21 +105,21 @@ public class VideoSettings {
 
     // Adds a .fpv file (created via the ndk file api) to the ContentResolver such that it is
     // indexed by the android os (displayed via the files app)
-    public static void addFpvFileToContentProvider(final Context c,final String filePathAndName){
-        final String filename="";
-        Log.d(TAG,"Add file "+filename+" "+filePathAndName);
+    public static void addFpvFileToContentProvider(final Context c,final String pathToFile){
+        Log.d(TAG,"Add file "+pathToFile);
         ContentValues values = new ContentValues();
         //values.put(MediaStore.Video.VideoColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
         //values.put(MediaStore.Video.Media.DISPLAY_NAME, "display_name");
         //values.put(MediaStore.Video.Media.TITLE, "my_title");
         values.put(MediaStore.MediaColumns.MIME_TYPE, "video/fpv");
         //values.put(MediaStore.Video.Media.RELATIVE_PATH, "$Q_VIDEO_PATH/$relativePath")
-        values.put(MediaStore.Video.Media.DATA,filePathAndName);
-        Uri uri=c.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+        values.put(MediaStore.Video.Media.DATA,pathToFile);
+        final Uri uri=c.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
         if(uri!=null){
             Log.d(TAG,"URI "+uri.toString());
         }else{
-            Log.w(TAG,"URI is null - something went wrong");
+            //Log.w(TAG,"URI is null - something went wrong");
+            throw new RuntimeException("Cannot add file to contentProvider "+pathToFile);
         }
     }
 }
