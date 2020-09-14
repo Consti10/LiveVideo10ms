@@ -39,12 +39,22 @@ android {
     prefab {
         TelemetryReceiver {
             headers "src/main/cpp/TelemetryReceiver"
+            //headers "src/main/cpp/SharedCppC"
+            //headers "src/main/cpp/WFBTelemetryData"
+            //headers "../VideoTelemetryShared/Helper"
+            //headers "../VideoTelemetryShared/InputOutput"
         }
+        /*SharedCppC{
+            headers "src/main/cpp/SharedCppC"
+        }
+        WFBTelemetryData{
+            headers "src/main/cpp/WFBTelemetryData"
+        }*/
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation('com.google.android.gms:play-services-location:17.0.0')
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
     implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"

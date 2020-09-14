@@ -6,8 +6,8 @@
 
 project(TelemetryCoreProject VERSION 1.0.0 LANGUAGES CXX)
 
-find_library( log-lib
-              log )
+#find_library( log-lib
+#              log )
 
 set(DIR_VideoTelemetryShared ${CMAKE_CURRENT_LIST_DIR}/../VideoTelemetryShared)
 
@@ -30,7 +30,6 @@ add_library( parser
         ${T_SOURCE_DIR}/parser_c/smartport.c
         )
 target_link_libraries(parser
-        ${log-lib}
         android
         log)
 #######################################################
@@ -44,7 +43,6 @@ add_library( TelemetryReceiver
         ${IO_PATH}/UDPReceiver.cpp
         )
 target_link_libraries(TelemetryReceiver
-        ${log-lib}
         android
         log
         mediandk

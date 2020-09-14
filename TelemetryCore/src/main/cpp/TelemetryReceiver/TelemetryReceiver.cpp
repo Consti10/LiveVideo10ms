@@ -39,8 +39,9 @@ int TelemetryReceiver::getTelemetryPort(const SharedPreferences &settingsN, int 
     return port;
 }
 
-TelemetryReceiver::TelemetryReceiver(JNIEnv* env,const char* DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader):
-        GROUND_RECORDING_DIRECTORY(DIR),
+TelemetryReceiver::TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader):
+BaseTelemetryReceiver(),
+        GROUND_RECORDING_DIRECTORY(std::move(DIR)),
         mGroundRecorder((externalGroundRecorder== nullptr) ?( * new GroundRecorderFPV(DIR)) : *externalGroundRecorder),
         mFileReceiver((externalFileReader== nullptr) ?( * new FileReader(1024)) : *externalFileReader),
         isExternalFileReceiver(externalFileReader!= nullptr){
@@ -279,8 +280,8 @@ void TelemetryReceiver::setFlightTime(float timeSeconds) {
     appOSDData.flight_time_seconds=timeSeconds;
 }
 
-TelemetryReceiver::MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) const {
-    MTelemetryValue ret = TelemetryReceiver::MTelemetryValue();
+MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) const {
+    MTelemetryValue ret = MTelemetryValue();
     //LOGD("Size %d",(int)sizeof(wifibroadcast_rx_status_forward_t2));
     ret.warning=0;
     switch (index){
@@ -568,9 +569,9 @@ TelemetryReceiver::MTelemetryValue TelemetryReceiver::getTelemetryValue(Telemetr
     return ret;
 }
 
-TelemetryReceiver::MTelemetryValue
+MTelemetryValue
 TelemetryReceiver::getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter) const {
-    MTelemetryValue ret = TelemetryReceiver::MTelemetryValue();
+    MTelemetryValue ret = MTelemetryValue();
     ret.warning=0;
     if(adapter>6 || adapter<0){
         adapter=0;
@@ -753,9 +754,8 @@ inline TelemetryReceiver *native(jlong ptr) {
 extern "C" {
 JNI_METHOD(jlong , createInstance)
 (JNIEnv *env,jclass unused,jobject context,jstring groundRecordingDirectory,jlong externalGroundRecorder,jlong externalFileReader) {
-    const char *str = env->GetStringUTFChars(groundRecordingDirectory, nullptr);
+    const auto str=NDKArrayHelper::DynamicSizeString(env,groundRecordingDirectory);
     auto* telemetryReceiver = new TelemetryReceiver(env,str,reinterpret_cast<GroundRecorderFPV*>(externalGroundRecorder),reinterpret_cast<FileReader*>(externalFileReader));
-    env->ReleaseStringUTFChars(groundRecordingDirectory,str);
     return jptr(telemetryReceiver);
 }
 

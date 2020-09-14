@@ -19,6 +19,7 @@
 #include <GroundRecorderRAW.hpp>
 #include <UDPReceiver.h>
 
+#include "BaseTelemetryReceiver.h"
 
 /*
  * This data is only generated on the android side and does not depend
@@ -35,7 +36,8 @@ typedef struct {
 } AppOSDData;
 
 
-class TelemetryReceiver{
+class TelemetryReceiver : public BaseTelemetryReceiver
+        {
 public:
     TelemetryReceiver(const TelemetryReceiver&) = delete;
     void operator=(const TelemetryReceiver&) = delete;
@@ -75,7 +77,7 @@ public:
 public:
     //External ground recorder means we use the ground recorder of the video lib for a merged
     //Video an telemetry ground recording file
-    explicit TelemetryReceiver(JNIEnv* env,const char* DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader);
+    TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader);
     /**
      * Start all telemetry receiver. If they are already receiving, nothing happens.
      * Make sure startReceiving() and stopReceivingAndWait() are not called on different threads
@@ -111,65 +113,7 @@ public:
     float getHeading_Deg()const;
     float getHeadingHome_Deg()const;
 
-    class MTelemetryValue{
-    public:
-        std::wstring prefix=std::wstring();
-        std::wstring prefixIcon=std::wstring();
-        float prefixScale=0.83f;
-        std::wstring value=L"";
-        double valueNotAsString;
-        std::wstring metric=L"";
-        int warning=0; //0==okay 1==orange 2==red and -1==green
-        unsigned long getLength()const{
-            return prefix.length()+value.length()+metric.length();
-        }
-        bool hasIcon()const{
-            return (!prefixIcon.empty());
-        }
-        std::wstring getPrefix()const{
-            return hasIcon() ? prefixIcon : prefix;
-        }
-    };
-    enum TelemetryValueIndex{
-        DECODER_FPS,
-        DECODER_BITRATE,
-        DECODER_LATENCY_DETAILED,
-        DECODER_LATENCY_SUM,
-        OPENGL_FPS,
-        FLIGHT_TIME,
-        //
-        RX_1,
-        BATT_VOLTAGE,
-        BATT_CURRENT,
-        BATT_USED_CAPACITY,
-        BATT_PERCENTAGE,
-        HOME_DISTANCE,
-        VS,
-        HS_GROUND,
-        HS_AIR,
-        LONGITUDE,
-        LATITUDE,
-        ALTITUDE_GPS,
-        ALTITUDE_BARO,
-        SATS_IN_USE,
-        FLIGHT_STATUS_MAV_ONLY,
-        //
-        EZWB_DOWNLINK_VIDEO_RSSI,
-        EZWB_DOWNLINK_VIDEO_RSSI2,
-        EZWB_UPLINK_RC_RSSI,
-        EZWB_UPLINK_RC_BLOCKS,
-        EZWB_STATUS_AIR,
-        EZWB_STATUS_GROUND,
-        EZWB_BLOCKS,
-        EZWB_RSSI_ADAPTER0,
-        EZWB_RSSI_ADAPTER1,
-        EZWB_RSSI_ADAPTER2,
-        EZWB_RSSI_ADAPTER3,
-        //EZWB_RSSI_ADAPTER4,
-        //EZWB_RSSI_ADAPTER5,
-        XXX
-    };
-    MTelemetryValue getTelemetryValue(TelemetryValueIndex index)const;
+    MTelemetryValue getTelemetryValue(TelemetryValueIndex index) const override;
     MTelemetryValue getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter)const;
     std::wstring getMAVLINKFlightMode()const;
 private:
