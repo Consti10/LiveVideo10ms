@@ -36,13 +36,17 @@ android {
 
     buildFeatures {
         viewBinding = true
-        //prefabPublishing true
+        prefabPublishing true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
+    prefab {
+        Helper {
+            headers "src/main/cpp"
+        }
+    }
 }
 
 dependencies {
