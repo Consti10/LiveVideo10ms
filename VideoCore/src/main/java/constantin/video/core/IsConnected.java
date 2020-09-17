@@ -1,7 +1,9 @@
 package constantin.video.core;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.SupplicantState;
@@ -105,9 +107,19 @@ public final class IsConnected {
         final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
         intent.setComponent(cn);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Toast.makeText(c, "enable 'USB tethering' (not wifi,but usb hotspot)", Toast.LENGTH_LONG).show();
         c.startActivity(intent);
     }
+    
+    public static void makeAlertDialogOpenTetherSettings(final Context c){
+        new AlertDialog.Builder(c).setMessage("enable 'USB tethering' (not wifi,but usb hotspot)")
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openUSBTetherSettings(c);
+                    }
+                }).show();
+    }
+    
     // X
     //get all Inet4Addresses that are
     //either wifi or wifi hotspot or usb tethering
