@@ -3,20 +3,16 @@ package constantin.video.impl;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.view.Surface;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import constantin.video.core.DecodingInfo;
 import constantin.video.core.IVideoParamsChanged;
-import constantin.video.core.R;
 import constantin.video.core.databinding.ActivitySimpleVideoBinding;
 import constantin.video.core.external.AspectFrameLayout;
-import constantin.video.core.video_player.VideoPlayer;
+import constantin.video.core.player.VideoPlayer;
 
 // Most basic implementation of an activity that uses LiveVideo to stream or play back video
 // Into an Android Surface View

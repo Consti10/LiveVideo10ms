@@ -14,7 +14,7 @@ import constantin.test.TranscodeService
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
 import constantin.video.core.RequestPermissionHelper
-import constantin.video.core.video_player.VideoSettings
+import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
 

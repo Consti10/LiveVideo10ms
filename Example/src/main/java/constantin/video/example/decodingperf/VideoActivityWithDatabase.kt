@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import constantin.video.core.DecodingInfo
 
-import constantin.video.core.video_player.VideoSettings
+import constantin.video.core.player.VideoSettings
 import constantin.video.example.Helper
 import constantin.video.example.R
 import constantin.video.impl.SimpleVideoActivity

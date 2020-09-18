@@ -1,18 +1,11 @@
-package constantin.video.core.video_player;
+package constantin.video.core.player;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ImageDecoder;
-import android.graphics.SurfaceTexture;
-import android.media.Image;
-import android.media.ImageReader;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
-import android.view.Surface;
 
 import androidx.annotation.NonNull;
 

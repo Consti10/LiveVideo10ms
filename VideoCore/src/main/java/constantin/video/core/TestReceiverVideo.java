@@ -11,7 +11,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import constantin.video.core.video_player.VideoPlayer;
+import constantin.video.core.player.VideoPlayer;
 
 //creates a new thread that -in between onResume() / onPause()
 //constantly reads from videoPlayer and updates the appropriate ui elements

@@ -1,29 +1,14 @@
-package constantin.video.core.video_player;
+package constantin.video.core.player;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.graphics.ImageDecoder;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.Drawable;
-import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
-import android.media.MediaCodecList;
-import android.media.MediaFormat;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 

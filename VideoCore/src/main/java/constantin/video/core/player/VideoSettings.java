@@ -1,4 +1,4 @@
-package constantin.video.core.video_player;
+package constantin.video.core.player;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
