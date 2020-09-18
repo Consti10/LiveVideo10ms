@@ -9,7 +9,7 @@ project(TelemetryCoreProject VERSION 1.0.0 LANGUAGES CXX)
 #find_library( log-lib
 #              log )
 
-set(DIR_VideoTelemetryShared ${CMAKE_CURRENT_LIST_DIR}/../VideoTelemetryShared)
+set(DIR_VideoTelemetryShared ${CMAKE_CURRENT_LIST_DIR}/../Shared/src/main/cpp)
 
 # Add IO and Helper from the video/telemetry shared folder
 set(IO_PATH ${DIR_VideoTelemetryShared}/InputOutput)

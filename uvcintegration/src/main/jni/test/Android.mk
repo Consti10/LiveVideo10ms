@@ -23,7 +23,7 @@ LOCAL_LDLIBS += -lOpenMAXAL
 
 
 #DIR_VideoTelemetryShared := $(LOCAL_PATH)/../../../../../../LiveVideo10ms/VideoTelemetryShared
-DIR_VideoTelemetryShared := $(V_CORE_DIR)/../VideoTelemetryShared
+DIR_VideoTelemetryShared := $(V_CORE_DIR)/../Shared/src/main/cpp
 # Android.mk doesnt work with absolute paths
 # DIR_VideoTelemetryShared := $(V_CORE_DIR)/../VideoTelemetryShared
 

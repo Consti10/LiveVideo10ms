@@ -6,13 +6,12 @@
 #define RENDERINGX_NDKHELPER_H
 
 #include "NDKArrayHelper.hpp"
+#include "AndroidLogger.hpp"
 #include <jni.h>
 #include <string>
 #include <vector>
 #include <array>
-#include <AndroidLogger.hpp>
 #include <android/asset_manager_jni.h>
-
 #include <type_traits>
 
 // The purpose of this namespace is to provide utility functions
