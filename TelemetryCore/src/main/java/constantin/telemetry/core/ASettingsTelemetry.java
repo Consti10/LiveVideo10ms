@@ -2,7 +2,6 @@ package constantin.telemetry.core;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
