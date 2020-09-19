@@ -6,7 +6,6 @@
 #define FPV_VR_HELPER_SHARED_PREFERENCES_HPP
 
 #include <jni.h>
-#include <android/log.h>
 #include <string>
 
 ///Example reading values
@@ -68,9 +67,7 @@ public:
         jclass jcContext = env->FindClass("android/content/Context");
         jclass jcSharedPreferences = env->FindClass("android/content/SharedPreferences");
         //jclass jcSharedPreferences_Editor=env->FindClass("android/content/SharedPreferences$Editor");
-        if(jcContext==nullptr || jcSharedPreferences== nullptr){
-            __android_log_print(ANDROID_LOG_DEBUG, "SharedPreferences","Cannot find classes");
-        }
+        assert(jcContext!=nullptr && jcSharedPreferences!=nullptr);
         //find the 3 functions we need to get values from an SharedPreferences instance
         jmGetBoolean=env->GetMethodID(jcSharedPreferences,"getBoolean","(Ljava/lang/String;Z)Z");
         jmGetInt=env->GetMethodID(jcSharedPreferences,"getInt","(Ljava/lang/String;I)I");

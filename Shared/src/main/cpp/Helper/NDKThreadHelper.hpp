@@ -6,7 +6,7 @@
 #define LIVEVIDEO10MS_NDKTHREAD_H
 
 #include <jni.h>
-#include <AndroidLogger.hpp>
+#include "AndroidLogger.hpp"
 
 //
 // Workaround for issue https://github.com/android/ndk/issues/1255 and more

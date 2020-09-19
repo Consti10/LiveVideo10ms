@@ -100,6 +100,9 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
         }
     }
 
+    /**
+     * Start btw. connect to already connected UVC device
+     */
     private void startAlreadyConnectedUSBDevice(){
         if (ContextCompat.checkSelfPermission(parent, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG,"Error camera not granted");

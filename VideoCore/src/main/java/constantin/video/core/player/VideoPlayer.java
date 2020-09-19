@@ -48,7 +48,7 @@ public class VideoPlayer implements INativeVideoParamsChanged{
         return nativeGetExternalFileReader(nativeVideoPlayer);
     }
 
-    public void setVideoSurface(final @Nullable Surface surface){
+    private void setVideoSurface(final @Nullable Surface surface){
         verifyApplicationThread();
         nativeSetVideoSurface(nativeVideoPlayer,surface);
     }

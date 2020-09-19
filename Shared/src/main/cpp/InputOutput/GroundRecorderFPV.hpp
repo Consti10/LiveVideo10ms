@@ -105,7 +105,7 @@ public:
 private:
     std::ofstream ofstream;
     void addFpvFileToContentProvider(JNIEnv* env,jobject androidContext,std::string filePath){
-        jclass jcVideoSettings = env->FindClass("constantin/video/core/video_player/VideoSettings");
+        jclass jcVideoSettings = env->FindClass("constantin/video/core/player/VideoSettings");
         assert(jcVideoSettings != nullptr);
         jmethodID jmethodId = env->GetStaticMethodID(jcVideoSettings, "addFpvFileToContentProvider", "(Landroid/content/Context;Ljava/lang/String;)V" );
         assert(jmethodId!=nullptr);

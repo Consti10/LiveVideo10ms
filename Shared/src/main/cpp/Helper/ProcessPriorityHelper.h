@@ -6,7 +6,7 @@
 #define FPV_VR_OS_PROCESSPRIORITYHELPER_H
 
 
-#include <AndroidLogger.hpp>
+#include "AndroidLogger.hpp"
 #include <sys/resource.h>
 #include <unistd.h>
 #include <sched.h>
