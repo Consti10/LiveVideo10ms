@@ -33,9 +33,9 @@ namespace ProcessPriorityHelper{
         int ret = setpriority(which, (id_t)pid, wantedPriority);
         const int currentPriorityAfterSet=getCurrentProcessPriority();
         if(ret!=0 || currentPriorityAfterSet != wantedPriority){
-            MLOGE2(TAG)<<"ERROR set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid);
+            MLOGE2(TAG)<<"ERROR set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid;
         }else{
-            MLOGD2(TAG)<<"SUCCESS Set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid);
+            MLOGD2(TAG)<<"SUCCESS Set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid;
         }
     }
 

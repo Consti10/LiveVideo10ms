@@ -11,7 +11,8 @@
         <item>FILE</item>
         <item>ASSETS</item>
         <item>VIA_FFMPEG_URL</item>
-        <item>EXTERNAL</item>
+        <item>EXTERNAL(DJI)</item>
+        <item>EXTERNAL(UVC)</item>
     </string-array>
 
 
