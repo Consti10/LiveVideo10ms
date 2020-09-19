@@ -8,4 +8,4 @@ include $(PROJ_PATH)/libusb/android/jni/Android.mk
 include $(PROJ_PATH)/libuvc/android/jni/Android.mk
 
 #include $(V_CORE_DIR)/../VideoTelemetryShared/Android.mk
-include $(PROJ_PATH)/test/Android.mk
+include $(PROJ_PATH)/uvcintegration/Android.mk

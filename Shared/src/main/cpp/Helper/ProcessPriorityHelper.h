@@ -21,7 +21,7 @@ namespace ProcessPriorityHelper{
     }
     static const void printCPUPriority(const char* caller){
         const int priority=getCurrentProcessPriority();
-        LOGD(TAG)<<"Priority is "<<priority<<"in"<<caller;
+        MLOGD2(TAG)<<"Priority is "<<priority<<"in"<<caller;
     }
     // If the current priority == wanted priority do nothing
     // Else, set the wanted priority and log Error / Success
@@ -33,9 +33,9 @@ namespace ProcessPriorityHelper{
         int ret = setpriority(which, (id_t)pid, wantedPriority);
         const int currentPriorityAfterSet=getCurrentProcessPriority();
         if(ret!=0 || currentPriorityAfterSet != wantedPriority){
-            LOGE(TAG)<<"ERROR set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid);
+            MLOGE2(TAG)<<"ERROR set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid);
         }else{
-            LOGD(TAG)<<"SUCCESS Set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid);
+            MLOGD2(TAG)<<"SUCCESS Set thread priority to:"<<wantedPriority<<" from "<<currentPriority<<" in "<<caller<<" pid "<<pid);
         }
     }
 
@@ -59,7 +59,7 @@ namespace ProcessPriorityHelper{
         // struct sched_param is used to store the scheduling priority
         struct sched_param params;
         auto errror=sched_getparam(this_thread,&params);
-        LOGD(TAG)<<"sched_getparam returns "<<errror;
+        MLOGD2(TAG)<<"sched_getparam returns "<<errror;
 
         // We'll set the priority to the maximum.
         /*CPULOGD("Scheduler is %d",sched_getscheduler(this_thread));

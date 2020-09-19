@@ -1,4 +1,4 @@
-package constantin.test;
+package constantin.uvcintegration;
 
 import android.view.Surface;
 

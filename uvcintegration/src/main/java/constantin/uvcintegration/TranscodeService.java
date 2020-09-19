@@ -1,4 +1,4 @@
-package constantin.test;
+package constantin.uvcintegration;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

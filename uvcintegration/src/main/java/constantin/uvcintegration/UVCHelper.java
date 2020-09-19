@@ -1,16 +1,13 @@
-package constantin.test;
+package constantin.uvcintegration;
 
 import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class UVCHelper {
     public static final int DEVICE_CLASS_ROTG02=239;

@@ -2,16 +2,12 @@ package constantin.video.example;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Camera;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CaptureRequest;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.TextureView;
 
-import constantin.test.ColorFormatTester;
+import constantin.uvcintegration.ColorFormatTester;
 import constantin.video.example.databinding.ActivityColorformatTestBinding;
 
 public class AColorFormatTester extends AppCompatActivity implements TextureView.SurfaceTextureListener {

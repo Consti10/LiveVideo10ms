@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
-import constantin.test.TranscodeService
+import constantin.uvcintegration.TranscodeService
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
 import constantin.video.core.RequestPermissionHelper

@@ -1,4 +1,4 @@
-package constantin.test;
+package constantin.uvcintegration;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
@@ -52,6 +52,15 @@ public class UVCReceiverDecoder {
         }
     }
 
+    public void stopReceiving(final Context context){
+        final String filenamePath=nativeStopReceiving(nativeInstance,context);
+        if(filenamePath!=null){
+            System.out.println("FilenamePath "+filenamePath);
+            //TODO TranscodeService.startTranscoding(context,filenamePath);
+        }
+        alreadyStreaming=false;
+    }
+
     public static String getDirectoryToSaveDataTo(){
         final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/FPV_VR/MJPEG/";
         File dir = new File(ret);
@@ -60,15 +69,6 @@ public class UVCReceiverDecoder {
             //System.out.println("mkdirs res"+mkdirs);
         }
         return ret;
-    }
-
-    public void stopReceiving(final Context context){
-        final String filenamePath=nativeStopReceiving(nativeInstance,context);
-        if(filenamePath!=null){
-            System.out.println("FilenamePath "+filenamePath);
-            //TODO TranscodeService.startTranscoding(context,filenamePath);
-        }
-        alreadyStreaming=false;
     }
 
     /**

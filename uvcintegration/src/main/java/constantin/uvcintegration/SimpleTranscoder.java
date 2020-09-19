@@ -1,4 +1,4 @@
-package constantin.test;
+package constantin.uvcintegration;
 
 public class SimpleTranscoder implements Runnable {
     static{
