@@ -7,6 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -21,14 +22,14 @@ public class TestReceiverTelemetry implements Runnable, LifecycleObserver {
     private TextView receivedTelemetryDataTV=null;
     private TextView ezwbForwardDataTV=null;
     private TextView dataAsStringTV=null;
-    private final Activity activity;
+    private final AppCompatActivity activity;
     private final TelemetryReceiver telemetryReceiver;
     private Thread mUpateThread;
 
-    public  <T extends Activity & LifecycleOwner> TestReceiverTelemetry(final T t){
-        this.activity=t;
-        telemetryReceiver =new TelemetryReceiver(t,0,0);
-        t.getLifecycle().addObserver(this);
+    public  TestReceiverTelemetry(final AppCompatActivity parent){
+        this.activity=parent;
+        telemetryReceiver =new TelemetryReceiver(parent,0,0);
+        parent.getLifecycle().addObserver(this);
     }
 
     public void setViews(TextView receivedTelemetryDataTV, TextView ezwbForwardDataTV, TextView telemetryValuesAsString){

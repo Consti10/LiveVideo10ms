@@ -8,6 +8,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,7 +33,7 @@ public class VideoPlayer implements INativeVideoParamsChanged{
 
     //Setup as much as possible without creating the decoder
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
-    public VideoPlayer(final Context parent){
+    public VideoPlayer(final AppCompatActivity parent){
         this.context=parent;
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
     }

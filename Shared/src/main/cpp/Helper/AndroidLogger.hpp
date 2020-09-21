@@ -117,9 +117,10 @@ namespace PrettyFunctionHelper{
             public:
                 static std::string testMacro(){
                     const auto namespaceAndClassName=PrettyFunctionHelper::namespaceAndClassName(__FUNCTION__,__PRETTY_FUNCTION__);
-                    assert(namespaceAndClassName.compare("TestNamespace1::TestNamespace2::Test2") == 0);
+                    AndroidLogger(ANDROID_LOG_DEBUG,"NoT2")<<namespaceAndClassName;
+                    assert(namespaceAndClassName.compare("PrettyFunctionHelper::TestNamespace1::TestNamespace2::Test2") == 0);
                     const auto className=PrettyFunctionHelper::className(namespaceAndClassName);
-                    assert(className.compare("Test") == 0);
+                    assert(className.compare("Test2") == 0);
                     return className;
                 }
             };

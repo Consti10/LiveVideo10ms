@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -19,14 +20,14 @@ import constantin.video.core.player.VideoPlayer;
 
 public class TestReceiverVideo implements Runnable, LifecycleObserver {
 
-    private final Activity activity;
+    private final AppCompatActivity activity;
     private final VideoPlayer videoPlayer;
     private Thread mThread;
 
     private TextView receivedVideoDataTV;
     private Button button;
 
-    public <T extends Activity & LifecycleOwner> TestReceiverVideo(final T parent){
+    public TestReceiverVideo(final AppCompatActivity parent){
         this.activity=parent;
         videoPlayer=new VideoPlayer(activity);
         parent.getLifecycle().addObserver(this);

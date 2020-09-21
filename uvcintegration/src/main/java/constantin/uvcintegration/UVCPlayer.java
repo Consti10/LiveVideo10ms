@@ -127,9 +127,9 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
         usbManager.requestPermission(uvcDevice, permissionIntent);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    private void resume(){
-        Log.d(TAG,"resume");
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    private void onStart(){
+        Log.d(TAG,"onStart");
         //register the broadcast receiver
         final IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_USB_PERMISSION);
@@ -140,9 +140,9 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
         startAlreadyConnectedUSBDevice();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    private void pause(){
-        Log.d(TAG,"pause");
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    private void onStop(){
+        Log.d(TAG,"onStop");
         parent.unregisterReceiver(this);
         mUVCReceiverDecoder.stopReceiving(parent);
     }

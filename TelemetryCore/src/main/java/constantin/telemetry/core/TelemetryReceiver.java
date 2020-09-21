@@ -4,6 +4,7 @@ package constantin.telemetry.core;
 import android.content.Context;
 import android.location.Location;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -53,7 +54,7 @@ public class TelemetryReceiver implements HomeLocation.IHomeLocationChanged, Lif
 
     //Only use with AppCombatActivity for lifecycle listener
     //receives data in between onPause()<-->onResume()
-    public <T extends Context & LifecycleOwner> TelemetryReceiver(final T parent,long externalGroundRecorder,long externalFileReader){
+    public TelemetryReceiver(final AppCompatActivity parent, long externalGroundRecorder, long externalFileReader){
         context=parent;
         nativeInstance=createInstance(parent,TelemetrySettings.getDirectoryToSaveDataTo(),externalGroundRecorder,externalFileReader);
         //Home location handles lifecycle itself
