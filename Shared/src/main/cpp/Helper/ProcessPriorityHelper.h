@@ -8,6 +8,7 @@
 
 #include "AndroidLogger.hpp"
 #include <sys/resource.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 #include <sched.h>
 #include <pthread.h>

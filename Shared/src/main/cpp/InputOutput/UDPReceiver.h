@@ -7,7 +7,6 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <jni.h>
-#include <android/log.h>
 #include <iostream>
 #include <thread>
 #include <atomic>

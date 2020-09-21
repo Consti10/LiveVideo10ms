@@ -24,6 +24,7 @@ namespace NDKHelper {
         jmethodID get_asset_manager_method = env->GetMethodID(
                 context_class, "getAssets", "()Landroid/content/res/AssetManager;");
         jobject java_asset_mgr=env->CallObjectMethod(android_context,get_asset_manager_method);
+        assert(java_asset_mgr!=nullptr);
         return java_asset_mgr;
     }
     // Return the AAssetManager object instead of the general 'jobject'

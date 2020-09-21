@@ -67,6 +67,7 @@ namespace PrettyFunctionHelper{
     static constexpr const auto UNKNOWN_CLASS_NAME="UnknownClassName";
     /**
      * @param prettyFunction as obtained by the macro __PRETTY_FUNCTION__
+     * @param function as obtained by the macro __FUNCTION__
      * @return a string containing the class name at the end, optionally prefixed by the namespace(s).
      * Example return values: "MyNamespace1::MyNamespace2::MyClassName","MyNamespace1::MyClassName" "MyClassName"
      */
@@ -99,17 +100,32 @@ namespace PrettyFunctionHelper{
     }
     class Test{
     public:
-        static std::string testMacro(std::string exampleParam=""){
+        static std::string testMacro(std::string unused){
             const auto namespaceAndClassName=PrettyFunctionHelper::namespaceAndClassName(__FUNCTION__,__PRETTY_FUNCTION__);
             //AndroidLogger(ANDROID_LOG_DEBUG,"NoT2")<<namespaceAndClassName;
             assert(namespaceAndClassName.compare("PrettyFunctionHelper::Test") == 0);
             const auto className=PrettyFunctionHelper::className(namespaceAndClassName);
             //AndroidLogger(ANDROID_LOG_DEBUG,"NoT2")<<className;
             assert(className.compare("Test") == 0);
-            return "";
+            return className;
         }
     };
     static const std::string x=Test::testMacro("");
+    namespace TestNamespace1{
+        namespace TestNamespace2{
+            class Test2{
+            public:
+                static std::string testMacro(){
+                    const auto namespaceAndClassName=PrettyFunctionHelper::namespaceAndClassName(__FUNCTION__,__PRETTY_FUNCTION__);
+                    assert(namespaceAndClassName.compare("TestNamespace1::TestNamespace2::Test2") == 0);
+                    const auto className=PrettyFunctionHelper::className(namespaceAndClassName);
+                    assert(className.compare("Test") == 0);
+                    return className;
+                }
+            };
+        }
+    }
+    static const std::string x2=TestNamespace1::TestNamespace2::Test2::testMacro();
 }
 #ifndef ANDROID_LOGER_DEFINE_CUSTOM_CLASS_NAME_MACRO
 #define __NAMESPACE_AND_CLASS_NAME__ PrettyFunctionHelper::namespaceAndClassName(__FUNCTION__,__PRETTY_FUNCTION__)

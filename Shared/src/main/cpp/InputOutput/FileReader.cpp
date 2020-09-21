@@ -34,12 +34,12 @@ static int isTelemetryFilename(const std::string& path){
     return packetType;
 }
 
-void FileReader::startReading(AAssetManager *assetManager1, const std::string FILEPATH1) {
+void FileReader::startReading(AAssetManager *assetManager1,std::string FILEPATH1) {
     std::lock_guard<std::mutex> lock(mMutexStartStop);
     if(started)
         return;
     this->assetManager=assetManager1;
-    this->FILEPATH=FILEPATH1;
+    this->FILEPATH=std::move(FILEPATH1);
     started=true;
     exitSignal=std::promise<void>();
     std::future<void> futureObj = exitSignal.get_future();

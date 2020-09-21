@@ -59,7 +59,7 @@ public:
      * @param assetManager use nullptr for 'normal' files, else a valid android asset manager
      * @param FILEPATH Path to file,depends on assetManager if relative to file or asset
      */
-    void startReading(AAssetManager* assetManager,const std::string FILEPATH);
+    void startReading(AAssetManager* assetManager,std::string FILEPATH);
     /**
      * After this call returns it is guaranteed that no more data will be fed trough the callback
      */

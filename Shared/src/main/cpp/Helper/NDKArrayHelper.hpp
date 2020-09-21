@@ -24,9 +24,10 @@ namespace NDKArrayHelper{
     * Returns a std::vector whose size depends on the size of the java array
     * and which owns the underlying memory. Most generic and memory safe.
     * Function has compile time type safety, see example() below
-    * @param TCpp basic cpp type like int, float inside a std::vector
+    * @param TCpp basic cpp type like int, float.
     * @param TJava java array like jintArray, jfloatArray - has to match the cpp type. For example,
     * T==int => T2==jintArray
+    * If TCpp==int and TJava==jintArray this method returns std::vector<int>
     */
     template <class TCpp,class TJava>
     static std::vector<TCpp> DynamicSizeArray(JNIEnv *env, TJava jArray){
