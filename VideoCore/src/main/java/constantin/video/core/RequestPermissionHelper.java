@@ -21,11 +21,12 @@ import java.util.List;
 // When also forwarding onRequestPermissionsResult() they are requested again until granted
 // When the user denies the permissions , on the second time a Alert dialog is shown before requesting the permissions
 public class RequestPermissionHelper implements ActivityCompat.OnRequestPermissionsResultCallback{
-    private static final String TAG="RequestPermissionHelper";
+    private static final String TAG=RequestPermissionHelper.class.getSimpleName();
     private final String[] REQUIRED_PERMISSION_LIST;
     private final List<String> missingPermission = new ArrayList<>();
     private static final int REQUEST_PERMISSION_CODE = 12345;
-    // This will be called once all permissions are granted. Called every time checkAndRequestPermissions is called
+    // This will be called once all permissions are granted.
+    // Called every time checkAndRequestPermissions is called and succeeded
     private final IOnPermissionsGranted iOnPermissionsGranted;
     private Activity activity;
     private int nRequests=0;
@@ -123,6 +124,9 @@ public class RequestPermissionHelper implements ActivityCompat.OnRequestPermissi
     }
 
     public interface IOnPermissionsGranted{
-        public void onPermissionsGranted();
+        /**
+         * Called when all the permissions are granted
+         */
+        void onPermissionsGranted();
     }
 }
