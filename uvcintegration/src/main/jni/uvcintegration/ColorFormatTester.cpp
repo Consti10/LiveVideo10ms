@@ -69,7 +69,7 @@ static ColorFormatTester tester;
 // ------------------------------------- Native Bindings -------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
-      Java_constantin_test_ColorFormatTester_##method_name
+      Java_constantin_uvcintegration_ColorFormatTester_##method_name
 extern "C" {
 
 JNI_METHOD(void, nativeSetSurface)
