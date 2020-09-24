@@ -112,7 +112,7 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
 }
 
 void ParseRAW::parseDjiLiveVideoData(const uint8_t* data,const size_t data_length){
-    /*for (size_t i = 0; i < data_length; ++i) {
+    for (size_t i = 0; i < data_length; ++i) {
         nalu_data[nalu_data_position++] = data[i];
         if (nalu_data_position >= NALU::NALU_MAXLEN - 1) {
             nalu_data_position = 0;
@@ -133,13 +133,13 @@ void ParseRAW::parseDjiLiveVideoData(const uint8_t* data,const size_t data_lengt
                     nalu_data[2] = 0;
                     nalu_data[3] = 1;
                     if(cb!=nullptr && nalu_data_position>=4){
-                        NALU nalu(nalu_data.data(),nalu_data_position-4);
+                        NALU nalu(nalu_data,nalu_data_position-4);
                         if(nalu.isSPS() || nalu.isPPS()){
                             cb(nalu);
                             dji_data_buff_size=0;
                         }else if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD){
                             if(dji_data_buff_size>0){
-                                NALU nalu2(dji_data_buff.data(),dji_data_buff_size);
+                                NALU nalu2(dji_data_buff,dji_data_buff_size);
                                 cb(nalu2);
                                 dji_data_buff_size=0;
                             }
@@ -155,5 +155,5 @@ void ParseRAW::parseDjiLiveVideoData(const uint8_t* data,const size_t data_lengt
             default:
                 break;
         }
-    }*/
+    }
 }
