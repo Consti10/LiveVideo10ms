@@ -10,12 +10,13 @@ project(TelemetryCoreProject VERSION 1.0.0 LANGUAGES CXX)
 #              log )
 
 set(DIR_VideoTelemetryShared ${CMAKE_CURRENT_LIST_DIR}/../Shared/src/main/cpp)
-
-# Add IO and Helper from the video/telemetry shared folder
+# Add the helper directories from the video/telemetry shared folder
 set(IO_PATH ${DIR_VideoTelemetryShared}/InputOutput)
 set(HELPER_PATH ${DIR_VideoTelemetryShared}/Helper)
+set(NDKHELPER_PATH ${DIR_VideoTelemetryShared}/NDKHelper)
 include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
+include_directories(${NDKHELPER_PATH})
 
 set(T_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp/)
 include_directories( ${T_SOURCE_DIR}/SharedCppC)

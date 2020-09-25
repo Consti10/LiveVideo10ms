@@ -7,11 +7,11 @@
 
 
 #include "AndroidLogger.hpp"
-#include <sys/resource.h>
-#include <sys/syscall.h>
-#include <unistd.h>
-#include <sched.h>
-#include <pthread.h>
+#include "../../../../../../../../../AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/sys/resource.h"
+#include "../../../../../../../../../AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/sys/syscall.h"
+#include "../../../../../../../../../AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/unistd.h"
+#include "../../../../../../../../../AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/sched.h"
+#include "../../../../../../../../../AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/pthread.h"
 
 namespace ProcessPriorityHelper{
     constexpr auto TAG="ProcessPriorityHelper";
@@ -79,7 +79,7 @@ namespace ProcessPriorityHelper{
         sched_getparam()*/
     }
 }
-#include <thread>
+#include "../../../../../../../../../AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/thread"
 namespace TEST_PROCESS_PRIO{
     static void setThreadPriorityContiniously(const int prio,const char* name) {
         while (true){

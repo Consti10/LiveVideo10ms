@@ -29,6 +29,7 @@ DIR_VideoTelemetryShared := $(V_CORE_DIR)/../Shared/src/main/cpp
 
 LOCAL_C_INCLUDES := $(DIR_VideoTelemetryShared)/Helper
 LOCAL_C_INCLUDES += $(DIR_VideoTelemetryShared)/InputOutput
+LOCAL_C_INCLUDES += $(DIR_VideoTelemetryShared)/NDKHelper
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/Encoder
 
 # If we remove dependency of libusb here we can build both libusb and libuvc as static libraries uvc usb1.0

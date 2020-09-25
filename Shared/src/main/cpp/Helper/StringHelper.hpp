@@ -7,7 +7,7 @@
 
 #include <string>
 #include <sstream>
-#include "AndroidLogger.hpp"
+#include "../NDKHelper/AndroidLogger.hpp"
 
 //Really messy spaghetti code
 

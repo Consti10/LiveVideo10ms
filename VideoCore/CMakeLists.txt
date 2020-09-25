@@ -86,12 +86,14 @@ target_link_libraries( FFMpegVideoReceiver
 #######################################################
 
 set(DIR_VideoTelemetryShared ${CMAKE_CURRENT_LIST_DIR}/../Shared/src/main/cpp)
-
-# Add IO and Helper from the video/telemetry shared folder
+# Add the helper directories from the video/telemetry shared folder
 set(IO_PATH ${DIR_VideoTelemetryShared}/InputOutput)
 set(HELPER_PATH ${DIR_VideoTelemetryShared}/Helper)
+set(NDKHELPER_PATH ${DIR_VideoTelemetryShared}/NDKHelper)
 include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
+include_directories(${NDKHELPER_PATH})
+
 
 set(VIDEO_PATH src/main/cpp)
 add_library( VideoNative

@@ -11,7 +11,7 @@
 namespace MyTimeHelper{
     // R stands for readable. Convert a std::chrono::duration into a readable format
     // Readable format is somewhat arbitrary, in this case readable means that for example
-    // 1second has 'ms' resolution since for values that big ns resolution probably isnt needed
+    // 1second has 'ms' resolution since for values that big ns resolution probably isn't needed
     static std::string R(const std::chrono::steady_clock::duration& dur){
         const auto durAbsolute=std::chrono::abs(dur);
         if(durAbsolute>=std::chrono::seconds(1)){
