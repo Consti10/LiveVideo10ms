@@ -12,3 +12,11 @@ add_library(NDKHelper
         SHARED
         src/main/cpp/NDKHelper/ZDummy.cpp
         )
+
+target_link_libraries( Helper
+        log
+        android)
+
+target_link_libraries( NDKHelper
+        log
+        android)
