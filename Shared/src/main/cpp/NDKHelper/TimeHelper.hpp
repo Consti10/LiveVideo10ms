@@ -41,7 +41,7 @@ namespace MyTimeHelper{
 // Saves the minimum,maximum and average of all the samples
 class AvgCalculator{
 private:
-    // do not forget the braces to initalize with 0
+    // do not forget the braces to initialize with 0
     std::chrono::nanoseconds sum{};
     long nSamples=0;
     std::chrono::nanoseconds min=std::chrono::nanoseconds::max();
@@ -102,6 +102,7 @@ public:
         ss<<"min="<<MyTimeHelper::R(getMin())<<" max="<<MyTimeHelper::R(getMax())<<" avg="<<MyTimeHelper::R(getAvg());
         return ss.str();
     }
+    // Merges two AvgCalculator(s) together
     static AvgCalculator median(const AvgCalculator& c1,const AvgCalculator& c2){
         AvgCalculator ret;
         ret.add(c1.getAvg());
