@@ -109,7 +109,6 @@ public:
         const char* valueP = env->GetStringUTFChars(value, nullptr);
         const std::string ret=std::string(valueP);
         env->ReleaseStringUTFChars(value,valueP);
-        //__android_log_print(ANDROID_LOG_DEBUG, "SharedPreferences","%s",ret.c_str());
         return ret;
     }
     SharedPreferences_Editor edit()const{
