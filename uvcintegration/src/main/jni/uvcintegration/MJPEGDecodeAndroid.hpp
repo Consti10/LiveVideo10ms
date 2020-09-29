@@ -57,6 +57,7 @@ public:
         if(DO_NOTHING)return;
         jpeg_destroy_decompress(&dinfo);
     }
+    Chronometer c;
 private:
    struct jpeg_decompress_struct dinfo;
     // 'Create array with pointers to an array'
@@ -93,6 +94,10 @@ public:
         //ANativeWindowBufferHelper::debugANativeWindowBuffer(nativeWindowBuffer);
         //printStartEnd((uint8_t*)jpegData,jpegDataSize);
         //MEASURE_FUNCTION_EXECUTION_TIME
+        if(c.getNSamples()>60){
+            c.reset();
+        }
+        c.start();
         unsigned int BYTES_PER_PIXEL;
         J_COLOR_SPACE wantedOutputColorspace;
         if(nativeWindowBuffer.format==AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM || nativeWindowBuffer.format==AHARDWAREBUFFER_FORMAT_R8G8B8X8_UNORM){
@@ -130,6 +135,8 @@ public:
             scanline_count+=lines_read;
         }
         jpeg_finish_decompress(&dinfo);
+        c.stop();
+        MLOGD<<"Decoding time "<<c.getAvgReadable();
     }
 
     // Decode a jpeg whose color format is YUV422 into the appropriate buffer

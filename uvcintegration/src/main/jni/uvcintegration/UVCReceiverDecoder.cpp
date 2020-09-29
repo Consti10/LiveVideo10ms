@@ -180,6 +180,9 @@ public:
         }
         return std::nullopt;
     }
+    float getAvgDecodingTimeMs(){
+        return mMJPEGDecodeAndroid.c.getAvg_ms();
+    }
 };
 
 // ------------------------------------- Native Bindings -------------------------------------
@@ -226,6 +229,11 @@ JNI_METHOD(jstring , nativeStopReceiving)
 JNI_METHOD(void, nativeSetSurface)
 (JNIEnv *env, jclass jclass1, jlong javaP,jobject surface) {
    native(javaP)->setSurface(env,surface);
+}
+
+JNI_METHOD(float, nativeGetDecodingTime)
+(JNIEnv *env, jclass jclass1, jlong javaP) {
+    return native(javaP)->getAvgDecodingTimeMs();
 }
 
 }

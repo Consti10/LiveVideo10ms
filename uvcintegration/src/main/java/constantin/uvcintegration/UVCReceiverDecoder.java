@@ -71,6 +71,10 @@ public class UVCReceiverDecoder {
         return ret;
     }
 
+    public float GetDecodingTime(){
+        return nativeGetDecodingTime(nativeInstance);
+    }
+
     /**
      * If @param surface!=null a native reference is created and
      * future uvc frames will be decoded into the underlying buffer(s) of the surface
@@ -87,4 +91,7 @@ public class UVCReceiverDecoder {
     // return ground recording filenamePath if file was created
     private static native String nativeStopReceiving(long nativeInstance,Context context);
     private static native void nativeSetSurface(long nativeInstance,Surface surface);
+
+    private static native float nativeGetDecodingTime(long nativeInstance);
+
 }

@@ -16,6 +16,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
@@ -24,9 +25,13 @@ import androidx.lifecycle.OnLifecycleEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import constantin.video.core.DecodingInfo;
 import constantin.video.core.IVideoParamsChanged;
 import constantin.video.core.gl.ISurfaceTextureAvailable;
+import constantin.video.core.player.VideoPlayer;
 
 // Pretty complicated / not good documented code
 // Uses BroadcastReceiver to get notified when USB devices are connected / permission is granted
@@ -43,6 +48,9 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
 
     private final AppCompatActivity parent;
     private final UsbManager usbManager;
+    //
+    @Nullable IVideoParamsChanged iVideoParamsChanged;
+    private Timer timer;
 
     public UVCPlayer(final AppCompatActivity parent){
         parent.getLifecycle().addObserver(this);
@@ -138,17 +146,35 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
         parent.registerReceiver(this,filter);
         // We won't get notified about already connected devices via USB_DEVICE_DETACHED broadcast
         startAlreadyConnectedUSBDevice();
+        //
+        timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                final float decodingTime= mUVCReceiverDecoder.GetDecodingTime();
+                DecodingInfo decodingInfo=new DecodingInfo(12,0,0,0,decodingTime,0,0);
+                if(iVideoParamsChanged!=null){
+                    iVideoParamsChanged.onDecodingInfoChanged(decodingInfo);
+                }
+
+            }
+        },0,1000);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private void onStop(){
         Log.d(TAG,"onStop");
+        //
+        timer.cancel();
+        timer.purge();
+        //
         parent.unregisterReceiver(this);
         mUVCReceiverDecoder.stopReceiving(parent);
     }
 
     // Video ratio is always the same
     public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged){
+        this.iVideoParamsChanged=iVideoParamsChanged;
         iVideoParamsChanged.onVideoRatioChanged(640,480);
     }
 
