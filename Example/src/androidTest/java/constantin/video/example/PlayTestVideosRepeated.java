@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import javax.annotation.Nullable;
 
-import constantin.video.core.DecodingInfo;
+import constantin.video.core.player.DecodingInfo;
 import constantin.video.core.player.VideoSettings;
 import constantin.video.example.decodingperf.VideoActivityWithDatabase;
 

@@ -28,10 +28,9 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import constantin.video.core.DecodingInfo;
-import constantin.video.core.IVideoParamsChanged;
+import constantin.video.core.player.DecodingInfo;
+import constantin.video.core.player.IVideoParamsChanged;
 import constantin.video.core.gl.ISurfaceTextureAvailable;
-import constantin.video.core.player.VideoPlayer;
 
 // Pretty complicated / not good documented code
 // Uses BroadcastReceiver to get notified when USB devices are connected / permission is granted

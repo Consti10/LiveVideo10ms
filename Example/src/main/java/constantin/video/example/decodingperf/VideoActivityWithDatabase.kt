@@ -11,7 +11,7 @@ import com.google.firebase.firestore.FieldValue
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import constantin.video.core.DecodingInfo
+import constantin.video.core.player.DecodingInfo
 
 import constantin.video.core.player.VideoSettings
 import constantin.video.example.Helper

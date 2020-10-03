@@ -13,8 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import constantin.video.core.DecodingInfo;
-import constantin.video.core.IVideoParamsChanged;
 import constantin.video.core.gl.ISurfaceTextureAvailable;
 
 
@@ -23,7 +21,7 @@ import constantin.video.core.gl.ISurfaceTextureAvailable;
  * Tied to the lifetime of the java instance a .cpp instance is created
  * And the native functions talk to the native instance
  */
-public class VideoPlayer implements INativeVideoParamsChanged{
+public class VideoPlayer implements IVideoParamsChanged{
     private static final String TAG="VideoPlayer";
     private final long nativeVideoPlayer;
     private IVideoParamsChanged mVideoParamsChanged;
@@ -150,12 +148,8 @@ public class VideoPlayer implements INativeVideoParamsChanged{
         System.out.println("Video W and H"+videoW+","+videoH);
     }
 
-    // called by native code via NDK
     @Override
-    @SuppressWarnings({"UnusedDeclaration"})
-    public void onDecodingInfoChanged(float currentFPS, float currentKiloBitsPerSecond, float avgParsingTime_ms, float avgWaitForInputBTime_ms, float avgDecodingTime_ms,
-                                      int nNALU,int nNALUSFeeded) {
-        final DecodingInfo decodingInfo=new DecodingInfo(currentFPS,currentKiloBitsPerSecond,avgParsingTime_ms,avgWaitForInputBTime_ms,avgDecodingTime_ms,nNALU,nNALUSFeeded);
+    public void onDecodingInfoChanged(DecodingInfo decodingInfo) {
         if(mVideoParamsChanged !=null){
             mVideoParamsChanged.onDecodingInfoChanged(decodingInfo);
         }
@@ -193,7 +187,7 @@ public class VideoPlayer implements INativeVideoParamsChanged{
     public static native long nativeGetExternalFileReader(long nativeInstance);
 
     //TODO: Use message queue from cpp for performance
-    public static native <T extends INativeVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
+    public static native <T extends IVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
 
     public static void verifyApplicationThread() {
         if (Looper.myLooper() != Looper.getMainLooper()) {

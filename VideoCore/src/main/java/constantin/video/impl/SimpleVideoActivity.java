@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import constantin.video.core.DecodingInfo;
-import constantin.video.core.IVideoParamsChanged;
+import constantin.video.core.player.DecodingInfo;
+import constantin.video.core.player.IVideoParamsChanged;
 import constantin.video.core.databinding.ActivitySimpleVideoBinding;
 import constantin.video.core.external.AspectFrameLayout;
 import constantin.video.core.player.VideoPlayer;

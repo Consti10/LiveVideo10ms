@@ -1,4 +1,4 @@
-package constantin.video.core;
+package constantin.video.core.player;
 
 import android.util.ArrayMap;
 
