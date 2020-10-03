@@ -26,7 +26,7 @@ public class VideoPlayer implements IVideoParamsChanged{
     private final long nativeVideoPlayer;
     private IVideoParamsChanged mVideoParamsChanged;
     private final Context context;
-    // This timer is used to then 'call back' the INativeVideoParamsChanged
+    // This timer is used to then 'call back' the IVideoParamsChanged
     private Timer timer;
 
     //Setup as much as possible without creating the decoder
