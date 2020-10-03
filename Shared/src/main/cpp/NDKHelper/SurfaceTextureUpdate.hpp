@@ -54,6 +54,7 @@ private:
     jobject weakGlobalRefSurfaceTexture;
     GLint textureId;
 public:
+    AvgCalculator2 delayToUpdate2{60};
     // look up all the method ids
     SurfaceTextureUpdate(JNIEnv* env){
         jclass jcSurfaceTexture = env->FindClass("android/graphics/SurfaceTexture");
@@ -129,6 +130,8 @@ public:
             const auto diff=newTimestamp-oldTimestamp;
             //MLOGD<<"Diff "<<MyTimeHelper::R(std::chrono::nanoseconds(diff));
             const auto delay=std::chrono::steady_clock::now().time_since_epoch()-std::chrono::nanoseconds(newTimestamp);
+            delayToUpdate2.add(delay);
+            //MLOGD<<"ST delay "<<delayToUpdate2.getAvgReadable();
             return delay;
         }
         return std::nullopt;

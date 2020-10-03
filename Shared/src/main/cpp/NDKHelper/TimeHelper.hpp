@@ -7,6 +7,7 @@
 
 #include "AndroidLogger.hpp"
 #include <chrono>
+#include <deque>
 
 namespace MyTimeHelper{
     // R stands for readable. Convert a std::chrono::duration into a readable format
@@ -103,15 +104,69 @@ public:
         return ss.str();
     }
     // Merges two AvgCalculator(s) together
-    static AvgCalculator median(const AvgCalculator& c1,const AvgCalculator& c2){
+    AvgCalculator operator+(const AvgCalculator& other){
         AvgCalculator ret;
-        ret.add(c1.getAvg());
-        ret.add(c2.getAvg());
-        const auto min=std::min(c1.getMin(),c2.getMin());
-        const auto max=std::max(c1.getMax(),c2.getMax());
-        ret.min=min;
-        ret.max=max;
+        ret.add(this->getAvg());
+        ret.add(other.getAvg());
+        const auto min1=std::min(this->getMin(),other.getMin());
+        const auto max1=std::max(this->getMax(),other.getMax());
+        ret.min=min1;
+        ret.max=max1;
         return ret;
+    }
+};
+
+// Instead of storing only the min, max and average this stores
+// The last n samples in a queue. However, this makes calculating the min/max/avg values much more expensive
+// And therefore should only be used with a small sample size.
+class AvgCalculator2{
+private:
+    const size_t sampleSize;
+    std::deque<std::chrono::nanoseconds> samples;
+public:
+    AvgCalculator2(size_t sampleSize=60):sampleSize(sampleSize){};
+    //
+    void add(const std::chrono::nanoseconds& value){
+        if(value<std::chrono::nanoseconds(0)){
+            MLOGE<<"Cannot add negative value";
+            return;
+        }
+        samples.push_back(value);
+        // Remove the oldest sample if needed
+        if(samples.size()>sampleSize){
+            samples.pop_front();
+        }
+    }
+    std::chrono::nanoseconds getAvg()const{
+        if(samples.empty()){
+            return std::chrono::nanoseconds(0);
+        }
+        std::chrono::nanoseconds sum{0};
+        for(const auto sample:samples){
+            sum+=sample;
+        }
+        return sum / samples.size();
+    }
+    std::chrono::nanoseconds getMin()const{
+        return *std::min_element(samples.begin(),samples.end());
+    }
+    std::chrono::nanoseconds getMax()const{
+        return *std::max_element(samples.begin(),samples.end());
+    }
+    void reset(){
+        samples.resize(0);
+    }
+    std::string getAvgReadable(const bool averageOnly=false)const{
+        std::stringstream ss;
+        if(averageOnly){
+            ss<<"avg="<<MyTimeHelper::R(getAvg());
+            return ss.str();
+        }
+        ss<<"min="<<MyTimeHelper::R(getMin())<<" max="<<MyTimeHelper::R(getMax())<<" avg="<<MyTimeHelper::R(getAvg())<<" N samples="<<samples.size();
+        return ss.str();
+    }
+    size_t getNSamples()const{
+        return samples.size();
     }
 };
 
