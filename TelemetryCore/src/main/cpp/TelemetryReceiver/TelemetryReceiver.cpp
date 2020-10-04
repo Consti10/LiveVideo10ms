@@ -857,10 +857,11 @@ JNI_METHOD(void, setDJIValues)
 
 JNI_METHOD(void, setDJIBatteryValues)
 (JNIEnv *env,jclass unused,jlong nativeInstance,
- jfloat BatteryPack_P,jfloat BatteryPack_A) {
+ jfloat BatteryPack_P,jfloat BatteryPack_A,jfloat BatteryPack_V) {
     TelemetryReceiver* instance=native(nativeInstance);
     instance->uav_td.BatteryPack_P=BatteryPack_P;
     instance->uav_td.BatteryPack_A=BatteryPack_A;
+    instance->uav_td.BatteryPack_V=BatteryPack_V;
 }
 
 JNI_METHOD(void, setDJISignalQuality)
@@ -868,6 +869,11 @@ JNI_METHOD(void, setDJISignalQuality)
     TelemetryReceiver* instance=native(nativeInstance);
     instance->uav_td.RSSI1_Percentage_dBm=qualityUpPercentage;
     //instance->uav_td.RSSI1_Percentage_dBm=
+}
+
+JNI_METHOD(void, setDJIFunctionButtonClicked)
+(JNIEnv *env,jclass unused,jlong nativeInstance) {
+    TelemetryReceiver* instance=native(nativeInstance);
 }
 
 }
