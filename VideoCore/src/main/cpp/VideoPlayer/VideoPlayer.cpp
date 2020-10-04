@@ -217,13 +217,13 @@ JNI_METHOD(void, nativeSetVideoSurface)
     native(videoPlayerN)->setVideoSurface(env,surface);
 }
 
-//This function is only called when the data for the video is coming from a file.
+//This function is only called when the data for the video is coming from the dji receiver.
 //In this case, the receiving is done via JAVA, and the received bytes are transfered from JAVA to NDK
 JNI_METHOD(void, nativePassNALUData)
 (JNIEnv *env,jclass jclass1,jlong videoPlayerN,jbyteArray b,jint offset,jint length){
     jbyte *arrayP=env->GetByteArrayElements(b, nullptr);
     auto * p=(uint8_t*)arrayP;
-    native(videoPlayerN)->onNewVideoData(&p[(int) offset], (size_t)length,VideoPlayer::VIDEO_DATA_TYPE::DJI);
+    native(videoPlayerN)->onNewVideoData(&p[(size_t) offset], (size_t)length,VideoPlayer::VIDEO_DATA_TYPE::DJI);
     env->ReleaseByteArrayElements(b,arrayP,0);
 }
 

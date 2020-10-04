@@ -110,9 +110,20 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
     AMediaFormat_setBuffer(format,"csd-0",sps.getData(),sps.getSize());
     AMediaFormat_setBuffer(format,"csd-1",pps.getData(),pps.getSize());
+    //static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
+    //AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
+    // Lower values mean higher priority
+    // Works on pixel 3 (look at output format description)
+    //static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
+    //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
+
 
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
     AMediaFormat_delete(format);
+    format=AMediaCodec_getOutputFormat(decoder.codec);
+    //MLOGD<<"Output format"<<AMediaFormat_toString(format);
+    AMediaFormat_delete(format);
+
     if (decoder.codec== nullptr) {
         MLOGD<<"Cannot configure decoder";
         //set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
