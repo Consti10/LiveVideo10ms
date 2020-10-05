@@ -7,7 +7,6 @@ import android.location.Location;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
 /*
@@ -42,12 +41,12 @@ public class TelemetryReceiver implements HomeLocation.IHomeLocationChanged, Lif
     private static native boolean isEZWBIpAvailable(long testRecN);
     private static native String getEZWBIPAdress(long testRecN);
     private static native boolean receivingEZWBButCannotParse(long testRecN);
+    private static native void nativeIncrementOsdViewMode(long instance);
     //new
     protected static native void setDJIValues(long instance,double Latitude_dDeg,double Longitude_dDeg,float AltitudeX_m,float Roll_Deg,float Pitch_Deg,
                                             float SpeedClimb_KPH,float SpeedGround_KPH,int SatsInUse,float Heading_Deg);
     protected static native void setDJIBatteryValues(long instance,float BatteryPack_P,float BatteryPack_A,float BatteryPack_V);
     protected static native void setDJISignalQuality(long instance,int qualityUpPercentage,int qualityDownPercentage);
-    protected static native void setDJIFunctionButtonClicked(long instance);
 
     protected final long nativeInstance;
     protected final Context context;
@@ -97,6 +96,11 @@ public class TelemetryReceiver implements HomeLocation.IHomeLocationChanged, Lif
     }
     public boolean receivingEZWBButCannotParse(){
         return receivingEZWBButCannotParse(nativeInstance);
+    }
+
+    // Allow the user to remove all / some OSD elements temporarily
+    public void incrementOsdViewMode(){
+        nativeIncrementOsdViewMode(nativeInstance);
     }
 
     public void setDecodingInfo(float currentFPS, float currentKiloBitsPerSecond,float avgParsingTime_ms,float avgWaitForInputBTime_ms,float avgDecodingTime_ms) {

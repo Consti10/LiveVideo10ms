@@ -871,7 +871,7 @@ JNI_METHOD(void, setDJISignalQuality)
     //instance->uav_td.RSSI1_Percentage_dBm=
 }
 
-JNI_METHOD(void, setDJIFunctionButtonClicked)
+JNI_METHOD(void, nativeIncrementOsdViewMode)
 (JNIEnv *env,jclass unused,jlong nativeInstance) {
     TelemetryReceiver* instance=native(nativeInstance);
     int value=instance->OSD_DISPLAY_MODE;
