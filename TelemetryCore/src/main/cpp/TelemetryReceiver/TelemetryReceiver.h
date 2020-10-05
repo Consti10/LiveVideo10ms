@@ -141,6 +141,11 @@ private:
     const std::wstring ICON_LATITUDE=std::wstring(1,(wchar_t)192+3);
     const std::wstring ICON_LONGITUDE=std::wstring(1,(wchar_t)192+4);
     const std::wstring ICON_SATELITE=std::wstring(1,(wchar_t)192+5);
+public:
+    // 0=='Normal'
+    // 1=='A lot of info'
+    // 2=='Immersive'
+    std::atomic<int> OSD_DISPLAY_MODE=0;
 };
 
 

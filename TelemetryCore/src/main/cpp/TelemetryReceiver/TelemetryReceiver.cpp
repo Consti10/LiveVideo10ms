@@ -874,6 +874,10 @@ JNI_METHOD(void, setDJISignalQuality)
 JNI_METHOD(void, setDJIFunctionButtonClicked)
 (JNIEnv *env,jclass unused,jlong nativeInstance) {
     TelemetryReceiver* instance=native(nativeInstance);
+    int value=instance->OSD_DISPLAY_MODE;
+    value++;
+    value=value % 3;
+    instance->OSD_DISPLAY_MODE=value;
 }
 
 }
