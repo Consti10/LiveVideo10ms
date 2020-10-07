@@ -43,6 +43,10 @@ typedef struct {
     int FlightMode_MAVLINK;
     bool FlightMode_MAVLINK_armed;
 
+    // These elements are for DJI drones
+    int DJI_linkQualityUp_P;
+    int DJI_linkQualityDown_P;
+
 } UAVTelemetryData;
 
 

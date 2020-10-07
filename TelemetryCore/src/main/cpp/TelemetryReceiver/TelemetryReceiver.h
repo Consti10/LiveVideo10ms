@@ -65,6 +65,8 @@ private:
     METRIC_SPEED T_METRIC_SPEED_HORIZONTAL;
     void updateSettings(JNIEnv *env,jobject context);
 public:
+    enum CONNECTED_SYSTEM{DEFAULT,DJI};
+    const CONNECTED_SYSTEM connectedSystem;
     bool MAVLINK_FLIGHTMODE_QUADCOPTER;
     bool ORIGIN_POSITION_ANDROID;
     bool ENABLE_GROUND_RECORDING;
@@ -77,7 +79,7 @@ public:
 public:
     //External ground recorder means we use the ground recorder of the video lib for a merged
     //Video an telemetry ground recording file
-    TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader);
+    TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader,CONNECTED_SYSTEM connectedSystem1);
     /**
      * Start all telemetry receiver. If they are already receiving, nothing happens.
      * Make sure startReceiving() and stopReceivingAndWait() are not called on different threads
@@ -131,7 +133,7 @@ private:
     AppOSDData appOSDData;
     JavaVM* javaVm;
 public:
-    UAVTelemetryData uav_td;
+    UAVTelemetryData uav_td{};
     wifibroadcast_rx_status_forward_t2 wifibroadcastTelemetryData;
     static constexpr const float KMH_TO_MS=1000.0F/(60.0F*60.0F);
 private:

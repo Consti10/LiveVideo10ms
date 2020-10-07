@@ -15,6 +15,12 @@ typedef struct {
     int8_t type; // 0 = Atheros, 1 = Ralink
 } __attribute__((packed)) wifi_adapter_rx_status_forward_t;
 
+typedef struct {
+    uint32_t received_packet_cnt;
+    int8_t current_signal_dbm;
+    int8_t type; // 0 = Atheros, 1 = Ralink
+    int8_t signal_good;
+} __attribute__((packed)) wifi_adapter_rx_status_forward_t2;
 
 typedef struct {
     uint32_t damaged_block_cnt; // number bad blocks video downstream
@@ -39,13 +45,6 @@ typedef struct {
     wifi_adapter_rx_status_forward_t adapter[6]; // see struct above
 } __attribute__((packed)) wifibroadcast_rx_status_forward_t;
 
-
-typedef struct {
-    uint32_t received_packet_cnt;
-    int8_t current_signal_dbm;
-    int8_t type; // 0 = Atheros, 1 = Ralink
-    int8_t signal_good;
-} __attribute__((packed)) wifi_adapter_rx_status_forward_t2;
 
 typedef struct {
     uint32_t damaged_block_cnt; // number bad blocks video downstream

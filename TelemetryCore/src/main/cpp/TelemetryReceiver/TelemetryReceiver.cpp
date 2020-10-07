@@ -39,12 +39,13 @@ int TelemetryReceiver::getTelemetryPort(const SharedPreferences &settingsN, int 
     return port;
 }
 
-TelemetryReceiver::TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader):
+TelemetryReceiver::TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader,CONNECTED_SYSTEM connectedSystem1):
 BaseTelemetryReceiver(),
         GROUND_RECORDING_DIRECTORY(std::move(DIR)),
         mGroundRecorder((externalGroundRecorder== nullptr) ?( * new GroundRecorderFPV(DIR)) : *externalGroundRecorder),
         mFileReceiver((externalFileReader== nullptr) ?( * new FileReader(1024)) : *externalFileReader),
-        isExternalFileReceiver(externalFileReader!= nullptr){
+        isExternalFileReceiver(externalFileReader!= nullptr),
+        connectedSystem(connectedSystem1){
     env->GetJavaVM(&javaVm);
     FileReader::RAW_DATA_CALLBACK callback=[this](const uint8_t* d,std::size_t len,GroundRecorderFPV::PACKET_TYPE packetType) {
         switch(packetType){
@@ -100,7 +101,7 @@ void TelemetryReceiver::updateSettings(JNIEnv *env,jobject context) {
     T_METRIC_SPEED_VERTICAL= static_cast<METRIC_SPEED>(settingsN.getInt(IDT::T_METRIC_SPEED_VERTICAL),1);
     //
     resetNReceivedTelemetryBytes();
-    std::memset (&uav_td, 0, sizeof(uav_td));
+    //std::memset (&uav_td, 0, sizeof(uav_td));
     uav_td.Pitch_Deg=10; //else you cannot see the AH 3D Quad,since it is totally flat
     std::memset (&originData, 0, sizeof(originData));
     originData.Latitude_dDeg=0;
@@ -440,9 +441,15 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
         }
             break;
         case EZWB_DOWNLINK_VIDEO_RSSI:{
-            ret.prefix=L"ezWB";
-            ret.value=StringHelper::intToString(getBestDbm(),5);
-            ret.metric=L"dBm";
+            if(connectedSystem==DJI){
+                ret.prefix=L"DJI";
+                ret.value=StringHelper::intToString(uav_td.DJI_linkQualityDown_P,5);
+                ret.metric=L"%";
+            }else{
+                ret.prefix=L"ezWB";
+                ret.value=StringHelper::intToString(getBestDbm(),5);
+                ret.metric=L"dBm";
+            }
         }
             break;
         case EZWB_DOWNLINK_VIDEO_RSSI2:{
@@ -504,8 +511,13 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
         }
             break;
         case EZWB_UPLINK_RC_RSSI:{
-            ret.value=StringHelper::intToString(wifibroadcastTelemetryData.current_signal_joystick_uplink,5);
-            ret.metric=L"dBm";
+            if(connectedSystem==DJI){
+                ret.value=StringHelper::intToString(uav_td.DJI_linkQualityUp_P,5);
+                ret.metric=L"%";
+            }else{
+                ret.value=StringHelper::intToString(wifibroadcastTelemetryData.current_signal_joystick_uplink,5);
+                ret.metric=L"dBm";
+            }
         }
             break;
         case EZWB_UPLINK_RC_BLOCKS:{
@@ -753,9 +765,11 @@ inline TelemetryReceiver *native(jlong ptr) {
 
 extern "C" {
 JNI_METHOD(jlong , createInstance)
-(JNIEnv *env,jclass unused,jobject context,jstring groundRecordingDirectory,jlong externalGroundRecorder,jlong externalFileReader) {
+(JNIEnv *env,jclass unused,jobject context,jstring groundRecordingDirectory,jlong externalGroundRecorder,jlong externalFileReader,jint connectedSystem) {
     const auto str=NDKArrayHelper::DynamicSizeString(env,groundRecordingDirectory);
-    auto* telemetryReceiver = new TelemetryReceiver(env,str,reinterpret_cast<GroundRecorderFPV*>(externalGroundRecorder),reinterpret_cast<FileReader*>(externalFileReader));
+    auto* telemetryReceiver = new TelemetryReceiver(env,str,reinterpret_cast<GroundRecorderFPV*>(externalGroundRecorder),
+                                                    reinterpret_cast<FileReader*>(externalFileReader),
+                                                    static_cast<TelemetryReceiver::CONNECTED_SYSTEM>(connectedSystem));
     return jptr(telemetryReceiver);
 }
 
@@ -867,8 +881,8 @@ JNI_METHOD(void, setDJIBatteryValues)
 JNI_METHOD(void, setDJISignalQuality)
 (JNIEnv *env,jclass unused,jlong nativeInstance,jint qualityUpPercentage,jint qualityDownPercentage) {
     TelemetryReceiver* instance=native(nativeInstance);
-    instance->uav_td.RSSI1_Percentage_dBm=qualityUpPercentage;
-    //instance->uav_td.RSSI1_Percentage_dBm=
+    instance->uav_td.DJI_linkQualityUp_P=qualityUpPercentage;
+    instance->uav_td.DJI_linkQualityDown_P=qualityDownPercentage;
 }
 
 JNI_METHOD(void, nativeIncrementOsdViewMode)

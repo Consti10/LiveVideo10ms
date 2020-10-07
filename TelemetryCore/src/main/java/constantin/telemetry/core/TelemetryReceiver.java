@@ -25,7 +25,7 @@ public class TelemetryReceiver implements HomeLocation.IHomeLocationChanged, Lif
     static {
         System.loadLibrary("TelemetryReceiver");
     }
-    private static native long createInstance(Context context,String groundRecordingDirectory,long externalGroundRecorder,long externalFileReader);
+    private static native long createInstance(Context context,String groundRecordingDirectory,long externalGroundRecorder,long externalFileReader,int connectedSystem);
     private static native void deleteInstance(long instance);
     private static native void startReceiving(long instance,Context context);
     private static native void stopReceiving(long instance,Context context);
@@ -54,9 +54,9 @@ public class TelemetryReceiver implements HomeLocation.IHomeLocationChanged, Lif
 
     //Only use with AppCombatActivity for lifecycle listener
     //receives data in between onPause()<-->onResume()
-    public TelemetryReceiver(final AppCompatActivity parent, long externalGroundRecorder, long externalFileReader){
+    public TelemetryReceiver(final AppCompatActivity parent, long externalGroundRecorder, long externalFileReader,int connectedSystem){
         context=parent;
-        nativeInstance=createInstance(parent,TelemetrySettings.getDirectoryToSaveDataTo(),externalGroundRecorder,externalFileReader);
+        nativeInstance=createInstance(parent,TelemetrySettings.getDirectoryToSaveDataTo(),externalGroundRecorder,externalFileReader,connectedSystem);
         //Home location handles lifecycle itself
         final HomeLocation mHomeLocation = new HomeLocation(parent, this);
         parent.getLifecycle().addObserver(this);

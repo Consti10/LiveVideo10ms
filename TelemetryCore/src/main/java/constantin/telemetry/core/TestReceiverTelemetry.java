@@ -28,7 +28,7 @@ public class TestReceiverTelemetry implements Runnable, LifecycleObserver {
 
     public  TestReceiverTelemetry(final AppCompatActivity parent){
         this.activity=parent;
-        telemetryReceiver =new TelemetryReceiver(parent,0,0);
+        telemetryReceiver =new TelemetryReceiver(parent,0,0,0);
         parent.getLifecycle().addObserver(this);
     }
 
