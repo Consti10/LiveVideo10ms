@@ -12,16 +12,17 @@
 class StringHelper{
 private:
     // Return the n of digits without the sign
-    static const size_t countDigitsWithoutSign(unsigned int n){
+    static const size_t countDigitsWithoutSign(unsigned long n){
         return std::floor(std::log10(n) + 1);
     }
     // Return n of digits with sign
-    static const size_t countDigitsWithSign(int n){
+    static const size_t countDigitsWithSign(long n){
         if(n==0)return 1;
         if(n<0)return countDigitsWithoutSign(std::abs(n))+1;
         return countDigitsWithoutSign(n);
     }
     // Return n of digits with sign, slower than the one above
+    // Only use for testing
     static const size_t countDigitsWithSignSlow(long n){
         return std::to_string(n).length();
     }
@@ -58,7 +59,7 @@ public:
         // Return the whole number when only the whole number fits (and if only the whole number and the '.'
         // fits, also return the whole number)
         if(digitsWholeNumberWithSign >= (maxLength - 1)){
-            return std::to_wstring(value);
+            return std::to_wstring((int)value);
         }
         const std::wstring valueAsStringWithDecimals=(std::wstringstream() << std::fixed << std::setprecision(wantedPrecisionAfterCome) << value).str();
         return valueAsStringWithDecimals.substr(0,maxLength);
@@ -73,15 +74,7 @@ public:
         sAfterCome=fractional;
     }
 
-    static const void test1(){
-        doubleToWString(10.9234, 10, 4);
-        doubleToWString(10.9234, 10, 2);
-        doubleToWString(10.9234, 10, 0);
-        doubleToWString(10.9234, 4, 4);
-        doubleToWString(-10.9234, 4, 4);
-    }
-
-    static const void testCountDigits(){
+    static void testCountDigits(){
         std::srand(std::time(nullptr));
         MLOGD<<"testCountDigits() start";
         std::vector<int> values={
@@ -99,7 +92,7 @@ public:
         MLOGD<<"testCountDigits() end";
     }
 
-    static const void testIntToWString(){
+    static void testIntToWString(){
         auto tmp= intToWString(100,3);
         assert(tmp.compare(L"100")==0);
         tmp= intToWString(1000,3);
@@ -110,7 +103,8 @@ public:
         assert(tmp.compare(L"E")==0);
     }
 
-    static const void testDoubleToWString(){
+    static void testDoubleToWString(){
+        //  MLOGD<<StringHelper::normalS(tmp);
         auto tmp= doubleToWString(100, 6, 2);
         assert(tmp.compare(L"100.00")==0);
         tmp= doubleToWString(100, 3, 2);
@@ -121,6 +115,14 @@ public:
         assert(tmp.compare(L"100.01")==0);
         tmp= doubleToWString(100.01, 7, 3);
         assert(tmp.compare(L"100.010")==0);
+    }
+
+    static void test1(){
+        doubleToWString(10.9234, 10, 4);
+        doubleToWString(10.9234, 10, 2);
+        doubleToWString(10.9234, 10, 0);
+        doubleToWString(10.9234, 4, 4);
+        doubleToWString(-10.9234, 4, 4);
     }
 };
 

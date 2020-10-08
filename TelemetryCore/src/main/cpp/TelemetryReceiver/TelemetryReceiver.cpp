@@ -283,7 +283,6 @@ void TelemetryReceiver::setFlightTime(float timeSeconds) {
 
 MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) const {
     MTelemetryValue ret = MTelemetryValue();
-    StringHelper::testDoubleToWString();
     //LOGD("Size %d",(int)sizeof(wifibroadcast_rx_status_forward_t2));
     ret.warning=0;
     switch (index){
