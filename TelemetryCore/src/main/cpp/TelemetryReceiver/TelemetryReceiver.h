@@ -19,7 +19,7 @@
 #include <GroundRecorderRAW.hpp>
 #include <UDPReceiver.h>
 
-#include "BaseTelemetryReceiver.h"
+#include "MTelemetryValue.hpp"
 
 /*
  * This data is only generated on the android side and does not depend
@@ -36,8 +36,7 @@ typedef struct {
 } AppOSDData;
 
 
-class TelemetryReceiver : public BaseTelemetryReceiver
-        {
+class TelemetryReceiver {
 public:
     TelemetryReceiver(const TelemetryReceiver&) = delete;
     void operator=(const TelemetryReceiver&) = delete;
@@ -114,8 +113,46 @@ public:
     float getCourseOG_Deg()const;
     float getHeading_Deg()const;
     float getHeadingHome_Deg()const;
-
-    MTelemetryValue getTelemetryValue(TelemetryValueIndex index) const override;
+    enum TelemetryValueIndex{
+        DECODER_FPS,
+        DECODER_BITRATE,
+        DECODER_LATENCY_DETAILED,
+        DECODER_LATENCY_SUM,
+        OPENGL_FPS,
+        FLIGHT_TIME,
+        //
+        RX_1,
+        BATT_VOLTAGE,
+        BATT_CURRENT,
+        BATT_USED_CAPACITY,
+        BATT_PERCENTAGE,
+        HOME_DISTANCE,
+        VS,
+        HS_GROUND,
+        HS_AIR,
+        LONGITUDE,
+        LATITUDE,
+        ALTITUDE_GPS,
+        ALTITUDE_BARO,
+        SATS_IN_USE,
+        FLIGHT_STATUS_MAV_ONLY,
+        //
+        EZWB_DOWNLINK_VIDEO_RSSI,
+        EZWB_DOWNLINK_VIDEO_RSSI2,
+        EZWB_UPLINK_RC_RSSI,
+        EZWB_UPLINK_RC_BLOCKS,
+        EZWB_STATUS_AIR,
+        EZWB_STATUS_GROUND,
+        EZWB_BLOCKS,
+        EZWB_RSSI_ADAPTER0,
+        EZWB_RSSI_ADAPTER1,
+        EZWB_RSSI_ADAPTER2,
+        EZWB_RSSI_ADAPTER3,
+        //EZWB_RSSI_ADAPTER4,
+        //EZWB_RSSI_ADAPTER5,
+        XXX
+    };
+    MTelemetryValue getTelemetryValue(TelemetryValueIndex index) const ;
     MTelemetryValue getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter)const;
     std::wstring getMAVLINKFlightMode()const;
 private:
@@ -148,6 +185,7 @@ public:
     // 1=='A lot of info'
     // 2=='Immersive'
     std::atomic<int> OSD_DISPLAY_MODE=0;
+public:
 };
 
 

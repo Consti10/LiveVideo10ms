@@ -40,7 +40,6 @@ int TelemetryReceiver::getTelemetryPort(const SharedPreferences &settingsN, int 
 }
 
 TelemetryReceiver::TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader,CONNECTED_SYSTEM connectedSystem1):
-BaseTelemetryReceiver(),
         GROUND_RECORDING_DIRECTORY(std::move(DIR)),
         mGroundRecorder((externalGroundRecorder== nullptr) ?( * new GroundRecorderFPV(DIR)) : *externalGroundRecorder),
         mFileReceiver((externalFileReader== nullptr) ?( * new FileReader(1024)) : *externalFileReader),
