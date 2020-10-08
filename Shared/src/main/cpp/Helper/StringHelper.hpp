@@ -113,9 +113,13 @@ public:
     static const void testDoubleToWString(){
         auto tmp= doubleToWString(100, 6, 2);
         assert(tmp.compare(L"100.00")==0);
+        tmp= doubleToWString(100, 3, 2);
+        assert(tmp.compare(L"100")==0);
         tmp= doubleToWString(100.01, 6, 2);
         assert(tmp.compare(L"100.01")==0);
         tmp= doubleToWString(100.01, 6, 3);
+        assert(tmp.compare(L"100.01")==0);
+        tmp= doubleToWString(100.01, 7, 3);
         assert(tmp.compare(L"100.010")==0);
     }
 };
