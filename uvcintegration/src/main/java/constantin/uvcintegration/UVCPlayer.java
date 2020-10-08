@@ -150,8 +150,7 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                final float decodingTime= mUVCReceiverDecoder.GetDecodingTime();
-                DecodingInfo decodingInfo=new DecodingInfo(12,0,0,0,decodingTime,0,0);
+                DecodingInfo decodingInfo=mUVCReceiverDecoder.getDecodingInfo();
                 if(iVideoParamsChanged!=null){
                     iVideoParamsChanged.onDecodingInfoChanged(decodingInfo);
                 }

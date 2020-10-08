@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 
 import java.io.File;
 
+import constantin.video.core.player.DecodingInfo;
+
 // Handles receiving & decoding of UVC devices that supply MJPEG frames (like ROTG02)
 public class UVCReceiverDecoder {
     private static final String TAG= "UVCReceiverDecoder";
@@ -71,8 +73,9 @@ public class UVCReceiverDecoder {
         return ret;
     }
 
-    public float GetDecodingTime(){
-        return nativeGetDecodingTime(nativeInstance);
+    public DecodingInfo getDecodingInfo(){
+        return new DecodingInfo(30,0,0,0,
+                nativeGetDecodingTime(nativeInstance),0,0);
     }
 
     /**
