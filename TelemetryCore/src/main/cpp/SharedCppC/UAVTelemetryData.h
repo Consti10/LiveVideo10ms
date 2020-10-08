@@ -18,7 +18,7 @@ typedef struct {
     float BatteryPack_V;  //Resolution only mVolt
     float BatteryPack_A;  //Resolution only mAmpere.
     float BatteryPack_mAh; //Already used capacity, in mAh
-    float BatteryPack_P; //remaining battery, in percentage.Only sent by MAVLINK -
+    float BatteryPack_P; //remaining battery, in percentage.Only sent by MAVLINK or DJI -
     // else it has to be calculated manually via already used capacity and battery capacity
 
     float AltitudeGPS_m; // GPS altitude in m. Relative (to origin) if possible
