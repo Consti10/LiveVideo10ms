@@ -334,7 +334,6 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             if(perc<10){
                 ret.warning=2;
             }
-            ret.warning=1;
         }
             break;
         case ALTITUDE_GPS:{
