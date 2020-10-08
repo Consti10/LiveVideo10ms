@@ -283,6 +283,7 @@ void TelemetryReceiver::setFlightTime(float timeSeconds) {
 
 MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) const {
     MTelemetryValue ret = MTelemetryValue();
+    StringHelper::testDoubleToWString();
     //LOGD("Size %d",(int)sizeof(wifibroadcast_rx_status_forward_t2));
     ret.warning=0;
     switch (index){
@@ -290,7 +291,7 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             ret.prefix=L"Batt";
             ret.prefixIcon=ICON_BATTERY;
             ret.prefixScale=1.2f;
-            ret.value= StringHelper::doubleToString(uav_td.BatteryPack_V, 5, 2);
+            ret.value= StringHelper::doubleToWString(uav_td.BatteryPack_V, 5, 2);
             ret.metric=L"V";
             float w1=BATT_CELLS_V_WARNING1_ORANGE*BATT_CELLS_N;
             float w2=BATT_CELLS_V_WARNING2_RED*BATT_CELLS_N;
@@ -305,7 +306,7 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             ret.prefix=L"Batt";
             ret.prefixIcon=ICON_BATTERY;
             ret.prefixScale=1.2f;
-            ret.value= StringHelper::doubleToString(uav_td.BatteryPack_A, 5, 2);
+            ret.value= StringHelper::doubleToWString(uav_td.BatteryPack_A, 5, 2);
             ret.metric=L"A";
         }
             break;
@@ -314,7 +315,7 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             ret.prefixIcon=ICON_BATTERY;
             ret.prefixScale=1.2f;
             float val=uav_td.BatteryPack_mAh;
-            ret.value=StringHelper::intToString((int)val,5);
+            ret.value= StringHelper::intToWString((int) val, 5);
             ret.metric=L"mAh";
             if(val>BATT_CAPACITY_MAH_USED_WARNING){
                 ret.warning=2;
@@ -326,38 +327,40 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             ret.prefixIcon=ICON_BATTERY;
             ret.prefixScale=1.2f;
             float perc=uav_td.BatteryPack_P;
-            ret.value=StringHelper::intToString((int)std::round(perc),3);
+            ret.value= StringHelper::intToWString((int) std::round(perc), 3);
             ret.metric=L"%";
             if(perc<20.0f){
                 ret.warning=1;
-            }if(perc<10){
+            }
+            if(perc<10){
                 ret.warning=2;
             }
+            ret.warning=1;
         }
             break;
         case ALTITUDE_GPS:{
             ret.prefix=L"Alt(G)";
-            ret.value=StringHelper::doubleToString(uav_td.AltitudeGPS_m,5,2);
+            ret.value= StringHelper::doubleToWString(uav_td.AltitudeGPS_m, 5, 2);
             ret.metric=L"m";
         }
             break;
         case ALTITUDE_BARO:{
             ret.prefix=L"Alt(B)";
-            ret.value=StringHelper::doubleToString(uav_td.AltitudeBaro_m,5,2);
+            ret.value= StringHelper::doubleToWString(uav_td.AltitudeBaro_m, 5, 2);
             ret.metric=L"m";
         }
             break;
         case LONGITUDE:{
             ret.prefix=L"Lon";
             ret.prefixIcon=ICON_LONGITUDE;
-            ret.value= StringHelper::doubleToString(uav_td.Longitude_dDeg, 10, 8);
+            ret.value= StringHelper::doubleToWString(uav_td.Longitude_dDeg, 10, 8);
             ret.metric=L"";
         }
             break;
         case LATITUDE:{
             ret.prefix=L"Lat";
             ret.prefixIcon=ICON_LATITUDE;
-            ret.value= StringHelper::doubleToString(uav_td.Latitude_dDeg, 10, 8);
+            ret.value= StringHelper::doubleToWString(uav_td.Latitude_dDeg, 10, 8);
             ret.metric=L"";
         }
             break;
@@ -365,11 +368,11 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             ret.prefix=L"HS";
             if(T_METRIC_SPEED_HORIZONTAL==KMH){
                 ret.valueNotAsString=uav_td.SpeedGround_KPH;
-                ret.value= StringHelper::doubleToString(uav_td.SpeedGround_KPH, 5, 2);
+                ret.value= StringHelper::doubleToWString(uav_td.SpeedGround_KPH, 5, 2);
                 ret.metric=L"km/h";
             }else{
                 ret.valueNotAsString=uav_td.SpeedGround_KPH*KMH_TO_MS;
-                ret.value= StringHelper::doubleToString(uav_td.SpeedGround_KPH*KMH_TO_MS, 5, 2);
+                ret.value= StringHelper::doubleToWString(uav_td.SpeedGround_KPH * KMH_TO_MS, 5, 2);
                 ret.metric=L"m/s";
             }
         }
@@ -377,10 +380,10 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
         case HS_AIR:{
             ret.prefix=L"HS";
             if(T_METRIC_SPEED_HORIZONTAL==KMH){
-                ret.value= StringHelper::doubleToString(uav_td.SpeedAir_KPH, 5, 2);
+                ret.value= StringHelper::doubleToWString(uav_td.SpeedAir_KPH, 5, 2);
                 ret.metric=L"km/h";
             }else{
-                ret.value= StringHelper::doubleToString(uav_td.SpeedAir_KPH*KMH_TO_MS, 5, 2);
+                ret.value= StringHelper::doubleToWString(uav_td.SpeedAir_KPH * KMH_TO_MS, 5, 2);
                 ret.metric=L"m/s";
             }
         }
@@ -389,10 +392,10 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             ret.prefix=L"Time";
             float time=appOSDData.flight_time_seconds;
             if(time<60){
-                ret.value=StringHelper::intToString((int)std::round(time),4);
+                ret.value= StringHelper::intToWString((int) std::round(time), 4);
                 ret.metric=L"sec";
             }else{
-                ret.value=StringHelper::intToString((int)std::round(time/60),4);
+                ret.value= StringHelper::intToWString((int) std::round(time / 60), 4);
                 ret.metric=L"min";
             }
         }
@@ -406,10 +409,10 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             }else{
                 int distanceM=(int)distance_between(uav_td.Latitude_dDeg,uav_td.Longitude_dDeg,originData.Latitude_dDeg,originData.Longitude_dDeg);
                 if(distanceM>1000){
-                    ret.value=StringHelper::doubleToString(distanceM/1000.0,5,1);
+                    ret.value= StringHelper::doubleToWString(distanceM / 1000.0, 5, 1);
                     ret.metric=L"km";
                 }else{
-                    ret.value=StringHelper::intToString(distanceM,5);
+                    ret.value= StringHelper::intToWString(distanceM, 5);
                     ret.metric=L"m";
                 }
             }
@@ -417,7 +420,7 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             break;
         case DECODER_FPS:{
             ret.prefix=L"Dec";
-            ret.value=StringHelper::intToString((int)std::round(appOSDData.decoder_fps),4);
+            ret.value= StringHelper::intToWString((int) std::round(appOSDData.decoder_fps), 4);
             ret.metric=L"fps";
         }
             break;
@@ -426,28 +429,28 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             float kbits=appOSDData.decoder_bitrate_kbits;
             if(kbits>1024){
                 float mbits=kbits/1024.0f;
-                ret.value= StringHelper::doubleToString(mbits, 6, 1);
+                ret.value= StringHelper::doubleToWString(mbits, 6, 1);
                 ret.metric=L"mb/s";
             }else{
-                ret.value= StringHelper::doubleToString(kbits, 6, 1);
+                ret.value= StringHelper::doubleToWString(kbits, 6, 1);
                 ret.metric=L"kb/s";
             }
         }
             break;
         case OPENGL_FPS:{
             ret.prefix=L"OGL";
-            ret.value=StringHelper::intToString((int)std::round(appOSDData.opengl_fps),4);
+            ret.value= StringHelper::intToWString((int) std::round(appOSDData.opengl_fps), 4);
             ret.metric=L"fps";
         }
             break;
         case EZWB_DOWNLINK_VIDEO_RSSI:{
             if(connectedSystem==DJI){
                 ret.prefix=L"DJI";
-                ret.value=StringHelper::intToString(uav_td.DJI_linkQualityDown_P,5);
+                ret.value= StringHelper::intToWString(uav_td.DJI_linkQualityDown_P, 5);
                 ret.metric=L"%";
             }else{
                 ret.prefix=L"ezWB";
-                ret.value=StringHelper::intToString(getBestDbm(),5);
+                ret.value= StringHelper::intToWString(getBestDbm(), 5);
                 ret.metric=L"dBm";
             }
         }
@@ -460,7 +463,7 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             break;
         case RX_1:{
             ret.prefix=L"RX1";
-            ret.value=StringHelper::intToString((int)uav_td.RSSI1_Percentage_dBm,4);
+            ret.value= StringHelper::intToWString((int) uav_td.RSSI1_Percentage_dBm, 4);
             if(T_Protocol==TelemetryReceiver::MAVLINK){
                 ret.metric=L"%";
             }else{
@@ -471,33 +474,33 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
         case SATS_IN_USE:{
             ret.prefix=L"Sat";
             ret.prefixIcon=ICON_SATELITE;
-            ret.value=StringHelper::intToString(uav_td.SatsInUse,3);
+            ret.value= StringHelper::intToWString(uav_td.SatsInUse, 3);
             ret.metric=L"";
         }
             break;
         case VS:{
             ret.prefix=L"VS";
             if(T_METRIC_SPEED_VERTICAL==KMH){
-                ret.value= StringHelper::doubleToString(uav_td.SpeedClimb_KPH, 5, 2);
+                ret.value= StringHelper::doubleToWString(uav_td.SpeedClimb_KPH, 5, 2);
                 ret.metric=L"km/h";
             }else{
-                ret.value= StringHelper::doubleToString(uav_td.SpeedClimb_KPH*KMH_TO_MS, 5, 2);
+                ret.value= StringHelper::doubleToWString(uav_td.SpeedClimb_KPH * KMH_TO_MS, 5, 2);
                 ret.metric=L"m/s";
             }
         }
             break;
         case DECODER_LATENCY_DETAILED:{
             ret.prefix=L"Dec";
-            ret.value=StringHelper::doubleToString(appOSDData.avgParsingTime_ms,2,1)+L","+
-                    StringHelper:: doubleToString(appOSDData.avgWaitForInputBTime_ms,2,1)+L","+
-                    StringHelper::doubleToString(appOSDData.avgDecodingTime_ms,2,1);
+            ret.value= StringHelper::doubleToWString(appOSDData.avgParsingTime_ms, 2, 1) + L"," +
+                       StringHelper::doubleToWString(appOSDData.avgWaitForInputBTime_ms, 2, 1) + L"," +
+                       StringHelper::doubleToWString(appOSDData.avgDecodingTime_ms, 2, 1);
             ret.metric=L"ms";
         }
             break;
         case DECODER_LATENCY_SUM:{
             ret.prefix=L"Dec";
             float total=appOSDData.avgParsingTime_ms+appOSDData.avgWaitForInputBTime_ms+appOSDData.avgDecodingTime_ms;
-            ret.value=StringHelper::doubleToString(total,4,2);
+            ret.value= StringHelper::doubleToWString(total, 4, 2);
             ret.metric=L"ms";
         }
             break;
@@ -512,25 +515,28 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             break;
         case EZWB_UPLINK_RC_RSSI:{
             if(connectedSystem==DJI){
-                ret.value=StringHelper::intToString(uav_td.DJI_linkQualityUp_P,5);
+                ret.value= StringHelper::intToWString(uav_td.DJI_linkQualityUp_P, 5);
                 ret.metric=L"%";
             }else{
-                ret.value=StringHelper::intToString(wifibroadcastTelemetryData.current_signal_joystick_uplink,5);
+                ret.value= StringHelper::intToWString(
+                        wifibroadcastTelemetryData.current_signal_joystick_uplink, 5);
                 ret.metric=L"dBm";
             }
         }
             break;
         case EZWB_UPLINK_RC_BLOCKS:{
-            std::wstring s1 = StringHelper::intToString((int) wifibroadcastTelemetryData.lost_packet_cnt_rc, 6);
-            std::wstring s2 = StringHelper::intToString((int) wifibroadcastTelemetryData.lost_packet_cnt_telemetry_up , 6);
+            std::wstring s1 = StringHelper::intToWString(
+                    (int) wifibroadcastTelemetryData.lost_packet_cnt_rc, 6);
+            std::wstring s2 = StringHelper::intToWString(
+                    (int) wifibroadcastTelemetryData.lost_packet_cnt_telemetry_up, 6);
             ret.value=s1+L"/"+s2;
             ret.metric=L"";
         }
             break;
         case EZWB_STATUS_AIR:{
-            std::wstring s2= StringHelper::intToString(wifibroadcastTelemetryData.cpuload_air, 2);
+            std::wstring s2= StringHelper::intToWString(wifibroadcastTelemetryData.cpuload_air, 2);
             std::wstring s3=L"%";
-            std::wstring s4=StringHelper::intToString(wifibroadcastTelemetryData.temp_air,3);
+            std::wstring s4= StringHelper::intToWString(wifibroadcastTelemetryData.temp_air, 3);
             std::wstring s5=L"°";
             ret.value=s2+s3+L" "+s4+s5;
             ret.prefix=L"CPU";
@@ -538,9 +544,9 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
         }
             break;
         case EZWB_STATUS_GROUND:{
-            std::wstring s2= StringHelper::intToString(wifibroadcastTelemetryData.cpuload_gnd, 2);
+            std::wstring s2= StringHelper::intToWString(wifibroadcastTelemetryData.cpuload_gnd, 2);
             std::wstring s3=L"%";
-            std::wstring s4=StringHelper::intToString(wifibroadcastTelemetryData.temp_gnd,3);
+            std::wstring s4= StringHelper::intToWString(wifibroadcastTelemetryData.temp_gnd, 3);
             std::wstring s5=L"°";
             ret.value=s2+s3+L" "+s4+s5;
             ret.prefix=L"CPU";
@@ -548,8 +554,10 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
         }
             break;
         case EZWB_BLOCKS:{
-            std::wstring s1 = StringHelper::intToString((int) wifibroadcastTelemetryData.damaged_block_cnt, 6);
-            std::wstring s2 = StringHelper::intToString((int) wifibroadcastTelemetryData.lost_packet_cnt, 6);
+            std::wstring s1 = StringHelper::intToWString(
+                    (int) wifibroadcastTelemetryData.damaged_block_cnt, 6);
+            std::wstring s2 = StringHelper::intToWString(
+                    (int) wifibroadcastTelemetryData.lost_packet_cnt, 6);
             ret.value=s1+L"/"+s2;
             ret.prefix=L"";
         }
@@ -590,9 +598,11 @@ TelemetryReceiver::getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter) const {
         MLOGD<<"Adapter error";
     }
     if(adapter<wifibroadcastTelemetryData.wifi_adapter_cnt){
-        const std::wstring s1=StringHelper::intToString((int)wifibroadcastTelemetryData.adapter[adapter].current_signal_dbm,4);
+        const std::wstring s1= StringHelper::intToWString(
+                (int) wifibroadcastTelemetryData.adapter[adapter].current_signal_dbm, 4);
         const std::wstring s2=L"dBm [";
-        const std::wstring s3=StringHelper::intToString((int)wifibroadcastTelemetryData.adapter[adapter].received_packet_cnt,7);
+        const std::wstring s3= StringHelper::intToWString(
+                (int) wifibroadcastTelemetryData.adapter[adapter].received_packet_cnt, 7);
         const std::wstring s4=L"]";
         ret.value=s1+s2+s3+s4;
     }else{

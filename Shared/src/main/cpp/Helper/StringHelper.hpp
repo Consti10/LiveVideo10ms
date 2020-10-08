@@ -9,63 +9,63 @@
 #include <sstream>
 #include "../NDKHelper/AndroidLogger.hpp"
 
-//Really messy spaghetti code
-
 class StringHelper{
 private:
-    static const int countDigitsFast(long n){
-        if(n==std::numeric_limits<long>::min()){
-            return 11;
-        }
-        if(n<0){
-            return countDigitsFast(-n)+1;
-        }
-        if(n==0){
-            return 1;
-        }
-        return (int)std::log10(n)+1;
+    // Return the n of digits without the sign
+    static const size_t countDigitsWithoutSign(unsigned int n){
+        return std::floor(std::log10(n) + 1);
     }
-    static const int countDigitsSlow(long n){
-        return (int)(std::stringstream()<<n).str().length();
+    // Return n of digits with sign
+    static const size_t countDigitsWithSign(int n){
+        if(n==0)return 1;
+        if(n<0)return countDigitsWithoutSign(std::abs(n))+1;
+        return countDigitsWithoutSign(n);
+    }
+    // Return n of digits with sign, slower than the one above
+    static const size_t countDigitsWithSignSlow(long n){
+        return std::to_string(n).length();
     }
 public:
     static const std::string normalS(std::wstring& input){
         return std::string(input.begin(),input.end());
     }
-    static const std::wstring intToString(const int value,const int maxStringL){
-        const auto asString=(std::wstringstream()<<value).str();
-        if(asString.length()>maxStringL){
+    /**
+     * If the value fits into a string of length @param maxLength return the value as string
+     * Else return 'E' string
+     */
+    static const std::wstring intToWString(const int value, const size_t maxLength){
+        assert(maxLength >= 1);
+        const auto asString=std::to_wstring(value);
+        if(asString.length() > maxLength){
             return L"E";
         }
         return asString;
     }
-
-//writes the fractional and non-fractional parts of value into input wstring(s)
-//maxLength: Maximum length of the string,including '-' and '.'
-//resAfterCome: The maximum resolution after the come
-    static const std::wstring doubleToString(double value,int maxLength,int maxResAfterCome){
-        const int maxPrecision=maxLength-countDigitsFast((long)std::abs(value))-1-(value<0 ? 1 : 0);
-        const int precision=maxPrecision>maxResAfterCome ? maxResAfterCome : maxPrecision;
-        std::wstring result;
-        if(precision>=0){
-            result=(std::wstringstream()<<std::fixed<<std::setprecision(precision)<<value).str();
-        }else{
-            result=L"E";
+    /**
+     * Returns the fractional and non-fractional parts of value as a w-string
+     * @param value The value to write
+     * @param maxLength  Maximum length of the string,including '-' and '.'
+     * @param wantedPrecisionAfterCome The wanted precision after the come, if possible
+     */
+    static const std::wstring doubleToWString(double value, int maxLength, int wantedPrecisionAfterCome){
+        assert(maxLength>=1);
+        // 'whole number' is the part before the '.'
+        const auto digitsWholeNumberWithSign=countDigitsWithSign((int)value);
+        // Return error when not even the whole number fits into maxLength
+        if(digitsWholeNumberWithSign>maxLength){
+            return L"E";
         }
-        //if(result.compare(L"-0")!=0){
-        //    result=L"0";
-        //}
-        //LOGSH("val:%f maxLen:%d maxResAfterCome:%d maxPrecision:%d precision:%d result:%s",value,maxLength,maxResAfterCome,maxPrecision,precision,normalS(result).c_str());
-        if(result.length()>maxLength){
-            MLOGE<<"ERROR max length";
-            result=L"EM";
+        // Return the whole number when only the whole number fits (and if only the whole number and the '.'
+        // fits, also return the whole number)
+        if(digitsWholeNumberWithSign >= (maxLength - 1)){
+            return std::to_wstring(value);
         }
-        return result;
+        const std::wstring valueAsStringWithDecimals=(std::wstringstream() << std::fixed << std::setprecision(wantedPrecisionAfterCome) << value).str();
+        return valueAsStringWithDecimals.substr(0,maxLength);
     }
 
-
     static const void doubleToString(std::wstring& sBeforeCome,std::wstring& sAfterCome,double value,int maxLength,int maxResAfterCome){
-        const auto valueAsString=doubleToString(value,maxLength,maxResAfterCome);
+        const auto valueAsString= doubleToWString(value, maxLength, maxResAfterCome);
         const auto idx=valueAsString.find(L".");
         const auto nonFractional=idx==std::wstring::npos ? valueAsString : valueAsString.substr(0,idx);
         const auto fractional=idx==std::wstring::npos ? L"" : valueAsString.substr(idx,valueAsString.length());
@@ -74,37 +74,50 @@ public:
     }
 
     static const void test1(){
-        doubleToString(10.9234,10,4);
-        doubleToString(10.9234,10,2);
-        doubleToString(10.9234,10,0);
-        doubleToString(10.9234,4,4);
-        doubleToString(-10.9234,4,4);
+        doubleToWString(10.9234, 10, 4);
+        doubleToWString(10.9234, 10, 2);
+        doubleToWString(10.9234, 10, 0);
+        doubleToWString(10.9234, 4, 4);
+        doubleToWString(-10.9234, 4, 4);
     }
 
     static const void testCountDigits(){
-        //
         std::srand(std::time(nullptr));
-        int logc=0;
         MLOGD<<"testCountDigits() start";
-        for(long i=-std::numeric_limits<int>::min();i<std::numeric_limits<int>::max();i+=10000){
-        //for(long i=-10000;i<10000;i+=1){
-        //for(long i=-std::numeric_limits<long>::max();i>=std::numeric_limits<long>::min();i-=100000){
-            int len1=countDigitsFast(i);
-            int len2=countDigitsSlow(i);
-            if(len1!=len2){
-                MLOGE<<"ERROR "<<i<<" "<<len1;
-            }
-            //i+=std::rand()%100000;
-            logc++;
-            if(logc>100){
-                MLOGD<<"%ld"<<i;
-            }
+        std::vector<int> values={
+                -100,0,1,9,10,100,100
+        };
+        for(int i=0;i<5000;i++){
+            values.push_back(std::rand());
+        }
+        for(int value:values){
+            const size_t size1=countDigitsWithSign(value);
+            const size_t size2=countDigitsWithSignSlow(value);
+            MLOGD<<"Value:"<<value<<" "<<size1<<" "<<size2;
+            assert(size1==size2);
         }
         MLOGD<<"testCountDigits() end";
     }
 
+    static const void testIntToWString(){
+        auto tmp= intToWString(100,3);
+        assert(tmp.compare(L"100")==0);
+        tmp= intToWString(1000,3);
+        assert(tmp.compare(L"E")==0);
+        tmp= intToWString(-100,4);
+        assert(tmp.compare(L"-100")==0);
+        tmp= intToWString(-1000,4);
+        assert(tmp.compare(L"E")==0);
+    }
 
-
+    static const void testDoubleToWString(){
+        auto tmp= doubleToWString(100, 6, 2);
+        assert(tmp.compare(L"100.00")==0);
+        tmp= doubleToWString(100.01, 6, 2);
+        assert(tmp.compare(L"100.01")==0);
+        tmp= doubleToWString(100.01, 6, 3);
+        assert(tmp.compare(L"100.010")==0);
+    }
 };
 
 
