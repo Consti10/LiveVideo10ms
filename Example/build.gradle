@@ -36,7 +36,6 @@ dependencies {
     implementation('com.google.firebase:firebase-firestore:21.7.1')
 
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
-
     implementation("androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion")
 
     testImplementation 'junit:junit:4.13'
