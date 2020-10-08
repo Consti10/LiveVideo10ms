@@ -46,6 +46,7 @@ typedef struct {
     // These elements are for DJI drones
     int DJI_linkQualityUp_P;
     int DJI_linkQualityDown_P;
+    float DJI_Gimbal_Attitude_Yaw_Degree;
 
 } UAVTelemetryData;
 
