@@ -20,6 +20,7 @@
 #include <UDPReceiver.h>
 
 #include "MTelemetryValue.hpp"
+#include "TelemetryHelper.hpp"
 
 /*
  * This data is only generated on the android side and does not depend
@@ -103,7 +104,6 @@ public:
     std::string getProtocolAsString()const;
     std::string getSystemAsString()const;
     std::string getAllTelemetryValuesAsString()const;
-    std::string getEZWBDataAsString()const;
     int getNReceivedTelemetryBytes()const;
     long getNEZWBPacketsParsingFailed()const;
     int getBestDbm()const;
@@ -154,7 +154,6 @@ public:
     };
     MTelemetryValue getTelemetryValue(TelemetryValueIndex index) const ;
     MTelemetryValue getTelemetryValueEZWB_RSSI_ADAPTERS_0to5(int adapter)const;
-    std::wstring getMAVLINKFlightMode()const;
 private:
     std::unique_ptr<UDPReceiver> mTelemetryDataReceiver;
     std::unique_ptr<UDPReceiver> mEZWBDataReceiver;

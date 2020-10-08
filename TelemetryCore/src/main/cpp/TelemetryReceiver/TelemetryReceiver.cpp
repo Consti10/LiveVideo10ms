@@ -503,7 +503,9 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             break;
         case FLIGHT_STATUS_MAV_ONLY:{
             if(T_Protocol==TelemetryReceiver::MAVLINK){
-                ret.value=getMAVLINKFlightMode();
+                ret.value= TelemetryHelper::getMAVLINKFlightModeAsWString(
+                        MAVLINK_FLIGHTMODE_QUADCOPTER, uav_td.FlightMode_MAVLINK,
+                        uav_td.FlightMode_MAVLINK_armed);
             }else{
                 ret.value=L"MAV only";
             }
@@ -635,57 +637,6 @@ std::string TelemetryReceiver::getStatisticsAsString()const {
     return ostream.str();
 }
 
-std::wstring TelemetryReceiver::getMAVLINKFlightMode() const {
-    std::wstring mode;
-    if(MAVLINK_FLIGHTMODE_QUADCOPTER){
-        switch (uav_td.FlightMode_MAVLINK) {
-            case 0:mode = L"STAB";break;
-            case 1:mode = L"ACRO";break;
-            case 2:mode = L"ALTHOLD";break;
-            case 3:mode = L"AUTO";break;
-            case 4:mode = L"GUIDED";break;
-            case 5:mode = L"LOITER";break;
-            case 6:mode = L"RTL";break;
-            case 7:mode = L"CIRCLE";break;
-            case 9:mode = L"LAND";break;
-            case 11:mode = L"DRIFT";break;
-            case 13:mode = L"SPORT";break;
-            case 14:mode = L"FLIP";break;
-            case 15:mode = L"AUTOTUNE";break;
-            case 16:mode = L"POSHOLD";break;
-            case 17:mode = L"BRAKE";break;
-            case 18:mode = L"THROW";break;
-            case 19:mode = L"AVOIDADSB";break;
-            case 20:mode = L"GUIDEDNOGPS";break;
-            default:mode = L"-----";break;
-        }
-    }else{
-        switch (uav_td.FlightMode_MAVLINK) {
-            case 0: mode = L"MAN"; break;
-            case 1: mode = L"CIRC"; break;
-            case 2: mode = L"STAB"; break;
-            case 3: mode = L"TRAI"; break;
-            case 4: mode = L"ACRO"; break;
-            case 5: mode = L"FBWA"; break;
-            case 6: mode = L"FBWB"; break;
-            case 7: mode = L"CRUZ"; break;
-            case 8: mode = L"TUNE"; break;
-            case 10: mode = L"AUTO"; break;
-            case 11: mode = L"RTL"; break;
-            case 12: mode = L"LOIT"; break;
-            case 15: mode = L"GUID"; break;
-            case 16: mode = L"INIT"; break;
-            default:
-                mode = L"-----";
-                break;
-        }
-    }
-    if(!uav_td.FlightMode_MAVLINK_armed){
-        mode=L"["+mode+L"]";
-    }
-    return mode;
-}
-
 std::string TelemetryReceiver::getAllTelemetryValuesAsString() const {
     std::wstringstream ss;
     for( int i = TelemetryValueIndex ::DECODER_FPS; i != TelemetryValueIndex::EZWB_RSSI_ADAPTER3; i++ ){
@@ -697,35 +648,6 @@ std::string TelemetryReceiver::getAllTelemetryValuesAsString() const {
     std::wstring_convert<convert_type, wchar_t> converter;
     const std::string converted_str = converter.to_bytes( ss.str());
     return converted_str;
-}
-
-std::string TelemetryReceiver::getEZWBDataAsString()const{
-    std::stringstream stringstream;
-    stringstream << "damaged_block_cnt:" << wifibroadcastTelemetryData.damaged_block_cnt << "\n";
-    stringstream << "lost_packet_cnt:" << wifibroadcastTelemetryData.lost_packet_cnt << "\n";
-    stringstream << "skipped_packet_cnt:" << wifibroadcastTelemetryData.skipped_packet_cnt << "\n";
-    stringstream << "received_packet_cnt:" << wifibroadcastTelemetryData.received_packet_cnt << "\n";
-    stringstream << "kbitrate:" << wifibroadcastTelemetryData.kbitrate << "\n";
-    stringstream << "kbitrate_measured:" << wifibroadcastTelemetryData.kbitrate_measured << "\n";
-    stringstream << "kbitrate_set:" << wifibroadcastTelemetryData.kbitrate_set << "\n";
-    stringstream << "lost_packet_cnt_telemetry_up:" << wifibroadcastTelemetryData.lost_packet_cnt_telemetry_up << "\n";
-    stringstream << "lost_packet_cnt_telemetry_down:" << wifibroadcastTelemetryData.lost_packet_cnt_telemetry_down<< "\n";
-    stringstream << "lost_packet_cnt_msp_up:" << wifibroadcastTelemetryData.lost_packet_cnt_msp_up << "\n";
-    stringstream << "lost_packet_cnt_msp_down:" << wifibroadcastTelemetryData.lost_packet_cnt_msp_down << "\n";
-    stringstream << "lost_packet_cnt_rc:" << wifibroadcastTelemetryData.lost_packet_cnt_rc << "\n";
-    stringstream << "current_signal_joystick_uplink:" << (int) wifibroadcastTelemetryData.current_signal_joystick_uplink << "\n";
-    stringstream << "current_signal_telemetry_uplink:" << (int) wifibroadcastTelemetryData.current_signal_telemetry_uplink << "\n";
-    stringstream << "joystick_connected:" << (int) wifibroadcastTelemetryData.joystick_connected << "\n";
-    stringstream << "cpuload_gnd:" << (int) wifibroadcastTelemetryData.cpuload_gnd << "\n";
-    stringstream << "temp_gnd:" << (int) wifibroadcastTelemetryData.temp_gnd << "\n";
-    stringstream << "cpuload_air:" << (int) wifibroadcastTelemetryData.cpuload_air << "\n";
-    stringstream << "temp_air:" << (int) wifibroadcastTelemetryData.temp_air << "\n";
-    stringstream << "wifi_adapter_cnt:" << wifibroadcastTelemetryData.wifi_adapter_cnt << "\n";
-    for (int i = 0; i < wifibroadcastTelemetryData.wifi_adapter_cnt; i++) {
-        stringstream << "Adapter" << i << " dbm:" << (int) wifibroadcastTelemetryData.adapter[i].current_signal_dbm<<" pkt:"
-                       << (int) wifibroadcastTelemetryData.adapter[i].received_packet_cnt << "\n";
-    }
-    return stringstream.str();
 }
 
 float TelemetryReceiver::getHeading_Deg() const {
@@ -808,7 +730,7 @@ JNI_METHOD(jstring , getStatisticsAsString)
 JNI_METHOD(jstring , getEZWBDataAsString)
 (JNIEnv *env,jclass unused,jlong telemetryReceiver) {
     TelemetryReceiver* telRecN=native(telemetryReceiver);
-    std::string s = telRecN->getEZWBDataAsString();
+    std::string s = TelemetryHelper::getEZWBDataAsString(telRecN->wifibroadcastTelemetryData);
     jstring ret = env->NewStringUTF(s.c_str());
     return ret;
 }
