@@ -39,15 +39,15 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    private void resume(){
+    private void startUiUpdates(){
         videoPlayer.addAndStartDecoderReceiver(null);
         mThread=new Thread(this);
-        mThread.setName("TestReceiverVideo");
+        mThread.setName("V_TestR");
         mThread.start();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    private void pause(){
+    private void stopUiUpdates(){
         mThread.interrupt();
         try {mThread.join();} catch (InterruptedException e) {e.printStackTrace();}
         videoPlayer.stopAndRemoveReceiverDecoder();
@@ -87,32 +87,31 @@ public class TestReceiverVideo implements Runnable, LifecycleObserver {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(currentlyReceivingData){
-                            button.setTextColor(Color.GREEN);
-                        }else{
-                            button.setTextColor(Color.RED);
-                        }
+                        button.setTextColor(currentlyReceivingData ? Color.GREEN : Color.RED);
                     }
                 });
             }
-            //Every 3.5s we check if we are receiving video data, but cannot parse the data. Probably the user did mix up
+            //Every N s we check if we are receiving video data, but cannot parse the data. Probably the user did mix up
             //rtp and raw. Make a warning toast
-            if(System.currentTimeMillis()-lastCheckMS>=3500){
+            if(System.currentTimeMillis()-lastCheckMS>=3000){
                 final boolean errorVideo=VideoPlayer.receivingVideoButCannotParse(videoPlayer.getNativeInstance());
                 lastCheckMS =System.currentTimeMillis();
                 if(errorVideo){
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity,"You are receiving video data, but FPV-VR cannot parse it. If you are using RAW, please disable" +
-                                    " rtp parsing via NETWORK-->UseRTP or change ez-wb config to rtp",Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    makeToastOnUI("You are receiving video data, but FPV-VR cannot parse it. If you are using RAW, please disable" +
+                            " rtp parsing via NETWORK-->UseRTP or change ez-wb config to rtp",Toast.LENGTH_LONG);
                 }
             }
             //Refresh every 200ms
             try {Thread.sleep(200);} catch (InterruptedException e) {return;}
         }
+    }
+    private void makeToastOnUI(final String s,final int length){
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(activity,s,length).show();
+            }
+        });
     }
 
 }

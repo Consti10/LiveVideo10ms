@@ -18,11 +18,10 @@ import androidx.lifecycle.OnLifecycleEvent;
 //if they are not null
 
 public class TestReceiverTelemetry implements Runnable, LifecycleObserver {
-
+    private final AppCompatActivity activity;
     private TextView receivedTelemetryDataTV=null;
     private TextView ezwbForwardDataTV=null;
     private TextView dataAsStringTV=null;
-    private final AppCompatActivity activity;
     private final TelemetryReceiver telemetryReceiver;
     private Thread mUpateThread;
 
@@ -75,9 +74,9 @@ public class TestReceiverTelemetry implements Runnable, LifecycleObserver {
             if(telemetryReceiver.isEZWBIpAvailable()){
                 onEZWBIpDetected(telemetryReceiver.getEZWBIPAdress());
             }
-            //Every 3.5s we check if we are receiving video data, but cannot parse the data. Probably the user did mix up
+            //Every N s we check if we are receiving ez-wb data, but cannot parse the data. Probably the user did mix up
             //ezwb-versions
-            if(System.currentTimeMillis()- lastCheckMS >=3500){
+            if(System.currentTimeMillis()- lastCheckMS >=3000){
                 final boolean errorEZ_WB= telemetryReceiver.receivingEZWBButCannotParse();
                 lastCheckMS =System.currentTimeMillis();
                 if(errorEZ_WB){

@@ -423,13 +423,14 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             break;
         case DECODER_BITRATE:{
             ret.prefix=L"Dec";
-            float kbits=appOSDData.decoder_bitrate_kbits;
+            const float kbits=appOSDData.decoder_bitrate_kbits;
+            //Example: Dec: XXX kb/s with 15 max chars there are 5 left for the number (10=5+5)
             if(kbits>1024){
                 float mbits=kbits/1024.0f;
-                ret.value= StringHelper::doubleToWString(mbits, 6, 1);
+                ret.value= StringHelper::doubleToWString(mbits, 5, 1);
                 ret.metric=L"mb/s";
             }else{
-                ret.value= StringHelper::doubleToWString(kbits, 6, 1);
+                ret.value= StringHelper::doubleToWString(kbits, 5, 1);
                 ret.metric=L"kb/s";
             }
         }
