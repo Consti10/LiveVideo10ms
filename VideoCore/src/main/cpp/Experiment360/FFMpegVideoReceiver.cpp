@@ -8,9 +8,8 @@
 #include "FFMpegVideoReceiver.h"
 
 #include <h264_stream.h>
+#include <AndroidLogger.hpp>
 
-constexpr auto TAG="FFMpegVideoReceiver.cpp";
-#define LOGV(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 //compilation without any changes (ok) but run time error on Pixel api 28
 ///lib/x86/libavcodec.so" has text relocations (https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#Text-Relocations-Enforced-for-API-level-23)
@@ -56,7 +55,7 @@ void FFMpegVideoReceiver::stop_playing() {
 }
 
 void FFMpegVideoReceiver::run() {
-    LOGV("FFMPeg playing: %s", m_url.c_str());
+    MLOGD<<"FFMPeg playing: "<<m_url.c_str();
 
     // Add a callback that we can use to shutdown.
     m_format_ctx = avformat_alloc_context();
@@ -74,20 +73,20 @@ void FFMpegVideoReceiver::run() {
 
     // Open the input stream.
     if (avformat_open_input(&m_format_ctx, m_url.c_str(), NULL, &opts) != 0) {
-        LOGV("Error connecting to: %s", m_url.c_str());
+        LOG_TERMINATING_ERROR("Error connecting to: "+m_url);
         return;
     }
 
     // Start reading packets from stream
     if (avformat_find_stream_info(m_format_ctx, 0) < 0) {
-        LOGV("Can't find video stream info");
+        LOG_TERMINATING_ERROR("Can't find video stream info");
         return;
     }
 
     // Find the video stream.
     m_video_stream = av_find_best_stream(m_format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     if (m_video_stream < 0) {
-        LOGV("Can't find video stream in input file");
+        LOG_TERMINATING_ERROR("Can't find video stream in input file");
         return;
     }
 
@@ -95,38 +94,37 @@ void FFMpegVideoReceiver::run() {
 
     // Find the decoder
     if (!(m_codec = avcodec_find_decoder(origin_par->codec_id))) {
-        LOGV("Error finding the decoder");
+        LOG_TERMINATING_ERROR("Error finding the decoder");
         return;
     }
 
     // Allocate the context
     if (!(m_codec_ctx = avcodec_alloc_context3(m_codec))) {
-        LOGV("Error opening the decoding context");
+        LOG_TERMINATING_ERROR("Error opening the decoding context");
         return;
     }
 
     if (avcodec_parameters_to_context(m_codec_ctx, origin_par)) {
-        LOGV("Error copying the decoder context");
+        LOG_TERMINATING_ERROR("Error copying the decoder context");
         return;
     }
 
-
     // Open the codec
     if (avcodec_open2(m_codec_ctx, m_codec, 0) < 0) {
-        LOGV("Error opening the decoding codec");
+        LOG_TERMINATING_ERROR("Error opening the decoding codec");
         return;
     }
 
     m_pCodecPaser = av_parser_init(AV_CODEC_ID_H264);
     if(!m_pCodecPaser){
-        LOGV("Cannot find parser");
+        LOG_TERMINATING_ERROR("Cannot find parser");
     }
     m_frame=av_frame_alloc();
     if(!m_frame){
-        LOGV("Could not allocate video frame");
+        LOG_TERMINATING_ERROR("Could not allocate video frame");
     }
 
-    LOGV("Started receiving");
+    MLOGD<<"Started receiving";
 
     int ret;
     uint8_t *data;
@@ -144,7 +142,7 @@ void FFMpegVideoReceiver::run() {
             break;
         }
         if (m_packet.stream_index == m_video_stream) {
-
+            currentlyReceivedVideoData+=m_packet.size;
             //LOGV("Read packet: %d", m_packet.size);
             //NALU nalu(m_packet.data, m_packet.size);
             raw_h264_data_callback(m_packet.data,m_packet.size);
@@ -197,7 +195,7 @@ void FFMpegVideoReceiver::run() {
 
     // Close the codec context
     if (avcodec_close(m_codec_ctx) != 0) {
-        LOGV("Error closing the AV codec context");
+        MLOGD<<"Error closing the AV codec context";
         return;
     }
     av_free(m_codec_ctx);
@@ -210,8 +208,13 @@ void FFMpegVideoReceiver::run() {
 
 int FFMpegVideoReceiver::shutdown_callback() {
     if (m_shutdown) {
-        LOGV("Shutting down");
+        MLOGD<<"Shutting down";
         return 1;
     }
     return 0;
+}
+
+void FFMpegVideoReceiver::LOG_TERMINATING_ERROR(const std::string message) {
+    MLOGD<<message;
+    currentErrorMessage=message;
 }

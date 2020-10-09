@@ -25,11 +25,11 @@ public:
   void start_playing();
   void stop_playing();
   int shutdown_callback();
-
+  const std::string m_url;
+  size_t currentlyReceivedVideoData=0;
+  std::string currentErrorMessage="";
 private:
   void run();
-
-  std::string m_url;
   int m_cpu_priority;
   uint32_t m_bufsize;
   int m_video_stream;
@@ -45,6 +45,8 @@ private:
 
   const std::function<void(uint8_t[],int)> raw_h264_data_callback;
   const NALU_DATA_CALLBACK onNewNALUCallback;
+  //
+  void LOG_TERMINATING_ERROR(const std::string message);
 };
 
 

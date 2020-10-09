@@ -120,12 +120,13 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
         }
         break;
         case VIA_FFMPEG_URL:{
-            MLOGD<<"Started with SOURCE=TEST360";
-            const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
+            MLOGD<<"Started with SOURCE=RTSP(FFMPEG)";
+            //const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/capture1.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/test.mp4";
+            const std::string url="https://www.radiantmediaplayer.com/media/big-buck-bunny-360p.mp4";
             //MLOGD("url:%s",url.c_str());
             mFFMpegVideoReceiver=std::make_unique<FFMpegVideoReceiver>(url,0,[this](uint8_t* data,int data_length) {
                 onNewVideoData(data,(size_t)data_length,VIDEO_DATA_TYPE::RAW);
@@ -165,8 +166,14 @@ std::string VideoPlayer::getInfoString()const{
         ss << "\nReceived: " << mUDPReceiver->getNReceivedBytes() << "B"
            << " | parsed frames: "
            << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKeyFrames;
+    }else if(mFFMpegVideoReceiver){
+        ss << "Connecting to "<<mFFMpegVideoReceiver->m_url;
+        ss << "\n"<<mFFMpegVideoReceiver->currentErrorMessage;
+        ss <<"\nReceived: "<<mFFMpegVideoReceiver->currentlyReceivedVideoData<<" B"
+                << " | parsed frames: "
+                << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKeyFrames;
     }else{
-        ss << "Not receiving from udp";
+        ss << "Not receiving udp raw / rtp / rtsp";
     }
     return ss.str();
 }
