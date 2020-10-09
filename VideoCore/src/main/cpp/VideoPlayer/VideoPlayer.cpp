@@ -21,7 +21,7 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
     mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
     mFileReceiver(1024){
     env->GetJavaVM(&javaVm);
-
+    //
     mLowLagDecoder.registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
         const bool changed=ratio!=this->latestVideoRatio;
         this->latestVideoRatio=ratio;
