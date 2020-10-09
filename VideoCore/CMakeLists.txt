@@ -61,26 +61,6 @@ target_link_libraries(h264bitstream
         android)
 include_directories(${H264_BITSTREAM_DIR})
 
-#Webbn 360 stuff
-add_library( FFMpegVideoReceiver
-        SHARED
-        src/main/cpp/Experiment360/FFMpegVideoReceiver.cpp
-        )
-target_link_libraries( FFMpegVideoReceiver
-        ${log-lib}
-        log
-        android
-        mediandk
-        OpenMAXAL
-        avcodec-lib
-        avformat-lib
-        avutil-lib
-        #
-        swresample-lib
-
-        h264bitstream
-        )
-
 #######################################################
 ########## Build the VideoCore native libary ##########
 #######################################################
@@ -94,6 +74,23 @@ include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
 include_directories(${NDKHELPER_PATH})
 
+#Webbn 360 stuff
+add_library( FFMpegVideoReceiver
+        SHARED
+        src/main/cpp/Experiment360/FFMpegVideoReceiver.cpp)
+target_link_libraries( FFMpegVideoReceiver
+        ${log-lib}
+        log
+        android
+        mediandk
+        OpenMAXAL
+        avcodec-lib
+        avformat-lib
+        avutil-lib
+        #
+        swresample-lib
+        h264bitstream
+        )
 
 set(VIDEO_PATH src/main/cpp)
 add_library( VideoNative
