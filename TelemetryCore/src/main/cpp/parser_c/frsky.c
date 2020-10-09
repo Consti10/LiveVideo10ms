@@ -90,8 +90,11 @@ int frsky_interpret_packet(frsky_state_t *state, UAVTelemetryData *td) {
 			break;
 		case ID_GPS_SPEED_AP:
 			td->validmsgsrx++;
-			td->SpeedGround_KPH += 1.0 * data / 1.94384449; //now we are in cm/s
-			td->SpeedGround_KPH = td->SpeedGround_KPH / 100 / 1000 * 3600; //now we are in km/h
+			{
+				float SpeedGround_KPH=1.0 * data / 1.94384449; //now we are in cm/s;
+				SpeedGround_KPH= SpeedGround_KPH / 100 / 1000 * 3600; //now we are in km/h
+				td->SpeedGround_KPH =SpeedGround_KPH;
+			}
 			break;
 		case ID_ACC_X:
 			td->validmsgsrx++;

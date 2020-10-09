@@ -15,8 +15,8 @@
 typedef struct {
     uint32_t validmsgsrx;
 
-    float BatteryPack_V;  //Resolution only mVolt
-    float BatteryPack_A;  //Resolution only mAmpere.
+    float BatteryPack_V;  //Resolution most likely mVolt
+    float BatteryPack_A;  //Resolution most likely mAmpere.
     float BatteryPack_mAh; //Already used capacity, in mAh
     float BatteryPack_P; //remaining battery, in percentage.Only sent by MAVLINK or DJI -
     // else it has to be calculated manually via already used capacity and battery capacity
@@ -32,7 +32,7 @@ typedef struct {
 
     float Heading_Deg; //Heading of the aircraft, in degrees
     float CourseOG_Deg; //course over ground (often reported by the compass) of the aircraft, in degrees
-
+    // TODO use meters per second instead of kilometers per hour (more scientific)
     float SpeedGround_KPH; // ( km/h) ==VS1
     float SpeedAir_KPH; // ( km/h) ==VS2
     float SpeedClimb_KPH; //(km/h) ==HS
