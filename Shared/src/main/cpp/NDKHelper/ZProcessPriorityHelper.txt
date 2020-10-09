@@ -5,6 +5,7 @@
 #ifndef FPV_VR_OS_PROCESSPRIORITYHELPER_H
 #define FPV_VR_OS_PROCESSPRIORITYHELPER_H
 
+// Deprected, use NDKThreadHelper ( JThread / JProcess)
 
 #include "AndroidLogger.hpp"
 #include "../../../../../../../../../AppData/Local/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/sys/resource.h"

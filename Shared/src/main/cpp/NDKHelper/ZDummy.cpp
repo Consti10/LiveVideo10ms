@@ -5,6 +5,5 @@
 #include "NDKArrayHelper.hpp"
 #include "NDKHelper.hpp"
 #include "NDKThreadHelper.hpp"
-#include "ProcessPriorityHelper.h"
 #include "SharedPreferences.hpp"
 #include "TimeHelper.hpp"
