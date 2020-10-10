@@ -16,7 +16,7 @@ private:
     static const size_t countDigitsWithoutSign(unsigned long n){
         return std::floor(std::log10(n) + 1);
     }
-    // Return n of digits with sign
+    // Return n of digits with sign (e.g. the '-' also counts as a digit)
     static const size_t countDigitsWithSign(long n){
         if(n==0)return 1;
         if(n<0)return countDigitsWithoutSign(std::abs(n))+1;
