@@ -14,7 +14,7 @@ import constantin.video.core.databinding.ActivitySimpleVideoBinding;
 import constantin.video.core.external.AspectFrameLayout;
 import constantin.video.core.player.VideoPlayer;
 
-// Most basic implementation of an activity that uses LiveVideo to stream or play back video
+// Most basic implementation of an activity that uses VideoCore to stream or play back video
 // Into an Android Surface View
 public class SimpleVideoActivity extends AppCompatActivity implements  IVideoParamsChanged {
     private ActivitySimpleVideoBinding binding;
