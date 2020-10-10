@@ -38,8 +38,8 @@
 
 #include <optional>
 #include <chrono>
-#include <TimeHelper.hpp>
-#include <NDKThreadHelper.hpp>
+#include "TimeHelper.hpp"
+#include "NDKThreadHelper.hpp"
 
 //Helper for calling the ASurfaceTexture_XXX method with a fallback for minApi<28
 // 03.06.2020 confirmed that the ASurfaceTexture_XXX methods call native code directly (not java)
@@ -52,7 +52,7 @@ private:
     ASurfaceTexture* mSurfaceTexture;
     // set later (not in constructor)
     jobject weakGlobalRefSurfaceTexture;
-    GLint textureId;
+    int textureId;
 public:
     AvgCalculator2 delayToUpdate2{60};
     // look up all the method ids
@@ -96,6 +96,8 @@ public:
 #endif
     }
     void updateFromSurfaceTextureHolder(JNIEnv* env,jobject surfaceTextureHolder){
+        // You are going to see an IDE error here since this module does not know RenderingXCore
+        // However, if you use this class in a module that also depends on RenderingXCore it will work without issues
         jclass jcSurfaceTextureHolder = env->FindClass("constantin/renderingx/core/xglview/SurfaceTextureHolder");
         assert(jcSurfaceTextureHolder);
         jmethodID jmGetTextureId = env->GetMethodID(jcSurfaceTextureHolder, "getTextureId", "()I" );
@@ -157,7 +159,7 @@ public:
         }
         return std::nullopt;
     }
-    GLuint getTextureId()const{
+    unsigned int getTextureId()const{
         return textureId;
     }
 };

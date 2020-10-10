@@ -6,4 +6,5 @@
 #include "NDKHelper.hpp"
 #include "NDKThreadHelper.hpp"
 #include "SharedPreferences.hpp"
+#include "SurfaceTextureUpdate.hpp"
 #include "TimeHelper.hpp"
