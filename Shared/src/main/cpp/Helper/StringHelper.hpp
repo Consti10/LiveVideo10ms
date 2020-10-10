@@ -7,6 +7,7 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 #include "../NDKHelper/AndroidLogger.hpp"
 
 class StringHelper{
