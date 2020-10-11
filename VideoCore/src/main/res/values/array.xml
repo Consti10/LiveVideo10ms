@@ -4,6 +4,7 @@
     <string-array name="entriesVideoStream" >
         <item>RTP</item>
         <item>RAW (h.264 nalus)</item>
+        <item>CUSTOM</item>
     </string-array>
 
     <string-array name="entriesVIDEO_SOURCE" >

@@ -50,6 +50,7 @@ private:
     SOURCE_IP_CALLBACK onSourceIP= nullptr;
     const int mPort;
     const int mCPUPriority;
+    // Hmm....
     const size_t WANTED_RCVBUF_SIZE;
     const std::string mName;
     ///We need this reference to stop the receiving thread

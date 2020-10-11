@@ -7,6 +7,7 @@
 #include <vector>
 #include <sstream>
 #include <array>
+#include <StringHelper.hpp>
 
 
 UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,std::string name,int CPUPriority,DATA_CALLBACK  onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
@@ -54,15 +55,15 @@ void UDPReceiver::receiveFromUDPLoop() {
     int recvBufferSize=0;
     socklen_t len=sizeof(recvBufferSize);
     getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
-    MLOGD<<"Default socket recv buffer is "<<recvBufferSize<<"bytes";
+    MLOGD<<"Default socket recv buffer is "<<StringHelper::memorySizeReadable(recvBufferSize);
 
     if(WANTED_RCVBUF_SIZE>recvBufferSize){
         recvBufferSize=WANTED_RCVBUF_SIZE;
         if(setsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &WANTED_RCVBUF_SIZE,len)) {
-            MLOGD<<"Cannot increase buffer size to "<<WANTED_RCVBUF_SIZE<<"bytes";
+            MLOGD<<"Cannot increase buffer size to "<<StringHelper::memorySizeReadable(WANTED_RCVBUF_SIZE);
         }
         getsockopt(mSocket, SOL_SOCKET, SO_RCVBUF, &recvBufferSize, &len);
-        MLOGD<<"Wanted "<<WANTED_RCVBUF_SIZE<<" Set "<<recvBufferSize;
+        MLOGD<<"Wanted "<<StringHelper::memorySizeReadable(WANTED_RCVBUF_SIZE)<<" Set "<<StringHelper::memorySizeReadable(recvBufferSize);
     }
     NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm, mCPUPriority, mName.c_str());
     struct sockaddr_in myaddr;
@@ -79,42 +80,17 @@ void UDPReceiver::receiveFromUDPLoop() {
 
     sockaddr_in source;
     socklen_t sourceLen= sizeof(sockaddr_in);
-    std::vector<uint8_t> sequenceNumbers;
-
+    
     while (receiving) {
         //TODO investigate: does a big buffer size create latency with MSG_WAITALL ?
+        //I do not think so. recvfrom should return as soon as new data arrived,not when the buffer is full
+        //But with a bigger buffer we do not loose packets when the receiver thread cannot keep up for a short amount of time
         const ssize_t message_length = recvfrom(mSocket,buff->data(),UDP_PACKET_MAX_SIZE, MSG_WAITALL,(sockaddr*)&source,&sourceLen);
         //ssize_t message_length = recv(mSocket, buff, (size_t) mBuffsize, MSG_WAITALL);
         if (message_length > 0) { //else -1 was returned;timeout/No data received
             //LOGD("Data size %d",(int)message_length);
+            onDataReceivedCallback(buff->data(), (size_t)message_length);
 
-            //Custom protocol where first byte of udp packet is sequence number
-            if(false){
-                uint8_t nr;
-                memcpy(&nr,buff->data(),1);
-                sequenceNumbers.push_back(nr);
-                if(sequenceNumbers.size()>32){
-                    std::stringstream ss;
-                    for(const auto seqnr:sequenceNumbers){
-                        ss<<((int)seqnr)<<" ";
-                    }
-                    bool allInOrder=true;
-                    bool allInAscendingOrder=true;
-                    for(size_t i=0;i<sequenceNumbers.size()-1;i++){
-                        if((sequenceNumbers.at(i)+1) != sequenceNumbers.at(i+1)){
-                            allInOrder=false;
-                        }
-                        if((sequenceNumbers.at(i)) >= sequenceNumbers.at(i+1)){
-                            allInAscendingOrder=false;
-                        }
-                    }
-                    MLOGD<<"Seq numbers. In order "<<allInOrder<<"  In ascending order "<<allInAscendingOrder<<" values : "<<ss.str();
-                    sequenceNumbers.resize(0);
-                }
-                onDataReceivedCallback(&buff->data()[1], (size_t)message_length);
-            }else{
-                onDataReceivedCallback(buff->data(), (size_t)message_length);
-            }
             nReceivedBytes+=message_length;
             //The source ip stuff
             const char* p=inet_ntoa(source.sin_addr);
