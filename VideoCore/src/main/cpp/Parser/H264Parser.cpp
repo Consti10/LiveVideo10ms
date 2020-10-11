@@ -7,6 +7,7 @@
 #include <endian.h>
 #include <chrono>
 #include <thread>
+#include <StringHelper.hpp>
 
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
     onNewNALU(std::move(onNewNALU)),
@@ -77,12 +78,22 @@ void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
                 allInAscendingOrder = false;
             }
         }
-        MLOGD<<"Seq numbers. In order "<<allInOrder<<"  In ascending order "<<allInAscendingOrder<<" values : "<<ss.str();
+        //MLOGD<<"Seq numbers. In order "<<allInOrder<<"  In ascending order "<<allInAscendingOrder<<" values : "<<ss.str();
         sequenceNumbers.resize(0);
     }
 }
 
 void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length) {
+    //
+    avgUDPPacketSize.add(std::chrono::nanoseconds(data_length));
+    if(avgUDPPacketSize.getNSamples()>100){
+        MLOGD<<"UDPPacketSize"
+        <<" min:"<<StringHelper::memorySizeReadable(avgUDPPacketSize.getMin().count())
+        <<" max:"<<StringHelper::memorySizeReadable(avgUDPPacketSize.getMax().count())
+        <<" avg:"<<StringHelper::memorySizeReadable(avgUDPPacketSize.getAvg().count());
+        avgUDPPacketSize.reset();
+    }
+    //
     //Custom protocol where first byte of udp packet is sequence number
     CustomUdpPacket customUdpPacket{0,&data[sizeof(uint32_t)],data_length-sizeof(uint32_t)};
     memcpy(&customUdpPacket.sequenceNumber,data,sizeof(uint32_t));

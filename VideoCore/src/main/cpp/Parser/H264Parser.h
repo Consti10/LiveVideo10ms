@@ -26,6 +26,7 @@
 //
 #include <map>
 #include <list>
+#include <TimeHelper.hpp>
 
 class H264Parser {
 public:
@@ -68,6 +69,7 @@ private:
     void debugSequenceNumbers(const uint32_t seqNr);
     uint32_t debugLastSequenceNumber;
     //
+    AvgCalculator avgUDPPacketSize;
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

@@ -81,14 +81,14 @@ public:
         // more than one MB
         if(sizeBytes>1024*1024){
             float sizeMB=(float)sizeBytes /1024.0 / 1024.0;
-            return std::to_string(sizeMB)+" mB";
+            return std::to_string(sizeMB)+"mB";
         }
         // more than one KB
         if(sizeBytes>1024){
             float sizeKB=(float)sizeBytes /1024.0;
-            return std::to_string(sizeKB)+" kB";
+            return std::to_string(sizeKB)+"kB";
         }
-        return std::to_string(sizeBytes)+" B";
+        return std::to_string(sizeBytes)+"B";
     }
 
     static void testCountDigits(){
