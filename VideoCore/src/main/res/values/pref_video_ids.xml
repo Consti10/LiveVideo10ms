@@ -4,7 +4,7 @@
 
     <string name="VS_PROTOCOL">Video stream protocol</string>
     <string name="VS_PORT">Video stream port</string>
-    <string name="VS_GROUND_RECORDING">VS GroundRecording</string>
+    <string name="VS_GROUND_RECORDING">VS_GROUND_RECORDING</string>
 
     //Advanced (hidden when not example build)
     <string name="VS_SOURCE">VS_SOURCE</string>
