@@ -8,10 +8,6 @@
 #include <chrono>
 #include <thread>
 
-constexpr auto TAG="H264Parser";
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-
-
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
     onNewNALU(std::move(onNewNALU)),
     mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
