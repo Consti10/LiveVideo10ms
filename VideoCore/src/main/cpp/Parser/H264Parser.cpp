@@ -60,3 +60,62 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
 
 
 
+void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
+    sequenceNumbers.push_back(seqNr);
+    if(sequenceNumbers.size()>32) {
+        std::stringstream ss;
+        for (const auto seqnr:sequenceNumbers) {
+            ss << ((int) seqnr) << " ";
+        }
+        bool allInOrder = true;
+        bool allInAscendingOrder = true;
+        for (size_t i = 0; i < sequenceNumbers.size() - 1; i++) {
+            if ((sequenceNumbers.at(i) + 1) != sequenceNumbers.at(i + 1)) {
+                allInOrder = false;
+            }
+            if ((sequenceNumbers.at(i)) >= sequenceNumbers.at(i + 1)) {
+                allInAscendingOrder = false;
+            }
+        }
+        MLOGD<<"Seq numbers. In order "<<allInOrder<<"  In ascending order "<<allInAscendingOrder<<" values : "<<ss.str();
+        sequenceNumbers.resize(0);
+    }
+}
+
+void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length) {
+    //Custom protocol where first byte of udp packet is sequence number
+    CustomUdpPacket customUdpPacket{0,&data[sizeof(uint32_t)],data_length-sizeof(uint32_t)};
+    memcpy(&customUdpPacket.sequenceNumber,data,sizeof(uint32_t));
+    debugSequenceNumbers(customUdpPacket.sequenceNumber);
+
+    if(lastForwardedSequenceNr==-1){
+        parse_raw_h264_stream(customUdpPacket.data,customUdpPacket.dataLength);
+        lastForwardedSequenceNr=customUdpPacket.sequenceNumber;
+        return;
+    }
+    if(customUdpPacket.sequenceNumber<=lastForwardedSequenceNr){
+        //duplicate or old packet
+        return;
+    }else{
+        parse_raw_h264_stream(customUdpPacket.data,customUdpPacket.dataLength);
+        lastForwardedSequenceNr=customUdpPacket.sequenceNumber;
+    }
+    //std::vector<uint8_t> tmp={customUdpPacket.data,customUdpPacket.data+customUdpPacket.dataLength};
+    /*XPacket xPacket{customUdpPacket.sequenceNumber,{customUdpPacket.data,customUdpPacket.data+customUdpPacket.dataLength}};
+    bufferedPackets.push_back(std::move(xPacket));
+    if(bufferedPackets.size()>5){
+        bufferedPackets.pop_front();
+    }*/
+
+    /*auto tmp2=std::make_pair(customUdpPacket.sequenceNumber, tmp);
+    dataMap.insert(tmp2);
+    if(dataMap.size()>5){
+        dataMap::iterator it;
+        for(auto it = dataMap.begin(); it != dataMap.end(); ++it) {
+            keys.push_back(it->first);
+        }
+        auto smallestKey=std::min_element(keys.begin(), keys.end());
+        dataMap.erase(smallestKey)
+    }*/
+    //
+}

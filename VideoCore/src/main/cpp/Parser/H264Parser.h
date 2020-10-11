@@ -23,6 +23,9 @@
 #include "ParseRTP.h"
 
 #include "FrameLimiter.hpp"
+//
+#include <map>
+#include <list>
 
 class H264Parser {
 public:
@@ -30,6 +33,8 @@ public:
     void parse_raw_h264_stream(const uint8_t* data,const size_t data_length);
     void parse_rtp_h264_stream(const uint8_t* rtp_data,const size_t data_len);
     void parseDjiLiveVideoData(const uint8_t* data,const size_t data_len);
+    //
+    void parseCustom(const uint8_t* data,const size_t data_len);
     void reset();
 public:
     long nParsedNALUs=0;
@@ -47,6 +52,22 @@ private:
     int maxFPS=0;
     //First time a NALU was succesfully decoded
     //std::chrono::steady_clock::time_point timeFirstNALUArrived=std::chrono::steady_clock::time_point(0);
+    // Custom stuff
+    std::vector<uint32_t> sequenceNumbers;
+    struct CustomUdpPacket{
+        uint32_t sequenceNumber;
+        const uint8_t* data;
+        size_t dataLength;
+    };
+    struct XPacket{
+        uint32_t sequenceNumber;
+        std::vector<uint8_t> data;
+    };
+    std::list<XPacket> bufferedPackets;
+    int lastForwardedSequenceNr=-1;
+    void debugSequenceNumbers(const uint32_t seqNr);
+    uint32_t debugLastSequenceNumber;
+    //
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H
