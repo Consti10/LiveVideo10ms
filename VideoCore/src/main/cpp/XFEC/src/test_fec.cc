@@ -81,7 +81,6 @@ std::size_t sendDataLossyAndOutOfOrder(FECDecoder&dec,const std::vector<std::sha
     std::random_device rng;
     std::mt19937 urng(rng());
     
-
     //std::shuffle(workingData.begin(),workingData.end(), urng);
     std::size_t drop_count=0;
     for (std::shared_ptr<FECBlock> blk : workingData) {
