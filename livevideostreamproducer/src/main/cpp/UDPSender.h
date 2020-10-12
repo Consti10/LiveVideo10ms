@@ -23,8 +23,7 @@ public:
     UDPSender(const std::string& IP,const int Port);
     /**
      * send data to the ip and port set previously. Logs error on failure.
-     * If data length exceeds the max UDP packet size, the method splits data and
-     * calls itself recursively
+     * If data length exceeds the max UDP packet size, the method splits data into smaller packets
      */
     void splitAndSend(const uint8_t* data, ssize_t data_length,bool addSeqNr);
     //

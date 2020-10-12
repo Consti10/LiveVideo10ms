@@ -21,10 +21,6 @@ public class UDPSender {
     native long nativeConstruct(String IP,int port);
     native void nativeDelete(long p);
     //Called by sendAsync / sendOnCurrentThread
-    //If length exceeds the max UDP packet size,
-    //The data is split into smaller chunks and the method calls itself recursively
-    native void nativeSplitAndSend(long p,ByteBuffer data,int dataSize);
-    native void nativeSendFEC(long p,ByteBuffer data,int dataSize);
 
     native void nativeSend(long p,ByteBuffer data,int dataSize,int mode);
 
