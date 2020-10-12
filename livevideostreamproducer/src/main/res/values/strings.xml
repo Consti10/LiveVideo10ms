@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">LiveVideoStreamProducer</string>
+
+
+    <string name="KEY_SP_UDP_IP">KEY_SP_UDP_IP</string>
+
+
 </resources>
