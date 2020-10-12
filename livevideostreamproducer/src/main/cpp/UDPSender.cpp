@@ -78,8 +78,6 @@ void UDPSender::sendPacket(const uint8_t *data, ssize_t data_length, bool addSeq
 }
 
 
-
-
 void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
     timeSpentSending.start();
     const auto result=sendto(sockfd,data,data_length, 0, (struct sockaddr *)&(address), sizeof(struct sockaddr_in));
