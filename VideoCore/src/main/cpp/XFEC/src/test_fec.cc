@@ -1,7 +1,8 @@
 
 #include <sys/time.h>
-
 #include <iostream>
+#include <algorithm>
+#include <random>
 
 //#include <cxxopts.hpp>
 
@@ -40,7 +41,7 @@ std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
   return buf;
 }
 
-// Create nBuffers buffers filled with random data, where each buffer has size of sizeBytes
+// Create N buffers filled with random data, where each buffer has size of sizeBytes
 std::vector<std::vector<uint8_t>> createRandomDataBuffers(const ssize_t sizeBytes,const ssize_t nBuffers){
     std::vector<std::vector<uint8_t>> ret;
     for(int i=0;i<nBuffers;i++){
@@ -57,6 +58,41 @@ std::size_t sizeBytes(const std::vector<std::shared_ptr<FECBlock>>& blocks){
   }
   return fecDataSize;
 }
+
+// Send all the blocks ( = add them to the decoder )
+// A lossy link is emulated by dropping some fec blocks
+// @param RANDOMNESS: the smaller the value, the more packets are dropped
+std::size_t sendDataLossy(FECDecoder& dec,const std::vector<std::shared_ptr<FECBlock>>& blks,const int RANDOMNESS=10){
+    std::size_t drop_count=0;
+    for (std::shared_ptr<FECBlock> blk : blks) {
+        if ((rand() % RANDOMNESS) != 0) {
+            dec.add_block(blk->pkt_data(), blk->pkt_length());
+        }else{
+            drop_count++;
+        }
+    }
+    return drop_count;
+}
+
+//same as above but also switch the order packets are sent
+std::size_t sendDataLossyAndOutOfOrder(FECDecoder&dec,const std::vector<std::shared_ptr<FECBlock>>& blks){
+    // we can copy a shared pointer without performance penalty
+    std::vector<std::shared_ptr<FECBlock>> workingData=blks;
+    std::random_device rng;
+    std::mt19937 urng(rng());
+
+    //std::shuffle(workingData.begin(),workingData.end(), urng);
+    std::size_t drop_count=0;
+    for (std::shared_ptr<FECBlock> blk : workingData) {
+        if ((rand() % 10) != 0) {
+            dec.add_block(blk->pkt_data(), blk->pkt_length());
+        }else{
+            drop_count++;
+        }
+    }
+    return drop_count;
+}
+
 
 struct TestResult{
     uint32_t nPassed;
@@ -86,13 +122,8 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc,const uint32_t max_bl
     std::vector<uint8_t> obuf;
     uint32_t drop_count = 0;
     // emulate transmission over a lossy link
-    for (std::shared_ptr<FECBlock> blk : blks) {
-      if ((rand() % 10) != 0) {
-        dec.add_block(blk->pkt_data(), blk->pkt_length());
-      }else{
-          drop_count++;
-      }
-    }
+    drop_count=sendDataLossyAndOutOfOrder(dec,blks);
+
     const auto droppedPacketsPercentage=(float)blks.size() / (float)drop_count;
     LOG_INFO << "Iteration: " << i << "  buffer size: " << buf_size
             <<" created blocks: "<<blks.size()<<" createdBlocksSizeSum: "<<sizeBytes(blks)
@@ -147,6 +178,7 @@ void run_test2(FECBufferEncoder &enc,const uint32_t max_block_size,
         }
     }
 }
+
 #ifndef __ANDROID__
 int main(int argc, char** argv) {
 
@@ -219,7 +251,7 @@ extern "C" {
 JNI_METHOD(void , nativeTestFec)
 (JNIEnv *env, jclass jclass1) {
     //test();
-    test2();
+    //test2();
 }
 
 }

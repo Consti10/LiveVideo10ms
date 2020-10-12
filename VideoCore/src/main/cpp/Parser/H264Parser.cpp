@@ -70,17 +70,18 @@ void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
         for (const auto seqnr:sequenceNumbers) {
             ss << ((int) seqnr) << " ";
         }
-        bool allInOrder = true;
-        bool allInAscendingOrder = true;
+        int nOutOufOrderBroken=0;
+        // Does not take out of order into account
+        int nLostPackets=0;
         for (size_t i = 0; i < sequenceNumbers.size() - 1; i++) {
-            if ((sequenceNumbers.at(i) + 1) != sequenceNumbers.at(i + 1)) {
-                allInOrder = false;
+            if (((sequenceNumbers.at(i)) >= sequenceNumbers.at(i + 1))) {
+                nOutOufOrderBroken++;
             }
-            if ((sequenceNumbers.at(i)) >= sequenceNumbers.at(i + 1)) {
-                allInAscendingOrder = false;
+            if ((sequenceNumbers.at(i) + 1) != sequenceNumbers.at(i + 1)) {
+                nLostPackets++;
             }
         }
-        //MLOGD<<"Seq numbers. In order "<<allInOrder<<"  In ascending order "<<allInAscendingOrder<<" values : "<<ss.str();
+        MLOGD<<"Seq numbers. LostPackets: "<<nLostPackets<<"  nOutOufOrderBroken: "<<nOutOufOrderBroken<<" values : "<<ss.str();
         sequenceNumbers.resize(0);
     }
 }
