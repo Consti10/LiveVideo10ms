@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "constantin.livevideostreamproducer"
         minSdkVersion 22
@@ -34,9 +33,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
-    implementation "androidx.preference:preference:1.1.1"
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion"
+    implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
