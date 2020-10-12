@@ -7,6 +7,7 @@
 #include <AndroidLogger.hpp>
 #define LOG_DEBUG MLOGD
 #define LOG_ERROR MLOGE
+#define LOG_INFO MLOGD
 
 #endif
 

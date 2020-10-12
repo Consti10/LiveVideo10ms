@@ -6,7 +6,7 @@
 //#include <cxxopts.hpp>
 
 #include <wifibroadcast/fec.hh>
-//#include <logging.hh>
+#include <logging.hh>
 
 #include <wifibroadcast/test_fec.h>
 
@@ -14,6 +14,31 @@ inline double cur_time() {
   struct timeval t;
   gettimeofday(&t, 0);
   return double(t.tv_sec) + double(t.tv_usec) * 1e-6;
+}
+
+// return 0 if buffers are equal
+// return -1 if size does not match, else return n of bytes that do not match
+int compareBuffers(const std::vector<uint8_t>& buff1,const std::vector<uint8_t>& buff2){
+  if (buff1.size() != buff2.size()) {
+    LOG_ERROR<<"Buffers are different sizes: " << buff1.size() << " != " << buff2.size();
+    return -1;
+  }
+  int nLocationsDiffer=0;
+  for (size_t j = 0; j < buff1.size(); ++j) {
+    if (buff1[j] != buff2[j]) {
+      LOG_ERROR<< "Buffers differ at location " << j << ": " << buff1[j] << " != " << buff2[j];
+      nLocationsDiffer++;
+    }
+  }
+  return nLocationsDiffer;
+}
+
+std::vector<uint8_t> createRandomDataBuffer(const size_t sizeBytes){
+  std::vector<uint8_t> buf(sizeBytes);
+  for (uint32_t j = 0; j < sizeBytes; ++j) {
+    buf[j] = rand() % 255;
+  }
+  return buf;
 }
 
 std::pair<uint32_t, double> run_test(FECBufferEncoder &enc, uint32_t max_block_size,
@@ -30,48 +55,34 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc, uint32_t max_block_s
     // Create a random buffer of data
     uint32_t buf_size = min_buffer_size + rand() % (max_buffer_size - min_buffer_size);
     bytes += buf_size;
-    std::vector<uint8_t> buf(buf_size);
-    for (uint32_t j = 0; j < buf_size; ++j) {
-      buf[j] = rand() % 255;
-    }
-    std::cout << "Iteration: " << i << "  buffer size: " << buf_size << std::endl;
+    auto buf=createRandomDataBuffer(buf_size);
+
+    LOG_INFO << "Iteration: " << i << "  buffer size: " << buf_size;
 
     // Encode it
     std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(buf);
-    std::cerr << blks.size() << " blocks created\n";
+    LOG_INFO << blks.size() << " blocks created\n";
 
     // Decode it
     std::vector<uint8_t> obuf;
     uint32_t drop_count = 0;
     for (std::shared_ptr<FECBlock> blk : blks) {
       if ((rand() % 10) != 0) {
-	dec.add_block(blk->pkt_data(), blk->pkt_length());
+        dec.add_block(blk->pkt_data(), blk->pkt_length());
       }
     }
     for (std::shared_ptr<FECBlock> sblk = dec.get_block(); sblk; sblk = dec.get_block()) {
       std::copy(sblk->data(), sblk->data() + sblk->data_length(),
-		std::back_inserter(obuf));
+                std::back_inserter(obuf));
     }
 
     // Compare
-    if (obuf.size() != buf.size()) {
-      std::cerr << "Buffers are different sizes: " << obuf.size() << " != " << buf.size()
-                << std::endl;
+    if(compareBuffers(buf,obuf)!=0){
       ++failed;
-    } else {
-      for (size_t j = 0; j < buf.size(); ++j) {
-	if (obuf[j] != buf[j]) {
-	  std::cerr << "Buffers differ at location " << j << ": " << obuf[j] << " != " << buf[j]
-                    << std::endl;
-	  ++failed;
-	  break;
-	}
-      }
     }
   }
-
   return std::make_pair(iterations - failed,
-			8e-6 * static_cast<double>(bytes) / (cur_time() - start_time));
+                        8e-6 * static_cast<double>(bytes) / (cur_time() - start_time));
 }
 
 
@@ -111,6 +122,15 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc, uint32_t max_block_s
   
   return (passed.first == iterations) ? EXIT_SUCCESS : EXIT_FAILURE;
 }*/
+
 void XFECTest::test() {
+  uint32_t iterations = 1000;
+  uint32_t block_size = 32;
+  float fec_ratio = 0.5f;
+
+  FECBufferEncoder enc(block_size, fec_ratio);
+  std::pair<uint32_t, double> passed = run_test(enc, block_size, iterations);
+  LOG_INFO <<"XFECTest::test"<< passed.first << " tests passed out of " << iterations
+           << "  " << passed.second << " Mbps";
 
 }

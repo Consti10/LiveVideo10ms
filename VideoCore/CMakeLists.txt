@@ -119,4 +119,6 @@ target_link_libraries( VideoNative
         android
         mediandk
         OpenMAXAL
-        h264bitstream)
+        h264bitstream
+        XFEC_lib
+        )

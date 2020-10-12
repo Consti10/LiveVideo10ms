@@ -33,6 +33,7 @@ public class VideoPlayer implements IVideoParamsChanged{
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
     public VideoPlayer(final AppCompatActivity parent){
         this.context=parent;
+        nativeTestFec();
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
     }
 
