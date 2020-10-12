@@ -53,10 +53,10 @@ void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length,bool addSe
     while (true){
         std::size_t remaining=data_length-offset;
         if(remaining<=MAX_VIDEO_DATA_PACKET_SIZE){
-            mySendTo(&data[offset],remaining,addSeqNr);
+            sendPacket(&data[offset],remaining,addSeqNr);
             break;
         }
-        mySendTo(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE,addSeqNr);
+        sendPacket(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE,addSeqNr);
         offset+=MAX_VIDEO_DATA_PACKET_SIZE;
     }
     //if(data_length>MAX_VIDEO_DATA_PACKET_SIZE){
@@ -67,29 +67,26 @@ void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length,bool addSe
     //}
 }
 
-void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length,bool addSeqNr) {
-    timeSpentSending.start();
-    if(addSeqNr) {
+
+void UDPSender::sendPacket(const uint8_t *data, ssize_t data_length, bool addSeqNr) {
+    if(addSeqNr){
         std::memcpy(workingBuffer.data(),&sequenceNumber,sizeof(uint32_t));
         std::memcpy(&workingBuffer.data()[sizeof(uint32_t)],data,data_length);
         sequenceNumber++;
-        // Send the packet N times
-        for(int i=0;i<1;i++){
-            const auto result = sendto(sockfd,workingBuffer.data(), data_length+sizeof(uint32_t), 0, (struct sockaddr *) &(address),
-                                       sizeof(struct sockaddr_in));
-            if (result < 0) {
-                MLOGE << "Cannot send data " << data_length << " " << strerror(errno)<<" ret:"<<result;
-            } else {
-                //MLOGD << "Sent " << data_length;
-            }
-        }
+        mySendTo(workingBuffer.data(), data_length+sizeof(uint32_t));
+    }
+}
+
+
+
+
+void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
+    timeSpentSending.start();
+    const auto result=sendto(sockfd,data,data_length, 0, (struct sockaddr *)&(address), sizeof(struct sockaddr_in));
+    if(result<0){
+        MLOGE<<"Cannot send data "<<data_length<<" "<<strerror(errno);
     }else{
-        const auto result=sendto(sockfd,data,data_length, 0, (struct sockaddr *)&(address), sizeof(struct sockaddr_in));
-        if(result<0){
-            MLOGE<<"Cannot send data "<<data_length<<" "<<strerror(errno);
-        }else{
-            //MLOGD<<"Sent "<<data_length;
-        }
+        //MLOGD<<"Sent "<<data_length;
     }
     timeSpentSending.stop();
     if(timeSpentSending.getNSamples()>100){
@@ -107,7 +104,6 @@ void UDPSender::FECSend(const uint8_t *data, ssize_t data_length) {
         mySendTo(blk->data(),blk->data_length(), false);
     }
 }
-
 
 
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------

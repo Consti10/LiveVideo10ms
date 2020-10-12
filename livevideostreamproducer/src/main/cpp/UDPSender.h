@@ -27,9 +27,11 @@ public:
      */
     void splitAndSend(const uint8_t* data, ssize_t data_length,bool addSeqNr);
     //
+    void sendPacket(const uint8_t* data, ssize_t data_length,bool addSeqNr);
+    //
     void FECSend(const uint8_t* data, ssize_t data_length);
     //
-    void mySendTo(const uint8_t* data,ssize_t data_length,bool addSeqNr);
+    void mySendTo(const uint8_t* data,ssize_t data_length);
 private:
     int sockfd;
     sockaddr_in address{};
