@@ -74,6 +74,8 @@ void UDPSender::sendPacket(const uint8_t *data, ssize_t data_length, bool addSeq
         std::memcpy(&workingBuffer.data()[sizeof(uint32_t)],data,data_length);
         sequenceNumber++;
         mySendTo(workingBuffer.data(), data_length+sizeof(uint32_t));
+    } else{
+        mySendTo(data, data_length);
     }
 }
 
@@ -84,7 +86,7 @@ void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
     if(result<0){
         MLOGE<<"Cannot send data "<<data_length<<" "<<strerror(errno);
     }else{
-        //MLOGD<<"Sent "<<data_length;
+        MLOGD<<"Sent "<<data_length;
     }
     timeSpentSending.stop();
     if(timeSpentSending.getNSamples()>100){
