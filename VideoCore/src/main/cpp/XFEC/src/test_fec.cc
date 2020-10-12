@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
-
+#include <list>
 //#include <cxxopts.hpp>
 
 #include <wifibroadcast/fec.hh>
@@ -74,14 +74,20 @@ std::size_t sendDataLossy(FECDecoder& dec,const std::vector<std::shared_ptr<FECB
     return drop_count;
 }
 
+
 //same as above but also switch the order packets are sent
 std::size_t sendDataLossyAndOutOfOrder(FECDecoder&dec,const std::vector<std::shared_ptr<FECBlock>>& blks){
     // we can copy a shared pointer without performance penalty
-    std::vector<std::shared_ptr<FECBlock>> workingData=blks;
-    std::random_device rng;
-    std::mt19937 urng(rng());
-    
-    //std::shuffle(workingData.begin(),workingData.end(), urng);
+    std::list<std::shared_ptr<FECBlock>> workingData{blks.begin(),blks.end()};
+    // shuffle the data a little bit
+    std::list<std::shared_ptr<FECBlock>>::iterator item(workingData.begin());
+    for(std::size_t i=0;i<workingData.size();i++){
+        if ((rand() % 10) == 0) {
+            // swap
+            std::iter_swap(item,std::next(item,1));
+            //MLOGD<<"Swapping "<<i<<" with "<<i+1;
+        }
+    }
     std::size_t drop_count=0;
     for (std::shared_ptr<FECBlock> blk : workingData) {
         if ((rand() % 10) != 0) {

@@ -107,7 +107,7 @@ void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length)
         lastForwardedSequenceNr=customUdpPacket.sequenceNumber;
         return;
     }
-    //duplicate or old packet
+    // duplicate or old packet
     if(customUdpPacket.sequenceNumber<=lastForwardedSequenceNr){
         // If there was a change of sequence numbers restart after N packets
         droppedPacketsSinceLastForwardedPacket++;
