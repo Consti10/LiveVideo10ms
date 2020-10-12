@@ -6,7 +6,7 @@ add_library(XFEC_lib
         SHARED
         #src/raw_socket.cc
         ${DIR_XFEC_SOURCES}/fec.c
-        #src/fec.cc
+        ${DIR_XFEC_SOURCES}/fec.cc
         #src/radiotap/radiotap.c
         #src/transfer_stats.cc
         )

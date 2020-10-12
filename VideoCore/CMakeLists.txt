@@ -61,10 +61,6 @@ target_link_libraries(h264bitstream
         android)
 include_directories(${H264_BITSTREAM_DIR})
 
-#######################################################
-########## Experimental-add the XFEC library ##########
-#######################################################
-include(${CMAKE_SOURCE_DIR}/src/main/cpp/XFEC/XFEC.cmake)
 
 #######################################################
 ########## Build the VideoCore native libary ##########
@@ -78,6 +74,12 @@ set(NDKHELPER_PATH ${DIR_VideoTelemetryShared}/NDKHelper)
 include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
 include_directories(${NDKHELPER_PATH})
+
+#######################################################
+########## Experimental-add the XFEC library ##########
+#######################################################
+include(${CMAKE_SOURCE_DIR}/src/main/cpp/XFEC/XFEC.cmake)
+###############
 
 #Webbn 360 stuff
 add_library( FFMpegVideoReceiver

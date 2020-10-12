@@ -1,9 +1,11 @@
 
 #include <math.h>
 
-#include <tinyformat.h>
+//#include <tinyformat.h>
+//#include <logging.hh>
+#include <AndroidLogger.hpp>
+#define LOG_DEBUG MLOGD
 
-#include <logging.hh>
 
 #include <wifibroadcast/fec.hh>
 
