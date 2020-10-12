@@ -36,6 +36,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion"
     implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"
+    implementation "com.github.Consti10:prefs-plus:$rootProject.myPrefsPlusVersion"
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

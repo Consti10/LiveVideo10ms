@@ -4,5 +4,7 @@
 
     <string name="KEY_SP_UDP_IP">KEY_SP_UDP_IP</string>
 
+    <string name="KEY_STREAM_MODE">KEY_STREAM_MODE</string>
+
 
 </resources>

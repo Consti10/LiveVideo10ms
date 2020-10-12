@@ -65,6 +65,7 @@ public class AVideoStream extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_avideo_stream);
+
         //mBackgroundThread = new HandlerThread("Encoder output");
         //mBackgroundThread.start();
         //mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
@@ -309,5 +310,6 @@ public class AVideoStream extends AppCompatActivity{
         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
         finish();
     }
+
 
 }

@@ -20,7 +20,10 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name="constantin.livevideostreamproducer.AVideoStream"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="constantin.livevideostreamproducer.ASettings"
+            android:screenOrientation="behind" />
         <activity android:name="constantin.livevideostreamproducer.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -18,9 +18,14 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.mapzen.prefsplusx.DefaultPreferenceFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         checkAndRequestPermissions();
         final Context context=this;
         findViewById(R.id.start_stream).setOnClickListener(new View.OnClickListener() {
@@ -141,6 +148,29 @@ public class MainActivity extends AppCompatActivity {
         if (!missingPermission.isEmpty()) {
             checkAndRequestPermissions();
         }
-
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                Intent i=new Intent();
+                i.setClass(this,ASettings.class);
+                startActivity(i);
+                return true;
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
 }
