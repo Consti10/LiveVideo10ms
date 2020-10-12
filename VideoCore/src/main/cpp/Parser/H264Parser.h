@@ -68,6 +68,8 @@ private:
     int lastForwardedSequenceNr=-1;
     void debugSequenceNumbers(const uint32_t seqNr);
     uint32_t debugLastSequenceNumber;
+    // To account for the rare case of restarting the tx I keep track of the n of dropped pack
+    int droppedPacketsSinceLastForwardedPacket=0;
     //
     AvgCalculator avgUDPPacketSize;
 };

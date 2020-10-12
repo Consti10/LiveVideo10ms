@@ -21,6 +21,8 @@ void H264Parser::reset(){
     nParsedNALUs=0;
     nParsedKeyFrames=0;
     setLimitFPS(-1);
+    lastForwardedSequenceNr=-1;
+    droppedPacketsSinceLastForwardedPacket=0;
 }
 
 void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_length) {
@@ -94,22 +96,29 @@ void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length)
         avgUDPPacketSize.reset();
     }
     //
-    //Custom protocol where first byte of udp packet is sequence number
+    //Custom protocol where N bytes of udp packet is the sequence number
     CustomUdpPacket customUdpPacket{0,&data[sizeof(uint32_t)],data_length-sizeof(uint32_t)};
     memcpy(&customUdpPacket.sequenceNumber,data,sizeof(uint32_t));
     debugSequenceNumbers(customUdpPacket.sequenceNumber);
-
+    // First packet to ever arrive
     if(lastForwardedSequenceNr==-1){
         parse_raw_h264_stream(customUdpPacket.data,customUdpPacket.dataLength);
         lastForwardedSequenceNr=customUdpPacket.sequenceNumber;
         return;
     }
+    //duplicate or old packet
     if(customUdpPacket.sequenceNumber<=lastForwardedSequenceNr){
-        //duplicate or old packet
+        // If there was a change of sequence numbers restart after N packets
+        droppedPacketsSinceLastForwardedPacket++;
+        if(droppedPacketsSinceLastForwardedPacket>100){
+            lastForwardedSequenceNr=-1;
+            droppedPacketsSinceLastForwardedPacket=0;
+        }
         return;
     }else{
         parse_raw_h264_stream(customUdpPacket.data,customUdpPacket.dataLength);
         lastForwardedSequenceNr=customUdpPacket.sequenceNumber;
+        droppedPacketsSinceLastForwardedPacket=0;
     }
     //std::vector<uint8_t> tmp={customUdpPacket.data,customUdpPacket.data+customUdpPacket.dataLength};
     /*XPacket xPacket{customUdpPacket.sequenceNumber,{customUdpPacket.data,customUdpPacket.data+customUdpPacket.dataLength}};
