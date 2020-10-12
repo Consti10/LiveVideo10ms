@@ -73,6 +73,7 @@ public class AVideoStream extends AppCompatActivity{
         //Initialize UDP sender
         mUDPSender=new UDPSender(this);
 
+
         //This thread will be started once the MediaCodec encoder has been created.
         //When decoding in LiveVideo10ms, testing indicates lower latency when constantly pulling on the output with one Thread.
         //Also, we have to use another Thread for networking anyways when using the 'callback' api

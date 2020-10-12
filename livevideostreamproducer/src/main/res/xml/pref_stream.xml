@@ -11,7 +11,7 @@
     <EditTextPreference
         android:key="@string/KEY_SP_UDP_IP"
         android:title="@string/KEY_SP_UDP_IP"
-        android:defaultValue="192.168.0.0" />
+        android:defaultValue="192.168.1.1" />
 
 
 </PreferenceScreen>

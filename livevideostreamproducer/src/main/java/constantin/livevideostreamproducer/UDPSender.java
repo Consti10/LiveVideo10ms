@@ -24,16 +24,20 @@ public class UDPSender {
     //If length exceeds the max UDP packet size,
     //The data is split into smaller chunks and the method calls itself recursively
     native void nativeSplitAndSend(long p,ByteBuffer data,int dataSize);
-
     native void nativeSendFEC(long p,ByteBuffer data,int dataSize);
 
+    native void nativeSend(long p,ByteBuffer data,int dataSize,int mode);
+
     private final long nativeInstance;
+
+    final int streamMode;
 
     UDPSender(final Context context){
         //"10.183.84.95"
         final String IP = PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.KEY_SP_UDP_IP), "192.168.1.172");
         Log.d("UDPSender","Sending to IP "+IP);
         nativeInstance=nativeConstruct(IP,PORT);
+        streamMode=ASettings.getSTREAM_MODE(context);
     }
 
     //Send the UDP data on another thread,since networking is strictly forbidden on the UI thread
@@ -54,8 +58,7 @@ public class UDPSender {
             //final ByteBuffer tmpDirectByteBuffer=ByteBuffer.allocateDirect(data.remaining());
             Log.e(TAG,"Cannot send non-direct byte buffer.Convert to direct first.");
         }
-        //nativeSplitAndSend(nativeInstance,data,data.remaining());
-        nativeSendFEC(nativeInstance,data,data.remaining());
+        nativeSend(nativeInstance,data,data.remaining(),streamMode);
     }
 
 

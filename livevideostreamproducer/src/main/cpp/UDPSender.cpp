@@ -31,7 +31,7 @@ UDPSender::UDPSender(const std::string &IP,const int Port) {
 }
 
 //Split data into smaller packets when exceeding UDP max packet size
-void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length) {
+void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length,bool addSeqNr) {
     if(lastForwardedPacket==std::chrono::steady_clock::time_point{}){
         lastForwardedPacket=std::chrono::steady_clock::now();
     }else{
@@ -53,10 +53,10 @@ void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length) {
     while (true){
         std::size_t remaining=data_length-offset;
         if(remaining<=MAX_VIDEO_DATA_PACKET_SIZE){
-            mySendTo(&data[offset],remaining);
+            mySendTo(&data[offset],remaining,addSeqNr);
             break;
         }
-        mySendTo(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE);
+        mySendTo(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE,addSeqNr);
         offset+=MAX_VIDEO_DATA_PACKET_SIZE;
     }
     //if(data_length>MAX_VIDEO_DATA_PACKET_SIZE){
@@ -67,9 +67,9 @@ void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length) {
     //}
 }
 
-void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
+void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length,bool addSeqNr) {
     timeSpentSending.start();
-    if(false) {
+    if(addSeqNr) {
         std::memcpy(workingBuffer.data(),&sequenceNumber,sizeof(uint32_t));
         std::memcpy(&workingBuffer.data()[sizeof(uint32_t)],data,data_length);
         sequenceNumber++;
@@ -104,7 +104,7 @@ void UDPSender::FECSend(const uint8_t *data, ssize_t data_length) {
         MLOGE<<"Cannot encode";
     }
     for (auto blk : blks) {
-        mySendTo(blk->data(),blk->data_length());
+        mySendTo(blk->data(),blk->data_length(), false);
     }
 }
 
@@ -134,26 +134,22 @@ JNI_METHOD(void, nativeDelete)
     delete native(p);
 }
 
-JNI_METHOD(void, nativeSplitAndSend)
-(JNIEnv *env, jobject obj, jlong p,jobject buf,jint size) {
-    //jlong size=env->GetDirectBufferCapacity(buf);
-    auto *data = (jbyte*)env->GetDirectBufferAddress(buf);
-    if(data== nullptr){
-        MLOGE<<"Something wrong with the byte buffer (is it direct ?)";
-    }
-    //LOGD("size %d",size);
-    native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
-}
 
-JNI_METHOD(void, nativeSendFEC)
-(JNIEnv *env, jobject obj, jlong p,jobject buf,jint size) {
+JNI_METHOD(void, nativeSend)
+(JNIEnv *env, jobject obj, jlong p,jobject buf,jint size,jint streamMode) {
     //jlong size=env->GetDirectBufferCapacity(buf);
     auto *data = (jbyte*)env->GetDirectBufferAddress(buf);
     if(data== nullptr){
         MLOGE<<"Something wrong with the byte buffer (is it direct ?)";
     }
     //LOGD("size %d",size);
-    native(p)->FECSend((uint8_t *) data, (ssize_t) size);
+    if(streamMode==0){
+        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, false);
+    }else if(streamMode==1){
+        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, true);
+    }else{
+        native(p)->FECSend((uint8_t *) data, (ssize_t) size);
+    }
 }
 
 }

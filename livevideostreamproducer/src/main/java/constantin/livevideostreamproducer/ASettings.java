@@ -1,5 +1,6 @@
 package constantin.livevideostreamproducer;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,12 +20,17 @@ public class ASettings extends AppCompatActivity {
                 .commit();
     }
 
+    public static int getSTREAM_MODE(final Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context).
+                getInt(context.getString(R.string.KEY_STREAM_MODE),0);
+    }
+
     public static class MSettingsFragment extends PreferenceFragmentCompat {
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             PreferenceManager preferenceManager=getPreferenceManager();
-            preferenceManager.setSharedPreferencesName("pref_stream");
+            //preferenceManager.setSharedPreferencesName("pref_stream");
             addPreferencesFromResource(R.xml.pref_stream);
         }
 

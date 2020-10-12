@@ -26,12 +26,11 @@ public:
      * If data length exceeds the max UDP packet size, the method splits data and
      * calls itself recursively
      */
-    void splitAndSend(const uint8_t* data, ssize_t data_length);
+    void splitAndSend(const uint8_t* data, ssize_t data_length,bool addSeqNr);
     //
     void FECSend(const uint8_t* data, ssize_t data_length);
-
     //
-    void mySendTo(const uint8_t* data,ssize_t data_length);
+    void mySendTo(const uint8_t* data,ssize_t data_length,bool addSeqNr);
 private:
     int sockfd;
     sockaddr_in address{};
