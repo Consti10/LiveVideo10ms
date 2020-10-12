@@ -189,6 +189,8 @@ public class VideoPlayer implements IVideoParamsChanged{
     //TODO: Use message queue from cpp for performance
     public static native <T extends IVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
 
+    public static native void nativeTestFec();
+
     public static void verifyApplicationThread() {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             Log.w(TAG, "Player is accessed on the wrong thread.");

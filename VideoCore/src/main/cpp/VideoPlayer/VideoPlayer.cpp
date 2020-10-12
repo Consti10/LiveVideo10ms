@@ -284,6 +284,12 @@ JNI_METHOD(jlong , nativeGetExternalFileReader)
     return (jlong) &p->mFileReceiver;
 }
 
+JNI_METHOD(void , nativeTestFEC)
+(JNIEnv *env,jclass jclass1) {
+
+
+}
+
 JNI_METHOD(void,nativeCallBack)
 (JNIEnv *env,jclass jclass1,jobject videoParamsChangedI,jlong testReceiverN){
     VideoPlayer* p=native(testReceiverN);

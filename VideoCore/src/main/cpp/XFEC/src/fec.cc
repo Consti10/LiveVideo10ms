@@ -3,10 +3,8 @@
 #include <cmath>
 
 //#include <tinyformat.h>
-//#include <logging.hh>
-// Using AndroidLogger instead is straight forward
-#include <AndroidLogger.hpp>
-#define LOG_DEBUG MLOGD
+#include <logging.hh>
+
 
 #include <wifibroadcast/fec.hh>
 

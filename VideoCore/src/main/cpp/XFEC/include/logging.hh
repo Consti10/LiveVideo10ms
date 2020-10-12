@@ -1,6 +1,17 @@
 
 #pragma once
 
+#ifdef __ANDROID__
+
+// Using AndroidLogger instead is straight forward
+#include <AndroidLogger.hpp>
+#define LOG_DEBUG MLOGD
+#define LOG_ERROR MLOGE
+
+#endif
+
+#ifndef __ANDROID__
+
 #include <cctype>
 #include <algorithm>
 
@@ -54,3 +65,5 @@ static log4cpp::Priority::PriorityLevel get_log_level(std::string level) {
     return log4cpp::Priority::NOTSET;
   }
 }
+
+#endif

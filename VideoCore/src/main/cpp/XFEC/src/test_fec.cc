@@ -3,10 +3,12 @@
 
 #include <iostream>
 
-#include <cxxopts.hpp>
+//#include <cxxopts.hpp>
 
 #include <wifibroadcast/fec.hh>
-#include <logging.hh>
+//#include <logging.hh>
+
+#include <wifibroadcast/test_fec.h>
 
 inline double cur_time() {
   struct timeval t;
@@ -73,7 +75,7 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc, uint32_t max_block_s
 }
 
 
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 
   cxxopts::Options options(argv[0], "Allowed options");
   options.add_options()
@@ -108,4 +110,7 @@ int main(int argc, char** argv) {
            << "  " << passed.second << " Mbps";
   
   return (passed.first == iterations) ? EXIT_SUCCESS : EXIT_FAILURE;
+}*/
+void XFECTest::test() {
+
 }

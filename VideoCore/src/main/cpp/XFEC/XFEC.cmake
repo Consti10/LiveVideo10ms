@@ -9,6 +9,7 @@ add_library(XFEC_lib
         #src/raw_socket.cc
         ${DIR_XFEC_SOURCES}/fec.c
         ${DIR_XFEC_SOURCES}/fec.cc
+        ${DIR_XFEC_SOURCES}/test_fec.cc
         #src/radiotap/radiotap.c
         #src/transfer_stats.cc
         )
