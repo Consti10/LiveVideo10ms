@@ -99,7 +99,7 @@ void UDPSender::FECSend(const uint8_t *data, ssize_t data_length) {
         MLOGE<<"Cannot encode";
     }
     for (auto blk : blks) {
-        mySendTo(blk->data(),blk->data_length(), false);
+        mySendTo(blk->data(),blk->data_length());
     }
 }
 
