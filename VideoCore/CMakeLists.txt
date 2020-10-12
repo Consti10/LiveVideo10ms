@@ -62,6 +62,11 @@ target_link_libraries(h264bitstream
 include_directories(${H264_BITSTREAM_DIR})
 
 #######################################################
+########## Experimental-add the XFEC library ##########
+#######################################################
+include(${CMAKE_SOURCE_DIR}/src/main/cpp/XFEC/XFEC.cmake)
+
+#######################################################
 ########## Build the VideoCore native libary ##########
 #######################################################
 
