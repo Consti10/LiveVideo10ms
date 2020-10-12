@@ -33,7 +33,7 @@ int compareBuffers(const std::vector<uint8_t>& buff1,const std::vector<uint8_t>&
   return nLocationsDiffer;
 }
 
-std::vector<uint8_t> createRandomDataBuffer(const size_t sizeBytes){
+std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
   std::vector<uint8_t> buf(sizeBytes);
   for (uint32_t j = 0; j < sizeBytes; ++j) {
     buf[j] = rand() % 255;
@@ -41,11 +41,28 @@ std::vector<uint8_t> createRandomDataBuffer(const size_t sizeBytes){
   return buf;
 }
 
-std::pair<uint32_t, double> run_test(FECBufferEncoder &enc, uint32_t max_block_size,
-				     uint32_t iterations) {
+//
+std::vector<std::vector<uint8_t>> createRandomDataBuffers(const ssize_t sizeBytes,const ssize_t nBuffers){
+    std::vector<std::vector<uint8_t>> ret;
+    for(int i=0;i<nBuffers;i++){
+        ret.push_back(std::move(createRandomDataBuffer(sizeBytes)));
+    }
+    return ret;
+}
+
+std::size_t sizeBytes(const std::vector<std::shared_ptr<FECBlock>>& blocks){
+  std::size_t fecDataSize=0;
+  for(const auto& block:blocks){
+    fecDataSize+=block->block_size();
+  }
+  return fecDataSize;
+}
+
+std::pair<uint32_t, double> run_test(FECBufferEncoder &enc,const uint32_t max_block_size,
+				     const uint32_t iterations) {
   FECDecoder dec;
-  uint32_t min_buffer_size = max_block_size * 6;
-  uint32_t max_buffer_size = max_block_size * 100;
+  const uint32_t min_buffer_size = max_block_size * 6;
+  const uint32_t max_buffer_size = max_block_size * 100;
 
   uint32_t failed = 0;
   size_t bytes = 0;
@@ -53,15 +70,15 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc, uint32_t max_block_s
   for (uint32_t i = 0; i < iterations; ++i) {
 
     // Create a random buffer of data
-    uint32_t buf_size = min_buffer_size + rand() % (max_buffer_size - min_buffer_size);
+    const uint32_t buf_size = min_buffer_size + rand() % (max_buffer_size - min_buffer_size);
     bytes += buf_size;
     auto buf=createRandomDataBuffer(buf_size);
 
-    LOG_INFO << "Iteration: " << i << "  buffer size: " << buf_size;
-
     // Encode it
     std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(buf);
-    LOG_INFO << blks.size() << " blocks created\n";
+
+    LOG_INFO << "Iteration: " << i << "  buffer size: " << buf_size
+    <<"created blocks: "<<blks.size()<<" createdBlocksSizeSum: "<<sizeBytes(blks);
 
     // Decode it
     std::vector<uint8_t> obuf;
@@ -85,6 +102,36 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc, uint32_t max_block_s
                         8e-6 * static_cast<double>(bytes) / (cur_time() - start_time));
 }
 
+
+void test2(FECBufferEncoder &enc,const uint32_t max_block_size,
+           const uint32_t iterations){
+
+    FECDecoder dec;
+    const uint32_t min_buffer_size = max_block_size * 6;
+    const uint32_t max_buffer_size = max_block_size * 100;
+
+
+    const uint32_t buf_size = min_buffer_size + rand() % (max_buffer_size - min_buffer_size);
+    auto input=createRandomDataBuffers(buf_size,1024);
+    for(int i=0;i<input.size();i++){
+        // Convert the packet to FEC data
+        std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(input.at(i));
+
+        // emulate transmission over a lossy link
+        for (std::shared_ptr<FECBlock> blk : blks) {
+            if ((rand() % 10) != 0) {
+                dec.add_block(blk->pkt_data(), blk->pkt_length());
+            }
+            // Check if there is an output block
+            if(dec.get_block()){
+
+            }
+        }
+
+    }
+
+
+}
 
 /*int main(int argc, char** argv) {
 
