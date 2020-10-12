@@ -66,13 +66,11 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
 void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
     sequenceNumbers.push_back(seqNr);
     if(sequenceNumbers.size()>32) {
-        std::stringstream ss;
-        for (const auto seqnr:sequenceNumbers) {
-            ss << ((int) seqnr) << " ";
-        }
+
         int nOutOufOrderBroken=0;
         // Does not take out of order into account
         int nLostPackets=0;
+        std::vector<int> diffs{};
         for (size_t i = 0; i < sequenceNumbers.size() - 1; i++) {
             if (((sequenceNumbers.at(i)) >= sequenceNumbers.at(i + 1))) {
                 nOutOufOrderBroken++;
@@ -80,8 +78,10 @@ void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
             if ((sequenceNumbers.at(i) + 1) != sequenceNumbers.at(i + 1)) {
                 nLostPackets++;
             }
+            diffs.push_back(sequenceNumbers.at(i+1)-sequenceNumbers.at(i));
         }
-        MLOGD<<"Seq numbers. LostPackets: "<<nLostPackets<<"  nOutOufOrderBroken: "<<nOutOufOrderBroken<<" values : "<<ss.str();
+        const bool lostOrBroken=nOutOufOrderBroken>0 || nLostPackets>0;
+        MLOGD<<"Seq numbers.LOB:"<<lostOrBroken<<" LostPackets: "<<nLostPackets<<"  nOutOfOrderBroken: "<<nOutOufOrderBroken<<" values : "<< StringHelper::vectorAsString(diffs);
         sequenceNumbers.resize(0);
     }
 }
@@ -139,4 +139,17 @@ void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length)
         dataMap.erase(smallestKey)
     }*/
     //
+}
+
+void H264Parser::parseCustom2(const uint8_t *data, const std::size_t data_length) {
+    mFECDecoder.add_block(data,data_length);
+    std::vector<uint8_t> obuf;
+    obuf.reserve(1024*1024);
+    for (std::shared_ptr<FECBlock> sblk = mFECDecoder.get_block(); sblk; sblk = mFECDecoder.get_block()) {
+        std::copy(sblk->data(), sblk->data() + sblk->data_length(),
+                  std::back_inserter(obuf));
+    }
+    if(obuf.size()>0){
+        parse_raw_h264_stream(obuf.data(),obuf.size());
+    }
 }

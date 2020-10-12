@@ -24,6 +24,9 @@ public class UDPSender {
     //If length exceeds the max UDP packet size,
     //The data is split into smaller chunks and the method calls itself recursively
     native void nativeSplitAndSend(long p,ByteBuffer data,int dataSize);
+
+    native void nativeSendFEC(long p,ByteBuffer data,int dataSize);
+
     private final long nativeInstance;
 
     UDPSender(final Context context){
@@ -51,7 +54,8 @@ public class UDPSender {
             //final ByteBuffer tmpDirectByteBuffer=ByteBuffer.allocateDirect(data.remaining());
             Log.e(TAG,"Cannot send non-direct byte buffer.Convert to direct first.");
         }
-        nativeSplitAndSend(nativeInstance,data,data.remaining());
+        //nativeSplitAndSend(nativeInstance,data,data.remaining());
+        nativeSendFEC(nativeInstance,data,data.remaining());
     }
 
 

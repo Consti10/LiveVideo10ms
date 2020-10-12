@@ -15,6 +15,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+//#include <wifibroadcast/fec.hh>
+#include "../../../../VideoCore/src/main/cpp/XFEC/include/wifibroadcast/fec.hh"
+
 UDPSender::UDPSender(const std::string &IP,const int Port) {
     //create the socket
     sockfd = socket(AF_INET,SOCK_DGRAM,0);
@@ -45,24 +48,33 @@ void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length) {
         }
     }
     if(data_length<=0)return;
-    //for(int i=0;i<data_length;i+=MAX_VIDEO_DATA_PACKET_SIZE){
-    //}
-    if(data_length>MAX_VIDEO_DATA_PACKET_SIZE){
-        mySendTo(data,MAX_VIDEO_DATA_PACKET_SIZE);
-        splitAndSend(&data[MAX_VIDEO_DATA_PACKET_SIZE], data_length - MAX_VIDEO_DATA_PACKET_SIZE);
-    }else{
-        mySendTo(data,data_length);
+    // Recursion is more pretty but dang the stack function pointer exception
+    std::size_t offset=0;
+    while (true){
+        std::size_t remaining=data_length-offset;
+        if(remaining<=MAX_VIDEO_DATA_PACKET_SIZE){
+            mySendTo(&data[offset],remaining);
+            break;
+        }
+        mySendTo(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE);
+        offset+=MAX_VIDEO_DATA_PACKET_SIZE;
     }
+    //if(data_length>MAX_VIDEO_DATA_PACKET_SIZE){
+    //    mySendTo(data,MAX_VIDEO_DATA_PACKET_SIZE);
+    //    splitAndSend(&data[MAX_VIDEO_DATA_PACKET_SIZE], data_length - MAX_VIDEO_DATA_PACKET_SIZE);
+    //}else{
+    //    mySendTo(data,data_length);
+    //}
 }
 
 void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
     timeSpentSending.start();
-    if(true) {
+    if(false) {
         std::memcpy(workingBuffer.data(),&sequenceNumber,sizeof(uint32_t));
         std::memcpy(&workingBuffer.data()[sizeof(uint32_t)],data,data_length);
         sequenceNumber++;
         // Send the packet N times
-        for(int i=0;i<8;i++){
+        for(int i=0;i<1;i++){
             const auto result = sendto(sockfd,workingBuffer.data(), data_length+sizeof(uint32_t), 0, (struct sockaddr *) &(address),
                                        sizeof(struct sockaddr_in));
             if (result < 0) {
@@ -83,6 +95,16 @@ void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
     if(timeSpentSending.getNSamples()>100){
         MLOGD<<"TimeSS "<<timeSpentSending.getAvgReadable();
         timeSpentSending.reset();
+    }
+}
+
+void UDPSender::FECSend(const uint8_t *data, ssize_t data_length) {
+    std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(data,data_length);
+    if(blks.size()==0){
+        MLOGE<<"Cannot encode";
+    }
+    for (auto blk : blks) {
+        mySendTo(blk->data(),blk->data_length());
     }
 }
 
@@ -123,5 +145,15 @@ JNI_METHOD(void, nativeSplitAndSend)
     native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
 }
 
+JNI_METHOD(void, nativeSendFEC)
+(JNIEnv *env, jobject obj, jlong p,jobject buf,jint size) {
+    //jlong size=env->GetDirectBufferCapacity(buf);
+    auto *data = (jbyte*)env->GetDirectBufferAddress(buf);
+    if(data== nullptr){
+        MLOGE<<"Something wrong with the byte buffer (is it direct ?)";
+    }
+    //LOGD("size %d",size);
+    native(p)->FECSend((uint8_t *) data, (ssize_t) size);
+}
 
 }

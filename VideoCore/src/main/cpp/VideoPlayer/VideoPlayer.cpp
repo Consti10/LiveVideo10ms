@@ -47,6 +47,9 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
         case VIDEO_DATA_TYPE::CUSTOM:
             mParser.parseCustom(data,data_length);
             break;
+        case VIDEO_DATA_TYPE::CUSTOM2:
+            mParser.parseCustom2(data,data_length);
+            break;
         case VIDEO_DATA_TYPE::DJI:
             mParser.parseDjiLiveVideoData(data,data_length);
             break;

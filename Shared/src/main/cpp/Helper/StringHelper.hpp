@@ -77,6 +77,15 @@ public:
         sAfterCome=fractional;
     }
 
+    template<typename T>
+    static std::string vectorAsString(const std::vector<T>& v){
+        std::stringstream ss;
+        for (const auto i:v) {
+            ss << i << " ";
+        }
+        return ss.str();
+    }
+
     static std::string memorySizeReadable(const size_t sizeBytes){
         // more than one MB
         if(sizeBytes>1024*1024){

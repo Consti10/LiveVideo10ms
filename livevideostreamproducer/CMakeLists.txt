@@ -11,6 +11,11 @@ include_directories(src/main/cpp)
 include_directories(${DIR_Shared}/Helper)
 include_directories(${DIR_Shared}/NDKHelper)
 
+########## Experimental-add the XFEC library ##########
+#######################################################
+include(${CMAKE_SOURCE_DIR}/../VideoCore/src/main/cpp/XFEC/XFEC.cmake)
+###############
+
 add_library( UDPSender
         SHARED
        src/main/cpp/UDPSender.cpp
@@ -19,4 +24,6 @@ add_library( UDPSender
 target_link_libraries( UDPSender
         ${log-lib}
         log
-        android)
+        android
+        XFEC_lib
+        )

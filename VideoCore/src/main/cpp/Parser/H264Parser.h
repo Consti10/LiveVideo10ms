@@ -27,6 +27,7 @@
 #include <map>
 #include <list>
 #include <TimeHelper.hpp>
+#include <wifibroadcast/fec.hh>
 
 class H264Parser {
 public:
@@ -36,6 +37,7 @@ public:
     void parseDjiLiveVideoData(const uint8_t* data,const size_t data_len);
     //
     void parseCustom(const uint8_t* data,const size_t data_len);
+    void parseCustom2(const uint8_t* data,const size_t data_len);
     void reset();
 public:
     long nParsedNALUs=0;
@@ -72,6 +74,8 @@ private:
     int droppedPacketsSinceLastForwardedPacket=0;
     //
     AvgCalculator avgUDPPacketSize;
+    //
+    FECDecoder mFECDecoder;
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

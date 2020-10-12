@@ -20,7 +20,7 @@
 class VideoPlayer{
 public:
     VideoPlayer(JNIEnv * env, jobject context, const char* DIR);
-    enum VIDEO_DATA_TYPE{RTP,RAW,CUSTOM,DJI};
+    enum VIDEO_DATA_TYPE{RTP,RAW,CUSTOM,CUSTOM2,DJI};
     void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType);
     /*
      * Set the surface the decoder can be configured with. When @param surface==nullptr

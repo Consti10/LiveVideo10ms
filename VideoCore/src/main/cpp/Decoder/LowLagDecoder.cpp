@@ -110,6 +110,8 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
     AMediaFormat_setBuffer(format,"csd-0",sps.getData(),sps.getSize());
     AMediaFormat_setBuffer(format,"csd-1",pps.getData(),pps.getSize());
+
+    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,50*1024*1024);
     //static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
     //AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
     // Lower values mean higher priority

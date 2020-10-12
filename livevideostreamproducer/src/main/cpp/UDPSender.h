@@ -11,6 +11,8 @@
 
 #include <TimeHelper.hpp>
 
+#include "../../../../VideoCore/src/main/cpp/XFEC/include/wifibroadcast/fec.hh"
+
 class UDPSender{
 public:
     /**
@@ -25,6 +27,9 @@ public:
      * calls itself recursively
      */
     void splitAndSend(const uint8_t* data, ssize_t data_length);
+    //
+    void FECSend(const uint8_t* data, ssize_t data_length);
+
     //
     void mySendTo(const uint8_t* data,ssize_t data_length);
 private:
@@ -41,6 +46,7 @@ private:
     std::chrono::steady_clock::time_point lastForwardedPacket{};
     Chronometer timeSpentSending;
     //
+    FECBufferEncoder enc{1024,0.5f};
 };
 
 
