@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import constantin.video.core.TestFEC;
 import constantin.video.core.gl.ISurfaceTextureAvailable;
 
 
@@ -33,7 +34,7 @@ public class VideoPlayer implements IVideoParamsChanged{
     //It is not recommended to change Settings in the Shared Preferences after instantiating the Video Player
     public VideoPlayer(final AppCompatActivity parent){
         this.context=parent;
-        nativeTestFec();
+        TestFEC.nativeTestFec();
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
     }
 
@@ -190,7 +191,6 @@ public class VideoPlayer implements IVideoParamsChanged{
     //TODO: Use message queue from cpp for performance
     public static native <T extends IVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
 
-    public static native void nativeTestFec();
 
     public static void verifyApplicationThread() {
         if (Looper.myLooper() != Looper.getMainLooper()) {

@@ -8,8 +8,6 @@
 #include <wifibroadcast/fec.hh>
 #include <logging.hh>
 
-#include <wifibroadcast/test_fec.h>
-
 inline double cur_time() {
   struct timeval t;
   gettimeofday(&t, 0);
@@ -33,6 +31,7 @@ int compareBuffers(const std::vector<uint8_t>& buff1,const std::vector<uint8_t>&
   return nLocationsDiffer;
 }
 
+// Create a buffer filled with random data of size sizeByes
 std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
   std::vector<uint8_t> buf(sizeBytes);
   for (uint32_t j = 0; j < sizeBytes; ++j) {
@@ -41,7 +40,7 @@ std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
   return buf;
 }
 
-//
+// Create nBuffers buffers filled with random data, where each buffer has size of sizeBytes
 std::vector<std::vector<uint8_t>> createRandomDataBuffers(const ssize_t sizeBytes,const ssize_t nBuffers){
     std::vector<std::vector<uint8_t>> ret;
     for(int i=0;i<nBuffers;i++){
@@ -50,6 +49,7 @@ std::vector<std::vector<uint8_t>> createRandomDataBuffers(const ssize_t sizeByte
     return ret;
 }
 
+// Returns the cumulative size of all FECBlocks
 std::size_t sizeBytes(const std::vector<std::shared_ptr<FECBlock>>& blocks){
   std::size_t fecDataSize=0;
   for(const auto& block:blocks){
@@ -57,6 +57,11 @@ std::size_t sizeBytes(const std::vector<std::shared_ptr<FECBlock>>& blocks){
   }
   return fecDataSize;
 }
+
+struct TestResult{
+    uint32_t nPassed;
+    double time;
+};
 
 std::pair<uint32_t, double> run_test(FECBufferEncoder &enc,const uint32_t max_block_size,
 				     const uint32_t iterations) {
@@ -77,18 +82,24 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc,const uint32_t max_bl
     // Encode it
     std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(buf);
 
-    LOG_INFO << "Iteration: " << i << "  buffer size: " << buf_size
-    <<"created blocks: "<<blks.size()<<" createdBlocksSizeSum: "<<sizeBytes(blks);
-
     // Decode it
     std::vector<uint8_t> obuf;
     uint32_t drop_count = 0;
+    // emulate transmission over a lossy link
     for (std::shared_ptr<FECBlock> blk : blks) {
       if ((rand() % 10) != 0) {
         dec.add_block(blk->pkt_data(), blk->pkt_length());
+      }else{
+          drop_count++;
       }
     }
+    const auto droppedPacketsPercentage=(float)blks.size() / (float)drop_count;
+    LOG_INFO << "Iteration: " << i << "  buffer size: " << buf_size
+            <<" created blocks: "<<blks.size()<<" createdBlocksSizeSum: "<<sizeBytes(blks)
+            <<" droppedPackets: "<<drop_count<<" droppedPackets%: "<<droppedPacketsPercentage;
+
     for (std::shared_ptr<FECBlock> sblk = dec.get_block(); sblk; sblk = dec.get_block()) {
+
       std::copy(sblk->data(), sblk->data() + sblk->data_length(),
                 std::back_inserter(obuf));
     }
@@ -102,38 +113,42 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc,const uint32_t max_bl
                         8e-6 * static_cast<double>(bytes) / (cur_time() - start_time));
 }
 
-
-void test2(FECBufferEncoder &enc,const uint32_t max_block_size,
+void run_test2(FECBufferEncoder &enc,const uint32_t max_block_size,
            const uint32_t iterations){
 
     FECDecoder dec;
     const uint32_t min_buffer_size = max_block_size * 6;
     const uint32_t max_buffer_size = max_block_size * 100;
 
-
     const uint32_t buf_size = min_buffer_size + rand() % (max_buffer_size - min_buffer_size);
-    auto input=createRandomDataBuffers(buf_size,1024);
-    for(int i=0;i<input.size();i++){
-        // Convert the packet to FEC data
-        std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(input.at(i));
+    auto inputBuff=createRandomDataBuffer(buf_size);
 
-        // emulate transmission over a lossy link
-        for (std::shared_ptr<FECBlock> blk : blks) {
-            if ((rand() % 10) != 0) {
-                dec.add_block(blk->pkt_data(), blk->pkt_length());
-            }
-            // Check if there is an output block
-            if(dec.get_block()){
+    std::vector<uint8_t> obuf;
 
-            }
+    // Convert the packet to FEC data
+    std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(inputBuff);
+
+    // emulate transmission over a lossy link
+    for (auto blk : blks) {
+        MLOGD<<"Feed block";
+        if ((rand() % 10) != 0) {
+            dec.add_block(blk->pkt_data(), blk->pkt_length());
+        }else{
+            MLOGD<<"Skipping block (lossy link)";
         }
-
+        // Get output blocks
+        for (std::shared_ptr<FECBlock> sblk = dec.get_block(); sblk; sblk = dec.get_block()) {
+            std::copy(sblk->data(), sblk->data() + sblk->data_length(),
+                      std::back_inserter(obuf));
+            MLOGD<<"Got X"<<sblk->block_size()<<" "<<sblk->is_fec_block();
+        }
+        if(compareBuffers(inputBuff,obuf)==0){
+            MLOGD<<"Got valid data";
+        }
     }
-
-
 }
-
-/*int main(int argc, char** argv) {
+#ifndef __ANDROID__
+int main(int argc, char** argv) {
 
   cxxopts::Options options(argv[0], "Allowed options");
   options.add_options()
@@ -168,9 +183,10 @@ void test2(FECBufferEncoder &enc,const uint32_t max_block_size,
            << "  " << passed.second << " Mbps";
   
   return (passed.first == iterations) ? EXIT_SUCCESS : EXIT_FAILURE;
-}*/
+}
+#endif
 
-void XFECTest::test() {
+void test() {
   uint32_t iterations = 1000;
   uint32_t block_size = 32;
   float fec_ratio = 0.5f;
@@ -179,5 +195,33 @@ void XFECTest::test() {
   std::pair<uint32_t, double> passed = run_test(enc, block_size, iterations);
   LOG_INFO <<"XFECTest::test"<< passed.first << " tests passed out of " << iterations
            << "  " << passed.second << " Mbps";
+}
+
+void test2() {
+    uint32_t block_size = 32;
+    float fec_ratio = 0.5f;
+
+    FECBufferEncoder enc(block_size, fec_ratio);
+    run_test2(enc,block_size,fec_ratio);
+}
+
+#ifdef __ANDROID__
+
+#include <jni.h>
+//----------------------------------------------------JAVA bindings---------------------------------------------------------------
+#define JNI_METHOD(return_type, method_name) \
+  JNIEXPORT return_type JNICALL              \
+      Java_constantin_video_core_TestFEC_##method_name
+
+
+extern "C" {
+
+JNI_METHOD(void , nativeTestFec)
+(JNIEnv *env, jclass jclass1) {
+    //test();
+    test2();
+}
 
 }
+#endif
+

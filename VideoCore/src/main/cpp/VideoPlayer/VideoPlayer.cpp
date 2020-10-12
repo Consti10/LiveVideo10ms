@@ -12,7 +12,6 @@
 //TEST
 //#include <NdkImage.h>
 //#include <NdkImageReader.h>
-#include "wifibroadcast/test_fec.h"
 
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
         mLowLagDecoder(env),
@@ -283,11 +282,6 @@ JNI_METHOD(jlong , nativeGetExternalFileReader)
 (JNIEnv *env,jclass jclass1,jlong instance) {
     VideoPlayer* p=native(instance);
     return (jlong) &p->mFileReceiver;
-}
-
-JNI_METHOD(void , nativeTestFec)
-(JNIEnv *env,jclass jclass1) {
-    XFECTest::test();
 }
 
 JNI_METHOD(void,nativeCallBack)
