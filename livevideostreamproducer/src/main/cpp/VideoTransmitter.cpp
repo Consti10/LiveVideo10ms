@@ -39,10 +39,10 @@ public:
     //
     void sendPacket(const uint8_t* data, ssize_t data_length,bool addSeqNr);
     //
-    void FECSend(const uint8_t* data, ssize_t data_length);
     //
     void RTPSend(const uint8_t* data, ssize_t data_length);
     AvgCalculator avgNALUSize;
+    bool DO_FEC_WRAPPING=false;
 private:
     UDPSender mUDPSender;
     //static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=UDP_PACKET_MAX_SIZE--sizeof(uint32_t);
@@ -52,10 +52,10 @@ private:
     AvgCalculator avgDeltaBetweenVideoPackets;
     std::chrono::steady_clock::time_point lastForwardedPacket{};
     //
-    FECBufferEncoder enc{1024,0.5f};
+    FECBufferEncoder enc{1500,0.5f};
     //
     RTPEncoder mEncodeRTP;
-    void newRTPPacket(const RTPEncoder::RTPPacket packet);
+    void newRTPPacket(const RTPEncoder::RTPPacket& packet);
 };
 
 //Split data into smaller packets when exceeding UDP max packet size
@@ -116,27 +116,26 @@ void VideoTransmitter::sendPacket(const uint8_t *data, ssize_t data_length, bool
     }
 }
 
-void VideoTransmitter::FECSend(const uint8_t *data, ssize_t data_length) {
-    std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(data,data_length);
-    if(blks.size()==0){
-        MLOGE<<"Cannot encode";
-    }
-    for (auto blk : blks) {
-        mUDPSender.mySendTo(blk->data(), blk->data_length());
-    }
-}
-
 void VideoTransmitter::RTPSend(const uint8_t *data, ssize_t data_length) {
     mEncodeRTP.parseNALtoRTP(30,data,data_length);
 }
 
-void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket packet) {
-    const bool DO_FEC=true;
-    if(DO_FEC){
-
+void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
+    /*std::vector<uint8_t> tmp;
+    tmp.reserve(1024);
+    for(int i=0;i<1024;i++){
+        tmp.push_back((uint8_t)i);
+    }*/
+    if(DO_FEC_WRAPPING){
+        std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(packet.data,packet.data_len);
+        for (auto blk : blks) {
+            mUDPSender.mySendTo(blk->data(), blk->data_length());
+        }
+    }else{
+        mUDPSender.mySendTo(packet.data, packet.data_len);
     }
-    mUDPSender.mySendTo(packet.data, packet.data_len);
 }
+
 
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 
@@ -173,11 +172,13 @@ JNI_METHOD(void, nativeSend)
     if(streamMode==0){
         native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, false);
     }else if(streamMode==1){
+        native(p)->DO_FEC_WRAPPING=false;
         native(p)->RTPSend((uint8_t*)data,(ssize_t)size);
     }else if(streamMode==2){
         native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, true);
     }else{
-        native(p)->FECSend((uint8_t *) data, (ssize_t) size);
+        native(p)->DO_FEC_WRAPPING=true;
+        native(p)->RTPSend((uint8_t *) data, (ssize_t) size);
     }
 }
 

@@ -39,10 +39,10 @@ public class AVideoStream extends AppCompatActivity{
 
     private Surface encoderInputSurface;
 
-    private static final int W=1920;
-    private static final int H=1080;
-    private static final int MDEIACODEC_ENCODER_TARGET_FPS=60;
-    private static final int MDEIACODEC_TARGET_KEY_BIT_RATE=50*1024*1024;
+    private static final int W=1280;
+    private static final int H=720;
+    private static final int MDEIACODEC_ENCODER_TARGET_FPS=30;
+    private static final int MDEIACODEC_TARGET_KEY_BIT_RATE=5*1024*1024;
 
     private CameraDevice cameraDevice;
     private MediaCodec codec;

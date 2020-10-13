@@ -138,15 +138,19 @@ void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length)
     //
 }
 
-void H264Parser::parseCustom2(const uint8_t *data, const std::size_t data_length) {
-    mFECDecoder.add_block(data,data_length);
+void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t data_len) {
+    mFECDecoder.add_block(data, data_len);
     std::vector<uint8_t> obuf;
     obuf.reserve(1024*1024);
     for (std::shared_ptr<FECBlock> sblk = mFECDecoder.get_block(); sblk; sblk = mFECDecoder.get_block()) {
         std::copy(sblk->data(), sblk->data() + sblk->data_length(),
                   std::back_inserter(obuf));
+        MLOGD<<"Got block";
+        mDecodeRTP.parseRTPtoNALU(sblk->data(),sblk->data_length());
     }
-    if(obuf.size()>0){
-        parse_raw_h264_stream(obuf.data(),obuf.size());
-    }
+    /*if(obuf.size()>0){
+        MLOGD<<"Got rtp packet";
+        //parse_raw_h264_stream(obuf.data(),obuf.size());
+        mDecodeRTP.parseRTPtoNALU(obuf.data(),obuf.size());
+    }*/
 }

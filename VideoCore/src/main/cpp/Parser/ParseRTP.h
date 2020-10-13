@@ -39,13 +39,15 @@ public:
 public:
     RTPEncoder(RTP_DATA_CALLBACK cb): mCB(cb){};
     int parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t nalu_data_len);
+    // If the NAL unit fits into one rtp packet the overhead is 12 bytes
+    // Else, the overhead can be up to 12+2 bytes
+    static constexpr std::size_t RTP_PACKET_MAX_OVERHEAD=12+2;
+    static constexpr std::size_t RTP_PACKET_MAX_SIZE=1024;
+    static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=RTP_PACKET_MAX_SIZE-RTP_PACKET_MAX_OVERHEAD;
 private:
     RTP_DATA_CALLBACK mCB;
     void forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len);
-    //
-    static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1024;
-    static constexpr std::size_t RTP_PACKET_MAX_SIZE=RTP_PAYLOAD_MAX_SIZE+1024;
-    static constexpr std::size_t SEND_BUF_SIZE=RTP_PAYLOAD_MAX_SIZE+1024;
+    static constexpr std::size_t SEND_BUF_SIZE=RTP_PACKET_MAX_SIZE;
     uint8_t mRTP_BUFF_SEND[SEND_BUF_SIZE];
     uint16_t seq_num = 0;
     uint32_t ts_current = 0;

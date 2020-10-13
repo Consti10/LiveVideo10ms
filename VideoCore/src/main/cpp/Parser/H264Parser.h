@@ -37,7 +37,7 @@ public:
     void parseDjiLiveVideoData(const uint8_t* data,const size_t data_len);
     //
     void parseCustom(const uint8_t* data,const size_t data_len);
-    void parseCustom2(const uint8_t* data,const size_t data_len);
+    void parseCustomRTPinsideFEC(const uint8_t* data, const size_t data_len);
     void reset();
 public:
     long nParsedNALUs=0;
