@@ -153,12 +153,12 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
         /*
          * single nal unit
          */
-        memset(RTP_BUFF_SEND, 0, sizeof(rtp_header_t)+sizeof(nalu_header_t));
+        memset(mRTP_BUFF_SEND, 0, sizeof(rtp_header_t) + sizeof(nalu_header_t));
         /**
          * Set pointer for headers
          */
-        rtp_header_t* rtp_hdr= (rtp_header_t *)RTP_BUFF_SEND;
-        nalu_header_t *nalu_hdr = (nalu_header_t *)&RTP_BUFF_SEND[sizeof(rtp_header_t)];
+        rtp_header_t* rtp_hdr= (rtp_header_t *)mRTP_BUFF_SEND;
+        nalu_header_t *nalu_hdr = (nalu_header_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t)];
         /**
          * Write rtp header
          */
@@ -181,12 +181,12 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
         /*
          * 3.Fill nal content
          */
-        memcpy(RTP_BUFF_SEND + 13, nalu_buf_without_prefix + 1, nalu_len_without_prefix - 1);    /* 不拷贝nalu头 */
+        memcpy(mRTP_BUFF_SEND + 13, nalu_buf_without_prefix + 1, nalu_len_without_prefix - 1);    /* 不拷贝nalu头 */
         /*
          * 4. Forward the RTP packet
          */
         const size_t len_sendbuf = 12 + nalu_len_without_prefix;
-        forwardRTPPacket(RTP_BUFF_SEND, len_sendbuf);
+        forwardRTPPacket(mRTP_BUFF_SEND, len_sendbuf);
         //
         MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
@@ -207,11 +207,11 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
         const int last_fu_pack_size = nalu_len_without_prefix % RTP_PAYLOAD_MAX_SIZE ? nalu_len_without_prefix % RTP_PAYLOAD_MAX_SIZE : RTP_PAYLOAD_MAX_SIZE;
         /* fu-A Serial number */
         for (int fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) {
-            memset(RTP_BUFF_SEND, 0,sizeof(rtp_header_t)+sizeof(fu_indicator_t)+sizeof(fu_header_t));
+            memset(mRTP_BUFF_SEND, 0, sizeof(rtp_header_t) + sizeof(fu_indicator_t) + sizeof(fu_header_t));
             //
-            rtp_header_t* rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
-            fu_indicator_t *fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[sizeof(rtp_header_t)];
-            fu_header_t *fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[sizeof(rtp_header_t)+sizeof(fu_indicator_t)];
+            rtp_header_t* rtp_hdr = (rtp_header_t *)mRTP_BUFF_SEND;
+            fu_indicator_t *fu_ind = (fu_indicator_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t)];
+            fu_header_t *fu_hdr = (fu_header_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t) + sizeof(fu_indicator_t)];
             /*
              * 根据FU-A的类型设置不同的rtp头和rtp荷载头
              */
@@ -242,12 +242,12 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
                 /*
                  * 3. 填充nalu内容
                  */
-                memcpy(RTP_BUFF_SEND + 14, nalu_buf_without_prefix + 1, RTP_PAYLOAD_MAX_SIZE - 1);    /* 不拷贝nalu头 */
+                memcpy(mRTP_BUFF_SEND + 14, nalu_buf_without_prefix + 1, RTP_PAYLOAD_MAX_SIZE - 1);    /* 不拷贝nalu头 */
                 /*
                  * 4. 发送打包好的rtp包到客户端
                  */
                 const size_t len_sendbuf = 12 + 2 + (RTP_PAYLOAD_MAX_SIZE - 1);  /* rtp头 + nalu头 + nalu内容 */
-                forwardRTPPacket(RTP_BUFF_SEND, len_sendbuf);
+                forwardRTPPacket(mRTP_BUFF_SEND, len_sendbuf);
 
             } else if (fu_seq < fu_pack_num - 1) { /* 中间的FU-A */
                 /*
@@ -276,12 +276,12 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
                 /*
                  * 3. 填充nalu内容
                  */
-                memcpy(RTP_BUFF_SEND + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, RTP_PAYLOAD_MAX_SIZE);    /* 不拷贝nalu头 */
+                memcpy(mRTP_BUFF_SEND + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, RTP_PAYLOAD_MAX_SIZE);    /* 不拷贝nalu头 */
                 /*
                  * 4. 发送打包好的rtp包到客户端
                  */
                 const size_t len_sendbuf = 12 + 2 + RTP_PAYLOAD_MAX_SIZE;
-                forwardRTPPacket(RTP_BUFF_SEND, len_sendbuf);
+                forwardRTPPacket(mRTP_BUFF_SEND, len_sendbuf);
             } else { /* 最后一个FU-A */
                 /*
                  * 1. 设置 rtp 头
@@ -309,12 +309,12 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
                 /*
                  * 3. 填充rtp荷载
                  */
-                memcpy(RTP_BUFF_SEND + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, last_fu_pack_size);    /* 不拷贝nalu头 */
+                memcpy(mRTP_BUFF_SEND + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, last_fu_pack_size);    /* 不拷贝nalu头 */
                 /*
                  * 4. 发送打包好的rtp包到客户端
                  */
                 const size_t len_sendbuf = 12 + 2 + last_fu_pack_size;
-                forwardRTPPacket(RTP_BUFF_SEND, len_sendbuf);
+                forwardRTPPacket(mRTP_BUFF_SEND, len_sendbuf);
 
             } /* else-if (fu_seq == 0) */
         } /* end of for (fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) */
