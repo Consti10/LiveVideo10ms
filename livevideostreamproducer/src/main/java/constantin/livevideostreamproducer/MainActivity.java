@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -19,13 +18,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.mapzen.prefsplusx.DefaultPreferenceFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         checkAndRequestPermissions();
         final Context context=this;
         findViewById(R.id.start_stream).setOnClickListener(new View.OnClickListener() {
@@ -59,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         final EditText editText=findViewById(R.id.ip_address_edit_text);
-        editText.setText(getIpAddress(context));
+        editText.setText(ASettings.getSP_UDP_IP(context));
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -72,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("ApplySharedPref")
             @Override
             public void afterTextChanged(Editable s) {
-                writeIpAddress(context,s.toString());
+                ASettings.setSP_UDP_IP(context,s.toString());
                 Toast.makeText(context,"Set IP "+s.toString(),Toast.LENGTH_SHORT).show();
             }
         });
@@ -91,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int item) {
                             final String ip=ips.get(item);
                             editText.setText(ip);
-                            writeIpAddress(context,ip);
+                            ASettings.setSP_UDP_IP(context,ip);
                             Toast.makeText(context,"Set ip to "+ip,Toast.LENGTH_LONG).show();
                         }
                     });
@@ -102,17 +97,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    @SuppressLint("ApplySharedPref")
-    private static void writeIpAddress(final Context context, final String ip){
-        PreferenceManager.getDefaultSharedPreferences(context).edit().
-                putString(context.getString(R.string.KEY_SP_UDP_IP),ip).commit();
-    }
-    @SuppressLint("ApplySharedPref")
-    private static String getIpAddress(final Context context){
-        return PreferenceManager.getDefaultSharedPreferences(context).
-                getString(context.getString(R.string.KEY_SP_UDP_IP),"192.168.1.1");
     }
 
     //Permissions stuff

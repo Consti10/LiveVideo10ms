@@ -17,7 +17,7 @@
         android:id="@+id/b_startSettingsActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Settings"
+        android:text="Video Settings"
         tools:ignore="HardcodedText" />
 
     <Spinner
@@ -33,21 +33,21 @@
         <Button
             android:id="@+id/b_startTethering"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="Start Tethering" />
 
         <Button
             android:id="@+id/b_startViewDatabase"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="View Database" />
+        <Button
+            android:id="@+id/b_startColorFormatsTester"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="start ColorFormat Tester" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <Button
-        android:id="@+id/b_startColorFormatsTester"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="start ColorFormat Tester" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"

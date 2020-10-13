@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import androidx.preference.PreferenceManager;
-
 import java.nio.ByteBuffer;
 
 //UDP -> Put data in, hope the data comes out at the other end of the network
@@ -30,7 +28,7 @@ public class VideoTransmitter {
 
     VideoTransmitter(final Context context){
         //"10.183.84.95"
-        final String IP = PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.KEY_SP_UDP_IP), "192.168.1.172");
+        final String IP = ASettings.getSP_UDP_IP(context);
         Log.d("UDPSender","Sending to IP "+IP);
         nativeInstance=nativeConstruct(IP,PORT);
         streamMode=ASettings.getSTREAM_MODE(context);

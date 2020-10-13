@@ -5,13 +5,18 @@
         android:key="@string/KEY_STREAM_MODE"
         android:title="@string/KEY_STREAM_MODE"
         android:entries="@array/entriesStreamMode"
-        android:defaultValue="0"
-        android:enabled="true"/>
+        android:defaultValue="0" />
 
     <EditTextPreference
         android:key="@string/KEY_SP_UDP_IP"
         android:title="@string/KEY_SP_UDP_IP"
         android:defaultValue="192.168.1.1" />
+
+    <com.mapzen.prefsplusx.EditIntPreference
+        android:key="@string/KEY_SP_ENCODER_BITRATE_MBITS"
+        android:title="@string/KEY_SP_ENCODER_BITRATE_MBITS"
+        android:defaultValue="5"
+        />
 
 
 </PreferenceScreen>

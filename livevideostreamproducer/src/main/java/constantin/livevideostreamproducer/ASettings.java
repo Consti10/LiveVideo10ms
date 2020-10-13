@@ -1,5 +1,6 @@
 package constantin.livevideostreamproducer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -25,6 +26,21 @@ public class ASettings extends AppCompatActivity {
                 getInt(context.getString(R.string.KEY_STREAM_MODE),0);
     }
 
+    @SuppressLint("ApplySharedPref")
+    public static void setSP_UDP_IP(final Context context, final String ip){
+        PreferenceManager.getDefaultSharedPreferences(context).edit().
+                putString(context.getString(R.string.KEY_SP_UDP_IP),ip).commit();
+    }
+    public static String getSP_UDP_IP(final Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context).
+                getString(context.getString(R.string.KEY_SP_UDP_IP),"192.168.1.1");
+    }
+
+    public static int getSP_ENCODER_BITRATE_MBITS(final Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context).
+                getInt(context.getString(R.string.KEY_SP_ENCODER_BITRATE_MBITS),5);
+    }
+
     public static class MSettingsFragment extends PreferenceFragmentCompat {
 
         @Override
@@ -48,7 +64,5 @@ public class ASettings extends AppCompatActivity {
         public void onPause(){
             super.onPause();
         }
-
-
     }
 }

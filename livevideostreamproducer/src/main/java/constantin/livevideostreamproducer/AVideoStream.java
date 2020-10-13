@@ -42,7 +42,6 @@ public class AVideoStream extends AppCompatActivity{
     private static final int W=1280;
     private static final int H=720;
     private static final int MDEIACODEC_ENCODER_TARGET_FPS=30;
-    private static final int MDEIACODEC_TARGET_KEY_BIT_RATE=5*1024*1024;
 
     private CameraDevice cameraDevice;
     private MediaCodec codec;
@@ -125,6 +124,10 @@ public class AVideoStream extends AppCompatActivity{
             codec= MediaCodec.createEncoderByType("video/avc");
             MediaFormat format = MediaFormat.createVideoFormat("video/avc",W,H);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+
+            //final int MDEIACODEC_TARGET_KEY_BIT_RATE=5*1024*1024;
+            final int MDEIACODEC_TARGET_KEY_BIT_RATE=ASettings.getSP_ENCODER_BITRATE_MBITS(this)*1024*1024;
+
             format.setInteger(MediaFormat.KEY_BIT_RATE,MDEIACODEC_TARGET_KEY_BIT_RATE); //X MBit/s
             format.setInteger(MediaFormat.KEY_FRAME_RATE,MDEIACODEC_ENCODER_TARGET_FPS);
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL,1);
