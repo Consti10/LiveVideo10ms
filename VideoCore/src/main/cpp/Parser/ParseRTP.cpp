@@ -155,7 +155,7 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
         /*
          * single nal unit
          */
-        memset(RTP_BUFF_SEND, 0, SEND_BUF_SIZE);
+        memset(RTP_BUFF_SEND, 0, sizeof(rtp_header_t)+sizeof(nalu_header_t));
         /*
          * 1. Set rtp header
          */
@@ -200,14 +200,17 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
          * Except for the last shard，
          * Consumption per shard RTP_PAYLOAD_MAX_SIZE BYLE
          */
-        int fu_seq=0;             /* fu-A Serial number */
         /* The number of splits when nalu needs to be split to send */
         const int fu_pack_num = nalu_len_without_prefix % RTP_PAYLOAD_MAX_SIZE ? (nalu_len_without_prefix / RTP_PAYLOAD_MAX_SIZE + 1) : nalu_len_without_prefix / RTP_PAYLOAD_MAX_SIZE;
         /* The size of the last shard */
         const int last_fu_pack_size = nalu_len_without_prefix % RTP_PAYLOAD_MAX_SIZE ? nalu_len_without_prefix % RTP_PAYLOAD_MAX_SIZE : RTP_PAYLOAD_MAX_SIZE;
-
-        for (fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) {
-            memset(RTP_BUFF_SEND, 0, SEND_BUF_SIZE);
+        /* fu-A Serial number */
+        for (int fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) {
+            memset(RTP_BUFF_SEND, 0,sizeof(rtp_header_t)+sizeof(fu_indicator_t)+sizeof(fu_header_t));
+            //
+            rtp_header_t* rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
+            fu_indicator_t *fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[sizeof(rtp_header_t)];
+            fu_header_t *fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[sizeof(rtp_header_t)+sizeof(fu_indicator_t)];
             /*
              * 根据FU-A的类型设置不同的rtp头和rtp荷载头
              */
@@ -215,7 +218,6 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_header_t* rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -228,12 +230,10 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
                 /*
                  * 2. 设置 rtp 荷载头部
                  */
-                fu_indicator_t *fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[12];
                 fu_ind->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;
                 fu_ind->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;
                 fu_ind->type = 28;
                 //
-                fu_header_t *fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[13];
                 fu_hdr->s = 1;
                 fu_hdr->e = 0;
                 fu_hdr->r = 0;
@@ -252,7 +252,6 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_header_t* rtp_hdr= (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -265,12 +264,10 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
                 /*
                  * 2. 设置 rtp 荷载头部
                  */
-                fu_indicator_t *fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[12];
                 fu_ind->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;
                 fu_ind->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;
                 fu_ind->type = 28;
                 //
-                fu_header_t *fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[13];
                 fu_hdr->s = 0;
                 fu_hdr->e = 0;
                 fu_hdr->r = 0;
@@ -288,7 +285,6 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_header_t* rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -301,12 +297,10 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
                 /*
                  * 2. 设置 rtp 荷载头部
                  */
-                fu_indicator_t *fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[12];
                 fu_ind->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;
                 fu_ind->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;
                 fu_ind->type = 28;
                 //
-                fu_header_t *fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[13];
                 fu_hdr->s = 0;
                 fu_hdr->e = 1;
                 fu_hdr->r = 0;

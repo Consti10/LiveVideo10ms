@@ -28,9 +28,18 @@ private:
     std::array<uint8_t,NALU::NALU_MAXLEN> BUFF_NALU_DATA;
     size_t BUFF_NALU_DATA_LENGTH=0;
     //
-    static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1024*1024;
+    static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1024;
     static constexpr std::size_t SEND_BUF_SIZE=RTP_PAYLOAD_MAX_SIZE+1024;
     uint8_t RTP_BUFF_SEND[SEND_BUF_SIZE];
+};
+
+class EncodeRTP{
+public:
+    struct RTPPacket{
+        const uint8_t* data;
+        const size_t data_len;
+    };
+    typedef std::function<void(const RTPPacket& rtpPacket)> RTP_DATA_CALLBACK;
 };
 
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H
