@@ -31,7 +31,7 @@ void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_len
 }
 
 void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
-    mParseRTP.parseData(rtp_data,data_length);
+    mParseRTP.parseRTPtoNALU(rtp_data, data_length);
 }
 
 void H264Parser::parseDjiLiveVideoData(const uint8_t *data,const size_t data_length) {
@@ -65,7 +65,7 @@ void H264Parser::newNaluExtracted2(const NALU &nalu) {
     //LOGD("H264Parser::newNaluExtracted");
     if(nalu.getSize()>0){
         MLOGD<<"X NALU size:"<<"header "<<((int)nalu.get_nal_unit_type());
-        mParseRTP.h264nal2rtp_send(30,nalu.getData(),nalu.getSize());
+        mParseRTP.parseNALtoRTP(30, nalu.getData(), nalu.getSize());
         //newNaluExtracted(nalu);
     }
 }
