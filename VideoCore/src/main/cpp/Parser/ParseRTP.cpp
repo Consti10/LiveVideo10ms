@@ -156,10 +156,14 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
          * single nal unit
          */
         memset(RTP_BUFF_SEND, 0, sizeof(rtp_header_t)+sizeof(nalu_header_t));
-        /*
-         * 1. Set rtp header
+        /**
+         * Set pointer for headers
          */
         rtp_header_t* rtp_hdr= (rtp_header_t *)RTP_BUFF_SEND;
+        nalu_header_t *nalu_hdr = (nalu_header_t *)&RTP_BUFF_SEND[sizeof(rtp_header_t)];
+        /**
+         * Write rtp header
+         */
         rtp_hdr->cc = 0;
         rtp_hdr->extension = 0;
         rtp_hdr->padding = 0;
@@ -170,9 +174,8 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
         rtp_hdr->timestamp = htonl(ts_current);
         rtp_hdr->sources = htonl(SSRC_NUM);
         /*
-         * 2. Set rtp load single nal unit header
+         * Set rtp load single nal unit header
          */
-        nalu_header_t *nalu_hdr = (nalu_header_t *)&RTP_BUFF_SEND[12];
         nalu_hdr->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;        /* bit0 */
         nalu_hdr->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;      /* bit1~2 */
         nalu_hdr->type = (nalu_buf_without_prefix[0] & 0x1f);
