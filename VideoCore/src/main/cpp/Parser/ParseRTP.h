@@ -28,7 +28,7 @@ private:
     size_t nalu_data_length=0;
     //
     static constexpr std::size_t SEND_BUF_SIZE=1500;
-    static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1400;
+    static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1024*1024;
     std::array<uint8_t,SEND_BUF_SIZE> SENDBUFFER[SEND_BUF_SIZE];
 };
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H

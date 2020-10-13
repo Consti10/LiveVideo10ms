@@ -11,7 +11,7 @@
 
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
     onNewNALU(std::move(onNewNALU)),
-    mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
+    mParseRAW(std::bind(&H264Parser::newNaluExtracted2, this, std::placeholders::_1)),
     mParseRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
 }
 
@@ -46,6 +46,7 @@ void H264Parser::setLimitFPS(int maxFPS) {
 void H264Parser::newNaluExtracted(const NALU& nalu) {
     using namespace std::chrono;
     //LOGD("H264Parser::newNaluExtracted");
+
     if(onNewNALU!= nullptr){
         onNewNALU(nalu);
     }
@@ -58,6 +59,13 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
     //E.g. they won't create a frame on the output pipe)
     if(!(sps_or_pps || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD)){
         mFrameLimiter.limitFps(maxFPS);
+    }
+}
+void H264Parser::newNaluExtracted2(const NALU &nalu) {
+    //LOGD("H264Parser::newNaluExtracted");
+    if(nalu.getSize()>0){
+        mParseRTP.h264nal2rtp_send(30,const_cast<uint8_t *>(nalu.getData()),nalu.getSize());
+        //newNaluExtracted(nalu);
     }
 }
 
