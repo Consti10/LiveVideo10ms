@@ -178,7 +178,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
         rtp_hdr->extension = 0;
         rtp_hdr->padding = 0;
         rtp_hdr->version = 2;
-        rtp_hdr->payload_type = H264;
+        rtp_hdr->payload = H264;
         // rtp_hdr->marker = (pstStream->u32PackCount - 1 == i) ? 1 : 0;   /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
         rtp_hdr->seq_no = htons(++seq_num % UINT16_MAX);
         rtp_hdr->timestamp = htonl(ts_current);
@@ -243,7 +243,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload_type = H264;
+                rtp_hdr->payload = H264;
                 rtp_hdr->marker = 0;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
                 rtp_hdr->seq_no = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
@@ -293,7 +293,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload_type = H264;
+                rtp_hdr->payload = H264;
                 rtp_hdr->marker = 0;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
                 rtp_hdr->seq_no = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
@@ -340,7 +340,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload_type = H264;
+                rtp_hdr->payload = H264;
                 rtp_hdr->marker = 1;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
                 rtp_hdr->seq_no = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
