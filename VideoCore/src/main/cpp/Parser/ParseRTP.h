@@ -25,11 +25,11 @@ public:
 private:
     const NALU_DATA_CALLBACK cb;
     std::array<uint8_t,NALU::NALU_MAXLEN> BUFF_NALU_DATA;
-    size_t nalu_data_length=0;
+    size_t BUFF_NALU_DATA_LENGTH=0;
     //
     static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1024;
     static constexpr std::size_t SEND_BUF_SIZE=RTP_PAYLOAD_MAX_SIZE+1024;
     //std::array<uint8_t,SEND_BUF_SIZE> SENDBUFFER;
-    uint8_t SENDBUFFER[SEND_BUF_SIZE];
+    uint8_t RTP_BUFF_SEND[SEND_BUF_SIZE];
 };
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H

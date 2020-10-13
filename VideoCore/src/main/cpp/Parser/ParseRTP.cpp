@@ -59,7 +59,7 @@ ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(std::move(cb)){
 }
 
 void ParseRTP::reset(){
-    nalu_data_length=0;
+    BUFF_NALU_DATA_LENGTH=0;
     //nalu_data.reserve(NALU::NALU_MAXLEN);
 }
 
@@ -81,33 +81,33 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
             if (fu_header->e == 1) {
                 /* end of fu-a */
-                memcpy(&BUFF_NALU_DATA[nalu_data_length], &rtp_data[14], (size_t)data_len - 14);
-                nalu_data_length+=data_len-14;
+                memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[14], (size_t)data_len - 14);
+                BUFF_NALU_DATA_LENGTH+= data_len - 14;
                 if(cb!= nullptr){
-                    NALU nalu(BUFF_NALU_DATA, nalu_data_length);
+                    NALU nalu(BUFF_NALU_DATA, BUFF_NALU_DATA_LENGTH);
                     //nalu_data.resize(nalu_data_length);
                     //NALU nalu(nalu_data);
                     cb(nalu);
                 }
-                nalu_data_length=0;
+                BUFF_NALU_DATA_LENGTH=0;
             } else if (fu_header->s == 1) {
                 /* start of fu-a */
                 BUFF_NALU_DATA[0]=0;
                 BUFF_NALU_DATA[1]=0;
                 BUFF_NALU_DATA[2]=0;
                 BUFF_NALU_DATA[3]=1;
-                nalu_data_length=4;
+                BUFF_NALU_DATA_LENGTH=4;
                 const uint8_t h264_nal_header = (uint8_t)(fu_header->type & 0x1f)
                                   | (nalu_header->nri << 5)
                                   | (nalu_header->f << 7);
                 BUFF_NALU_DATA[4]=h264_nal_header;
-                nalu_data_length++;
-                memcpy(&BUFF_NALU_DATA[nalu_data_length], &rtp_data[14], (size_t)data_len - 14);
-                nalu_data_length+=data_len-14;
+                BUFF_NALU_DATA_LENGTH++;
+                memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[14], (size_t)data_len - 14);
+                BUFF_NALU_DATA_LENGTH+= data_len - 14;
             } else {
                 /* middle of fu-a */
-                memcpy(&BUFF_NALU_DATA[nalu_data_length], &rtp_data[14], (size_t)data_len - 14);
-                nalu_data_length+=data_len-14;
+                memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[14], (size_t)data_len - 14);
+                BUFF_NALU_DATA_LENGTH+= data_len - 14;
             }
             //LOGV("partially nalu");
         } else if(nalu_header->type>0 && nalu_header->type<24){
@@ -117,22 +117,22 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             BUFF_NALU_DATA[1]=0;
             BUFF_NALU_DATA[2]=0;
             BUFF_NALU_DATA[3]=1;
-            nalu_data_length=4;
+            BUFF_NALU_DATA_LENGTH=4;
             const uint8_t h264_nal_header = (uint8_t )(nalu_header->type & 0x1f)
                               | (nalu_header->nri << 5)
                               | (nalu_header->f << 7);
             BUFF_NALU_DATA[4]=h264_nal_header;
-            nalu_data_length++;
-            memcpy(&BUFF_NALU_DATA[nalu_data_length], &rtp_data[13], (size_t)data_len - 13);
-            nalu_data_length+=data_len-13;
+            BUFF_NALU_DATA_LENGTH++;
+            memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[13], (size_t)data_len - 13);
+            BUFF_NALU_DATA_LENGTH+= data_len - 13;
 
             if(cb!= nullptr){
-                NALU nalu(BUFF_NALU_DATA, nalu_data_length);
+                NALU nalu(BUFF_NALU_DATA, BUFF_NALU_DATA_LENGTH);
                 //nalu_data.resize(nalu_data_length);
                 //NALU nalu(nalu_data);
                 cb(nalu);
             }
-            nalu_data_length=0;
+            BUFF_NALU_DATA_LENGTH=0;
             //LOGV("full nalu");
         }else{
             //MLOGD<<"header:"<<nalu_header->type;
@@ -173,11 +173,11 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
         /*
          * single nal unit
          */
-        memset(SENDBUFFER, 0, SEND_BUF_SIZE);
+        memset(RTP_BUFF_SEND, 0, SEND_BUF_SIZE);
         /*
          * 1. 设置 rtp 头
          */
-        rtp_hdr = (rtp_header_t *)SENDBUFFER;
+        rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
         rtp_hdr->cc = 0;
         rtp_hdr->extension = 0;
         rtp_hdr->padding = 0;
@@ -192,7 +192,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
          * 2. Set rtp load single nal unit header
          */
 
-        nalu_hdr = (nalu_header_t *)&SENDBUFFER[12];
+        nalu_hdr = (nalu_header_t *)&RTP_BUFF_SEND[12];
         nalu_hdr->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;        /* bit0 */
         nalu_hdr->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;      /* bit1~2 */
         nalu_hdr->type = (nalu_buf_without_prefix[0] & 0x1f);
@@ -204,12 +204,12 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
          * 3.Fill nal content
          */
         //debug_print();
-        memcpy(SENDBUFFER + 13, nalu_buf_without_prefix + 1, nalu_len_without_prefix - 1);    /* 不拷贝nalu头 */
+        memcpy(RTP_BUFF_SEND + 13, nalu_buf_without_prefix + 1, nalu_len_without_prefix - 1);    /* 不拷贝nalu头 */
         /*
          * 4. Send the packaged rtp to the client
          */
         len_sendbuf = 12 + nalu_len_without_prefix;
-        send_data_to_client_list(SENDBUFFER, len_sendbuf);
+        send_data_to_client_list(RTP_BUFF_SEND, len_sendbuf);
         //debug_print();
         MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
 
@@ -232,7 +232,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
         fu_seq = 0;
 
         for (fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) {
-            memset(SENDBUFFER, 0, SEND_BUF_SIZE);
+            memset(RTP_BUFF_SEND, 0, SEND_BUF_SIZE);
 
             /*
              * 根据FU-A的类型设置不同的rtp头和rtp荷载头
@@ -241,7 +241,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_hdr = (rtp_header_t *)SENDBUFFER;
+                rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -256,7 +256,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                  * 2. 设置 rtp 荷载头部
                  */
 #if 1
-                fu_ind = (fu_indicator_t *)&SENDBUFFER[12];
+                fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[12];
                 fu_ind->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;
                 fu_ind->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;
                 fu_ind->type = 28;
@@ -267,7 +267,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
 #endif
 
 #if 1
-                fu_hdr = (fu_header_t *)&SENDBUFFER[13];
+                fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[13];
                 fu_hdr->s = 1;
                 fu_hdr->e = 0;
                 fu_hdr->r = 0;
@@ -279,19 +279,19 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 3. 填充nalu内容
                  */
-                memcpy(SENDBUFFER + 14, nalu_buf_without_prefix + 1, RTP_PAYLOAD_MAX_SIZE - 1);    /* 不拷贝nalu头 */
+                memcpy(RTP_BUFF_SEND + 14, nalu_buf_without_prefix + 1, RTP_PAYLOAD_MAX_SIZE - 1);    /* 不拷贝nalu头 */
 
                 /*
                  * 4. 发送打包好的rtp包到客户端
                  */
                 len_sendbuf = 12 + 2 + (RTP_PAYLOAD_MAX_SIZE - 1);  /* rtp头 + nalu头 + nalu内容 */
-                send_data_to_client_list(SENDBUFFER, len_sendbuf);
+                send_data_to_client_list(RTP_BUFF_SEND, len_sendbuf);
 
             } else if (fu_seq < fu_pack_num - 1) { /* 中间的FU-A */
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_hdr = (rtp_header_t *)SENDBUFFER;
+                rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -306,12 +306,12 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                  * 2. 设置 rtp 荷载头部
                  */
 #if 1
-                fu_ind = (fu_indicator_t *)&SENDBUFFER[12];
+                fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[12];
                 fu_ind->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;
                 fu_ind->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;
                 fu_ind->type = 28;
 
-                fu_hdr = (fu_header_t *)&SENDBUFFER[13];
+                fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[13];
                 fu_hdr->s = 0;
                 fu_hdr->e = 0;
                 fu_hdr->r = 0;
@@ -326,19 +326,19 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 3. 填充nalu内容
                  */
-                memcpy(SENDBUFFER + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, RTP_PAYLOAD_MAX_SIZE);    /* 不拷贝nalu头 */
+                memcpy(RTP_BUFF_SEND + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, RTP_PAYLOAD_MAX_SIZE);    /* 不拷贝nalu头 */
 
                 /*
                  * 4. 发送打包好的rtp包到客户端
                  */
                 len_sendbuf = 12 + 2 + RTP_PAYLOAD_MAX_SIZE;
-                send_data_to_client_list(SENDBUFFER, len_sendbuf);
+                send_data_to_client_list(RTP_BUFF_SEND, len_sendbuf);
 
             } else { /* 最后一个FU-A */
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_hdr = (rtp_header_t *)SENDBUFFER;
+                rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -353,12 +353,12 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                  * 2. 设置 rtp 荷载头部
                  */
 #if 1
-                fu_ind = (fu_indicator_t *)&SENDBUFFER[12];
+                fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[12];
                 fu_ind->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;
                 fu_ind->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;
                 fu_ind->type = 28;
 
-                fu_hdr = (fu_header_t *)&SENDBUFFER[13];
+                fu_hdr = (fu_header_t *)&RTP_BUFF_SEND[13];
                 fu_hdr->s = 0;
                 fu_hdr->e = 1;
                 fu_hdr->r = 0;
@@ -373,13 +373,13 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 3. 填充rtp荷载
                  */
-                memcpy(SENDBUFFER + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, last_fu_pack_size);    /* 不拷贝nalu头 */
+                memcpy(RTP_BUFF_SEND + 14, nalu_buf_without_prefix + RTP_PAYLOAD_MAX_SIZE * fu_seq, last_fu_pack_size);    /* 不拷贝nalu头 */
 
                 /*
                  * 4. 发送打包好的rtp包到客户端
                  */
                 len_sendbuf = 12 + 2 + last_fu_pack_size;
-                send_data_to_client_list(SENDBUFFER, len_sendbuf);
+                send_data_to_client_list(RTP_BUFF_SEND, len_sendbuf);
 
             } /* else-if (fu_seq == 0) */
         } /* end of for (fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) */
