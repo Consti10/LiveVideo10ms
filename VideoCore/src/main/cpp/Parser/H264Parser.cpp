@@ -64,7 +64,7 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
 void H264Parser::newNaluExtracted2(const NALU &nalu) {
     //LOGD("H264Parser::newNaluExtracted");
     if(nalu.getSize()>0){
-        mParseRTP.h264nal2rtp_send(30,const_cast<uint8_t *>(nalu.getData()),nalu.getSize());
+        mParseRTP.h264nal2rtp_send(30,nalu.getData(),nalu.getSize());
         //newNaluExtracted(nalu);
     }
 }

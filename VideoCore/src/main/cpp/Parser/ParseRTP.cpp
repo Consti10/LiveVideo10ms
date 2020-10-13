@@ -139,8 +139,8 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
         }
 }
 
-int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) {
-    uint8_t *nalu_buf;
+int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_len) {
+    const uint8_t *nalu_buf;
     nalu_buf = &pstStream[4];
     nalu_len-=4;
     // int nalu_len;   /* Does not include the 0x00000001 start code, but includes the length of the nalu header */
@@ -173,9 +173,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
         /*
          * single nal unit
          */
-
         memset(SENDBUFFER, 0, SEND_BUF_SIZE);
-
         /*
          * 1. 设置 rtp 头
          */
@@ -189,30 +187,31 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
         rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
         rtp_hdr->timestamp = htonl(ts_current);
         rtp_hdr->sources = htonl(SSRC_NUM);
-
         //debug_print();
         /*
          * 2. Set rtp load single nal unit header
          */
+        //const uint8_t h264_nal_header = (uint8_t )(nalu_header->type & 0x1f)
+        //                              | (nalu_header->nri << 5)
+        //                              | (nalu_header->f << 7);
+        MLOGD<<"NALU hdr"<<((int)nalu_buf[0]);
+
         nalu_hdr = (nalu_header_t *)&SENDBUFFER[12];
         nalu_hdr->f = (nalu_buf[0] & 0x80) >> 7;        /* bit0 */
         nalu_hdr->nri = (nalu_buf[0] & 0x60) >> 5;      /* bit1~2 */
         nalu_hdr->type = (nalu_buf[0] & 0x1f);
         //debug_print();
-
         /*
          * 3.Fill nal content
          */
         //debug_print();
         memcpy(SENDBUFFER + 13, nalu_buf + 1, nalu_len - 1);    /* 不拷贝nalu头 */
-
         /*
          * 4. Send the packaged rtp to the client
          */
         len_sendbuf = 12 + nalu_len;
         send_data_to_client_list(SENDBUFFER->data(), len_sendbuf);
         //debug_print();
-
         MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
 
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
