@@ -48,7 +48,6 @@ public:
     bool ADD_SEQUENCE_NR=false;
 private:
     UDPSender mUDPSender;
-    //static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=UDP_PACKET_MAX_SIZE--sizeof(uint32_t);
     static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=1024-sizeof(uint32_t);
     int32_t sequenceNumber=0;
     std::array<uint8_t,UDPSender::UDP_PACKET_MAX_SIZE> workingBuffer;
