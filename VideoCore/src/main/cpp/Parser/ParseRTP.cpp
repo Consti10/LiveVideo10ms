@@ -143,7 +143,8 @@ int RTPDecoder::getSequenceNumber(const uint8_t* rtp_data,const size_t data_len)
     }
     const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
     const auto seqNr=rtp_header->sequence;
-    return seqNr;
+    return htons(seqNr);
+    //return seqNr;
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxx RTPEncoder part xxxxxxxxxxxxxxxxxxxxxxxxxxx
