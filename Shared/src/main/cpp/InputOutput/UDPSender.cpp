@@ -48,6 +48,8 @@ void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
         MLOGE<<"Data size exceeds UDP packet size";
         return;
     }
+    nSentBytes+=data_length;
+    // Measure the time this call takes (is there some funkiness ? )
     timeSpentSending.start();
     const auto result= sendto(sockfd, data, data_length, 0, (struct sockaddr *) &(address),
                                 sizeof(struct sockaddr_in));

@@ -31,6 +31,7 @@ public:
     //https://en.wikipedia.org/wiki/User_Datagram_Protocol
     //65,507 bytes (65,535 − 8 byte UDP header − 20 byte IP header).
     static constexpr const size_t UDP_PACKET_MAX_SIZE=65507;
+    std::size_t nSentBytes=0;
 private:
     int sockfd;
     sockaddr_in address{};
