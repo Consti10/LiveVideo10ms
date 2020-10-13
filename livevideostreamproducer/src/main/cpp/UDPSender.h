@@ -10,6 +10,9 @@
 #include <array>
 #include <TimeHelper.hpp>
 
+/**
+ * Allows sending UDP data on the current thread. No extra thread for sending is created (make sure to not call sendto() on the UI thread)
+ */
 class UDPSender{
 public:
     /**
@@ -21,8 +24,8 @@ public:
      */
     UDPSender(const std::string& IP,const int Port,const int WANTED_SNDBUFF_SIZE=0);
     ~UDPSender();
-    //
-    void mySendTo(const uint8_t* data,ssize_t data_length);
+    // Send one udp packet. Packet size must not exceed the max UDP packet size
+    void sendto(const uint8_t* data, ssize_t data_length);
     //https://en.wikipedia.org/wiki/User_Datagram_Protocol
     //65,507 bytes (65,535 − 8 byte UDP header − 20 byte IP header).
     static constexpr const size_t UDP_PACKET_MAX_SIZE=65507;

@@ -109,10 +109,10 @@ void VideoTransmitter::sendPacket(const uint8_t *data, ssize_t data_length, bool
         std::memcpy(&workingBuffer.data()[sizeof(uint32_t)],data,data_length);
         sequenceNumber++;
         for(int i=0;i<1;i++){
-            mUDPSender.mySendTo(workingBuffer.data(), data_length+sizeof(uint32_t));
+            mUDPSender.sendto(workingBuffer.data(), data_length + sizeof(uint32_t));
         }
     } else{
-        mUDPSender.mySendTo(data, data_length);
+        mUDPSender.sendto(data, data_length);
     }
 }
 
@@ -122,7 +122,7 @@ void VideoTransmitter::FECSend(const uint8_t *data, ssize_t data_length) {
         MLOGE<<"Cannot encode";
     }
     for (auto blk : blks) {
-        mUDPSender.mySendTo(blk->data(),blk->data_length());
+        mUDPSender.sendto(blk->data(), blk->data_length());
     }
 }
 
@@ -131,7 +131,7 @@ void VideoTransmitter::RTPSend(const uint8_t *data, ssize_t data_length) {
 }
 
 void VideoTransmitter::newRTPPacket(const EncodeRTP::RTPPacket packet) {
-    mUDPSender.mySendTo(packet.data,packet.data_len);
+    mUDPSender.sendto(packet.data, packet.data_len);
 }
 
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
