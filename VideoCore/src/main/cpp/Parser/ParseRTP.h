@@ -29,7 +29,6 @@ private:
     //
     static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1024;
     static constexpr std::size_t SEND_BUF_SIZE=RTP_PAYLOAD_MAX_SIZE+1024;
-    //std::array<uint8_t,SEND_BUF_SIZE> SENDBUFFER;
     uint8_t RTP_BUFF_SEND[SEND_BUF_SIZE];
 };
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H

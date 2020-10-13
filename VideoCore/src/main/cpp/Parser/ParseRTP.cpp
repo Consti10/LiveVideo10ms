@@ -75,8 +75,6 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
 
         const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[12];
 
-        MLOGD<<"DEC NALU hdr type"<<((int)nalu_header->type);
-
         if (nalu_header->type == 28) { /* FU-A */
             const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
             if (fu_header->e == 1) {
@@ -111,7 +109,7 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
             }
             //LOGV("partially nalu");
         } else if(nalu_header->type>0 && nalu_header->type<24){
-            MLOGD<<"Got full NALU";
+            //MLOGD<<"Got full NALU";
             /* full nalu */
             BUFF_NALU_DATA[0]=0;
             BUFF_NALU_DATA[1]=0;
@@ -146,7 +144,6 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
 
     static uint32_t ts_current = 0;
     static uint16_t seq_num = 0;
-    rtp_header_t *rtp_hdr;
     nalu_header_t *nalu_hdr;
     fu_indicator_t *fu_ind;
     fu_header_t *fu_hdr;
@@ -177,7 +174,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
         /*
          * 1. 设置 rtp 头
          */
-        rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
+        rtp_header_t* rtp_hdr= (rtp_header_t *)RTP_BUFF_SEND;
         rtp_hdr->cc = 0;
         rtp_hdr->extension = 0;
         rtp_hdr->padding = 0;
@@ -241,7 +238,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
+                rtp_header_t* rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -291,7 +288,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
+                rtp_header_t* rtp_hdr= (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
@@ -338,7 +335,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 1. 设置 rtp 头
                  */
-                rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
+                rtp_header_t* rtp_hdr = (rtp_header_t *)RTP_BUFF_SEND;
                 rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
