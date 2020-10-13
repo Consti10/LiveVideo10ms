@@ -75,6 +75,8 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
 
         const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[12];
 
+        MLOGD<<"Parsing RTP data"<<nalu_header->type;
+
         if (nalu_header->type == 28) { /* FU-A */
             const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
             if (fu_header->e == 1) {
@@ -139,7 +141,8 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
 
 int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) {
     uint8_t *nalu_buf;
-    nalu_buf = pstStream;
+    nalu_buf = &pstStream[4];
+    nalu_len-=4;
     // int nalu_len;   /* Does not include the 0x00000001 start code, but includes the length of the nalu header */
     static uint32_t ts_current = 0;
     static uint16_t seq_num = 0;
