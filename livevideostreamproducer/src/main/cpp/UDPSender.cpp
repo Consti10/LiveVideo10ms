@@ -15,7 +15,9 @@
 #include <StringHelper.hpp>
 
 
-UDPSender::UDPSender(const std::string &IP,const int Port) {
+UDPSender::UDPSender(const std::string &IP,const int Port,const int WANTED_SNDBUFF_SIZE):
+        WANTED_SNDBUFF_SIZE(WANTED_SNDBUFF_SIZE)
+{
     //create the socket
     sockfd = socket(AF_INET,SOCK_DGRAM,0);
     if (sockfd < 0) {
@@ -30,8 +32,7 @@ UDPSender::UDPSender(const std::string &IP,const int Port) {
     socklen_t len=sizeof(sendBufferSize);
     getsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &sendBufferSize, &len);
     MLOGD<<"Default socket send buffer is "<<StringHelper::memorySizeReadable(sendBufferSize);
-    if(true){
-        int WANTED_SNDBUFF_SIZE=1024*1024*5;
+    if(WANTED_SNDBUFF_SIZE!=0){
         if(setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &WANTED_SNDBUFF_SIZE,len)) {
             MLOGD<<"Cannot increase buffer size to "<<StringHelper::memorySizeReadable(WANTED_SNDBUFF_SIZE);
         }

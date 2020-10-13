@@ -16,8 +16,10 @@ public:
      * Construct a UDP sender that sends UDP data packets
      * @param IP ipv4 address to send data to
      * @param Port port for sending data
+     * @param WANTED_SNDBUFF_SIZE: If not set to 0, increase the buffer allocated by the OS to buffer data before sending UDP packets out
+     * Should not increase latency (data is not only sent when this buffer is full)
      */
-    UDPSender(const std::string& IP,const int Port);
+    UDPSender(const std::string& IP,const int Port,const int WANTED_SNDBUFF_SIZE=0);
     ~UDPSender();
     //
     void mySendTo(const uint8_t* data,ssize_t data_length);
@@ -28,6 +30,7 @@ private:
     int sockfd;
     sockaddr_in address{};
     Chronometer timeSpentSending;
+    const int WANTED_SNDBUFF_SIZE;
 };
 
 
