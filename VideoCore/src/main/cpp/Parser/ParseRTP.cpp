@@ -302,7 +302,6 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 /*
                  * 2. 设置 rtp 荷载头部
                  */
-#if 1
                 fu_ind = (fu_indicator_t *)&RTP_BUFF_SEND[12];
                 fu_ind->f = (nalu_buf_without_prefix[0] & 0x80) >> 7;
                 fu_ind->nri = (nalu_buf_without_prefix[0] & 0x60) >> 5;
@@ -313,12 +312,6 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *data, int data_len) 
                 fu_hdr->e = 0;
                 fu_hdr->r = 0;
                 fu_hdr->type = nalu_buf_without_prefix[0] & 0x1f;
-#else   /* 下面的错误以后要找 */
-                SENDBUFFER[12] = (nalu_buf[0] & 0x80) >> 7  /* bit0: f */
-                        | (nalu_buf[0] & 0x60) >> 4             /* bit1~2: nri */
-                        | 28 << 3;                              /* bit3~7: type */
-                    SENDBUFFER[13] = 0 | (nalu_buf[0] & 0x1f) << 3;
-#endif
 
                 /*
                  * 3. 填充nalu内容
