@@ -2,7 +2,8 @@
 <resources>
 
     <string-array name="entriesStreamMode" >
-        <item>NORMAL</item>
+        <item>RAW H264</item>
+        <item>RTP H264</item>
         <item>CUSTOM1</item>
         <item>CUSTOM2</item>
     </string-array>

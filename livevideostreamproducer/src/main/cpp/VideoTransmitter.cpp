@@ -42,6 +42,7 @@ public:
     void FECSend(const uint8_t* data, ssize_t data_length);
     //
     void RTPSend(const uint8_t* data, ssize_t data_length);
+    AvgCalculator avgNALUSize;
 private:
     UDPSender mUDPSender;
     //static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=UDP_PACKET_MAX_SIZE--sizeof(uint32_t);
@@ -52,7 +53,6 @@ private:
     std::chrono::steady_clock::time_point lastForwardedPacket{};
     //
     FECBufferEncoder enc{1024,0.5f};
-    AvgCalculator avgNALUSize;
     //
     EncodeRTP mEncodeRTP;
     void newRTPPacket(const EncodeRTP::RTPPacket packet);
@@ -131,6 +131,10 @@ void VideoTransmitter::RTPSend(const uint8_t *data, ssize_t data_length) {
 }
 
 void VideoTransmitter::newRTPPacket(const EncodeRTP::RTPPacket packet) {
+    const bool DO_FEC=true;
+    if(DO_FEC){
+
+    }
     mUDPSender.mySendTo(packet.data, packet.data_len);
 }
 
@@ -167,9 +171,10 @@ JNI_METHOD(void, nativeSend)
     }
     //LOGD("size %d",size);
     if(streamMode==0){
-        //native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, false);
-        native(p)->RTPSend((uint8_t*)data,(ssize_t)size);
+        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, false);
     }else if(streamMode==1){
+        native(p)->RTPSend((uint8_t*)data,(ssize_t)size);
+    }else if(streamMode==2){
         native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, true);
     }else{
         native(p)->FECSend((uint8_t *) data, (ssize_t) size);
