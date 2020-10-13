@@ -10,15 +10,15 @@
 #include <StringHelper.hpp>
 
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
-    onNewNALU(std::move(onNewNALU)),
-    mParseRAW(std::bind(&H264Parser::newNaluExtracted2, this, std::placeholders::_1)),
-    mParseRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
-    mEncodeRTP(std::bind(&H264Parser::newRTPPacket, this, std::placeholders::_1)){
+        onNewNALU(std::move(onNewNALU)),
+        mParseRAW(std::bind(&H264Parser::newNaluExtracted2, this, std::placeholders::_1)),
+        mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
+        mEncodeRTP(std::bind(&H264Parser::newRTPPacket, this, std::placeholders::_1)){
 }
 
 void H264Parser::reset(){
     mParseRAW.reset();
-    mParseRTP.reset();
+    mDecodeRTP.reset();
     nParsedNALUs=0;
     nParsedKeyFrames=0;
     setLimitFPS(-1);
@@ -32,7 +32,7 @@ void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_len
 }
 
 void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
-    mParseRTP.parseRTPtoNALU(rtp_data, data_length);
+    mDecodeRTP.parseRTPtoNALU(rtp_data, data_length);
 }
 
 void H264Parser::parseDjiLiveVideoData(const uint8_t *data,const size_t data_length) {

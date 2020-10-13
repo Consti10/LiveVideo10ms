@@ -52,7 +52,7 @@ private:
     std::chrono::steady_clock::time_point lastFrameLimitFPS=std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point lastTimeOnNewNALUCalled=std::chrono::steady_clock::now();
     ParseRAW mParseRAW;
-    ParseRTP mParseRTP;
+    DecodeRTP mDecodeRTP;
     EncodeRTP mEncodeRTP;
 
     FrameLimiter mFrameLimiter;

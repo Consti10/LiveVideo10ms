@@ -55,15 +55,15 @@ static constexpr auto H264=96;
 static constexpr auto SSRC_NUM=10;
 
 
-ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(std::move(cb)){
+DecodeRTP::DecodeRTP(NALU_DATA_CALLBACK cb): cb(std::move(cb)){
 }
 
-void ParseRTP::reset(){
+void DecodeRTP::reset(){
     mNALU_DATA_LENGTH=0;
     //nalu_data.reserve(NALU::NALU_MAXLEN);
 }
 
-void ParseRTP::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length){
+void DecodeRTP::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length){
     //12 rtp header bytes and 1 nalu_header_t type byte
     if(data_length <= 13){
         MLOGD<<"Not enough rtp data";

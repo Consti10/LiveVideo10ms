@@ -11,9 +11,9 @@
 /*********************************************
  ** Parses a stream of rtp h264 data into NALUs
 **********************************************/
-class ParseRTP{
+class DecodeRTP{
 public:
-    ParseRTP(NALU_DATA_CALLBACK cb);
+    DecodeRTP(NALU_DATA_CALLBACK cb);
 public:
     //Decoding
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
