@@ -11,7 +11,7 @@
 
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
         onNewNALU(std::move(onNewNALU)),
-        mParseRAW(std::bind(&H264Parser::newNaluExtracted2, this, std::placeholders::_1)),
+        mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
         mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
         mEncodeRTP(std::bind(&H264Parser::newRTPPacket, this, std::placeholders::_1)){
 }

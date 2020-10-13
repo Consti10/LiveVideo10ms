@@ -3,9 +3,6 @@
 //
 
 #include "UDPSender.h"
-#include <NDKArrayHelper.hpp>
-#include <AndroidLogger.hpp>
-
 #include <jni.h>
 #include <cstdlib>
 #include <pthread.h>
@@ -14,9 +11,9 @@
 #include <endian.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <AndroidLogger.hpp>
+#include <StringHelper.hpp>
 
-//#include <wifibroadcast/fec.hh>
-#include "../../../../VideoCore/src/main/cpp/XFEC/include/wifibroadcast/fec.hh"
 
 UDPSender::UDPSender(const std::string &IP,const int Port) {
     //create the socket
@@ -28,65 +25,33 @@ UDPSender::UDPSender(const std::string &IP,const int Port) {
     address.sin_family = AF_INET;
     address.sin_port = htons(Port);
     inet_pton(AF_INET,IP.c_str(), &address.sin_addr);
-}
-
-//Split data into smaller packets when exceeding UDP max packet size
-void UDPSender::splitAndSend(const uint8_t *data, ssize_t data_length,bool addSeqNr) {
-    if(lastForwardedPacket==std::chrono::steady_clock::time_point{}){
-        lastForwardedPacket=std::chrono::steady_clock::now();
-    }else{
-        const auto now=std::chrono::steady_clock::now();
-        const auto delta=now-lastForwardedPacket;
-        lastForwardedPacket=now;
-        avgDeltaBetweenVideoPackets.add(delta);
-        if(delta>std::chrono::milliseconds(150)){
-            MLOGD<<"Dafuq why so high";
+    //
+    int sendBufferSize=0;
+    socklen_t len=sizeof(sendBufferSize);
+    getsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &sendBufferSize, &len);
+    MLOGD<<"Default socket send buffer is "<<StringHelper::memorySizeReadable(sendBufferSize);
+    if(true){
+        int WANTED_SNDBUFF_SIZE=1024*1024*5;
+        if(setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &WANTED_SNDBUFF_SIZE,len)) {
+            MLOGD<<"Cannot increase buffer size to "<<StringHelper::memorySizeReadable(WANTED_SNDBUFF_SIZE);
         }
-        if( avgDeltaBetweenVideoPackets.getNSamples()>120){
-            MLOGD<<""<<avgDeltaBetweenVideoPackets.getAvgReadable();
-            avgDeltaBetweenVideoPackets.reset();
-        }
-    }
-    if(data_length<=0)return;
-    // Recursion is more pretty but dang the stack function pointer exception
-    std::size_t offset=0;
-    while (true){
-        std::size_t remaining=data_length-offset;
-        if(remaining<=MAX_VIDEO_DATA_PACKET_SIZE){
-            sendPacket(&data[offset],remaining,addSeqNr);
-            break;
-        }
-        sendPacket(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE,addSeqNr);
-        offset+=MAX_VIDEO_DATA_PACKET_SIZE;
-    }
-    //if(data_length>MAX_VIDEO_DATA_PACKET_SIZE){
-    //    mySendTo(data,MAX_VIDEO_DATA_PACKET_SIZE);
-    //    splitAndSend(&data[MAX_VIDEO_DATA_PACKET_SIZE], data_length - MAX_VIDEO_DATA_PACKET_SIZE);
-    //}else{
-    //    mySendTo(data,data_length);
-    //}
-}
-
-
-void UDPSender::sendPacket(const uint8_t *data, ssize_t data_length, bool addSeqNr) {
-    if(addSeqNr){
-        std::memcpy(workingBuffer.data(),&sequenceNumber,sizeof(uint32_t));
-        std::memcpy(&workingBuffer.data()[sizeof(uint32_t)],data,data_length);
-        sequenceNumber++;
-        mySendTo(workingBuffer.data(), data_length+sizeof(uint32_t));
-    } else{
-        mySendTo(data, data_length);
+        sendBufferSize=0;
+        getsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &sendBufferSize, &len);
+        MLOGD<<"Wanted "<<StringHelper::memorySizeReadable(WANTED_SNDBUFF_SIZE)<<" Set "<<StringHelper::memorySizeReadable(sendBufferSize);
     }
 }
 
 
 void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
+    if(data_length>UDP_PACKET_MAX_SIZE){
+        MLOGE<<"Data size exceeds UDP packet size";
+    }
     timeSpentSending.start();
     const auto result=sendto(sockfd,data,data_length, 0, (struct sockaddr *)&(address), sizeof(struct sockaddr_in));
     if(result<0){
         MLOGE<<"Cannot send data "<<data_length<<" "<<strerror(errno);
     }else{
-        MLOGD<<"Sent "<<data_length;
+        //MLOGD<<"Sent "<<data_length;
     }
     timeSpentSending.stop();
     if(timeSpentSending.getNSamples()>100){
@@ -95,57 +60,6 @@ void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
     }
 }
 
-void UDPSender::FECSend(const uint8_t *data, ssize_t data_length) {
-    std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(data,data_length);
-    if(blks.size()==0){
-        MLOGE<<"Cannot encode";
-    }
-    for (auto blk : blks) {
-        mySendTo(blk->data(),blk->data_length());
-    }
-}
-
-
-//----------------------------------------------------JAVA bindings---------------------------------------------------------------
-
-#define JNI_METHOD(return_type, method_name) \
-  JNIEXPORT return_type JNICALL              \
-      Java_constantin_livevideostreamproducer_UDPSender_##method_name
-
-inline jlong jptr(UDPSender *p) {
-    return reinterpret_cast<intptr_t>(p);
-}
-inline UDPSender *native(jlong ptr) {
-    return reinterpret_cast<UDPSender*>(ptr);
-}
-
-extern "C" {
-
-JNI_METHOD(jlong, nativeConstruct)
-(JNIEnv *env, jobject obj, jstring ip,jint port) {
-    return jptr(new UDPSender(NDKArrayHelper::DynamicSizeString(env,ip),(int)port));
-}
-JNI_METHOD(void, nativeDelete)
-(JNIEnv *env, jobject obj, jlong p) {
-    delete native(p);
-}
-
-
-JNI_METHOD(void, nativeSend)
-(JNIEnv *env, jobject obj, jlong p,jobject buf,jint size,jint streamMode) {
-    //jlong size=env->GetDirectBufferCapacity(buf);
-    auto *data = (jbyte*)env->GetDirectBufferAddress(buf);
-    if(data== nullptr){
-        MLOGE<<"Something wrong with the byte buffer (is it direct ?)";
-    }
-    //LOGD("size %d",size);
-    if(streamMode==0){
-        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, false);
-    }else if(streamMode==1){
-        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, true);
-    }else{
-        native(p)->FECSend((uint8_t *) data, (ssize_t) size);
-    }
-}
-
+UDPSender::~UDPSender() {
+    //TODO
 }

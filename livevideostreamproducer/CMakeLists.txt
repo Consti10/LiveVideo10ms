@@ -5,25 +5,44 @@ find_library( log-lib
 
 set(DIR_Shared ${CMAKE_CURRENT_LIST_DIR}/../Shared/src/main/cpp)
 
-
 include_directories(src/main/cpp)
 
 include_directories(${DIR_Shared}/Helper)
 include_directories(${DIR_Shared}/NDKHelper)
 
+set(DIR_VideoCore ${CMAKE_CURRENT_LIST_DIR}/../VideoCore/src/main/cpp)
+
 ########## Experimental-add the XFEC library ##########
 #######################################################
-include(${CMAKE_SOURCE_DIR}/../VideoCore/src/main/cpp/XFEC/XFEC.cmake)
+include(${DIR_VideoCore}/XFEC/XFEC.cmake)
 ###############
 
-add_library( UDPSender
+##
+set(H264_BITSTREAM_DIR ${DIR_VideoCore}/../../../libs/h264bitstream)
+add_library(h264bitstream
+        SHARED
+        ${H264_BITSTREAM_DIR}/h264_stream.c
+        ${H264_BITSTREAM_DIR}/h264_sei.c
+        ${H264_BITSTREAM_DIR}/h264_nal.c
+        )
+target_link_libraries(h264bitstream
+        ${log-lib}
+        log
+        android)
+include_directories(${H264_BITSTREAM_DIR})
+#############
+
+add_library( VideoTransmitter
         SHARED
        src/main/cpp/UDPSender.cpp
+        src/main/cpp/VideoTransmitter.cpp
+        ${DIR_VideoCore}/Parser/ParseRTP.cpp
         )
 
-target_link_libraries( UDPSender
+target_link_libraries( VideoTransmitter
         ${log-lib}
         log
         android
         XFEC_lib
+        h264bitstream
         )

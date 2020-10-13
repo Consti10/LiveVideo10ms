@@ -42,7 +42,7 @@ public class AVideoStream extends AppCompatActivity{
     private static final int W=1920;
     private static final int H=1080;
     private static final int MDEIACODEC_ENCODER_TARGET_FPS=60;
-    private static final int MDEIACODEC_TARGET_KEY_BIT_RATE=1*1024*1024;
+    private static final int MDEIACODEC_TARGET_KEY_BIT_RATE=5*1024*1024;
 
     private CameraDevice cameraDevice;
     private MediaCodec codec;
@@ -51,7 +51,7 @@ public class AVideoStream extends AppCompatActivity{
     //private Handler mBackgroundHandler;
     //private HandlerThread mBackgroundThread;
 
-    private UDPSender mUDPSender;
+    private VideoTransmitter mUDPSender;
     private Thread drainEncoderThread;
     // Every n frames send sps pps data to allow re-starting of the stream
     private boolean SEND_SPS_PPS_EVERY_N_FRAMES=false;
@@ -71,7 +71,7 @@ public class AVideoStream extends AppCompatActivity{
         //mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
         previewTextureView =findViewById(R.id.mTextureView);
         //Initialize UDP sender
-        mUDPSender=new UDPSender(this);
+        mUDPSender=new VideoTransmitter(this);
 
 
         //This thread will be started once the MediaCodec encoder has been created.
@@ -113,8 +113,8 @@ public class AVideoStream extends AppCompatActivity{
                             }else{
                                 SEND_SPS_PPS_EVERY_N_FRAMES=true;
                             }
-                            currentCSD0=UDPSender.createDirectByteBuffer(Objects.requireNonNull(currentOutputFormat.getByteBuffer("csd-0")));
-                            currentCSD1=UDPSender.createDirectByteBuffer(Objects.requireNonNull(currentOutputFormat.getByteBuffer("csd-1")));
+                            currentCSD0= VideoTransmitter.createDirectByteBuffer(Objects.requireNonNull(currentOutputFormat.getByteBuffer("csd-0")));
+                            currentCSD1= VideoTransmitter.createDirectByteBuffer(Objects.requireNonNull(currentOutputFormat.getByteBuffer("csd-1")));
                         }
                     }
                 }

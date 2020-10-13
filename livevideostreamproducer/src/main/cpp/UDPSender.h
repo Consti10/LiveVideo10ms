@@ -8,10 +8,7 @@
 #include <string>
 #include <arpa/inet.h>
 #include <array>
-
 #include <TimeHelper.hpp>
-
-#include "../../../../VideoCore/src/main/cpp/XFEC/include/wifibroadcast/fec.hh"
 
 class UDPSender{
 public:
@@ -21,32 +18,16 @@ public:
      * @param Port port for sending data
      */
     UDPSender(const std::string& IP,const int Port);
-    /**
-     * send data to the ip and port set previously. Logs error on failure.
-     * If data length exceeds the max UDP packet size, the method splits data into smaller packets
-     */
-    void splitAndSend(const uint8_t* data, ssize_t data_length,bool addSeqNr);
-    //
-    void sendPacket(const uint8_t* data, ssize_t data_length,bool addSeqNr);
-    //
-    void FECSend(const uint8_t* data, ssize_t data_length);
+    ~UDPSender();
     //
     void mySendTo(const uint8_t* data,ssize_t data_length);
-private:
-    int sockfd;
-    sockaddr_in address{};
     //https://en.wikipedia.org/wiki/User_Datagram_Protocol
     //65,507 bytes (65,535 − 8 byte UDP header − 20 byte IP header).
     static constexpr const size_t UDP_PACKET_MAX_SIZE=65507;
-    //static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=UDP_PACKET_MAX_SIZE--sizeof(uint32_t);
-    static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=1024-sizeof(uint32_t);
-    int32_t sequenceNumber=0;
-    std::array<uint8_t,UDP_PACKET_MAX_SIZE> workingBuffer;
-    AvgCalculator avgDeltaBetweenVideoPackets;
-    std::chrono::steady_clock::time_point lastForwardedPacket{};
+private:
+    int sockfd;
+    sockaddr_in address{};
     Chronometer timeSpentSending;
-    //
-    FECBufferEncoder enc{1024,0.5f};
 };
 
 

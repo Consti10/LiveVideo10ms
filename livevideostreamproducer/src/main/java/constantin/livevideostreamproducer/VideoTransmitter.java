@@ -12,11 +12,11 @@ import java.nio.ByteBuffer;
 //UDP -> Put data in, hope the data comes out at the other end of the network
 //Uses ndk to send UDP packets to specified ip and port
 
-public class UDPSender {
-    private static final String TAG="UDPSender";
+public class VideoTransmitter {
+    private static final String TAG="VideoTransmitter";
     private static final int PORT=5600;
     static {
-        System.loadLibrary("UDPSender");
+        System.loadLibrary("VideoTransmitter");
     }
     native long nativeConstruct(String IP,int port);
     native void nativeDelete(long p);
@@ -28,7 +28,7 @@ public class UDPSender {
 
     final int streamMode;
 
-    UDPSender(final Context context){
+    VideoTransmitter(final Context context){
         //"10.183.84.95"
         final String IP = PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.KEY_SP_UDP_IP), "192.168.1.172");
         Log.d("UDPSender","Sending to IP "+IP);

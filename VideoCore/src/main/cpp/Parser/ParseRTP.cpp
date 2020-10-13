@@ -188,9 +188,9 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
         const size_t len_sendbuf = 12 + nalu_len_without_prefix;
         forwardRTPPacket(mRTP_BUFF_SEND, len_sendbuf);
         //
-        MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
+        //MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
-        MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
+        //MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
         //assert(false);
         /*
          * FU-A segmentation
@@ -325,7 +325,7 @@ int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_
 
 
 void EncodeRTP::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {
-    MLOGD << "send_data_to_client_list" << rtp_packet_len;
+    //MLOGD << "send_data_to_client_list" << rtp_packet_len;
     if(mCB!= nullptr){
         mCB({rtp_packet,rtp_packet_len});
     }
