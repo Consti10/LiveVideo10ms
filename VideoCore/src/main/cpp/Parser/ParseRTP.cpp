@@ -137,6 +137,15 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
     }
 }
 
+int RTPDecoder::getSequenceNumber(const uint8_t* rtp_data,const size_t data_len) {
+    if(data_len<sizeof(rtp_header_t)){
+        return -1;
+    }
+    const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
+    const auto seqNr=rtp_header->sequence;
+    return seqNr;
+}
+
 int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const size_t nalu_data_len) {
     // Watch out for not enough data (else algorithm might crash)
     if(nalu_data_len <= 5){
@@ -331,6 +340,29 @@ void RTPEncoder::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {
     }
 }
 
-void TestEncodeDecodeRTP::testEncodeDecodeRTP(const NALU& nalu) {
 
+TestEncodeDecodeRTP::TestEncodeDecodeRTP() {
+    decoder=std::make_unique<RTPDecoder>(std::bind(&TestEncodeDecodeRTP::onNALU, this, std::placeholders::_1));
+    encoder=std::make_unique<RTPEncoder>(std::bind(&TestEncodeDecodeRTP::onRTP, this, std::placeholders::_1));
+}
+
+void TestEncodeDecodeRTP::testEncodeDecodeRTP(const NALU& nalu) {
+    if(nalu.getSize()<=6)return;
+    encoder->parseNALtoRTP(30,nalu.getData(),nalu.getSize());
+    //
+    assert(lastNALU!=nullptr);
+    assert(lastNALU->getSize()==nalu.getSize());
+    const bool contentEquals=memcmp(nalu.getData(),lastNALU->getData(),nalu.getSize())==0;
+    assert(contentEquals==true);
+    lastNALU.reset();
+}
+
+void TestEncodeDecodeRTP::onRTP(const RTPEncoder::RTPPacket &packet) {
+    decoder->parseRTPtoNALU(packet.data,packet.data_len);
+}
+
+void TestEncodeDecodeRTP::onNALU(const NALU &nalu) {
+    // If we feed one NALU we should only get one NALU out
+    assert(lastNALU==nullptr);
+    lastNALU=std::make_unique<NALU>(nalu);
 }

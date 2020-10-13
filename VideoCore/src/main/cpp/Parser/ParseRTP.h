@@ -18,6 +18,8 @@ public:
     //Decoding
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
     void reset();
+    // Returns rhe sequence number of an RTP packet
+    static int getSequenceNumber(const uint8_t* rtp_data,const size_t data_len);
 private:
     const NALU_DATA_CALLBACK cb;
     std::array<uint8_t,NALU::NALU_MAXLEN> mNALU_DATA;
@@ -51,7 +53,15 @@ private:
 
 class TestEncodeDecodeRTP{
 private:
+    void onNALU(const NALU& nalu);
+    void onRTP(const RTPEncoder::RTPPacket& packet);
+    std::unique_ptr<RTPEncoder> encoder;
+    std::unique_ptr<RTPDecoder> decoder;
+    std::unique_ptr<NALU> lastNALU;
 public:
+    TestEncodeDecodeRTP();
+    // This encodes the nalu to RTP then decodes it again
+    // After that, check that their contents match
     void testEncodeDecodeRTP(const NALU& nalu);
 };
 
