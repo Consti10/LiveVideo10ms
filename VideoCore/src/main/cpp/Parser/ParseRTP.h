@@ -20,8 +20,8 @@ public:
     void reset();
 private:
     const NALU_DATA_CALLBACK cb;
-    std::array<uint8_t,NALU::NALU_MAXLEN> BUFF_NALU_DATA;
-    size_t BUFF_NALU_DATA_LENGTH=0;
+    std::array<uint8_t,NALU::NALU_MAXLEN> mNALU_DATA;
+    size_t mNALU_DATA_LENGTH=0;
 };
 
 /*********************************************

@@ -59,7 +59,7 @@ ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(std::move(cb)){
 }
 
 void ParseRTP::reset(){
-    BUFF_NALU_DATA_LENGTH=0;
+    mNALU_DATA_LENGTH=0;
     //nalu_data.reserve(NALU::NALU_MAXLEN);
 }
 
@@ -79,58 +79,58 @@ void ParseRTP::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length)
         const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
         if (fu_header->e == 1) {
             /* end of fu-a */
-            memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
-            BUFF_NALU_DATA_LENGTH+= data_length - 14;
+            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
+            mNALU_DATA_LENGTH+= data_length - 14;
             if(cb!= nullptr){
-                NALU nalu(BUFF_NALU_DATA, BUFF_NALU_DATA_LENGTH);
+                NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
                 //nalu_data.resize(nalu_data_length);
                 //NALU nalu(nalu_data);
                 cb(nalu);
             }
-            BUFF_NALU_DATA_LENGTH=0;
+            mNALU_DATA_LENGTH=0;
         } else if (fu_header->s == 1) {
             /* start of fu-a */
-            BUFF_NALU_DATA[0]=0;
-            BUFF_NALU_DATA[1]=0;
-            BUFF_NALU_DATA[2]=0;
-            BUFF_NALU_DATA[3]=1;
-            BUFF_NALU_DATA_LENGTH=4;
+            mNALU_DATA[0]=0;
+            mNALU_DATA[1]=0;
+            mNALU_DATA[2]=0;
+            mNALU_DATA[3]=1;
+            mNALU_DATA_LENGTH=4;
             const uint8_t h264_nal_header = (uint8_t)(fu_header->type & 0x1f)
                                             | (nalu_header->nri << 5)
                                             | (nalu_header->f << 7);
-            BUFF_NALU_DATA[4]=h264_nal_header;
-            BUFF_NALU_DATA_LENGTH++;
-            memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
-            BUFF_NALU_DATA_LENGTH+= data_length - 14;
+            mNALU_DATA[4]=h264_nal_header;
+            mNALU_DATA_LENGTH++;
+            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
+            mNALU_DATA_LENGTH+= data_length - 14;
         } else {
             /* middle of fu-a */
-            memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
-            BUFF_NALU_DATA_LENGTH+= data_length - 14;
+            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
+            mNALU_DATA_LENGTH+= data_length - 14;
         }
         //LOGV("partially nalu");
     } else if(nalu_header->type>0 && nalu_header->type<24){
         //MLOGD<<"Got full NALU";
         /* full nalu */
-        BUFF_NALU_DATA[0]=0;
-        BUFF_NALU_DATA[1]=0;
-        BUFF_NALU_DATA[2]=0;
-        BUFF_NALU_DATA[3]=1;
-        BUFF_NALU_DATA_LENGTH=4;
+        mNALU_DATA[0]=0;
+        mNALU_DATA[1]=0;
+        mNALU_DATA[2]=0;
+        mNALU_DATA[3]=1;
+        mNALU_DATA_LENGTH=4;
         const uint8_t h264_nal_header = (uint8_t )(nalu_header->type & 0x1f)
                                         | (nalu_header->nri << 5)
                                         | (nalu_header->f << 7);
-        BUFF_NALU_DATA[4]=h264_nal_header;
-        BUFF_NALU_DATA_LENGTH++;
-        memcpy(&BUFF_NALU_DATA[BUFF_NALU_DATA_LENGTH], &rtp_data[13], (size_t)data_length - 13);
-        BUFF_NALU_DATA_LENGTH+= data_length - 13;
+        mNALU_DATA[4]=h264_nal_header;
+        mNALU_DATA_LENGTH++;
+        memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[13], (size_t)data_length - 13);
+        mNALU_DATA_LENGTH+= data_length - 13;
 
         if(cb!= nullptr){
-            NALU nalu(BUFF_NALU_DATA, BUFF_NALU_DATA_LENGTH);
+            NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
             //nalu_data.resize(nalu_data_length);
             //NALU nalu(nalu_data);
             cb(nalu);
         }
-        BUFF_NALU_DATA_LENGTH=0;
+        mNALU_DATA_LENGTH=0;
         //LOGV("full nalu");
     }else{
         //MLOGD<<"header:"<<nalu_header->type;
