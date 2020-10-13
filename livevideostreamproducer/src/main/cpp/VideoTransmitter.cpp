@@ -54,8 +54,8 @@ private:
     //
     FECBufferEncoder enc{1024,0.5f};
     //
-    EncodeRTP mEncodeRTP;
-    void newRTPPacket(const EncodeRTP::RTPPacket packet);
+    RTPEncoder mEncodeRTP;
+    void newRTPPacket(const RTPEncoder::RTPPacket packet);
 };
 
 //Split data into smaller packets when exceeding UDP max packet size
@@ -130,7 +130,7 @@ void VideoTransmitter::RTPSend(const uint8_t *data, ssize_t data_length) {
     mEncodeRTP.parseNALtoRTP(30,data,data_length);
 }
 
-void VideoTransmitter::newRTPPacket(const EncodeRTP::RTPPacket packet) {
+void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket packet) {
     const bool DO_FEC=true;
     if(DO_FEC){
 

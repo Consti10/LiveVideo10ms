@@ -165,6 +165,6 @@ void H264Parser::parseCustom2(const uint8_t *data, const std::size_t data_length
     }
 }
 
-void H264Parser::newRTPPacket(const EncodeRTP::RTPPacket packet) {
+void H264Parser::newRTPPacket(const RTPEncoder::RTPPacket packet) {
     parse_rtp_h264_stream(packet.data,packet.data_len);
 }

@@ -47,13 +47,13 @@ public:
 private:
     void newNaluExtracted(const NALU& nalu);
     void newNaluExtracted2(const NALU& nalu);
-    void newRTPPacket(const EncodeRTP::RTPPacket packet);
+    void newRTPPacket(const RTPEncoder::RTPPacket packet);
     const NALU_DATA_CALLBACK onNewNALU;
     std::chrono::steady_clock::time_point lastFrameLimitFPS=std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point lastTimeOnNewNALUCalled=std::chrono::steady_clock::now();
     ParseRAW mParseRAW;
-    DecodeRTP mDecodeRTP;
-    EncodeRTP mEncodeRTP;
+    RTPDecoder mDecodeRTP;
+    RTPEncoder mEncodeRTP;
 
     FrameLimiter mFrameLimiter;
     int maxFPS=0;

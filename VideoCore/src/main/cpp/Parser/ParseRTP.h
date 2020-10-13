@@ -11,9 +11,9 @@
 /*********************************************
  ** Parses a stream of rtp h264 data into NALUs
 **********************************************/
-class DecodeRTP{
+class RTPDecoder{
 public:
-    DecodeRTP(NALU_DATA_CALLBACK cb);
+    RTPDecoder(NALU_DATA_CALLBACK cb);
 public:
     //Decoding
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
@@ -27,7 +27,7 @@ private:
 /*********************************************
  ** Parses a stream of h264 NALUs into RTP packets
 **********************************************/
-class EncodeRTP{
+class RTPEncoder{
 public:
     struct RTPPacket{
         const uint8_t* data;
@@ -35,7 +35,7 @@ public:
     };
     typedef std::function<void(const RTPPacket& rtpPacket)> RTP_DATA_CALLBACK;
 public:
-    EncodeRTP(RTP_DATA_CALLBACK cb):mCB(cb){};
+    RTPEncoder(RTP_DATA_CALLBACK cb): mCB(cb){};
     int parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t nalu_data_len);
 private:
     RTP_DATA_CALLBACK mCB;
@@ -51,7 +51,8 @@ private:
 
 class TestEncodeDecodeRTP{
 private:
-
+public:
+    void testEncodeDecodeRTP(const NALU& nalu);
 };
 
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H
