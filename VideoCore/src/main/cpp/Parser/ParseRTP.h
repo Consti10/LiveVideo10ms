@@ -40,6 +40,9 @@ public:
         const size_t data_len;
     };
     typedef std::function<void(const RTPPacket& rtpPacket)> RTP_DATA_CALLBACK;
+    EncodeRTP(RTP_DATA_CALLBACK cb):mCB(cb){};
+private:
+    RTP_DATA_CALLBACK mCB;
 };
 
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H
