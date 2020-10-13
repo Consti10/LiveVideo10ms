@@ -11,7 +11,6 @@
 /*********************************************
  ** Parses a stream of rtp h264 data into NALUs
 **********************************************/
-
 class ParseRTP{
 public:
     ParseRTP(NALU_DATA_CALLBACK cb);
@@ -25,6 +24,9 @@ private:
     size_t BUFF_NALU_DATA_LENGTH=0;
 };
 
+/*********************************************
+ ** Parses a stream of h264 NALUs into RTP packets
+**********************************************/
 class EncodeRTP{
 public:
     struct RTPPacket{
@@ -45,6 +47,11 @@ private:
     uint8_t RTP_BUFF_SEND[SEND_BUF_SIZE];
     uint16_t seq_num = 0;
     uint32_t ts_current = 0;
+};
+
+class TestEncodeDecodeRTP{
+private:
+
 };
 
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERTP_H
