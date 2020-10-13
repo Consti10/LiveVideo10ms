@@ -137,7 +137,7 @@ void ParseRTP::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length)
     }
 }
 
-int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t nalu_data_len) {
+int EncodeRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t nalu_data_len) {
     // Watch out for not enough data (else algorithm might crash)
     if(nalu_data_len <= 5){
         return -1;
@@ -146,8 +146,6 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
     const uint8_t *nalu_buf_without_prefix = &nalu_data[4];
     const size_t nalu_len_without_prefix= nalu_data_len - 4;
 
-    static uint32_t ts_current = 0;
-    static uint16_t seq_num = 0;
 
     ts_current += (90000 / framerate);  /* 90000 / 25 = 3600 */
 
@@ -325,8 +323,11 @@ int ParseRTP::parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t
     return 0;
 }/* void *h264tortp_send(VENC_STREAM_S *pstream, char *rec_ipaddr) */
 
-void ParseRTP::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {
+
+void EncodeRTP::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {
     MLOGD << "send_data_to_client_list" << rtp_packet_len;
-    parseRTPtoNALU(rtp_packet, rtp_packet_len);
+    if(mCB!= nullptr){
+        mCB({rtp_packet,rtp_packet_len});
+    }
 }
 

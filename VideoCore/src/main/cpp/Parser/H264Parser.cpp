@@ -12,7 +12,8 @@
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
     onNewNALU(std::move(onNewNALU)),
     mParseRAW(std::bind(&H264Parser::newNaluExtracted2, this, std::placeholders::_1)),
-    mParseRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
+    mParseRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
+    mEncodeRTP(std::bind(&H264Parser::newRTPPacket, this, std::placeholders::_1)){
 }
 
 void H264Parser::reset(){
@@ -61,11 +62,12 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
         mFrameLimiter.limitFps(maxFPS);
     }
 }
+
 void H264Parser::newNaluExtracted2(const NALU &nalu) {
     //LOGD("H264Parser::newNaluExtracted");
     if(nalu.getSize()>0){
         MLOGD<<"X NALU size:"<<"header "<<((int)nalu.get_nal_unit_type());
-        mParseRTP.parseNALtoRTP(30, nalu.getData(), nalu.getSize());
+        mEncodeRTP.parseNALtoRTP(30,nalu.getData(),nalu.getSize());
         //newNaluExtracted(nalu);
     }
 }
@@ -161,4 +163,8 @@ void H264Parser::parseCustom2(const uint8_t *data, const std::size_t data_length
     if(obuf.size()>0){
         parse_raw_h264_stream(obuf.data(),obuf.size());
     }
+}
+
+void H264Parser::newRTPPacket(const EncodeRTP::RTPPacket packet) {
+    parse_rtp_h264_stream(packet.data,packet.data_len);
 }
