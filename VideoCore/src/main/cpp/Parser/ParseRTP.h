@@ -29,6 +29,7 @@ private:
     size_t BUFF_NALU_DATA_LENGTH=0;
     //
     static constexpr std::size_t RTP_PAYLOAD_MAX_SIZE=1024;
+    static constexpr std::size_t RTP_PACKET_MAX_SIZE=RTP_PAYLOAD_MAX_SIZE+1024;
     static constexpr std::size_t SEND_BUF_SIZE=RTP_PAYLOAD_MAX_SIZE+1024;
     uint8_t RTP_BUFF_SEND[SEND_BUF_SIZE];
 };
