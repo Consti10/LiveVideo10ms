@@ -17,7 +17,7 @@ typedef struct rtp_header {
     uint8_t payload:7;       // Payload type
 #else
     //For little endian
-    uint8_t cc:4;            // CSRC count csrc_len
+    uint8_t cc:4;            // CSRC count
     uint8_t extension:1;     // Extension bit
     uint8_t padding:1;       // Padding bit
     uint8_t version:2;       // Version, currently 2
@@ -174,7 +174,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
          * 1. 设置 rtp 头
          */
         rtp_hdr = (rtp_header_t *)SENDBUFFER;
-        rtp_hdr->csrc_len = 0;
+        rtp_hdr->cc = 0;
         rtp_hdr->extension = 0;
         rtp_hdr->padding = 0;
         rtp_hdr->version = 2;
@@ -239,7 +239,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
                  * 1. 设置 rtp 头
                  */
                 rtp_hdr = (rtp_header_t *)SENDBUFFER;
-                rtp_hdr->csrc_len = 0;
+                rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
@@ -289,7 +289,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
                  * 1. 设置 rtp 头
                  */
                 rtp_hdr = (rtp_header_t *)SENDBUFFER;
-                rtp_hdr->csrc_len = 0;
+                rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
@@ -336,7 +336,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
                  * 1. 设置 rtp 头
                  */
                 rtp_hdr = (rtp_header_t *)SENDBUFFER;
-                rtp_hdr->csrc_len = 0;
+                rtp_hdr->cc = 0;
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
