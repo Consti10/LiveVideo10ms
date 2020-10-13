@@ -46,7 +46,7 @@ void H264Parser::setLimitFPS(int maxFPS) {
 void H264Parser::newNaluExtracted(const NALU& nalu) {
     using namespace std::chrono;
     //LOGD("H264Parser::newNaluExtracted");
-
+    MLOGD<<"Y NALU header "<<((int)nalu.get_nal_unit_type());
     if(onNewNALU!= nullptr){
         onNewNALU(nalu);
     }
@@ -64,6 +64,7 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
 void H264Parser::newNaluExtracted2(const NALU &nalu) {
     //LOGD("H264Parser::newNaluExtracted");
     if(nalu.getSize()>0){
+        MLOGD<<"X NALU size:"<<"header "<<((int)nalu.get_nal_unit_type());
         mParseRTP.h264nal2rtp_send(30,nalu.getData(),nalu.getSize());
         //newNaluExtracted(nalu);
     }

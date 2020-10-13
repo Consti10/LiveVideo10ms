@@ -75,7 +75,7 @@ void ParseRTP::parseData(const uint8_t* rtp_data,const size_t data_len){
 
         const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[12];
 
-        MLOGD<<"Parsing RTP data"<<nalu_header->type;
+        MLOGD<<"DEC NALU hdr type"<<((int)nalu_header->type);
 
         if (nalu_header->type == 28) { /* FU-A */
             const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
@@ -194,12 +194,14 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_
         //const uint8_t h264_nal_header = (uint8_t )(nalu_header->type & 0x1f)
         //                              | (nalu_header->nri << 5)
         //                              | (nalu_header->f << 7);
-        MLOGD<<"NALU hdr"<<((int)nalu_buf[0]);
 
         nalu_hdr = (nalu_header_t *)&SENDBUFFER[12];
         nalu_hdr->f = (nalu_buf[0] & 0x80) >> 7;        /* bit0 */
         nalu_hdr->nri = (nalu_buf[0] & 0x60) >> 5;      /* bit1~2 */
         nalu_hdr->type = (nalu_buf[0] & 0x1f);
+
+        MLOGD<<"ENC NALU hdr type"<<((int)nalu_hdr->type);
+
         //debug_print();
         /*
          * 3.Fill nal content
@@ -210,12 +212,13 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_
          * 4. Send the packaged rtp to the client
          */
         len_sendbuf = 12 + nalu_len;
-        send_data_to_client_list(SENDBUFFER->data(), len_sendbuf);
+        send_data_to_client_list(SENDBUFFER, len_sendbuf);
         //debug_print();
         MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
 
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
-        MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
+        //MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
+        assert(false);
         /*
          * FU-A segmentation
          */
@@ -285,7 +288,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_
                  * 4. 发送打包好的rtp包到客户端
                  */
                 len_sendbuf = 12 + 2 + (RTP_PAYLOAD_MAX_SIZE - 1);  /* rtp头 + nalu头 + nalu内容 */
-                send_data_to_client_list(SENDBUFFER->data(), len_sendbuf);
+                send_data_to_client_list(SENDBUFFER, len_sendbuf);
 
             } else if (fu_seq < fu_pack_num - 1) { /* 中间的FU-A */
                 /*
@@ -332,7 +335,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_
                  * 4. 发送打包好的rtp包到客户端
                  */
                 len_sendbuf = 12 + 2 + RTP_PAYLOAD_MAX_SIZE;
-                send_data_to_client_list(SENDBUFFER->data(), len_sendbuf);
+                send_data_to_client_list(SENDBUFFER, len_sendbuf);
 
             } else { /* 最后一个FU-A */
                 /*
@@ -379,7 +382,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_
                  * 4. 发送打包好的rtp包到客户端
                  */
                 len_sendbuf = 12 + 2 + last_fu_pack_size;
-                send_data_to_client_list(SENDBUFFER->data(), len_sendbuf);
+                send_data_to_client_list(SENDBUFFER, len_sendbuf);
 
             } /* else-if (fu_seq == 0) */
         } /* end of for (fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) */
@@ -391,7 +394,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_
 }/* void *h264tortp_send(VENC_STREAM_S *pstream, char *rec_ipaddr) */
 
 void ParseRTP::send_data_to_client_list(uint8_t *send_buf, size_t len_sendbuf) {
-    MLOGD<<"Got RTP packet "<<len_sendbuf;
+    MLOGD<<"send_data_to_client_list"<<len_sendbuf;
     parseData(send_buf,len_sendbuf);
 }
 
