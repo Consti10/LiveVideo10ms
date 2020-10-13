@@ -194,17 +194,11 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
         /*
          * 2. Set rtp load single nal unit header
          */
-#if 1
         nalu_hdr = (nalu_header_t *)&SENDBUFFER[12];
         nalu_hdr->f = (nalu_buf[0] & 0x80) >> 7;        /* bit0 */
         nalu_hdr->nri = (nalu_buf[0] & 0x60) >> 5;      /* bit1~2 */
         nalu_hdr->type = (nalu_buf[0] & 0x1f);
         //debug_print();
-#else
-        SENDBUFFER[12] = ((nalu_buf[0] & 0x80))    /* bit0: f */
-                | (nalu_buf[0] & 0x60)                 /* bit1~2: nri */
-                | (nalu_buf[0] & 0x1f);                /* bit3~7: type */
-#endif
 
         /*
          * 3.Fill nal content
@@ -222,6 +216,7 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
         MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
 
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
+        MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
         /*
          * FU-A segmentation
          */
@@ -393,13 +388,6 @@ int ParseRTP::h264nal2rtp_send(int framerate, uint8_t *pstStream, int nalu_len) 
     } /* end of else-if (nalu_len <= RTP_PAYLOAD_MAX_SIZE) */
 
     //debug_print();
-#if 0
-    if (nalu_buf) {
-            free(nalu_buf);
-            nalu_buf = NULL;
-        }
-#endif
-
     return 0;
 }/* void *h264tortp_send(VENC_STREAM_S *pstream, char *rec_ipaddr) */
 
