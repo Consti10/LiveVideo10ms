@@ -332,5 +332,5 @@ void RTPEncoder::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {
 }
 
 void TestEncodeDecodeRTP::testEncodeDecodeRTP(const NALU& nalu) {
-    
+
 }
