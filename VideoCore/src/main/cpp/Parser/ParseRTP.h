@@ -18,7 +18,7 @@ public:
     //Decoding
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
     void reset();
-    // Returns rhe sequence number of an RTP packet
+    // Returns the sequence number of an RTP packet
     static int getSequenceNumber(const uint8_t* rtp_data,const size_t data_len);
 private:
     const NALU_DATA_CALLBACK cb;

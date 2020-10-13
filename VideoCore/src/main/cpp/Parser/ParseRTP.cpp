@@ -146,6 +146,8 @@ int RTPDecoder::getSequenceNumber(const uint8_t* rtp_data,const size_t data_len)
     return seqNr;
 }
 
+// xxxxxxxxxxxxxxxxxxxxxxxxxxx RTPEncoder part xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const size_t nalu_data_len) {
     // Watch out for not enough data (else algorithm might crash)
     if(nalu_data_len <= 5){
