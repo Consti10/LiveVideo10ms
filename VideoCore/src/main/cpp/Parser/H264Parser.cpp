@@ -12,8 +12,7 @@
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
         onNewNALU(std::move(onNewNALU)),
         mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
-        mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
-        mEncodeRTP(std::bind(&H264Parser::newRTPPacket, this, std::placeholders::_1)){
+        mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
 }
 
 void H264Parser::reset(){
@@ -40,14 +39,13 @@ void H264Parser::parseDjiLiveVideoData(const uint8_t *data,const size_t data_len
     mParseRAW.parseDjiLiveVideoData(data,data_length);
 }
 
-void H264Parser::setLimitFPS(int maxFPS) {
-    this->maxFPS=maxFPS;
+void H264Parser::setLimitFPS(int maxFPS1) {
+    this->maxFPS=maxFPS1;
 }
 
 void H264Parser::newNaluExtracted(const NALU& nalu) {
     using namespace std::chrono;
     //LOGD("H264Parser::newNaluExtracted");
-    MLOGD<<"Y NALU header "<<((int)nalu.get_nal_unit_type());
     if(onNewNALU!= nullptr){
         onNewNALU(nalu);
     }
@@ -63,21 +61,9 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
     }
 }
 
-void H264Parser::newNaluExtracted2(const NALU &nalu) {
-    //LOGD("H264Parser::newNaluExtracted");
-    if(nalu.getSize()>0){
-        MLOGD<<"X NALU size:"<<"header "<<((int)nalu.get_nal_unit_type());
-        mEncodeRTP.parseNALtoRTP(30,nalu.getData(),nalu.getSize());
-        //newNaluExtracted(nalu);
-    }
-}
-
-
-
 void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
     sequenceNumbers.push_back(seqNr);
     if(sequenceNumbers.size()>32) {
-
         int nOutOufOrderBroken=0;
         // Does not take out of order into account
         int nLostPackets=0;
@@ -163,8 +149,4 @@ void H264Parser::parseCustom2(const uint8_t *data, const std::size_t data_length
     if(obuf.size()>0){
         parse_raw_h264_stream(obuf.data(),obuf.size());
     }
-}
-
-void H264Parser::newRTPPacket(const RTPEncoder::RTPPacket packet) {
-    parse_rtp_h264_stream(packet.data,packet.data_len);
 }
