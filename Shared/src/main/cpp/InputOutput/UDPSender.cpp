@@ -43,13 +43,14 @@ UDPSender::UDPSender(const std::string &IP,const int Port,const int WANTED_SNDBU
 }
 
 
-void UDPSender::sendto(const uint8_t* data, ssize_t data_length) {
+void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
     if(data_length>UDP_PACKET_MAX_SIZE){
         MLOGE<<"Data size exceeds UDP packet size";
         return;
     }
     timeSpentSending.start();
-    const auto result=sendto(sockfd,data,data_length, 0, (struct sockaddr *)&(address), sizeof(struct sockaddr_in));
+    const auto result= sendto(sockfd, data, data_length, 0, (struct sockaddr *) &(address),
+                                sizeof(struct sockaddr_in));
     if(result<0){
         MLOGE<<"Cannot send data "<<data_length<<" "<<strerror(errno);
     }else{

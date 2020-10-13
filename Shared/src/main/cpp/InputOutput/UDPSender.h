@@ -25,7 +25,9 @@ public:
     UDPSender(const std::string& IP,const int Port,const int WANTED_SNDBUFF_SIZE=0);
     ~UDPSender();
     // Send one udp packet. Packet size must not exceed the max UDP packet size
-    void sendto(const uint8_t* data, ssize_t data_length);
+    // Do not rename to sendto() because this method also exists from the linux socket lib
+    // (This method does nothing else than validate the data size, then call sendto()
+    void mySendTo(const uint8_t* data, ssize_t data_length);
     //https://en.wikipedia.org/wiki/User_Datagram_Protocol
     //65,507 bytes (65,535 − 8 byte UDP header − 20 byte IP header).
     static constexpr const size_t UDP_PACKET_MAX_SIZE=65507;

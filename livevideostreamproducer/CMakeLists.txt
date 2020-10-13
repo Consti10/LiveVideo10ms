@@ -9,6 +9,7 @@ include_directories(src/main/cpp)
 
 include_directories(${DIR_Shared}/Helper)
 include_directories(${DIR_Shared}/NDKHelper)
+include_directories(${DIR_Shared}/InputOutput)
 
 set(DIR_VideoCore ${CMAKE_CURRENT_LIST_DIR}/../VideoCore/src/main/cpp)
 
@@ -34,9 +35,9 @@ include_directories(${H264_BITSTREAM_DIR})
 
 add_library( VideoTransmitter
         SHARED
-       src/main/cpp/UDPSender.cpp
-        src/main/cpp/VideoTransmitter.cpp
+        ${DIR_Shared}/InputOutput/UDPSender.cpp
         ${DIR_VideoCore}/Parser/ParseRTP.cpp
+        src/main/cpp/VideoTransmitter.cpp
         )
 
 target_link_libraries( VideoTransmitter
