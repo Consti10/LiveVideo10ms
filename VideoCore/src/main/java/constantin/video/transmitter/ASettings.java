@@ -1,16 +1,21 @@
-package constantin.livevideostreamproducer;
+package constantin.video.transmitter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import constantin.video.core.R;
+
+
+// Video stream provider settings
 public class ASettings extends AppCompatActivity {
     public static final String EXTRA_KEY="SHOW_ADVANCED_SETTINGS";
+    public static final String SHARED_PREFERENCES_NAME="pref_stream_provider";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,23 +26,27 @@ public class ASettings extends AppCompatActivity {
                 .commit();
     }
 
+    public static SharedPreferences getSharedPreferences(final Context c){
+        return c.getSharedPreferences(SHARED_PREFERENCES_NAME,MODE_PRIVATE);
+    }
+
     public static int getSTREAM_MODE(final Context context){
-        return PreferenceManager.getDefaultSharedPreferences(context).
+        return getSharedPreferences(context).
                 getInt(context.getString(R.string.KEY_STREAM_MODE),0);
     }
 
     @SuppressLint("ApplySharedPref")
     public static void setSP_UDP_IP(final Context context, final String ip){
-        PreferenceManager.getDefaultSharedPreferences(context).edit().
+        getSharedPreferences(context).edit().
                 putString(context.getString(R.string.KEY_SP_UDP_IP),ip).commit();
     }
     public static String getSP_UDP_IP(final Context context){
-        return PreferenceManager.getDefaultSharedPreferences(context).
+        return getSharedPreferences(context).
                 getString(context.getString(R.string.KEY_SP_UDP_IP),"192.168.1.1");
     }
 
     public static int getSP_ENCODER_BITRATE_MBITS(final Context context){
-        return PreferenceManager.getDefaultSharedPreferences(context).
+        return getSharedPreferences(context).
                 getInt(context.getString(R.string.KEY_SP_ENCODER_BITRATE_MBITS),5);
     }
 
@@ -46,8 +55,8 @@ public class ASettings extends AppCompatActivity {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             PreferenceManager preferenceManager=getPreferenceManager();
-            //preferenceManager.setSharedPreferencesName("pref_stream");
-            addPreferencesFromResource(R.xml.pref_stream);
+            preferenceManager.setSharedPreferencesName(SHARED_PREFERENCES_NAME);
+            addPreferencesFromResource(R.xml.pref_stream_provider);
         }
 
         @Override

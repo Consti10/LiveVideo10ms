@@ -46,6 +46,7 @@ dependencies {
     implementation project(path: ':VideoCore')
     implementation project(path: ':uvcintegration')
     implementation project(path: ':TelemetryCore')
+    //implementation project(path: ':livevideostreamproducer')
 
     implementation "androidx.core:core-ktx:1.3.2"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

@@ -1,4 +1,4 @@
-package constantin.livevideostreamproducer;
+package constantin.video.transmitter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +26,8 @@ import android.widget.Toast;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
+
+import constantin.video.core.R;
 
 //Note: Pausing /resuming is not supported.
 //Once started,everything runs until onDestroy() is called

@@ -17,12 +17,15 @@ import constantin.video.core.RequestPermissionHelper
 import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
+import constantin.video.transmitter.ASettings
+import constantin.video.transmitter.AVideoStream
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var spinnerVideoTestFileFromAssets: Spinner;
     private lateinit var context: Context;
     private val permissionHelper=RequestPermissionHelper(
-            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA)
     );
 
     @SuppressLint("ApplySharedPref")
@@ -62,10 +65,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<View>(R.id.b_startGraphView).setOnClickListener { startActivity(Intent().setClass(context, GraphViewA::class.java)) }
 
         findViewById<View>(R.id.b_startTranscodeService).setOnClickListener {
-            TranscodeService.startTranscoding(context,"");
+            TranscodeService.startTranscoding(context, "");
         }
         findViewById<View>(R.id.b_stopTranscodeService).setOnClickListener {
             TranscodeService.stopTranscoding(context);
+        }
+        findViewById<View>(R.id.b_StartStreamingServer).setOnClickListener {
+            val intent = Intent().setClass(context, AVideoStream::class.java)
+            startActivity(intent)
+        }
+        findViewById<View>(R.id.b_StreamingServerSettings).setOnClickListener {
+            // User chose the "Settings" item, show the app settings UI...
+            val i = Intent()
+            i.setClass(this, ASettings::class.java)
+            startActivity(i)
         }
     }
 
@@ -81,13 +94,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionHelper.onRequestPermissionsResult(requestCode,permissions,grantResults)
+        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     public companion object {
-        public val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("x264/testVideo.h264", "rpi_cam/rpi.h264","webcam/720p_usb.h264","360/insta_interference.h264",
-                "360/insta_webbn_1_shortened.h264","360/insta_webbn_2.h264","360/insta_mjpeg_test.mp4"
+        public val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("x264/testVideo.h264", "rpi_cam/rpi.h264", "webcam/720p_usb.h264", "360/insta_interference.h264",
+                "360/insta_webbn_1_shortened.h264", "360/insta_webbn_2.h264", "360/insta_mjpeg_test.mp4"
                 //,"360/insta_mjpeg_test.h264")
-                ,"360/testRoom1_1920Mono.mp4")
+                , "360/testRoom1_1920Mono.mp4")
     }
 }

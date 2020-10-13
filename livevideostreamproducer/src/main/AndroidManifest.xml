@@ -10,27 +10,13 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+    <application>
         <activity
-            android:name="constantin.livevideostreamproducer.AVideoStream"
+            android:name="constantin.livevideostreamproducer.src.main.java.constantin.video.transmitter.AVideoStream"
             android:screenOrientation="portrait" />
         <activity
-            android:name="constantin.livevideostreamproducer.ASettings"
+            android:name="constantin.livevideostreamproducer.src.main.java.constantin.video.transmitter.ASettings"
             android:screenOrientation="behind" />
-        <activity android:name="constantin.livevideostreamproducer.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

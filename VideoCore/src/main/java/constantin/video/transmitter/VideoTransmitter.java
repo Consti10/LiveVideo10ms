@@ -1,4 +1,4 @@
-package constantin.livevideostreamproducer;
+package constantin.video.transmitter;
 
 
 import android.content.Context;

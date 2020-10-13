@@ -20,13 +20,14 @@ include(${DIR_VideoCore}/XFEC/XFEC.cmake)
 
 ##
 set(H264_BITSTREAM_DIR ${DIR_VideoCore}/../../../libs/h264bitstream)
-add_library(h264bitstream
+# use '2' to avoid duplicate error
+add_library(h264bitstream2
         SHARED
         ${H264_BITSTREAM_DIR}/h264_stream.c
         ${H264_BITSTREAM_DIR}/h264_sei.c
         ${H264_BITSTREAM_DIR}/h264_nal.c
         )
-target_link_libraries(h264bitstream
+target_link_libraries(h264bitstream2
         ${log-lib}
         log
         android)
@@ -45,5 +46,5 @@ target_link_libraries( VideoTransmitter
         log
         android
         XFEC_lib
-        h264bitstream
+        h264bitstream2
         )

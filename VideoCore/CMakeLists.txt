@@ -122,3 +122,19 @@ target_link_libraries( VideoNative
         h264bitstream
         XFEC_lib
         )
+
+# the transmitter stuff
+add_library( VideoTransmitter
+        SHARED
+        ${DIR_VideoTelemetryShared}/InputOutput/UDPSender.cpp
+        ${VIDEO_PATH}/Parser/ParseRTP.cpp
+        src/main/cpp/VideoTransmitter/VideoTransmitter.cpp
+        )
+
+target_link_libraries( VideoTransmitter
+        ${log-lib}
+        log
+        android
+        XFEC_lib
+        h264bitstream
+        )

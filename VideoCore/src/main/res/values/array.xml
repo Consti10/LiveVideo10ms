@@ -30,4 +30,12 @@
         <item>X8</item>
     </string-array>
 
+    <!-- for streaming -->
+    <string-array name="entriesStreamMode" >
+        <item>RAW H264</item>
+        <item>RTP H264</item>
+        <item>CUSTOM1</item>
+        <item>CUSTOM2</item>
+    </string-array>
+
 </resources>

@@ -26,6 +26,11 @@
         android:layout_height="wrap_content"
         tools:ignore="HardcodedText" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="?android:attr/listDivider" />
+
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,6 +80,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start Telemetry Example" />
+
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="?android:attr/listDivider" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/b_StartStreamingServer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="StartStreamingServer" />
+        <Button
+            android:id="@+id/b_StreamingServerSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SS_Settings" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
 
     <Button
         android:id="@+id/b_startGraphView"

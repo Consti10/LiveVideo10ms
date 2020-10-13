@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- for transmitter -->
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application>
         <activity android:name="constantin.video.impl.SimpleVideoActivity"
@@ -15,6 +17,14 @@
         <activity
             android:name=".AVideoSettings"
             android:screenOrientation="behind" />
+
+        <activity
+            android:name="constantin.video.transmitter.AVideoStream"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="constantin.video.transmitter.ASettings"
+            android:screenOrientation="behind" />
+
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package constantin.livevideostreamproducer;
+package constantin.video.transmitter;
 
 import java.net.Inet4Address;
 import java.util.ArrayList;
