@@ -35,14 +35,17 @@ public:
      * send data to the ip and port set previously. Logs error on failure.
      * If data length exceeds the max UDP packet size, the method splits data into smaller packets
      */
-    void splitAndSend(const uint8_t* data, ssize_t data_length,bool addSeqNr);
+    void splitAndSend(const uint8_t* data, ssize_t data_length);
     //
-    void sendPacket(const uint8_t* data, ssize_t data_length,bool addSeqNr);
+    void sendPacket(const uint8_t* data, ssize_t data_length);
     //
     //
     void RTPSend(const uint8_t* data, ssize_t data_length);
     AvgCalculator avgNALUSize;
+    // Do FEC over the RTP packets
     bool DO_FEC_WRAPPING=false;
+    // Prepend each udp packets with 4 bytes of sequence numbers (for raw)
+    bool ADD_SEQUENCE_NR=false;
 private:
     UDPSender mUDPSender;
     //static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=UDP_PACKET_MAX_SIZE--sizeof(uint32_t);
@@ -59,7 +62,7 @@ private:
 };
 
 //Split data into smaller packets when exceeding UDP max packet size
-void VideoTransmitter::splitAndSend(const uint8_t *data, ssize_t data_length,bool addSeqNr) {
+void VideoTransmitter::splitAndSend(const uint8_t *data, ssize_t data_length) {
     avgNALUSize.add(std::chrono::nanoseconds(data_length));
     if(avgNALUSize.getNSamples() > 100){
         MLOGD<<"NALUSize"
@@ -89,10 +92,10 @@ void VideoTransmitter::splitAndSend(const uint8_t *data, ssize_t data_length,boo
     while (true){
         std::size_t remaining=data_length-offset;
         if(remaining<=MAX_VIDEO_DATA_PACKET_SIZE){
-            sendPacket(&data[offset],remaining,addSeqNr);
+            sendPacket(&data[offset],remaining);
             break;
         }
-        sendPacket(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE,addSeqNr);
+        sendPacket(&data[offset],MAX_VIDEO_DATA_PACKET_SIZE);
         offset+=MAX_VIDEO_DATA_PACKET_SIZE;
     }
     //if(data_length>MAX_VIDEO_DATA_PACKET_SIZE){
@@ -103,8 +106,8 @@ void VideoTransmitter::splitAndSend(const uint8_t *data, ssize_t data_length,boo
     //}
 }
 
-void VideoTransmitter::sendPacket(const uint8_t *data, ssize_t data_length, bool addSeqNr) {
-    if(addSeqNr){
+void VideoTransmitter::sendPacket(const uint8_t *data, ssize_t data_length) {
+    if(ADD_SEQUENCE_NR){
         std::memcpy(workingBuffer.data(),&sequenceNumber,sizeof(uint32_t));
         std::memcpy(&workingBuffer.data()[sizeof(uint32_t)],data,data_length);
         sequenceNumber++;
@@ -168,14 +171,16 @@ JNI_METHOD(void, nativeSend)
     if(data== nullptr){
         MLOGE<<"Something wrong with the byte buffer (is it direct ?)";
     }
+    native(p)->DO_FEC_WRAPPING=false;
+    native(p)->ADD_SEQUENCE_NR=false;
     //LOGD("size %d",size);
     if(streamMode==0){
-        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, false);
+        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
     }else if(streamMode==1){
-        native(p)->DO_FEC_WRAPPING=false;
         native(p)->RTPSend((uint8_t*)data,(ssize_t)size);
     }else if(streamMode==2){
-        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size, true);
+        native(p)->ADD_SEQUENCE_NR=true;
+        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
     }else{
         native(p)->DO_FEC_WRAPPING=true;
         native(p)->RTPSend((uint8_t *) data, (ssize_t) size);

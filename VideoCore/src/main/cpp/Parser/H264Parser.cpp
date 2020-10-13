@@ -121,24 +121,6 @@ void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length)
         lastForwardedSequenceNr=customUdpPacket.sequenceNumber;
         droppedPacketsSinceLastForwardedPacket=0;
     }
-    //std::vector<uint8_t> tmp={customUdpPacket.data,customUdpPacket.data+customUdpPacket.dataLength};
-    /*XPacket xPacket{customUdpPacket.sequenceNumber,{customUdpPacket.data,customUdpPacket.data+customUdpPacket.dataLength}};
-    bufferedPackets.push_back(std::move(xPacket));
-    if(bufferedPackets.size()>5){
-        bufferedPackets.pop_front();
-    }*/
-
-    /*auto tmp2=std::make_pair(customUdpPacket.sequenceNumber, tmp);
-    dataMap.insert(tmp2);
-    if(dataMap.size()>5){
-        dataMap::iterator it;
-        for(auto it = dataMap.begin(); it != dataMap.end(); ++it) {
-            keys.push_back(it->first);
-        }
-        auto smallestKey=std::min_element(keys.begin(), keys.end());
-        dataMap.erase(smallestKey)
-    }*/
-    //
 }
 
 void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t data_len) {
