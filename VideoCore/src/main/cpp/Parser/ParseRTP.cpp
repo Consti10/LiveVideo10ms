@@ -4,6 +4,7 @@
 
 #include "ParseRTP.h"
 #include <AndroidLogger.hpp>
+#include <arpa/inet.h>
 
 //changed "unsigned char" to uint8_t
 typedef struct rtp_header {
@@ -30,7 +31,7 @@ typedef struct rtp_header {
 } __attribute__ ((packed)) rtp_header_t; /* 12 bytes */
 //NOTE: sequence,timestamp and sources has to be converted to the right endian using htonl/htons
 
-//Taken from https://github.com/hmgle/h264_to_rtp/blob/6cf8f07a8243413d7bbbdf5fa5db5fd1ca48beca/h264tortp.h
+//Taken from https://github.com/hmgle/h264_to_rtp/blob/master/h264tortp.h
 typedef struct nalu_header {
     uint8_t type:   5;  /* bit: 0~4 */
     uint8_t nri:    2;  /* bit: 5~6 */
@@ -52,7 +53,6 @@ typedef struct fu_indicator {
 } __attribute__ ((packed)) fu_indicator_t; /* 1 bytes */
 static constexpr auto H264=96;
 static constexpr auto SSRC_NUM=10;
-#include <arpa/inet.h>
 
 
 ParseRTP::ParseRTP(NALU_DATA_CALLBACK cb):cb(std::move(cb)){
