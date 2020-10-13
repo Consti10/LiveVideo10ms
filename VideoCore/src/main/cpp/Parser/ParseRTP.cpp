@@ -218,7 +218,7 @@ int ParseRTP::h264nal2rtp_send(int framerate,const uint8_t *pstStream, int nalu_
 
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
         //MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
-        assert(false);
+        //assert(false);
         /*
          * FU-A segmentation
          */
