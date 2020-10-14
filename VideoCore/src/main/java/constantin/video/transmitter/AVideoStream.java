@@ -31,7 +31,7 @@ import constantin.video.core.R;
 
 //Note: Pausing /resuming is not supported.
 //Once started,everything runs until onDestroy() is called
-
+// Create a video transmitter using the android camera for testing
 public class AVideoStream extends AppCompatActivity{
     private static final String TAG="AVideoStream";
 
