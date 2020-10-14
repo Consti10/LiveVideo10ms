@@ -69,9 +69,24 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         MLOGD<<"Not enough rtp data";
         return;
     }
-    //
-    //const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
-    //LOG::D("Sequence number %d",(int)rtp_header->sequence);
+    // Testing regarding sequence numbers.This stuff an be removed without issues
+    const int seqNr=getSequenceNumber(rtp_data,data_length);
+    if(seqNr==lastSequenceNumber){
+        // duplicate. This should never happen for 'normal' rtp streams, but can be usefully when testing bitrates
+        // (Since you can send the same packet multiple times to emulate a higher bitrate)
+        return;
+    }
+    if(lastSequenceNumber==-1){
+        // first packet in stream
+        flagPacketHasGoneMissing=false;
+    }else{
+        if(seqNr != ((lastSequenceNumber+1) % UINT16_MAX)){
+            // We are missing a Packet !
+            MLOGD<<"missing a packet"<<seqNr<<" "<<lastSequenceNumber<<" "<<(seqNr-(int)lastSequenceNumber);
+            flagPacketHasGoneMissing=true;
+        }
+    }
+    lastSequenceNumber=seqNr;
 
     const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[12];
 
@@ -81,7 +96,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             /* end of fu-a */
             memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
             mNALU_DATA_LENGTH+= data_length - 14;
-            if(cb!= nullptr){
+            if(cb!= nullptr && !flagPacketHasGoneMissing){
                 NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
                 //nalu_data.resize(nalu_data_length);
                 //NALU nalu(nalu_data);
@@ -89,6 +104,11 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             }
             mNALU_DATA_LENGTH=0;
         } else if (fu_header->s == 1) {
+            // Beginning of new fu sequence - we can remove the 'drop packet' flag
+            if(flagPacketHasGoneMissing){
+                MLOGD<<"Got fu-a start - clearing missing packet flag";
+            }
+            flagPacketHasGoneMissing=false;
             /* start of fu-a */
             mNALU_DATA[0]=0;
             mNALU_DATA[1]=0;
@@ -109,6 +129,11 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         }
         //LOGV("partially nalu");
     } else if(nalu_header->type>0 && nalu_header->type<24){
+        // Full NALU - we can remove the 'drop packet' flag
+        if(flagPacketHasGoneMissing){
+            MLOGD<<"Got full NALU - clearing missing packet flag";
+        }
+        flagPacketHasGoneMissing= false;
         //MLOGD<<"Got full NALU";
         /* full nalu */
         mNALU_DATA[0]=0;

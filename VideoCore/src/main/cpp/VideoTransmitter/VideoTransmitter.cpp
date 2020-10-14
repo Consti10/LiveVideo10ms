@@ -46,6 +46,7 @@ public:
     bool DO_FEC_WRAPPING=false;
     // Prepend each udp packets with 4 bytes of sequence numbers (for raw)
     bool ADD_SEQUENCE_NR=false;
+    int SEND_EACH_RTP_PACKET_MULTIPLE_TIMES=0;
 private:
     // RTP parser splits into packets of this maximum size
     static constexpr const size_t MY_RTP_PACKET_MAX_SIZE=1024;
@@ -148,7 +149,14 @@ void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
         }
         //
     }else{
-        mUDPSender.mySendTo(packet.data, packet.data_len);
+        // To emulate a higher bitstream rate (the receiver has to drop duplicates though)
+        if(SEND_EACH_RTP_PACKET_MULTIPLE_TIMES>0){
+            for(int i=0;i<SEND_EACH_RTP_PACKET_MULTIPLE_TIMES;i++){
+                mUDPSender.mySendTo(packet.data, packet.data_len);
+            }
+        }else{
+            mUDPSender.mySendTo(packet.data, packet.data_len);
+        }
     }
 }
 
@@ -194,9 +202,11 @@ JNI_METHOD(void, nativeSend)
         // RAW
         native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
     }else if(streamMode==2){
-        native(p)->ADD_SEQUENCE_NR=true;
-        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
+        // Send each rtp packet multiple times
+        native(p)->SEND_EACH_RTP_PACKET_MULTIPLE_TIMES=5;
+        native(p)->RTPSend((uint8_t*)data,(ssize_t)size);
     }else{
+        // RTP inside FEC over UDP
         native(p)->DO_FEC_WRAPPING=true;
         native(p)->RTPSend((uint8_t *) data, (ssize_t) size);
     }
