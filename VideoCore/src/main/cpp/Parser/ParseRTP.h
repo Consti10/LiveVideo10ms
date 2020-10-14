@@ -21,6 +21,8 @@ public:
     // Returns the sequence number of an RTP packet
     static int getSequenceNumber(const uint8_t* rtp_data,const size_t data_len);
 private:
+    // Properly calls the cb function
+    void forwardNALU();
     const NALU_DATA_CALLBACK cb;
     std::array<uint8_t,NALU::NALU_MAXLEN> mNALU_DATA;
     size_t mNALU_DATA_LENGTH=0;

@@ -80,9 +80,10 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         // first packet in stream
         flagPacketHasGoneMissing=false;
     }else{
+        // Don't forget that the sequence number loops every UINT16_MAX packets
         if(seqNr != ((lastSequenceNumber+1) % UINT16_MAX)){
             // We are missing a Packet !
-            MLOGD<<"missing a packet"<<seqNr<<" "<<lastSequenceNumber<<" "<<(seqNr-(int)lastSequenceNumber);
+            MLOGD<<"missing a packet. Last:"<<lastSequenceNumber<<" Curr:"<<seqNr<<" Diff:"<<(seqNr-(int)lastSequenceNumber);
             flagPacketHasGoneMissing=true;
         }
     }
@@ -96,19 +97,16 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             /* end of fu-a */
             memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
             mNALU_DATA_LENGTH+= data_length - 14;
-            if(cb!= nullptr && !flagPacketHasGoneMissing){
-                NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
-                //nalu_data.resize(nalu_data_length);
-                //NALU nalu(nalu_data);
-                cb(nalu);
+            if(!flagPacketHasGoneMissing){
+                forwardNALU();
             }
             mNALU_DATA_LENGTH=0;
         } else if (fu_header->s == 1) {
             // Beginning of new fu sequence - we can remove the 'drop packet' flag
             if(flagPacketHasGoneMissing){
                 MLOGD<<"Got fu-a start - clearing missing packet flag";
+                flagPacketHasGoneMissing=false;
             }
-            flagPacketHasGoneMissing=false;
             /* start of fu-a */
             mNALU_DATA[0]=0;
             mNALU_DATA[1]=0;
@@ -132,8 +130,8 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         // Full NALU - we can remove the 'drop packet' flag
         if(flagPacketHasGoneMissing){
             MLOGD<<"Got full NALU - clearing missing packet flag";
+            flagPacketHasGoneMissing= false;
         }
-        flagPacketHasGoneMissing= false;
         //MLOGD<<"Got full NALU";
         /* full nalu */
         mNALU_DATA[0]=0;
@@ -148,18 +146,22 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         mNALU_DATA_LENGTH++;
         memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[13], (size_t)data_length - 13);
         mNALU_DATA_LENGTH+= data_length - 13;
-
-        if(cb!= nullptr){
-            NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
-            //nalu_data.resize(nalu_data_length);
-            //NALU nalu(nalu_data);
-            cb(nalu);
-        }
+        forwardNALU();
         mNALU_DATA_LENGTH=0;
         //LOGV("full nalu");
     }else{
         //MLOGD<<"header:"<<nalu_header->type;
     }
+}
+
+void RTPDecoder::forwardNALU() {
+    if(cb!= nullptr){
+        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
+        //nalu_data.resize(nalu_data_length);
+        //NALU nalu(nalu_data);
+        cb(nalu);
+    }
+    mNALU_DATA_LENGTH=0;
 }
 
 int RTPDecoder::getSequenceNumber(const uint8_t* rtp_data,const size_t data_len) {
@@ -171,6 +173,7 @@ int RTPDecoder::getSequenceNumber(const uint8_t* rtp_data,const size_t data_len)
     return htons(seqNr);
     //return seqNr;
 }
+
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxx RTPEncoder part xxxxxxxxxxxxxxxxxxxxxxxxxxx
 
