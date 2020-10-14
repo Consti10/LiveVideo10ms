@@ -23,12 +23,13 @@
 #include <UDPSender.h>
 #include <wifibroadcast/fec.hh>
 #include "../Parser/ParseRTP.h"
+#include <ATraceCompbat.hpp>
 
 
 class VideoTransmitter{
 public:
     VideoTransmitter(const std::string& IP,const int Port):
-    mUDPSender(IP,Port),
+    mUDPSender(IP,Port,UDPSender::EXAMPLE_MEDIUM_SNDBUFF_SIZE),
     mEncodeRTP(std::bind(&VideoTransmitter::newRTPPacket, this, std::placeholders::_1),MY_RTP_PACKET_MAX_SIZE){}
     /**
      * send data to the ip and port set previously. Logs error on failure.
@@ -121,7 +122,9 @@ void VideoTransmitter::sendPacket(const uint8_t *data, ssize_t data_length) {
 }
 
 void VideoTransmitter::RTPSend(const uint8_t *data, ssize_t data_length) {
+    ATrace_beginSection("VideoTransmitter::RTPSend");
     mEncodeRTP.parseNALtoRTP(30,data,data_length);
+    ATrace_endSection();
 }
 
 void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
@@ -131,13 +134,17 @@ void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
         tmp.push_back((uint8_t)i);
     }*/
     if(DO_FEC_WRAPPING){
+        ATrace_beginSection("VideoTransmitter::FECWrapping");
         MLOGD<<"Wrapping rtp packet into FEC";
         assert(packet.data_len<=1024);
         std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(packet.data,packet.data_len);
         // With a ratio of 0.5 we should get exactly 2 blocks
         assert(blks.size()==2);
+        ATrace_endSection();
         for (auto blk : blks) {
+            ATrace_beginSection("UDP::sendto");
             mUDPSender.mySendTo(blk->pkt_data(), blk->pkt_length());
+            ATrace_endSection();
         }
         //
     }else{

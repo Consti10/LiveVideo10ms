@@ -31,8 +31,8 @@ void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_len
 }
 
 void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
-    //const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
-    //debugSequenceNumbers(seqNr);
+    const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
+    debugSequenceNumbers(seqNr);
     mDecodeRTP.parseRTPtoNALU(rtp_data, data_length);
 }
 
@@ -69,6 +69,7 @@ void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
         int nOutOufOrderBroken=0;
         // Does not take out of order into account
         int nLostPackets=0;
+        AvgCalculator avgDeltaBetweenSeqNrs;
         std::vector<int> diffs{};
         for (size_t i = 0; i < sequenceNumbers.size() - 1; i++) {
             if (((sequenceNumbers.at(i)) >= sequenceNumbers.at(i + 1))) {
@@ -77,10 +78,19 @@ void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
             if ((sequenceNumbers.at(i) + 1) != sequenceNumbers.at(i + 1)) {
                 nLostPackets++;
             }
-            diffs.push_back(sequenceNumbers.at(i+1)-sequenceNumbers.at(i));
+            const int diff=sequenceNumbers.at(i+1)-sequenceNumbers.at(i);
+            diffs.push_back(diff);
+            avgDeltaBetweenSeqNrs.add(std::chrono::nanoseconds(diff));
         }
         const bool lostOrBroken=nOutOufOrderBroken>0 || nLostPackets>0;
-        MLOGD<<"Seq numbers.LOB:"<<lostOrBroken<<" LostPackets: "<<nLostPackets<<"  nOutOfOrderBroken: "<<nOutOufOrderBroken<<" values : "<< StringHelper::vectorAsString(sequenceNumbers);
+        MLOGD<<"Seq numbers.LOB:"<<lostOrBroken<<" LostPackets: "<<nLostPackets<<"  nOutOfOrderBroken: "<<nOutOufOrderBroken<<" values : "<<
+        //StringHelper::vectorAsString(sequenceNumbers)<<"\n"<<
+        StringHelper::vectorAsString(diffs);
+        /*MLOGD<<"SeqNrDiffs "<<lostOrBroken
+             <<" min:"<<StringHelper::memorySizeReadable(avgDeltaBetweenSeqNrs.getMin().count())
+             <<" max:"<<StringHelper::memorySizeReadable(avgDeltaBetweenSeqNrs.getMax().count())
+             <<" avg:"<<StringHelper::memorySizeReadable(avgDeltaBetweenSeqNrs.getAvg().count());*/
+
         sequenceNumbers.resize(0);
     }
 }
@@ -132,7 +142,7 @@ void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t 
         const uint8_t* sblkData=sblk->data();
         const size_t sblkDataLength=sblk->data_length();
         if(sblkDataLength>10){
-            MLOGD<<"Parsing rtp";
+            MLOGD<<"Parsing rtp "<<sblkDataLength;
             const auto seqNr=RTPDecoder::getSequenceNumber(sblkData,sblkDataLength);
             debugSequenceNumbers(seqNr);
             mDecodeRTP.parseRTPtoNALU(sblkData,sblkDataLength);

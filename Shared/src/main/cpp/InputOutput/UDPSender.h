@@ -32,6 +32,7 @@ public:
     //65,507 bytes (65,535 − 8 byte UDP header − 20 byte IP header).
     static constexpr const size_t UDP_PACKET_MAX_SIZE=65507;
     std::size_t nSentBytes=0;
+    static constexpr std::size_t EXAMPLE_MEDIUM_SNDBUFF_SIZE=1024*1024;
 private:
     int sockfd;
     sockaddr_in address{};

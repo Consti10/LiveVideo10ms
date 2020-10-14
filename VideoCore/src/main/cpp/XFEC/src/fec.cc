@@ -12,13 +12,19 @@
  * FECEncoder
  ******************************************************************************/
 
+static bool hasFECInitialized=false;
+
 FECEncoder::FECEncoder(uint8_t num_blocks, uint8_t num_fec_blocks, uint16_t max_block_size,
 		       uint8_t start_seq_num) :
   m_num_blocks(num_blocks), m_num_fec_blocks(num_fec_blocks), m_max_block_size(max_block_size),
   m_seq_num(start_seq_num) {
   // Ensure that the FEC library is initialized
   // This may not work with multiple threads!
-  fec_init();
+  // Modification by C
+  if(!hasFECInitialized){
+    fec_init();
+    hasFECInitialized=true;
+  }
 }
 
 // Allocate and initialize the next data block.
@@ -113,7 +119,12 @@ void FECEncoder::encode_blocks() {
  ******************************************************************************/
 
 FECDecoder::FECDecoder() : m_block_size(0) {
-  fec_init();
+  //fec_init();
+  // Mod by Consti
+    if(!hasFECInitialized){
+        fec_init();
+        hasFECInitialized=true;
+    }
 }
 
 void FECDecoder::add_block(const uint8_t *buf, uint16_t block_length) {
@@ -361,6 +372,7 @@ FECBufferEncoder::encode_buffer(const uint8_t *buf, size_t len) {
 
   // We can only encode a maximum of 255 blocks
   if (nblocks > 255) {
+    //assert(true);
     return ret;
   }
 

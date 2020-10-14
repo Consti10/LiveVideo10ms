@@ -169,6 +169,8 @@ private:
   std::queue<std::shared_ptr<FECBlock> > m_out_blocks;
 
   void encode_blocks();
+  //
+  //static bool hasFECInitialized;
 };
 
 
