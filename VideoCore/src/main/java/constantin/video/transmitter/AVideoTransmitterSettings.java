@@ -30,22 +30,22 @@ public class AVideoTransmitterSettings extends AppCompatActivity {
         return c.getSharedPreferences(SHARED_PREFERENCES_NAME,MODE_PRIVATE);
     }
 
-    public static int getSTREAM_MODE(final Context context){
+    public static int getVIDEO_TRANSMITTER_STREAM_MODE(final Context context){
         return getSharedPreferences(context).
                 getInt(context.getString(R.string.VIDEO_TRANSMITTER_STREAM_MODE),0);
     }
 
     @SuppressLint("ApplySharedPref")
-    public static void setSP_UDP_IP(final Context context, final String ip){
+    public static void setVIDEO_TRANSMITTER_UDP_IP(final Context context, final String ip){
         getSharedPreferences(context).edit().
                 putString(context.getString(R.string.VIDEO_TRANSMITTER_UDP_IP),ip).commit();
     }
-    public static String getSP_UDP_IP(final Context context){
+    public static String getVIDEO_TRANSMITTER_UDP_IP(final Context context){
         return getSharedPreferences(context).
                 getString(context.getString(R.string.VIDEO_TRANSMITTER_UDP_IP),"192.168.1.1");
     }
 
-    public static int getSP_ENCODER_BITRATE_MBITS(final Context context){
+    public static int getVIDEO_TRANSMITTER_ENCODER_BITRATE_MBITS(final Context context){
         return getSharedPreferences(context).
                 getInt(context.getString(R.string.VIDEO_TRANSMITTER_ENCODER_BITRATE_MBITS),5);
     }

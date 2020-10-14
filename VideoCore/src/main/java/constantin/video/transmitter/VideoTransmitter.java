@@ -28,10 +28,10 @@ public class VideoTransmitter {
 
     VideoTransmitter(final Context context){
         //"10.183.84.95"
-        final String IP = AVideoTransmitterSettings.getSP_UDP_IP(context);
+        final String IP = AVideoTransmitterSettings.getVIDEO_TRANSMITTER_UDP_IP(context);
         Log.d("UDPSender","Sending to IP "+IP);
         nativeInstance=nativeConstruct(IP,PORT);
-        streamMode= AVideoTransmitterSettings.getSTREAM_MODE(context);
+        streamMode= AVideoTransmitterSettings.getVIDEO_TRANSMITTER_STREAM_MODE(context);
     }
 
     //Send the UDP data on another thread,since networking is strictly forbidden on the UI thread
