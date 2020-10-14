@@ -18,7 +18,7 @@ import constantin.video.core.TestFEC
 import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
-import constantin.video.transmitter.ASettings
+import constantin.video.transmitter.AVideoTransmitterSettings
 import constantin.video.transmitter.AVideoStream
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<View>(R.id.b_StreamingServerSettings).setOnClickListener {
             // User chose the "Settings" item, show the app settings UI...
             val i = Intent()
-            i.setClass(this, ASettings::class.java)
+            i.setClass(this, AVideoTransmitterSettings::class.java)
             startActivity(i)
         }
         findViewById<View>(R.id.b_TestFEC).setOnClickListener {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="KEY_SP_UDP_IP">KEY_SP_UDP_IP</string>
-    <string name="KEY_STREAM_MODE">KEY_STREAM_MODE</string>
-    <string name="KEY_SP_ENCODER_BITRATE_MBITS">KEY_SP_ENCODER_BITRATE_MBITS</string>
+    <string name="VIDEO_TRANSMITTER_UDP_IP">KEY_SP_UDP_IP</string>
+    <string name="VIDEO_TRANSMITTER_STREAM_MODE">KEY_STREAM_MODE</string>
+    <string name="VIDEO_TRANSMITTER_ENCODER_BITRATE_MBITS">KEY_SP_ENCODER_BITRATE_MBITS</string>
 
 </resources>

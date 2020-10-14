@@ -181,9 +181,11 @@ JNI_METHOD(void, nativeSend)
     native(p)->ADD_SEQUENCE_NR=false;
     //LOGD("size %d",size);
     if(streamMode==0){
-        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
-    }else if(streamMode==1){
+        // RTP
         native(p)->RTPSend((uint8_t*)data,(ssize_t)size);
+    }else if(streamMode==1){
+        // RAW
+        native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);
     }else if(streamMode==2){
         native(p)->ADD_SEQUENCE_NR=true;
         native(p)->splitAndSend((uint8_t *) data, (ssize_t) size);

@@ -2,19 +2,19 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.mapzen.prefsplusx.IntListPreference
-        android:key="@string/KEY_STREAM_MODE"
-        android:title="@string/KEY_STREAM_MODE"
+        android:key="@string/VIDEO_TRANSMITTER_STREAM_MODE"
+        android:title="@string/VIDEO_TRANSMITTER_STREAM_MODE"
         android:entries="@array/entriesVideoTransmitterStreamMode"
         android:defaultValue="0" />
 
     <EditTextPreference
-        android:key="@string/KEY_SP_UDP_IP"
-        android:title="@string/KEY_SP_UDP_IP"
+        android:key="@string/VIDEO_TRANSMITTER_UDP_IP"
+        android:title="@string/VIDEO_TRANSMITTER_UDP_IP"
         android:defaultValue="192.168.1.1" />
 
     <com.mapzen.prefsplusx.EditIntPreference
-        android:key="@string/KEY_SP_ENCODER_BITRATE_MBITS"
-        android:title="@string/KEY_SP_ENCODER_BITRATE_MBITS"
+        android:key="@string/VIDEO_TRANSMITTER_ENCODER_BITRATE_MBITS"
+        android:title="@string/VIDEO_TRANSMITTER_ENCODER_BITRATE_MBITS"
         android:defaultValue="5"
         />
 

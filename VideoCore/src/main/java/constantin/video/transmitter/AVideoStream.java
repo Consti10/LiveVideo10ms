@@ -128,7 +128,7 @@ public class AVideoStream extends AppCompatActivity{
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
 
             //final int MDEIACODEC_TARGET_KEY_BIT_RATE=5*1024*1024;
-            final int MDEIACODEC_TARGET_KEY_BIT_RATE=ASettings.getSP_ENCODER_BITRATE_MBITS(this)*1024*1024;
+            final int MDEIACODEC_TARGET_KEY_BIT_RATE= AVideoTransmitterSettings.getSP_ENCODER_BITRATE_MBITS(this)*1024*1024;
 
             format.setInteger(MediaFormat.KEY_BIT_RATE,MDEIACODEC_TARGET_KEY_BIT_RATE); //X MBit/s
             format.setInteger(MediaFormat.KEY_FRAME_RATE,MDEIACODEC_ENCODER_TARGET_FPS);
