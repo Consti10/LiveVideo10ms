@@ -214,6 +214,10 @@ public:
   FECDecoder();
 
   void add_block(const uint8_t *buf, uint16_t block_length);
+  // Make sure to use pkt_data and pkt_length instead of data / data_length
+  void add_block(std::shared_ptr<FECBlock> blk){
+    add_block(blk->pkt_data(), blk->pkt_length());
+  }
 
   // Retrieve the next data/fec block
   std::shared_ptr<FECBlock> get_block();

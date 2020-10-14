@@ -124,14 +124,25 @@ void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length)
 }
 
 void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t data_len) {
+
     mFECDecoder.add_block(data, data_len);
-    std::vector<uint8_t> obuf;
-    obuf.reserve(1024*1024);
+    //std::vector<uint8_t> obuf;
+    //obuf.reserve(1024*1024);
     for (std::shared_ptr<FECBlock> sblk = mFECDecoder.get_block(); sblk; sblk = mFECDecoder.get_block()) {
-        std::copy(sblk->data(), sblk->data() + sblk->data_length(),
-                  std::back_inserter(obuf));
-        MLOGD<<"Got block";
-        mDecodeRTP.parseRTPtoNALU(sblk->data(),sblk->data_length());
+        // One block should be equal to one rtp packet
+        const uint8_t* sblkData=sblk->data();
+        const size_t sblkDataLength=sblk->data_length();
+        if(sblkDataLength>10){
+            MLOGD<<"Parsing rtp";
+            const auto seqNr=RTPDecoder::getSequenceNumber(sblkData,sblkDataLength);
+            debugSequenceNumbers(seqNr);
+            mDecodeRTP.parseRTPtoNALU(sblkData,sblkDataLength);
+        }else{
+            MLOGD<<"Weird packet"<<sblkDataLength;
+        }
+
+        //std::copy(sblk->data(), sblk->data() + sblk->data_length(),
+        //          std::back_inserter(obuf));
     }
     /*if(obuf.size()>0){
         MLOGD<<"Got rtp packet";

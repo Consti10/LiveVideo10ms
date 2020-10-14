@@ -29,7 +29,7 @@ class VideoTransmitter{
 public:
     VideoTransmitter(const std::string& IP,const int Port):
     mUDPSender(IP,Port),
-    mEncodeRTP(std::bind(&VideoTransmitter::newRTPPacket, this, std::placeholders::_1)){}
+    mEncodeRTP(std::bind(&VideoTransmitter::newRTPPacket, this, std::placeholders::_1),MY_RTP_PACKET_MAX_SIZE){}
     /**
      * send data to the ip and port set previously. Logs error on failure.
      * If data length exceeds the max UDP packet size, the method splits data into smaller packets
@@ -46,6 +46,8 @@ public:
     // Prepend each udp packets with 4 bytes of sequence numbers (for raw)
     bool ADD_SEQUENCE_NR=false;
 private:
+    // RTP parser splits into packets of this maximum size
+    static constexpr const size_t MY_RTP_PACKET_MAX_SIZE=1024;
     UDPSender mUDPSender;
     static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=1024-sizeof(uint32_t);
     int32_t sequenceNumber=0;
@@ -57,6 +59,7 @@ private:
     //
     RTPEncoder mEncodeRTP;
     void newRTPPacket(const RTPEncoder::RTPPacket& packet);
+    FECDecoder mFECDecoder;
 };
 
 //Split data into smaller packets when exceeding UDP max packet size
@@ -128,10 +131,15 @@ void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
         tmp.push_back((uint8_t)i);
     }*/
     if(DO_FEC_WRAPPING){
+        MLOGD<<"Wrapping rtp packet into FEC";
+        assert(packet.data_len<=1024);
         std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(packet.data,packet.data_len);
+        // With a ratio of 0.5 we should get exactly 2 blocks
+        assert(blks.size()==2);
         for (auto blk : blks) {
-            mUDPSender.mySendTo(blk->data(), blk->data_length());
+            mUDPSender.mySendTo(blk->pkt_data(), blk->pkt_length());
         }
+        //
     }else{
         mUDPSender.mySendTo(packet.data, packet.data_len);
     }

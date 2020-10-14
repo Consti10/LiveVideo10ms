@@ -337,16 +337,15 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
 
 
 void RTPEncoder::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {
-    if(rtp_packet_len==0)return;
-    //
+    assert(rtp_packet_len!=0);
     assert(rtp_packet_len<=RTP_PACKET_MAX_SIZE);
-
-    //MLOGD << "send_data_to_client_list" << rtp_packet_len;
+    //MLOGD<<"forwardRTPPacket of size "<<rtp_packet_len;
     if(mCB!= nullptr){
         mCB({rtp_packet,rtp_packet_len});
+    }else{
+        MLOGE<<"No RTP Encoder callback set";
     }
 }
-
 
 TestEncodeDecodeRTP::TestEncodeDecodeRTP() {
     decoder=std::make_unique<RTPDecoder>(std::bind(&TestEncodeDecodeRTP::onNALU, this, std::placeholders::_1));

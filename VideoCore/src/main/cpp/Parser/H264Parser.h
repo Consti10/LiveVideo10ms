@@ -77,6 +77,8 @@ private:
     AvgCalculator avgUDPPacketSize;
     //
     FECDecoder mFECDecoder;
+    //
+    std::vector<std::size_t> receivedDataPacketsSize;
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

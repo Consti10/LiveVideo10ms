@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <random>
 #include <list>
+#include <chrono>
 //#include <cxxopts.hpp>
 
 #include <wifibroadcast/fec.hh>
@@ -42,16 +43,16 @@ std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
 }
 
 // Create N buffers filled with random data, where each buffer has size of sizeBytes
-std::vector<std::vector<uint8_t>> createRandomDataBuffers(const ssize_t sizeBytes,const ssize_t nBuffers){
+std::vector<std::vector<uint8_t>> createRandomDataBuffers(const ssize_t nBuffers,const ssize_t bufferSizeBytes){
     std::vector<std::vector<uint8_t>> ret;
     for(int i=0;i<nBuffers;i++){
-        ret.push_back(std::move(createRandomDataBuffer(sizeBytes)));
+        ret.push_back(createRandomDataBuffer(bufferSizeBytes));
     }
     return ret;
 }
 
 // Returns the cumulative size of all FECBlocks
-std::size_t sizeBytes(const std::vector<std::shared_ptr<FECBlock>>& blocks){
+std::size_t cumulativeSizeBytes(const std::vector<std::shared_ptr<FECBlock>>& blocks){
   std::size_t fecDataSize=0;
   for(const auto& block:blocks){
     fecDataSize+=block->block_size();
@@ -62,13 +63,19 @@ std::size_t sizeBytes(const std::vector<std::shared_ptr<FECBlock>>& blocks){
 // Send all the blocks ( = add them to the decoder )
 // A lossy link is emulated by dropping some fec blocks
 // @param RANDOMNESS: the smaller the value, the more packets are dropped
+// If RANDOMNESS is a negative value no packets are dropped,if RANDOMNESS is 0 all packets are dropped
+// If RANDOMNESS is 10 for example, roughly 10 % of the packets wre dropped
 std::size_t sendDataLossy(FECDecoder& dec,const std::vector<std::shared_ptr<FECBlock>>& blks,const int RANDOMNESS=10){
     std::size_t drop_count=0;
     for (std::shared_ptr<FECBlock> blk : blks) {
-        if ((rand() % RANDOMNESS) != 0) {
-            dec.add_block(blk->pkt_data(), blk->pkt_length());
-        }else{
+        bool dropPacket=false;
+        if(RANDOMNESS>0 && ((rand() % RANDOMNESS) == 0)){
+            dropPacket=true;
+        }
+        if(dropPacket){
             drop_count++;
+        }else{
+            dec.add_block(blk);
         }
     }
     return drop_count;
@@ -88,22 +95,20 @@ std::size_t sendDataLossyAndOutOfOrder(FECDecoder&dec,const std::vector<std::sha
             //MLOGD<<"Swapping "<<i<<" with "<<i+1;
         }
     }
-    std::size_t drop_count=0;
-    for (std::shared_ptr<FECBlock> blk : workingData) {
-        if ((rand() % 10) != 0) {
-            dec.add_block(blk->pkt_data(), blk->pkt_length());
-        }else{
-            drop_count++;
-        }
-    }
-    return drop_count;
+    return sendDataLossy(dec,blks,-1);
 }
 
-
-struct TestResult{
-    uint32_t nPassed;
-    double time;
-};
+// Cumulate all FEC blocks from decoder
+std::vector<uint8_t> getDataFromDecoder(FECDecoder& dec){
+    std::vector<uint8_t> obuf;
+    obuf.reserve(1024*1024);
+    for (std::shared_ptr<FECBlock> sblk = dec.get_block(); sblk; sblk = dec.get_block()) {
+        MLOGD<<"Blk size "<<sblk->block_size()<<" Data size "<<sblk->data_length();
+        std::copy(sblk->data(), sblk->data() + sblk->data_length(),
+                  std::back_inserter(obuf));
+    }
+    return obuf;
+}
 
 std::pair<uint32_t, double> run_test(FECBufferEncoder &enc,const uint32_t max_block_size,
 				     const uint32_t iterations) {
@@ -115,75 +120,73 @@ std::pair<uint32_t, double> run_test(FECBufferEncoder &enc,const uint32_t max_bl
   size_t bytes = 0;
   double start_time = cur_time();
   for (uint32_t i = 0; i < iterations; ++i) {
-
     // Create a random buffer of data
     const uint32_t buf_size = min_buffer_size + rand() % (max_buffer_size - min_buffer_size);
     bytes += buf_size;
     auto buf=createRandomDataBuffer(buf_size);
 
-    // Encode it
+    // Encode the test data
     std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(buf);
 
-    // Decode it
-    std::vector<uint8_t> obuf;
-    uint32_t drop_count = 0;
     // emulate transmission over a lossy link
-    drop_count=sendDataLossyAndOutOfOrder(dec,blks);
+    const uint32_t drop_count=sendDataLossy(dec,blks,10);
+    //drop_count=sendDataLossyAndOutOfOrder(dec,blks);
 
-    const auto droppedPacketsPercentage=(float)blks.size() / (float)drop_count;
-    LOG_INFO << "Iteration: " << i << "  buffer size: " << buf_size
-            <<" created blocks: "<<blks.size()<<" createdBlocksSizeSum: "<<sizeBytes(blks)
-            <<" droppedPackets: "<<drop_count<<" droppedPackets%: "<<droppedPacketsPercentage;
+    const auto droppedPacketsPercentage=drop_count>0 ? ((float)blks.size() / (float)drop_count) : 0;
 
-    for (std::shared_ptr<FECBlock> sblk = dec.get_block(); sblk; sblk = dec.get_block()) {
-
-      std::copy(sblk->data(), sblk->data() + sblk->data_length(),
-                std::back_inserter(obuf));
-    }
+      // Decode it
+    const auto obuf=getDataFromDecoder(dec);
 
     // Compare
+    bool thisIterationFailded=false;
     if(compareBuffers(buf,obuf)!=0){
       ++failed;
+      thisIterationFailded=true;
     }
+    LOG_INFO << "Iteration: " << i << " Failed:"<<(thisIterationFailded ? "YES" : "NO")<<"  buffer size: " << buf_size
+    << " created blocks: " << blks.size() << " createdBlocksSizeSum: " << cumulativeSizeBytes(blks)
+    <<" droppedPackets: "<<drop_count<<" droppedPackets%: "<<droppedPacketsPercentage;
   }
-  return std::make_pair(iterations - failed,
-                        8e-6 * static_cast<double>(bytes) / (cur_time() - start_time));
+  const auto nTestsPassed=iterations - failed;
+  const auto testDataRate=8e-6 * static_cast<double>(bytes) / (cur_time() - start_time);
+  return std::make_pair(nTestsPassed,testDataRate);
 }
 
-void run_test2(FECBufferEncoder &enc,const uint32_t max_block_size,
-           const uint32_t iterations){
+void run_test2(){
+
+    const uint32_t block_size = 1024;
+    float fec_ratio = 0.5f;
+
+    FECBufferEncoder enc(block_size, fec_ratio);
 
     FECDecoder dec;
-    const uint32_t min_buffer_size = max_block_size * 6;
-    const uint32_t max_buffer_size = max_block_size * 100;
 
-    const uint32_t buf_size = min_buffer_size + rand() % (max_buffer_size - min_buffer_size);
-    auto inputBuff=createRandomDataBuffer(buf_size);
+    // create a random data stream with packets of fixed size
+    const auto packets=createRandomDataBuffers(100, 1024);
+    for(int i=0; i < packets.size(); i++){
+        const auto buff=packets.at(i);
+        // Convert the current packet to FEC data
+        std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(buff);
+        MLOGD<<"N created blocks "<<blks.size();
 
-    std::vector<uint8_t> obuf;
-
-    // Convert the packet to FEC data
-    std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(inputBuff);
-
-    // emulate transmission over a lossy link
-    for (auto blk : blks) {
-        MLOGD<<"Feed block";
-        if ((rand() % 10) != 0) {
-            dec.add_block(blk->pkt_data(), blk->pkt_length());
-        }else{
-            MLOGD<<"Skipping block (lossy link)";
+        for(const auto& blk:blks){
+            MLOGD<<"Blk size "<<blk->block_size()<<" Data size "<<blk->data_length();
         }
-        // Get output blocks
-        for (std::shared_ptr<FECBlock> sblk = dec.get_block(); sblk; sblk = dec.get_block()) {
-            std::copy(sblk->data(), sblk->data() + sblk->data_length(),
-                      std::back_inserter(obuf));
-            MLOGD<<"Got X"<<sblk->block_size()<<" "<<sblk->is_fec_block();
+        // Send fec blocks over emulated lossy link
+        sendDataLossy(dec,blks,10);
+        // Check if the decoder properly outputs the data buffer
+        const auto obuf=getDataFromDecoder(dec);
+        bool buffersAreEqual=true;
+        if(compareBuffers(buff,obuf)!=0){
+            buffersAreEqual=false;
         }
-        if(compareBuffers(inputBuff,obuf)==0){
-            MLOGD<<"Got valid data";
-        }
+        MLOGD<<"Iteration "<<i<<" Equal "<<(buffersAreEqual ? "YES" : "NO");
     }
+    MLOGD<<"Done";
 }
+
+
+
 
 #ifndef __ANDROID__
 int main(int argc, char** argv) {
@@ -225,8 +228,8 @@ int main(int argc, char** argv) {
 #endif
 
 void test() {
-  uint32_t iterations = 1000;
-  uint32_t block_size = 32;
+  uint32_t iterations = 10;
+  uint32_t block_size = 1024;
   float fec_ratio = 0.5f;
 
   FECBufferEncoder enc(block_size, fec_ratio);
@@ -235,13 +238,6 @@ void test() {
            << "  " << passed.second << " Mbps";
 }
 
-void test2() {
-    uint32_t block_size = 32;
-    float fec_ratio = 0.5f;
-
-    FECBufferEncoder enc(block_size, fec_ratio);
-    run_test2(enc,block_size,fec_ratio);
-}
 
 #ifdef __ANDROID__
 
@@ -258,6 +254,7 @@ JNI_METHOD(void , nativeTestFec)
 (JNIEnv *env, jclass jclass1) {
     //test();
     //test2();
+    //run_test2();
 }
 
 }
