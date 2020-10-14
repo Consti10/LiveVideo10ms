@@ -90,18 +90,24 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:orientation="horizontal">
         <Button
             android:id="@+id/b_StartStreamingServer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="StartStreamingServer" />
         <Button
             android:id="@+id/b_StreamingServerSettings"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="SS_Settings" />
+        <Button
+            android:id="@+id/b_TestFEC"
+            android:textSize="9dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Test_FEC" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 

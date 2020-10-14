@@ -2,8 +2,8 @@
 <resources>
 
     <string-array name="entriesVideoStream" >
-        <item>RTP</item>
-        <item>RAW (h.264 nalus)</item>
+        <item>RTP H264</item>
+        <item>RAW H264</item>
         <item>CUSTOM</item>
         <item>CUSTOM2</item>
     </string-array>
@@ -31,9 +31,9 @@
     </string-array>
 
     <!-- for streaming -->
-    <string-array name="entriesStreamMode" >
-        <item>RAW H264</item>
+    <string-array name="entriesVideoTransmitterStreamMode" >
         <item>RTP H264</item>
+        <item>RAW H264</item>
         <item>CUSTOM1</item>
         <item>CUSTOM2</item>
     </string-array>

@@ -4,7 +4,7 @@
     <com.mapzen.prefsplusx.IntListPreference
         android:key="@string/KEY_STREAM_MODE"
         android:title="@string/KEY_STREAM_MODE"
-        android:entries="@array/entriesStreamMode"
+        android:entries="@array/entriesVideoTransmitterStreamMode"
         android:defaultValue="0" />
 
     <EditTextPreference

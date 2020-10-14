@@ -252,8 +252,7 @@ extern "C" {
 
 JNI_METHOD(void , nativeTestFec)
 (JNIEnv *env, jclass jclass1) {
-    //test();
-    //test2();
+    test();
     //run_test2();
 }
 

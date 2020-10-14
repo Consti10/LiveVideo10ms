@@ -14,6 +14,7 @@ import constantin.uvcintegration.TranscodeService
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
 import constantin.video.core.RequestPermissionHelper
+import constantin.video.core.TestFEC
 import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
@@ -79,6 +80,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             val i = Intent()
             i.setClass(this, ASettings::class.java)
             startActivity(i)
+        }
+        findViewById<View>(R.id.b_TestFEC).setOnClickListener {
+            TestFEC.nativeTestFec();
         }
     }
 
