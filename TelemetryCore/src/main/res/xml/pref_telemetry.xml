@@ -57,7 +57,7 @@
         <SwitchPreference
             android:key="@string/T_ORIGIN_POSITION_ANDROID"
             android:title="@string/T_ORIGIN_POSITION_ANDROID"
-            android:summary="Use you smartphone gps to calculate origin data (lat,lon,alt). This is needed unless you are using LTM or MAVLINK."
+            android:summary="Use your smartphone gps to calculate origin data (lat,lon,alt). This is needed unless you are using LTM or MAVLINK."
             android:defaultValue="false" />
         <SwitchPreference
             android:key="@string/T_MAVLINK_FLIGHTMODE_QUADCOPTER"
