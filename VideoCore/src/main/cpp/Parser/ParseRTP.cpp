@@ -65,7 +65,7 @@ void RTPDecoder::reset(){
 
 void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length){
     //12 rtp header bytes and 1 nalu_header_t type byte
-    if(data_length <= 13){
+    if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
         MLOGD<<"Not enough rtp data";
         return;
     }
@@ -89,7 +89,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
     }
     lastSequenceNumber=seqNr;
 
-    const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[12];
+    const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
 
     if (nalu_header->type == 28) { /* FU-A */
         const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
