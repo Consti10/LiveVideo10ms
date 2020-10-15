@@ -33,16 +33,13 @@ import constantin.video.core.R;
 //Once started,everything runs until onDestroy() is called
 // Create a video transmitter using the android camera for testing
 public class AVideoTransmitter extends AppCompatActivity{
-    private static final String TAG="AVideoStream";
+    private static final String TAG=AVideoTransmitter.class.getSimpleName();
 
     private TextureView previewTextureView;
     private SurfaceTexture previewTexture;
     private Surface previewSurface;
 
     private Surface encoderInputSurface;
-
-    //private static final int W=1280;
-    //private static final int H=720;
 
     private CameraDevice cameraDevice;
     private MediaCodec codec;
@@ -144,6 +141,7 @@ public class AVideoTransmitter extends AppCompatActivity{
             //format.setInteger(MediaFormat.KEY_LEVEL,MediaCodecInfo.CodecProfileLevel.AVCLevel32);
             //format.setInteger(MediaFormat.KEY_PROFILE,MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline);
             codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            Log.d(TAG,"Actual output format:"+codec.getOutputFormat().toString());
             encoderInputSurface = codec.createInputSurface();
             //codec.setCallback(mediaCodecCallback);
             codec.start();
@@ -154,15 +152,11 @@ public class AVideoTransmitter extends AppCompatActivity{
             notifyUserAndFinishActivity( "Error MediaCodec.createEncoderByType");
         }
         //Open main camera. We don't need to wait for the surface texture, since we set the callback once camera was opened
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         Log.d(TAG,"Opening camera");
         try {
             //Just assume there is a front camera
             final String cameraId = manager.getCameraIdList()[0];
-            final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            Range<Integer>[] fpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
-            Log.d(TAG,"Available fps range(s):"+Arrays.toString(fpsRanges));
-
             //StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             //imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
             manager.openCamera(cameraId, stateCallback, null);
@@ -257,6 +251,12 @@ public class AVideoTransmitter extends AppCompatActivity{
         previewSurface = new Surface(previewTexture);
 
         try {
+            final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            final String cameraId = manager.getCameraIdList()[0];
+            final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            final Range<Integer>[] supportedFpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            Log.d(TAG,"Available fps range(s):"+Arrays.toString(supportedFpsRanges));
+
             final CaptureRequest.Builder captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             captureRequestBuilder.addTarget(previewSurface);
             captureRequestBuilder.addTarget(encoderInputSurface);
@@ -269,6 +269,9 @@ public class AVideoTransmitter extends AppCompatActivity{
             }else{
                 fpsRange=new Range<>(VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS,VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS);
             }
+            //for(final Range<Integer> supportedFpsRange:supportedFpsRanges){
+            //
+            //}
             captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,fpsRange);
 
             cameraDevice.createCaptureSession(Arrays.asList(previewSurface,encoderInputSurface), new CameraCaptureSession.StateCallback() {
