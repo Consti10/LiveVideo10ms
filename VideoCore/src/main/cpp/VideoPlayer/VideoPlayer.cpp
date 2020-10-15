@@ -38,11 +38,11 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
 void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType){
     //MLOGD("onNewVideoData %d",data_length);
     switch(videoDataType){
-        case VIDEO_DATA_TYPE::RAW:
-            mParser.parse_raw_h264_stream(data,data_length);
-            break;
         case VIDEO_DATA_TYPE::RTP:
             mParser.parse_rtp_h264_stream(data,data_length);
+            break;
+        case VIDEO_DATA_TYPE::RAW:
+            mParser.parse_raw_h264_stream(data,data_length);
             break;
         case VIDEO_DATA_TYPE::CUSTOM:
             mParser.parseCustom(data,data_length);
