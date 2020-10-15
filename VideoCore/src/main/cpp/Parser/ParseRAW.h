@@ -35,6 +35,9 @@ private:
     std::size_t dji_data_buff_size=0;
     //
     void getAvailableBuffer();
+    // This time point is as 'early as possible' to debug the parsing time as accurately as possible.
+    // E.g not the time when the 'ending' sequence was detected, but the first byte of this nalu was received / parsed
+    std::chrono::steady_clock::time_point timePointStartOfReceivingNALU;
 };
 
 #endif //LIVE_VIDEO_10MS_ANDROID_PARSERAW_H

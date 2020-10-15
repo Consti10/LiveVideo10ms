@@ -22,7 +22,7 @@ public:
     static int getSequenceNumber(const uint8_t* rtp_data,const size_t data_len);
 private:
     // Properly calls the cb function
-    void forwardNALU();
+    void forwardNALU(const std::chrono::steady_clock::time_point creationTime);
     const NALU_DATA_CALLBACK cb;
     std::array<uint8_t,NALU::NALU_MAXLEN> mNALU_DATA;
     size_t mNALU_DATA_LENGTH=0;
@@ -30,6 +30,9 @@ private:
     //TDOD: What shall we do if a start, middle or end of fu-a is missing ?
     int lastSequenceNumber=-1;
     bool flagPacketHasGoneMissing=false;
+    // This time point is as 'early as possible' to debug the parsing time as accurately as possible.
+    // E.g for a fu-a NALU the time point when the start fu-a was received, not when its end is received
+    std::chrono::steady_clock::time_point timePointStartOfReceivingNALU;
 };
 
 /*********************************************

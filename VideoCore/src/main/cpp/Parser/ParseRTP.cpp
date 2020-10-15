@@ -98,10 +98,11 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
             mNALU_DATA_LENGTH+= data_length - 14;
             if(!flagPacketHasGoneMissing){
-                forwardNALU();
+                forwardNALU(timePointStartOfReceivingNALU);
             }
             mNALU_DATA_LENGTH=0;
         } else if (fu_header->s == 1) {
+            timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
             // Beginning of new fu sequence - we can remove the 'drop packet' flag
             if(flagPacketHasGoneMissing){
                 MLOGD<<"Got fu-a start - clearing missing packet flag";
@@ -127,6 +128,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         }
         //LOGV("partially nalu");
     } else if(nalu_header->type>0 && nalu_header->type<24){
+        timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
         // Full NALU - we can remove the 'drop packet' flag
         if(flagPacketHasGoneMissing){
             MLOGD<<"Got full NALU - clearing missing packet flag";
@@ -146,7 +148,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         mNALU_DATA_LENGTH++;
         memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[13], (size_t)data_length - 13);
         mNALU_DATA_LENGTH+= data_length - 13;
-        forwardNALU();
+        forwardNALU(timePointStartOfReceivingNALU);
         mNALU_DATA_LENGTH=0;
         //LOGV("full nalu");
     }else{
@@ -154,7 +156,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
     }
 }
 
-void RTPDecoder::forwardNALU() {
+void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime) {
     if(cb!= nullptr){
         NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
         //nalu_data.resize(nalu_data_length);

@@ -35,7 +35,12 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
     for (size_t i = 0; i < data_length; ++i) {
         nalu_data[nalu_data_position++] = data[i];
         if (nalu_data_position >= NALU::NALU_MAXLEN - 1) {
+            // This should never happen, but rather continue parsing than
+            // possibly raising an 'memory access' exception
             nalu_data_position = 0;
+        }
+        if(nalu_data_position==5){
+            timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
         }
         switch (nalu_search_state) {
             case 0:
@@ -66,12 +71,11 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
                         NALU nalu(lol);
                         nalu_data.resize(0);*/
                         //nalu_data.resize(naluLen);
-                        NALU nalu(nalu_data,naluLen);
+                        NALU nalu(nalu_data,naluLen,timePointStartOfReceivingNALU);
 
                         //auto x2=MLOGD;
                         //x2<<"Vector holds";
                         //for(auto& el: nalu_data) x2 << el << ' ';
-
 
                         //MLOGD<<"Size is"<<nalu_data.size()<<" capacity is"<<nalu_data.capacity();
                         //std::vector<uint8_t> v;
