@@ -158,7 +158,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
 
 void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime) {
     if(cb!= nullptr){
-        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH);
+        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,creationTime);
         //nalu_data.resize(nalu_data_length);
         //NALU nalu(nalu_data);
         cb(nalu);
@@ -187,7 +187,6 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
     // Prefix is the 0,0,0,1. RTP does not use it
     const uint8_t *nalu_buf_without_prefix = &nalu_data[4];
     const size_t nalu_len_without_prefix= nalu_data_len - 4;
-
 
     ts_current += (90000 / framerate);  /* 90000 / 25 = 3600 */
 

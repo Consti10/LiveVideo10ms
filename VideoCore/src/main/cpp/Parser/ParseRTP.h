@@ -22,6 +22,7 @@ public:
     static int getSequenceNumber(const uint8_t* rtp_data,const size_t data_len);
 private:
     // Properly calls the cb function
+    // Resets the mNALU_DATA_LENGTH to 0
     void forwardNALU(const std::chrono::steady_clock::time_point creationTime);
     const NALU_DATA_CALLBACK cb;
     std::array<uint8_t,NALU::NALU_MAXLEN> mNALU_DATA;
