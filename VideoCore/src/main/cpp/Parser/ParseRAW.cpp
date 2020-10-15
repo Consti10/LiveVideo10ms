@@ -39,6 +39,8 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
             // possibly raising an 'memory access' exception
             nalu_data_position = 0;
         }
+        // Since the '0,0,0,1' is written by the loop,
+        // The 5th byte is the first byte that is actually 'parsed'
         if(nalu_data_position==5){
             timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
         }
