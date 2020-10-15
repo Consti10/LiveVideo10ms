@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="constantin.video.transmitter.AVideoStream">
+    tools:context="constantin.video.transmitter.AVideoTransmitter">
 
     <TextureView
         android:id="@+id/mTextureView"

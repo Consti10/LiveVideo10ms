@@ -32,7 +32,7 @@ import constantin.video.core.R;
 //Note: Pausing /resuming is not supported.
 //Once started,everything runs until onDestroy() is called
 // Create a video transmitter using the android camera for testing
-public class AVideoStream extends AppCompatActivity{
+public class AVideoTransmitter extends AppCompatActivity{
     private static final String TAG="AVideoStream";
 
     private TextureView previewTextureView;
@@ -65,7 +65,7 @@ public class AVideoStream extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_avideo_stream);
+        setContentView(R.layout.activity_video_transmitter);
 
         //mBackgroundThread = new HandlerThread("Encoder output");
         //mBackgroundThread.start();
@@ -272,7 +272,7 @@ public class AVideoStream extends AppCompatActivity{
                 }
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(AVideoStream.this, "Configuration change", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AVideoTransmitter.this, "Configuration change", Toast.LENGTH_SHORT).show();
                 }
             }, null);
         } catch (CameraAccessException e) {

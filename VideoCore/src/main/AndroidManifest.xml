@@ -19,7 +19,7 @@
             android:screenOrientation="behind" />
 
         <activity
-            android:name="constantin.video.transmitter.AVideoStream"
+            android:name="constantin.video.transmitter.AVideoTransmitter"
             android:screenOrientation="portrait" />
         <activity
             android:name="constantin.video.transmitter.AVideoTransmitterSettings"

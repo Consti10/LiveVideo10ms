@@ -19,7 +19,7 @@ import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
 import constantin.video.transmitter.AVideoTransmitterSettings
-import constantin.video.transmitter.AVideoStream
+import constantin.video.transmitter.AVideoTransmitter
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var spinnerVideoTestFileFromAssets: Spinner;
@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             TranscodeService.stopTranscoding(context);
         }
         findViewById<View>(R.id.b_StartStreamingServer).setOnClickListener {
-            val intent = Intent().setClass(context, AVideoStream::class.java)
+            val intent = Intent().setClass(context, AVideoTransmitter::class.java)
             startActivity(intent)
         }
         findViewById<View>(R.id.b_StreamingServerSettings).setOnClickListener {
