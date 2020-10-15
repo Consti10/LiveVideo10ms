@@ -31,8 +31,8 @@ void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_len
 }
 
 void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
-    const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
-    debugSequenceNumbers(seqNr);
+    //const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
+    //debugSequenceNumbers(seqNr);
     mDecodeRTP.parseRTPtoNALU(rtp_data, data_length);
 }
 

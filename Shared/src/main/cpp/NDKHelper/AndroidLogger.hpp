@@ -126,7 +126,7 @@ namespace PrettyFunctionHelper{
             };
         }
     }
-    static const std::string x2=TestNamespace1::TestNamespace2::Test2::testMacro();
+    //static const std::string x2=TestNamespace1::TestNamespace2::Test2::testMacro();
 }
 #ifndef ANDROID_LOGER_DEFINE_CUSTOM_CLASS_NAME_MACRO
 #define __NAMESPACE_AND_CLASS_NAME__ PrettyFunctionHelper::namespaceAndClassName(__FUNCTION__,__PRETTY_FUNCTION__)

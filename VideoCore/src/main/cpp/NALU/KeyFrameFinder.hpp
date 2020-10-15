@@ -21,10 +21,10 @@ public:
         if(nalu.getSize()<=0)return;
         if(nalu.isSPS()){
             CSD0=new NALU(nalu);
-            MLOGD<<"SPS found";
+            //MLOGD<<"SPS found";
         }else if(nalu.isPPS()){
             CSD1=new NALU(nalu);
-            MLOGD<<"PPS found";
+            //MLOGD<<"PPS found";
         }
     }
     bool allKeyFramesAvailable(){
