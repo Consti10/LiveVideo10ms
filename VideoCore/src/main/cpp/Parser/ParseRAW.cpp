@@ -61,51 +61,8 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
                     nalu_data[3] = 1;
                     if(cb!=nullptr && nalu_data_position>=4){
                         const size_t naluLen=nalu_data_position-4;
-                        //test(nalu_data,naluLen);
-
-                        //auto x=MLOGD;
-                        //x<<"Vector holds";
-                        //for(auto& el: nalu_data) x << el << ' ';
-
-                        /*nalu_data.resize(dataLen);
-                        auto lol=std::vector<uint8_t>(nalu_data.data(),nalu_data.data()+dataLen);
-                        lol.resize(dataLen);
-                        NALU nalu(lol);
-                        nalu_data.resize(0);*/
-                        //nalu_data.resize(naluLen);
                         NALU nalu(nalu_data,naluLen,timePointStartOfReceivingNALU);
-
-                        //auto x2=MLOGD;
-                        //x2<<"Vector holds";
-                        //for(auto& el: nalu_data) x2 << el << ' ';
-
-                        //MLOGD<<"Size is"<<nalu_data.size()<<" capacity is"<<nalu_data.capacity();
-                        //std::vector<uint8_t> v;
-                        //for(int i=0;i<nalu_data_position-4;i++){
-                        //    v.push_back(nalu_data[i]);
-                        //}
-                        //v.resize(nalu_data_position-4);
-                        //nalu_data.resize(nalu_data_position-4);
-                        //MLOGD<<"N size is"<<nalu_data_position-4;
-                        //NALU nalu(nalu_data);
-
                         cb(nalu);
-
-                        /*auto x=MLOGD;
-                        std::vector<int> c = {1, 2, 3};
-                        x << "The vector holds: ";
-                        for(auto& el: c) x << el << ' ';
-                        x << '\n';
-                        c.resize(5);
-                        x << "After resize up to 5: ";
-                        for(auto& el: c) x << el << ' ';
-                        x << '\n';
-                        c.resize(2);
-                        x << "After resize down to 2: ";
-                        for(auto& el: c) x << el << ' ';
-                        x << '\n';
-                        MLOGD<<"Size is"<<c.size()<<"capacity "<<c.capacity();*/
-
                     }
                     nalu_data_position = 4;
                 }
