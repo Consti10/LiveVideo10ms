@@ -240,7 +240,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
          * 1. Count the number of divisions
          *
          * Except for the last shard，
-         * Consumption per shard RTP_PAYLOAD_MAX_SIZE BYLE
+         * Consumption per shard RTP_PAYLOAD_MAX_SIZE BYTE
          */
         /* The number of splits when nalu needs to be split to send */
         const int fu_pack_num = nalu_len_without_prefix % RTP_PAYLOAD_MAX_SIZE ? (nalu_len_without_prefix / RTP_PAYLOAD_MAX_SIZE + 1) : nalu_len_without_prefix / RTP_PAYLOAD_MAX_SIZE;
@@ -362,7 +362,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
 
     } /* end of else-if (nalu_len <= RTP_PAYLOAD_MAX_SIZE) */
     return 0;
-}/* void *h264tortp_send(VENC_STREAM_S *pstream, char *rec_ipaddr) */
+}
 
 
 void RTPEncoder::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {

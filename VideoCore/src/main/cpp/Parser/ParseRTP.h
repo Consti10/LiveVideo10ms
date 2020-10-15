@@ -58,6 +58,7 @@ public:
     };
     // Set / change the callback
     void setCallback(RTP_DATA_CALLBACK cb){mCB=cb;};
+    // Parse one NALU into one or more RTP packets
     int parseNALtoRTP(int framerate, const uint8_t *nalu_data,const size_t nalu_data_len);
     // If the NAL unit fits into one rtp packet the overhead is 12 bytes
     // Else, the overhead can be up to 12+2 bytes
@@ -68,7 +69,7 @@ private:
     RTP_DATA_CALLBACK mCB;
     void forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len);
     // This buffer size does not affect the RTP packet size
-    // I allocate a big buffer here to account for RTP packet sizes of up to 1024*1024 bytes
+    // I allocate a big buffer here to account for all RTP packet sizes of up to 1024*1024 bytes
     static constexpr const std::size_t SEND_BUF_SIZE=1024*1024;
     uint8_t mRTP_BUFF_SEND[SEND_BUF_SIZE];
     uint16_t seq_num = 0;
