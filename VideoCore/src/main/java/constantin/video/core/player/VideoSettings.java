@@ -105,6 +105,7 @@ public class VideoSettings {
 
     // Adds a .fpv file (created via the ndk file api) to the ContentResolver such that it is
     // indexed by the android os (displayed via the files app)
+    // Called by native code
     public static void addFpvFileToContentProvider(final Context c,final String pathToFile){
         Log.d(TAG,"Add file "+pathToFile);
         ContentValues values = new ContentValues();

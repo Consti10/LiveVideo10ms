@@ -76,11 +76,11 @@ public class VideoPlayer implements IVideoParamsChanged{
 
     /**
      * Depending on the selected Settings, this starts either
-     * a) Receiving RAW over UDP
-     * b) Receiving RTP over UDP
+     * a) Receiving RTP over UDP
+     * b) Receiving RAW over UDP
      * c) Receiving Data from a resource file (Assets)
      * d) Receiving Data from a file in the phone file system
-     * e) External
+     * e) and more
      */
     public void addAndStartDecoderReceiver(Surface surface){
         setVideoSurface(surface);
@@ -149,6 +149,7 @@ public class VideoPlayer implements IVideoParamsChanged{
         System.out.println("Video W and H"+videoW+","+videoH);
     }
 
+    // called by native code via NDK
     @Override
     public void onDecodingInfoChanged(DecodingInfo decodingInfo) {
         if(mVideoParamsChanged !=null){
@@ -187,9 +188,9 @@ public class VideoPlayer implements IVideoParamsChanged{
     public static native long nativeGetExternalGroundRecorder(long nativeInstance);
     public static native long nativeGetExternalFileReader(long nativeInstance);
 
-    //TODO: Use message queue from cpp for performance
+    //TODO: Use message queue from cpp for performance#
+    //This initiates a 'call back' for the IVideoParams
     public static native <T extends IVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
-
 
     public static void verifyApplicationThread() {
         if (Looper.myLooper() != Looper.getMainLooper()) {

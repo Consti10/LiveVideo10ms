@@ -8,7 +8,7 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 
 //UDP -> Put data in, hope the data comes out at the other end of the network
-//Uses ndk to send UDP packets to specified ip and port
+//Uses ndk to send UDP packets to specified ip and port at the set protocol
 
 public class VideoTransmitter {
     private static final String TAG="VideoTransmitter";
@@ -44,7 +44,7 @@ public class VideoTransmitter {
         });
     }
 
-    //When using a special Handler for the Encoder*s callbacks
+    //When using a special Handler for the Encoder's callbacks
     //We do not need to create an extra thread
     public void sendOnCurrentThread(final ByteBuffer data){
         if(!data.isDirect()){
