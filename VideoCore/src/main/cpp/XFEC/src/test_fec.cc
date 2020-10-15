@@ -64,7 +64,7 @@ std::size_t cumulativeSizeBytes(const std::vector<std::shared_ptr<FECBlock>>& bl
 // A lossy link is emulated by dropping some fec blocks
 // @param RANDOMNESS: the smaller the value, the more packets are dropped
 // If RANDOMNESS is a negative value no packets are dropped,if RANDOMNESS is 0 all packets are dropped
-// If RANDOMNESS is 10 for example, roughly 10 % of the packets wre dropped
+// If RANDOMNESS is 10 for example, roughly 10 % of the packets are dropped
 std::size_t sendDataLossy(FECDecoder& dec,const std::vector<std::shared_ptr<FECBlock>>& blks,const int RANDOMNESS=10){
     std::size_t drop_count=0;
     for (std::shared_ptr<FECBlock> blk : blks) {
@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
 #endif
 
 void test() {
-  uint32_t iterations = 10;
+  uint32_t iterations = 100;
   uint32_t block_size = 1024;
   float fec_ratio = 0.5f;
 
@@ -253,7 +253,7 @@ extern "C" {
 JNI_METHOD(void , nativeTestFec)
 (JNIEnv *env, jclass jclass1) {
     test();
-    //run_test2();
+    run_test2();
 }
 
 }
