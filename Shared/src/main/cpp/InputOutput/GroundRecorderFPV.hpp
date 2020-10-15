@@ -14,6 +14,7 @@
 #include <chrono>
 #include <optional>
 #include <jni.h>
+#include <AndroidLogger.hpp>
 
 /**
  * Thread-safe class for writing a .fpv ground recording file
@@ -30,9 +31,15 @@ private:
     * to not pollute the file system with empty files
     */
     void createOpenFileIfNeeded(){
+        //MLOGD<<"createOpenFileIfNeeded";
         if(!ofstream.is_open()){
             createdPathFilename=FileHelper::findUnusedFilename(DIRECTORY,"fpv");
+            //createdPathFilename=DIRECTORY+"TESTING.txt";
+            MLOGD<<"Created "<<createdPathFilename;
             ofstream.open (createdPathFilename.c_str());
+            if(!ofstream.is_open()){
+                MLOGE<<"Cannot open ?!"<<ofstream.failbit<<" fail: " <<ofstream.fail() << " bad: " << ofstream.bad();
+            }
             fileCreationTime=std::chrono::steady_clock::now();
         }
     }
@@ -43,6 +50,8 @@ private:
             ofstream.flush();
             ofstream.close();
             return createdPathFilename;
+        }else{
+            MLOGD<<"No data was recorded";
         }
         return std::nullopt;
     }
@@ -105,6 +114,7 @@ public:
 private:
     std::ofstream ofstream;
     void addFpvFileToContentProvider(JNIEnv* env,jobject androidContext,std::string filePath){
+        MLOGD<<"Adding fpv file to content provider";
         jclass jcVideoSettings = env->FindClass("constantin/video/core/player/VideoSettings");
         assert(jcVideoSettings != nullptr);
         jmethodID jmethodId = env->GetStaticMethodID(jcVideoSettings, "addFpvFileToContentProvider", "(Landroid/content/Context;Ljava/lang/String;)V" );

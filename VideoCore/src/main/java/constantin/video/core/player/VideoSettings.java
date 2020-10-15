@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.preference.PreferenceManager;
 
@@ -105,7 +106,7 @@ public class VideoSettings {
 
     // Adds a .fpv file (created via the ndk file api) to the ContentResolver such that it is
     // indexed by the android os (displayed via the files app)
-    // Called by native code
+    // Called via jni from native code
     public static void addFpvFileToContentProvider(final Context c,final String pathToFile){
         Log.d(TAG,"Add file "+pathToFile);
         ContentValues values = new ContentValues();
@@ -118,6 +119,7 @@ public class VideoSettings {
         final Uri uri=c.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
         if(uri!=null){
             Log.d(TAG,"URI "+uri.toString());
+            Toast.makeText(c,"Saved Ground Recording File "+pathToFile,Toast.LENGTH_SHORT).show();
         }else{
             //Log.w(TAG,"URI is null - something went wrong");
             throw new RuntimeException("Cannot add file to contentProvider "+pathToFile);
