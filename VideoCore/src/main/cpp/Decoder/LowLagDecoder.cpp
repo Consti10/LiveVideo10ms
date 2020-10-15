@@ -164,6 +164,8 @@ void LowLagDecoder::feedDecoder(const NALU& nalu){
             //just try again. But if we had no success in the last 1 second,log a warning and return.
             const auto elapsedTimeTryingForBuffer=std::chrono::steady_clock::now()-now;
             if(elapsedTimeTryingForBuffer>std::chrono::seconds(1)){
+                // Since OpenHD provides a lossy link it is really unlikely, but possible that we somehow 'break' the codec by feeding corrupt data.
+                // It will probably recover itself as soon as we feed enough valid data though;
                 MLOGE<<"AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "<<MyTimeHelper::R(elapsedTimeTryingForBuffer)<<"return.";
                 return;
             }
