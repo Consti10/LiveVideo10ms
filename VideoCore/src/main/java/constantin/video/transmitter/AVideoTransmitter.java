@@ -98,7 +98,7 @@ public class AVideoTransmitter extends AppCompatActivity{
                                     mUDPSender.sendOnCurrentThread(currentCSD1);
                                 }
                                 haveToManuallySendKeyFrame++;
-                                haveToManuallySendKeyFrame=haveToManuallySendKeyFrame % 2;
+                                haveToManuallySendKeyFrame=haveToManuallySendKeyFrame % 10;
                             }
                             mUDPSender.sendOnCurrentThread(outputBuffer);
                             codec.releaseOutputBuffer(outputBufferId,false);
