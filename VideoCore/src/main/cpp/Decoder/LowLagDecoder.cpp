@@ -22,8 +22,10 @@ LowLagDecoder::LowLagDecoder(JNIEnv* env){
 void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface,SharedPreferences& videoSettings){
     USE_SW_DECODER_INSTEAD=videoSettings.getBoolean(IDV::VS_USE_SW_DECODER);
     if(surface==nullptr){
+        //MLOGD<<"Set output surface to null";
         //assert(decoder.window!=nullptr);
         if(decoder.window== nullptr){
+            //MLOGD<<"Decoder window is already null";
             return;
         }
         std::lock_guard<std::mutex> lock(mMutexInputPipe);

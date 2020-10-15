@@ -92,9 +92,10 @@ private:
     std::unique_ptr<std::thread> mCheckOutputThread= nullptr;
     bool USE_SW_DECODER_INSTEAD=false;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)
-    Decoder decoder;
+    Decoder decoder{};
     DecodingInfo decodingInfo;
-    bool inputPipeClosed=false;
+    // The input pipe is closed until we set a valid surface
+    bool inputPipeClosed=true;
     std::mutex mMutexInputPipe;
     DECODER_RATIO_CHANGED onDecoderRatioChangedCallback= nullptr;
     DECODING_INFO_CHANGED_CALLBACK onDecodingInfoChangedCallback= nullptr;
