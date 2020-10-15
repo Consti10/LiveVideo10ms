@@ -18,5 +18,22 @@
         android:defaultValue="5"
         />
 
+    <com.mapzen.prefsplusx.EditIntPreference
+        android:key="@string/VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS"
+        android:title="@string/VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS"
+        android:defaultValue="30"
+        />
+
+
+    <com.mapzen.prefsplusx.EditIntPreference
+        android:key="@string/VIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX"
+        android:title="@string/VIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX"
+        android:defaultValue="1280"
+        />
+    <com.mapzen.prefsplusx.EditIntPreference
+        android:key="@string/VIDEO_TRANSMITTER_CAMERA_ENCODER_H_PX"
+        android:title="@string/VIDEO_TRANSMITTER_CAMERA_ENCODER_H_PX"
+        android:defaultValue="720"
+        />
 
 </PreferenceScreen>

@@ -41,9 +41,8 @@ public class AVideoTransmitter extends AppCompatActivity{
 
     private Surface encoderInputSurface;
 
-    private static final int W=1280;
-    private static final int H=720;
-    private static final int MDEIACODEC_ENCODER_TARGET_FPS=30;
+    //private static final int W=1280;
+    //private static final int H=720;
 
     private CameraDevice cameraDevice;
     private MediaCodec codec;
@@ -66,6 +65,7 @@ public class AVideoTransmitter extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_transmitter);
+
 
         //mBackgroundThread = new HandlerThread("Encoder output");
         //mBackgroundThread.start();
@@ -124,11 +124,14 @@ public class AVideoTransmitter extends AppCompatActivity{
         //Create Decoder. We don't have to wait for anything here
         try {
             codec= MediaCodec.createEncoderByType("video/avc");
+            final int W=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX(this);
+            final int H=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_H_PX(this);
             MediaFormat format = MediaFormat.createVideoFormat("video/avc",W,H);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
 
             //final int MDEIACODEC_TARGET_KEY_BIT_RATE=5*1024*1024;
             final int MDEIACODEC_TARGET_KEY_BIT_RATE= AVideoTransmitterSettings.getVIDEO_TRANSMITTER_ENCODER_BITRATE_MBITS(this)*1024*1024;
+            final int MDEIACODEC_ENCODER_TARGET_FPS=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_FPS(this);
 
             format.setInteger(MediaFormat.KEY_BIT_RATE,MDEIACODEC_TARGET_KEY_BIT_RATE); //X MBit/s
             format.setInteger(MediaFormat.KEY_FRAME_RATE,MDEIACODEC_ENCODER_TARGET_FPS);
@@ -248,6 +251,8 @@ public class AVideoTransmitter extends AppCompatActivity{
         //The Camera has been opened
         //The preview Surface texture has been created
         //The encoder surface has been created
+        final int W=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX(this);
+        final int H=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_H_PX(this);
         previewTexture.setDefaultBufferSize(W,H);
         previewSurface = new Surface(previewTexture);
 
@@ -257,7 +262,13 @@ public class AVideoTransmitter extends AppCompatActivity{
             captureRequestBuilder.addTarget(encoderInputSurface);
 
             //Log.d("FPS", "SYNC_MAX_LATENCY_PER_FRAME_CONTROL: " + Arrays.toString(fpsRanges));
-            Range<Integer> fpsRange=new Range<>(30,60);
+            final int VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_FPS(this);
+            final Range<Integer> fpsRange;
+            if(VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS==30){
+               fpsRange=new Range<>(30,60);
+            }else{
+                fpsRange=new Range<>(VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS,VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS);
+            }
             captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,fpsRange);
 
             cameraDevice.createCaptureSession(Arrays.asList(previewSurface,encoderInputSurface), new CameraCaptureSession.StateCallback() {
@@ -272,7 +283,7 @@ public class AVideoTransmitter extends AppCompatActivity{
                 }
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(AVideoTransmitter.this, "Configuration change", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AVideoTransmitter.this, "Camera onConfigureFailed", Toast.LENGTH_SHORT).show();
                 }
             }, null);
         } catch (CameraAccessException e) {

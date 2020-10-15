@@ -12,7 +12,7 @@ import androidx.preference.PreferenceManager;
 import constantin.video.core.R;
 
 
-// Video stream provider settings
+// Video stream transmitter settings
 public class AVideoTransmitterSettings extends AppCompatActivity {
     public static final String EXTRA_KEY="SHOW_ADVANCED_SETTINGS";
     public static final String SHARED_PREFERENCES_NAME="pref_video_transmitter";
@@ -49,6 +49,20 @@ public class AVideoTransmitterSettings extends AppCompatActivity {
         return getSharedPreferences(context).
                 getInt(context.getString(R.string.VIDEO_TRANSMITTER_ENCODER_BITRATE_MBITS),5);
     }
+
+    public static int getVIDEO_TRANSMITTER_CAMERA_ENCODER_FPS(final Context context){
+        return getSharedPreferences(context).
+                getInt(context.getString(R.string.VIDEO_TRANSMITTER_CAMERA_ENCODER_FPS),30);
+    }
+    public static int getVIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX(final Context context){
+        return getSharedPreferences(context).
+                getInt(context.getString(R.string.VIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX),1280);
+    }
+    public static int getVIDEO_TRANSMITTER_CAMERA_ENCODER_H_PX(final Context context){
+        return getSharedPreferences(context).
+                getInt(context.getString(R.string.VIDEO_TRANSMITTER_CAMERA_ENCODER_H_PX),720);
+    }
+
 
     public static class MSettingsFragment extends PreferenceFragmentCompat {
 
