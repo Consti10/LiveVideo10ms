@@ -58,6 +58,6 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion"
     implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"
     implementation "com.github.Consti10:prefs-plus:$rootProject.myPrefsPlusVersion"
-    implementation project(':Shared')
+    api project(':Shared')
     //implementation 'com.github.Consti10:prefab-publishing:Tag'
 }

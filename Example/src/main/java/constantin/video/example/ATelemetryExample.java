@@ -2,26 +2,16 @@ package constantin.video.example;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.opengl.EGL14;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import constantin.helper.RequestPermissionHelper;
 import constantin.telemetry.core.ASettingsTelemetry;
-import constantin.telemetry.core.RequestPermissionHelper;
 import constantin.telemetry.core.TelemetrySettings;
 import constantin.telemetry.core.TestReceiverTelemetry;
 

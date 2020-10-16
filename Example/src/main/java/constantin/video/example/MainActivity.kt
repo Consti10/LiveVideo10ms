@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import constantin.uvcintegration.TranscodeService
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
-import constantin.video.core.RequestPermissionHelper
+import constantin.helper.RequestPermissionHelper
 import constantin.video.core.TestFEC
 import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
@@ -24,7 +24,7 @@ import constantin.video.transmitter.AVideoTransmitter
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var spinnerVideoTestFileFromAssets: Spinner;
     private lateinit var context: Context;
-    private val permissionHelper=RequestPermissionHelper(
+    private val permissionHelper= constantin.helper.RequestPermissionHelper(
             arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA)
     );
