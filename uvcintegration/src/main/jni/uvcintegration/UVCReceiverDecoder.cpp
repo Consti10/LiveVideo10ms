@@ -46,9 +46,12 @@ private:
     const std::string GROUND_RECORDING_DIRECTORY;
     GroundRecorderFPV groundRecorderFPV;
     MJPEGDecodeAndroid mMJPEGDecodeAndroid;
+    const boolean ENABLE_GROUND_REC;
 public:
-    UVCReceiverDecoder(JNIEnv* env,std::string GROUND_RECORDING_DIRECTORY2):GROUND_RECORDING_DIRECTORY(std::move(GROUND_RECORDING_DIRECTORY2)),
-    groundRecorderFPV(GROUND_RECORDING_DIRECTORY){
+    UVCReceiverDecoder(JNIEnv* env,std::string GROUND_RECORDING_DIRECTORY2,boolean enableGroundRec):GROUND_RECORDING_DIRECTORY(std::move(GROUND_RECORDING_DIRECTORY2)),
+    groundRecorderFPV(GROUND_RECORDING_DIRECTORY)
+    ,ENABLE_GROUND_REC(enableGroundRec)
+    {
         javaVm=nullptr;
         env->GetJavaVM(&javaVm);
     }
@@ -153,7 +156,9 @@ public:
                         MLOGD<<"Streaming...";
                         //uvc_set_ae_mode(devh, 1); /* e.g., turn on auto exposure */
                         isStreaming=true;
-                        groundRecorderFPV.start();
+                        if(ENABLE_GROUND_REC){
+                            groundRecorderFPV.start();
+                        }
                         return 0;
                     }
                 }
@@ -199,8 +204,8 @@ inline UVCReceiverDecoder *native(jlong ptr) {
 }
 
 JNI_METHOD(jlong, nativeConstruct)
-(JNIEnv *env, jclass jclass1,jstring groundRecordingDir) {
-    auto* tmp=new UVCReceiverDecoder(env,NDKArrayHelper::DynamicSizeString(env,groundRecordingDir));
+(JNIEnv *env, jclass jclass1,jstring groundRecordingDir,jboolean enableGroundRec) {
+    auto* tmp=new UVCReceiverDecoder(env,NDKArrayHelper::DynamicSizeString(env,groundRecordingDir),enableGroundRec);
     return jptr(tmp);
 }
 JNI_METHOD(void, nativeDelete)

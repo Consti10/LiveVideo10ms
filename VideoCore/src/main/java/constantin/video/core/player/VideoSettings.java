@@ -73,6 +73,10 @@ public class VideoSettings {
         context.getSharedPreferences("pref_video",Context.MODE_PRIVATE).edit().
                 putBoolean(context.getString(R.string.VS_GROUND_RECORDING),enable).commit();
     }
+    public static boolean getVS_GROUND_RECORDING(final Context context){
+        return context.getSharedPreferences("pref_video",Context.MODE_PRIVATE).
+                getBoolean(context.getString(R.string.VS_GROUND_RECORDING),false);
+    }
 
 
     //0=normal

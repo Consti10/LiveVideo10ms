@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import java.io.File;
 
 import constantin.video.core.player.DecodingInfo;
+import constantin.video.core.player.VideoSettings;
 
 // Handles receiving & decoding of UVC devices that supply MJPEG frames (like ROTG02)
 public class UVCReceiverDecoder {
@@ -23,8 +24,8 @@ public class UVCReceiverDecoder {
     public long nativeInstance;
     private boolean alreadyStreaming=false;
 
-    public UVCReceiverDecoder(){
-        nativeInstance=nativeConstruct(getDirectoryToSaveDataTo());
+    public UVCReceiverDecoder(final Context context){
+        nativeInstance=nativeConstruct(getDirectoryToSaveDataTo(), VideoSettings.getVS_GROUND_RECORDING(context));
     }
 
     public void startReceiving(final Context context,final UsbDevice device,final UsbDeviceConnection connection){
@@ -87,7 +88,7 @@ public class UVCReceiverDecoder {
         nativeSetSurface(nativeInstance,surface);
     }
 
-    private static native long nativeConstruct(String GroundRecordingDirectory);
+    private static native long nativeConstruct(String GroundRecordingDirectory,boolean enableGroundRecording);
     private static native void nativeDelete(long nativeInstance);
     // returns 0 on success
     private static native int nativeStartReceiving(long nativeInstance,int venderId, int productId, int fileDescriptor, int busNum, int devAddr, String usbfs);

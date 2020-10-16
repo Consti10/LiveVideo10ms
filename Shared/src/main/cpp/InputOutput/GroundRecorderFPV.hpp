@@ -35,7 +35,7 @@ private:
         if(!ofstream.is_open()){
             createdPathFilename=FileHelper::findUnusedFilename(DIRECTORY,"fpv");
             //createdPathFilename=DIRECTORY+"TESTING.txt";
-            MLOGD<<"Created "<<createdPathFilename;
+            //MLOGD<<"Created "<<createdPathFilename;
             ofstream.open (createdPathFilename.c_str());
             if(!ofstream.is_open()){
                 MLOGE<<"Cannot open ?!"<<ofstream.failbit<<" fail: " <<ofstream.fail() << " bad: " << ofstream.bad();

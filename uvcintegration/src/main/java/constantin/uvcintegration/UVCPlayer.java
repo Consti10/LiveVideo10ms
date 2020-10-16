@@ -38,7 +38,7 @@ import constantin.video.core.gl.ISurfaceTextureAvailable;
 // Uses SurfaceHolder.Callback to get / remove decoding surface
 public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
     private static final String TAG="UVCPlayer";
-    private final UVCReceiverDecoder mUVCReceiverDecoder=new UVCReceiverDecoder();
+    private final UVCReceiverDecoder mUVCReceiverDecoder;
     public static final String ACTION_USB_PERMISSION =
             "constantin.fpv_vr.wifibroadcast.USB_PERMISSION";
     public static final String USB_DEVICE_ATTACHED="android.hardware.usb.action.USB_DEVICE_ATTACHED";
@@ -52,6 +52,7 @@ public class UVCPlayer extends BroadcastReceiver implements LifecycleObserver {
     private Timer timer;
 
     public UVCPlayer(final AppCompatActivity parent){
+        mUVCReceiverDecoder=new UVCReceiverDecoder(parent);
         parent.getLifecycle().addObserver(this);
         this.parent=parent;
         usbManager=(UsbManager)parent.getSystemService(Context.USB_SERVICE);
