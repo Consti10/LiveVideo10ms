@@ -47,6 +47,10 @@ android {
     //        headers "src/main/cpp"
     //    }
     //}
+    // https://github.com/google/prefab/issues/118
+    packagingOptions {
+        exclude("**.so")
+    }
 }
 
 dependencies {

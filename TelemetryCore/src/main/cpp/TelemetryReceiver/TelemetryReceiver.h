@@ -46,7 +46,7 @@ private:
     void onUAVTelemetryDataReceived(const uint8_t[],size_t);
     void onEZWBStatusDataReceived(const uint8_t[],size_t);
 private:
-    enum SOURCE_TYPE_OPTIONS { UDP,FILE,ASSETS,EXTERNAL_DJI };
+    enum SOURCE_TYPE_OPTIONS {UDP,FILE,ASSETS,EXTERNAL_DJI };
     enum PROTOCOL_OPTIONS {NONE,LTM,MAVLINK,SMARTPORT,FRSKY};
     enum EZWB_STATUS_PROTOCOL{DISABLED,EZWB_16_rc6,OpenHD_1_0_0};
     enum METRIC_SPEED{KMH,MS};
@@ -82,7 +82,7 @@ public:
     TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderFPV* externalGroundRecorder,FileReader* externalFileReader,CONNECTED_SYSTEM connectedSystem1);
     /**
      * Start all telemetry receiver. If they are already receiving, nothing happens.
-     * Make sure startReceiving() and stopReceivingAndWait() are not called on different threads
+     * Make sure startReceiving() and stopReceiving() are not called on different threads
      * Also make sure to call stopReceiving() every time startReceiving() is called
      * Change 22.02.2020: Also read all settings from shared preferences (before they were immutable, but this meant you
      * had to re-create the native TelemetryReceiver() every time shared preferences were changed)
@@ -170,7 +170,7 @@ private:
     JavaVM* javaVm;
 public:
     UAVTelemetryData uav_td{};
-    wifibroadcast_rx_status_forward_t2 wifibroadcastTelemetryData;
+    wifibroadcast_rx_status_forward_t2 wifibroadcastTelemetryData{};
     static constexpr const float KMH_TO_MS=1000.0F/(60.0F*60.0F);
 private:
     const std::wstring ICON_BATTERY=std::wstring(1,(wchar_t)192);

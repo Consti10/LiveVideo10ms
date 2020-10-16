@@ -11,7 +11,7 @@
 #include <TimeHelper.hpp>
 
 /**
- * Allows sending UDP data on the current thread. No extra thread for sending is created (make sure to not call sendto() on the UI thread)
+ * Allows sending UDP data on the current thread. No extra thread for sending is created (make sure to not call mySendTo() on the UI thread)
  */
 class UDPSender{
 public:

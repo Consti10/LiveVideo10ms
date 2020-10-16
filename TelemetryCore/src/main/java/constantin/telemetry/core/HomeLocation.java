@@ -77,7 +77,7 @@ public class HomeLocation implements LifecycleObserver {
         }
     }
 
-    private void printLocation(Location mCurrentHomeLocation){
+    private void printLocation(final Location mCurrentHomeLocation){
         System.out.println("Lat:"+mCurrentHomeLocation.getLatitude()+" Lon:"+mCurrentHomeLocation.getLongitude()+" Alt:"
                 +mCurrentHomeLocation.getAltitude()+" Accuracy:"+mCurrentHomeLocation.getAccuracy()+" Provider:"
                 +mCurrentHomeLocation.getProvider());

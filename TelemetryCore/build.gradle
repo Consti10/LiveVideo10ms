@@ -34,17 +34,17 @@ android {
 
     // looks like prefab is just not ready yet ( too many compile errors for me)
     buildFeatures {
-        prefabPublishing true
+        //prefabPublishing true
     }
-    prefab {
-        TelemetryReceiver {
-            headers "src/main/cpp/TelemetryReceiver"
-            //headers "src/main/cpp/SharedCppC"
-            //headers "src/main/cpp/WFBTelemetryData"
-            //headers "../VideoTelemetryShared/Helper"
-            //headers "../VideoTelemetryShared/InputOutput"
-        }
-    }
+    //prefab {
+    //   TelemetryReceiver {
+    //       headers "src/main/cpp/TelemetryReceiver"
+    //        //headers "src/main/cpp/SharedCppC"
+    //         //headers "src/main/cpp/WFBTelemetryData"
+    //        //headers "../VideoTelemetryShared/Helper"
+    //        //headers "../VideoTelemetryShared/InputOutput"
+    //   }
+    //}
 }
 
 dependencies {
