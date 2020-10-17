@@ -40,19 +40,19 @@ namespace MyTimeHelper{
 
 // Use this class to compare many samples of the same kind
 // Saves the minimum,maximum and average of all the samples
-class AvgCalculator{
+// The type of the samples is for example std::chrono::nanoseconds when measuring time intervalls
+template<typename T>
+class BaseAvgCalculator{
 private:
     // do not forget the braces to initialize with 0
-    std::chrono::nanoseconds sum{};
+    T sum{};
     long nSamples=0;
-    std::chrono::nanoseconds min=std::chrono::nanoseconds::max();
-    std::chrono::nanoseconds max{};
+    T min=std::numeric_limits<T>::max();
+    T max{};
 public:
-    AvgCalculator() = default;
-    // typedef duration<long long,         nano> nanoseconds;
-    // I think std::chrono::nanoseconds is a duration
-    void add(const std::chrono::nanoseconds& value){
-        if(value<std::chrono::nanoseconds(0)){
+    BaseAvgCalculator() = default;
+    void add(const T& value){
+        if(value<T(0)){
             MLOGE<<"Cannot add negative value";
             return;
         }
@@ -65,47 +65,34 @@ public:
             max=value;
         }
     }
-    std::chrono::nanoseconds getAvg()const{
-        if(nSamples == 0)return std::chrono::nanoseconds(0);
+    // Returns the average of all samples.
+    // If 0 samples were recorded, return 0
+    T getAvg()const{
+        if(nSamples == 0)return T(0);
         return sum / nSamples;
     }
-    std::chrono::nanoseconds getMin()const{
+    // Returns the minimum value of all samples
+    T getMin()const{
         return min;
     }
-    std::chrono::nanoseconds getMax()const{
+    // Returns the maximum value of all samples
+    T getMax()const{
         return max;
     }
-    // max delta between average and min / max
-    std::chrono::nanoseconds getMaxDifferenceMinMaxAvg()const{
-        const auto deltaMin=std::chrono::abs(getAvg()-getMin());
-        const auto deltaMax=std::chrono::abs(getAvg()-getMax());
-        if(deltaMin>deltaMax)return deltaMin;
-        return deltaMax;
-    }
-    float getAvg_ms(){
-        return (float)(std::chrono::duration_cast<std::chrono::microseconds>(getAvg()).count())/1000.0f;
-    }
+    // Returns the n of samples that were processed
     long getNSamples()const{
         return nSamples;
     }
+    // Reset everything (as if zero samples were processed)
     void reset(){
         sum={};
         nSamples=0;
-        min=std::chrono::nanoseconds::max();
+        min=std::numeric_limits<T>::max();
         max={};
     }
-    std::string getAvgReadable(const bool averageOnly=false)const{
-        std::stringstream ss;
-        if(averageOnly){
-            ss<<"avg="<<MyTimeHelper::R(getAvg());
-            return ss.str();
-        }
-        ss<<"min="<<MyTimeHelper::R(getMin())<<" max="<<MyTimeHelper::R(getMax())<<" avg="<<MyTimeHelper::R(getAvg());
-        return ss.str();
-    }
-    // Merges two AvgCalculator(s) together
-    AvgCalculator operator+(const AvgCalculator& other){
-        AvgCalculator ret;
+    // Merges two AvgCalculator(s) that hold the same types of samples together
+    BaseAvgCalculator<T> operator+(const BaseAvgCalculator<T>& other){
+        BaseAvgCalculator<T> ret;
         ret.add(this->getAvg());
         ret.add(other.getAvg());
         const auto min1=std::min(this->getMin(),other.getMin());
@@ -114,7 +101,39 @@ public:
         ret.max=max1;
         return ret;
     }
+    // max delta between average and min / max
+    std::chrono::nanoseconds getMaxDifferenceMinMaxAvg()const{
+        const auto deltaMin=std::chrono::abs(getAvg()-getMin());
+        const auto deltaMax=std::chrono::abs(getAvg()-getMax());
+        if(deltaMin>deltaMax)return deltaMin;
+        return deltaMax;
+    }
+    std::string getAvgReadable(const bool averageOnly=false)const{
+        std::stringstream ss;
+        if constexpr (std::is_same_v<T,std::chrono::nanoseconds>){
+            // Class stores time samples
+            if(averageOnly){
+                ss<<"avg="<<MyTimeHelper::R(getAvg());
+                return ss.str();
+            }
+            ss<<"min="<<MyTimeHelper::R(getMin())<<" max="<<MyTimeHelper::R(getMax())<<" avg="<<MyTimeHelper::R(getAvg());
+        }else{
+            // Class stores other type of samples
+            if(averageOnly){
+                ss<<"avg="<<getAvg();
+                return ss.str();
+            }
+            ss<<"min="<<getMin()<<" max="<<getMax()<<" avg="<<getAvg();
+        }
+        return ss.str();
+    }
+    float getAvg_ms(){
+        return (float)(std::chrono::duration_cast<std::chrono::microseconds>(getAvg()).count())/1000.0f;
+    }
 };
+using AvgCalculator=BaseAvgCalculator<std::chrono::nanoseconds>;
+
+
 
 // Instead of storing only the min, max and average this stores
 // The last n samples in a queue. However, this makes calculating the min/max/avg values much more expensive
