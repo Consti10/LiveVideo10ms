@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "../NDKHelper/AndroidLogger.hpp"
+#include <AndroidLogger.hpp>
 #include <cmath>
 #include <iomanip>
 

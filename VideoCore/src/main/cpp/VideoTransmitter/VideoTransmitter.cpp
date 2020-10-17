@@ -41,7 +41,7 @@ public:
     //
     //
     void RTPSend(const uint8_t* data, ssize_t data_length);
-    AvgCalculator avgNALUSize;
+    AvgCalculatorSize avgNALUSize;
     // Do FEC over the RTP packets
     bool DO_FEC_WRAPPING=false;
     // Prepend each udp packets with 4 bytes of sequence numbers (for raw)
@@ -54,7 +54,7 @@ private:
     static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=1024-sizeof(uint32_t);
     int32_t sequenceNumber=0;
     std::array<uint8_t,UDPSender::UDP_PACKET_MAX_SIZE> workingBuffer;
-    AvgCalculator avgDeltaBetweenVideoPackets;
+    AvgCalculator avgTimeBetweenVideoNALUS;
     std::chrono::steady_clock::time_point lastForwardedPacket{};
     //
     FECBufferEncoder enc{1500,0.5f};
@@ -66,12 +66,9 @@ private:
 
 //Split data into smaller packets when exceeding UDP max packet size
 void VideoTransmitter::splitAndSend(const uint8_t *data, ssize_t data_length) {
-    avgNALUSize.add(std::chrono::nanoseconds(data_length));
+    avgNALUSize.add(data_length);
     if(avgNALUSize.getNSamples() > 100){
-        MLOGD<<"NALUSize"
-             <<" min:"<<StringHelper::memorySizeReadable(avgNALUSize.getMin().count())
-             <<" max:"<<StringHelper::memorySizeReadable(avgNALUSize.getMax().count())
-             <<" avg:"<<StringHelper::memorySizeReadable(avgNALUSize.getAvg().count());
+        MLOGD<<"NALUSize "<<avgNALUSize.getAvgReadable();
         avgNALUSize.reset();
     }
     if(lastForwardedPacket==std::chrono::steady_clock::time_point{}){
@@ -80,13 +77,13 @@ void VideoTransmitter::splitAndSend(const uint8_t *data, ssize_t data_length) {
         const auto now=std::chrono::steady_clock::now();
         const auto delta=now-lastForwardedPacket;
         lastForwardedPacket=now;
-        avgDeltaBetweenVideoPackets.add(delta);
+        avgTimeBetweenVideoNALUS.add(delta);
         if(delta>std::chrono::milliseconds(150)){
             MLOGD<<"Dafuq why so high";
         }
-        if( avgDeltaBetweenVideoPackets.getNSamples()>120){
-            MLOGD<<""<<avgDeltaBetweenVideoPackets.getAvgReadable();
-            avgDeltaBetweenVideoPackets.reset();
+        if(avgTimeBetweenVideoNALUS.getNSamples() > 120){
+            MLOGD << "" << avgTimeBetweenVideoNALUS.getAvgReadable();
+            avgTimeBetweenVideoNALUS.reset();
         }
     }
     if(data_length<=0)return;

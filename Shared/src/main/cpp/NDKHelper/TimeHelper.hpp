@@ -8,6 +8,7 @@
 #include "AndroidLogger.hpp"
 #include <chrono>
 #include <deque>
+#include <StringHelper.hpp>
 
 namespace MyTimeHelper{
     // R stands for readable. Convert a std::chrono::duration into a readable format
@@ -117,7 +118,15 @@ public:
                 return ss.str();
             }
             ss<<"min="<<MyTimeHelper::R(getMin())<<" max="<<MyTimeHelper::R(getMax())<<" avg="<<MyTimeHelper::R(getAvg());
-        }else{
+        }else if constexpr(std::is_same_v<T,std::size_t>){
+            // Class stores memory sizes
+            if(averageOnly){
+                ss<<"avg="<<StringHelper::memorySizeReadable(getAvg());
+                return ss.str();
+            }
+            ss<<"min="<<StringHelper::memorySizeReadable(getMin())<<" max="<<StringHelper::memorySizeReadable(getMax())<<" avg="<<StringHelper::memorySizeReadable(getAvg());
+        }
+        else{
             // Class stores other type of samples
             if(averageOnly){
                 ss<<"avg="<<getAvg();
@@ -131,7 +140,9 @@ public:
         return (float)(std::chrono::duration_cast<std::chrono::microseconds>(getAvg()).count())/1000.0f;
     }
 };
+// Default is using timestamps
 using AvgCalculator=BaseAvgCalculator<std::chrono::nanoseconds>;
+using AvgCalculatorSize=BaseAvgCalculator<std::size_t>;
 
 
 

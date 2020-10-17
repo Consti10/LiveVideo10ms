@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.6)
 
 set(SHARED_PATH ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp)
-include_directories(${SHARED_PATH})
+#include_directories(${SHARED_PATH})
+include_directories(${SHARED_PATH}/Helper)
+include_directories(${SHARED_PATH}/NDKHelper)
 
 add_library(Helper
         SHARED

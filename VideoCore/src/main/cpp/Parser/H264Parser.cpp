@@ -97,12 +97,9 @@ void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
 
 void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length) {
     //
-    avgUDPPacketSize.add(std::chrono::nanoseconds(data_length));
+    avgUDPPacketSize.add(data_length);
     if(avgUDPPacketSize.getNSamples()>100){
-        MLOGD<<"UDPPacketSize"
-        <<" min:"<<StringHelper::memorySizeReadable(avgUDPPacketSize.getMin().count())
-        <<" max:"<<StringHelper::memorySizeReadable(avgUDPPacketSize.getMax().count())
-        <<" avg:"<<StringHelper::memorySizeReadable(avgUDPPacketSize.getAvg().count());
+        MLOGD<<"UDPPacketSize "<<avgUDPPacketSize.getAvgReadable();
         avgUDPPacketSize.reset();
     }
     //
