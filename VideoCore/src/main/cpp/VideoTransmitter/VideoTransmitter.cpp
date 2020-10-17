@@ -150,6 +150,7 @@ void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
         //
     }else{
         // To emulate a higher bitstream rate (the receiver has to drop duplicates though)
+        // Only enabled in 'CUSTOM' mode
         if(SEND_EACH_RTP_PACKET_MULTIPLE_TIMES>0){
             for(int i=0;i<SEND_EACH_RTP_PACKET_MULTIPLE_TIMES;i++){
                 mUDPSender.mySendTo(packet.data, packet.data_len);
@@ -194,6 +195,7 @@ JNI_METHOD(void, nativeSend)
     }
     native(p)->DO_FEC_WRAPPING=false;
     native(p)->ADD_SEQUENCE_NR=false;
+    native(p)->SEND_EACH_RTP_PACKET_MULTIPLE_TIMES=0;
     //LOGD("size %d",size);
     if(streamMode==0){
         // RTP
