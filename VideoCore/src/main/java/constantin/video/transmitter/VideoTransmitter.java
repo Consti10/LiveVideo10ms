@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 
 public class VideoTransmitter {
     private static final String TAG="VideoTransmitter";
+    // Port is hard coded, since 5600 is generally the port to use for live video
     private static final int PORT=5600;
     static {
         System.loadLibrary("VideoTransmitter");
@@ -19,12 +20,10 @@ public class VideoTransmitter {
     native long nativeConstruct(String IP,int port);
     native void nativeDelete(long p);
     //Called by sendAsync / sendOnCurrentThread
-
     native void nativeSend(long p,ByteBuffer data,int dataSize,int mode);
 
     private final long nativeInstance;
-
-    final int streamMode;
+    private final int streamMode;
 
     VideoTransmitter(final Context context){
         //"10.183.84.95"
