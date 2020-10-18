@@ -38,23 +38,6 @@ public:
     static constexpr const auto NALU_MAXLEN=1024*1024;
     // Application should re-use NALU_BUFFER to avoid memory allocations
     using NALU_BUFFER=std::array<uint8_t,NALU_MAXLEN>;
-    //Copy constructor
-    //NALU(const NALU& nalu):data(nalu.data.begin(),nalu.data.end()),creationTime(std::chrono::steady_clock::now()){
-    //    MLOGD<<"Copy is called";
-    //}
-    /*NALU(const NALU& nalu)= default;
-    NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-    data(data1,data1+data_length),
-        creationTime{creationTime}{
-    };
-    NALU(const std::vector<uint8_t> data1,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data1),
-            creationTime{creationTime}{
-    };*/
-    /*NALU(const NALU& nalu):data(makeOwnedCopy(nalu.getData(),nalu.getSize())),creationTime(nalu.creationTime),data_len(nalu.getSize()){}
-    NALU(const uint8_t* data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data1),data_len(data_length),creationTime{creationTime}{
-    };*/
     // Copy constructor allocates new buffer for data (heavy)
     NALU(const NALU& nalu):
     ownedData(std::vector<uint8_t>(nalu.getData(),nalu.getData()+nalu.getSize())),

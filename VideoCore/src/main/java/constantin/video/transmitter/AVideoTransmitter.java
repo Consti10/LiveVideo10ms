@@ -54,7 +54,7 @@ public class AVideoTransmitter extends AppCompatActivity{
     private boolean SEND_SPS_PPS_EVERY_N_FRAMES=false;
     private ByteBuffer currentCSD0;
     private ByteBuffer currentCSD1;
-    private int haveToManuallySendKeyFrame=0;
+    private int timeToManuallySendKeyFrame =0;
 
 
     @SuppressLint("MissingPermission")
@@ -88,18 +88,17 @@ public class AVideoTransmitter extends AppCompatActivity{
                             //Log.d(TAG,"NEW OUTPUT BUFFER"+outputBufferId);
                             final ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);
                             if(SEND_SPS_PPS_EVERY_N_FRAMES){
-                                if(haveToManuallySendKeyFrame==0){
+                                if(timeToManuallySendKeyFrame ==0){
                                     //Log.d(TAG,"Manually inserting SPS & PPS");
                                     //Log.d(TAG,"csd0"+currentCSD0.isDirect());
                                     mUDPSender.sendOnCurrentThread(currentCSD0);
                                     mUDPSender.sendOnCurrentThread(currentCSD1);
                                 }
-                                haveToManuallySendKeyFrame++;
-                                haveToManuallySendKeyFrame=haveToManuallySendKeyFrame % 10;
+                                timeToManuallySendKeyFrame++;
+                                timeToManuallySendKeyFrame = timeToManuallySendKeyFrame % 10;
                             }
                             mUDPSender.sendOnCurrentThread(outputBuffer);
                             codec.releaseOutputBuffer(outputBufferId,false);
-
                         } else if (outputBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                             // Subsequent data will conform to new format.
                             final MediaFormat currentOutputFormat= codec.getOutputFormat();
