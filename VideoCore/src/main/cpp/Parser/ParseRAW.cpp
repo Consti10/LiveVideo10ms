@@ -61,7 +61,7 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length){
                     nalu_data[3] = 1;
                     if(cb!=nullptr && nalu_data_position>=4){
                         const size_t naluLen=nalu_data_position-4;
-                        NALU nalu(nalu_data,naluLen,timePointStartOfReceivingNALU);
+                        NALU nalu(nalu_data,naluLen);
                         cb(nalu);
                     }
                     nalu_data_position = 4;

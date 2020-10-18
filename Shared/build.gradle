@@ -35,7 +35,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        //viewBinding = true
         //prefabPublishing true
     }
     compileOptions {
