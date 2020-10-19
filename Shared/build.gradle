@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    ndkVersion rootProject.myNdkVersion
+    //ndkVersion rootProject.myNdkVersion
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
@@ -35,6 +35,7 @@ android {
     }
 
     buildFeatures {
+        dataBinding false
         //viewBinding = true
         //prefabPublishing true
     }

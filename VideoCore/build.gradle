@@ -59,5 +59,6 @@ dependencies {
     implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"
     implementation "com.github.Consti10:prefs-plus:$rootProject.myPrefsPlusVersion"
     api project(':Shared')
+    //implementation project(path: ':Shared')
     //implementation 'com.github.Consti10:prefab-publishing:Tag'
 }
