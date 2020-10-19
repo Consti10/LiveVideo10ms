@@ -25,6 +25,12 @@ android {
     buildFeatures{
         viewBinding=true
     }
+    // for firebase testing
+    //signingConfigs {
+    //   debug {
+    //        storeFile file("C:\\Users\\geier\\Desktop\\FPV_VR\\YOther\\safety\\keystore.jks")
+    //   }
+    //}
 }
 
 dependencies {
