@@ -58,12 +58,10 @@ public class PlayTestVideosRepeated {
 
     private static void validateDecodingInfo(final @Nullable DecodingInfo info){
         assert info!=null : "info!=null";
-        assert info.nNALU<=0 : "nNalu<=0";
-        assert info.nNALUSFeeded<=0 : "nNaluFeeded<=0";
-        assert info.currentFPS<=10 : "info.currentFPS<=10";
-        if(info!=null){
-            System.out.println(info.toString());
-        }
+        System.out.println(info.toString());
+        assert info.nNALU>0 : "nNalu<=0";
+        assert info.nNALUSFeeded>0 : "nNaluFeeded<=0";
+        assert info.currentFPS>10 : "info.currentFPS<=10";
     }
 
 

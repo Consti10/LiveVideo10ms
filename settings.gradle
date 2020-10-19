@@ -1,6 +1,5 @@
+include ':Shared'
 include  ':VideoCore'
 include  ':uvcintegration'
 include ':TelemetryCore'
 include ':Example'
-include ':Shared'
-//include ':livevideostreamproducer'

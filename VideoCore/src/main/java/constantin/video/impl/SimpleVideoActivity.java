@@ -69,12 +69,12 @@ public class SimpleVideoActivity extends AppCompatActivity implements  IVideoPar
 
     @Override
     public void onDecodingInfoChanged(final DecodingInfo decodingInfo) {
+        mDecodingInfo=decodingInfo;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 textViewStatistics.setText(decodingInfo.toString(true));
             }
         });
-        mDecodingInfo=decodingInfo;
     }
 }
