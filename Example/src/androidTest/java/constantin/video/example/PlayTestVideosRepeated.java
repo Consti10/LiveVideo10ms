@@ -12,6 +12,8 @@ import androidx.test.rule.GrantPermissionRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Objects;
+
 import javax.annotation.Nullable;
 
 import constantin.video.core.player.DecodingInfo;
@@ -43,8 +45,8 @@ public class PlayTestVideosRepeated {
     //Dang, I cannot get the Spinner work with an Espresso test
     private void selectVideoFilename(final int selectedFile){
         final Context context=mActivityTestRule.getActivity();
-        SharedPreferences sharedPreferences=context.getSharedPreferences("pref_video",Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(context.getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), MainActivity.Companion.getASSETS_TEST_VIDEO_FILE_NAMES()[selectedFile]).commit();
+        final String filename= Objects.requireNonNull(MainActivity.Companion.ASSETS_TEST_VIDEO_FILE_NAMES(context))[selectedFile];
+        VideoSettings.setVS_ASSETS_FILENAME_TEST_ONLY(context,filename);
     }
 
     private void testPlayVideo(){

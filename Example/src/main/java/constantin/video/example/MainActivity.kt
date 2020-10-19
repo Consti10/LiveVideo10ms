@@ -10,16 +10,16 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import constantin.helper.RequestPermissionHelper
 import constantin.uvcintegration.TranscodeService
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
-import constantin.helper.RequestPermissionHelper
 import constantin.video.core.TestFEC
 import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
-import constantin.video.transmitter.AVideoTransmitterSettings
 import constantin.video.transmitter.AVideoTransmitter
+import constantin.video.transmitter.AVideoTransmitterSettings
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var spinnerVideoTestFileFromAssets: Spinner;
@@ -40,14 +40,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         spinnerVideoTestFileFromAssets = findViewById<Spinner>(R.id.s_videoFileSelector)
         val adapter = ArrayAdapter.createFromResource(this,
                 R.array.video_test_files, android.R.layout.simple_spinner_item)
+
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerVideoTestFileFromAssets.adapter = adapter
         //
         val startVideoActivity = findViewById<Button>(R.id.b_startVideoActivity)
         startVideoActivity.setOnClickListener {
-            val selectedTestFile = spinnerVideoTestFileFromAssets.selectedItemPosition
+            val selectedTestFile = spinnerVideoTestFileFromAssets.getSelectedItem() as String
             val preferences = getSharedPreferences("pref_video", Context.MODE_PRIVATE)
-            preferences.edit().putString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), ASSETS_TEST_VIDEO_FILE_NAMES[selectedTestFile]).commit()
+            preferences.edit().putString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), selectedTestFile).commit()
             val intentVideoActivity = Intent()
             intentVideoActivity.setClass(context, VideoActivityWithDatabase::class.java)
             startActivity(intentVideoActivity)
@@ -102,9 +104,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     public companion object {
-        public val ASSETS_TEST_VIDEO_FILE_NAMES = arrayOf("x264/testVideo.h264", "rpi_cam/rpi.h264", "webcam/720p_usb.h264", "360/insta_interference.h264",
-                "360/insta_webbn_1_shortened.h264", "360/insta_webbn_2.h264", "360/insta_mjpeg_test.mp4"
-                //,"360/insta_mjpeg_test.h264")
-                , "360/testRoom1_1920Mono.mp4")
+        fun ASSETS_TEST_VIDEO_FILE_NAMES(context: Context): Array<String?>? {
+            return context.resources.getStringArray(R.array.video_test_files)
+        }
     }
 }

@@ -142,9 +142,9 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
             Log.d(TAG, "Fetching data for:$selectedDevice:$selectedOS")
             lastFetchedConfiguration = Pair(selectedDevice, selectedOS)
             //Query data for all possible test files
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi.h264", tvDataRpiCam)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "", tvDataX264)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "webbn_second.h264", tvDataInsta360)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi_cam/rpi.h264", tvDataRpiCam)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "x264/testVideo.h264", tvDataX264)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "360/insta_webbn_2.h264", tvDataInsta360)
         }
     }
 
