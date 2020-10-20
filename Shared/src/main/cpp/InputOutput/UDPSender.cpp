@@ -42,7 +42,6 @@ UDPSender::UDPSender(const std::string &IP,const int Port,const int WANTED_SNDBU
     }
 }
 
-
 void UDPSender::mySendTo(const uint8_t* data, ssize_t data_length) {
     if(data_length>UDP_PACKET_MAX_SIZE){
         MLOGE<<"Data size exceeds UDP packet size";

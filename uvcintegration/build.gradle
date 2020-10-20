@@ -4,7 +4,7 @@ group='com.github.Consti10'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    ndkVersion rootProject.myNdkVersion
+    //ndkVersion rootProject.myNdkVersion
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
