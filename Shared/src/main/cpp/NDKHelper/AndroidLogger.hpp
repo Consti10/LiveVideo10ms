@@ -5,6 +5,12 @@
 #ifndef FPV_VR_PRIVATE_MDEBUG_H
 #define FPV_VR_PRIVATE_MDEBUG_H
 
+#ifndef __ANDROID__
+#include <iostream>
+#define MLOGD std::cout
+#define MLOGE std::cout
+#else
+
 #include "android/log.h"
 #include <string.h>
 #include <sstream>
@@ -194,3 +200,6 @@ namespace TEST_LOGGING_ON_ANDROID{
     }
 }*/
 #endif //FPV_VR_PRIVATE_MDEBUG_H
+
+
+#endif //__ANDROID__
