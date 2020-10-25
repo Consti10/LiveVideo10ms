@@ -198,9 +198,7 @@ static void fillBufferWithRandomData(std::vector<uint8_t>& data){
 // Create a buffer filled with random data of size sizeByes
 std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
   std::vector<uint8_t> buf(sizeBytes);
-  for (uint32_t j = 0; j < sizeBytes; j++) {
-    buf[j] = rand() % 255;
-  }
+  fillBufferWithRandomData(buf);
   return buf;
 }
 
@@ -233,7 +231,10 @@ static void validateReceivedData(const uint8_t* dataP,size_t data_length){
     const auto info=getSequenceNumberAndTimestamp(data);
     const auto latency=std::chrono::steady_clock::now()-info.timestamp;
     MLOGD<<"XGot data"<<data_length<<" "<<info.seqNr<<" "<<MyTimeHelper::R(latency);
-    avgUDPProcessingTime.add(latency);
+    // do not use the first couple of packets, system needs to ramp up first
+    if(info.seqNr>10){
+        avgUDPProcessingTime.add(latency);
+    }
 }
 
 static void generateDataPackets(std::function<void(std::vector<uint8_t>&)> cb,const int N_PACKETS,const int PACKET_SIZE,const int PACKETS_PER_SECOND){
@@ -248,9 +249,9 @@ static void test_latency(){
     // For a packet size of 1024 bytes, 1024 packets per second equals 1 MB/s or 8 MBit/s
     // 8 MBit/s is a just enough for encoded 720p video
     const int PACKET_SIZE=1024;
-    const int WANTED_PACKETS_PER_SECOND=1*1024;
+    const int WANTED_PACKETS_PER_SECOND=2*1024;
     const std::chrono::nanoseconds TIME_BETWEEN_PACKETS=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::seconds(1))/WANTED_PACKETS_PER_SECOND;
-    const int N_PACKETS=60;
+    const int N_PACKETS=WANTED_PACKETS_PER_SECOND*5;
 
     // start the receiver in its own thread
     UDPReceiver udpReceiver{nullptr,6001,"LTUdpRec",0,validateReceivedData,0};
