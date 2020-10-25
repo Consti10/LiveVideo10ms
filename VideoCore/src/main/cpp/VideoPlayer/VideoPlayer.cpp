@@ -188,6 +188,13 @@ std::string VideoPlayer::getInfoString()const{
     return ss.str();
 }
 
+static void fillBufferWithRandomData(std::vector<uint8_t>& data){
+    const std::size_t size=data.size();
+    for(std::size_t i=0;i<size;i++){
+        data[i] = rand() % 255;
+    }
+}
+
 // Create a buffer filled with random data of size sizeByes
 std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
   std::vector<uint8_t> buf(sizeBytes);
@@ -245,7 +252,7 @@ static void test_latency(){
     const std::chrono::nanoseconds TIME_BETWEEN_PACKETS=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::seconds(1))/WANTED_PACKETS_PER_SECOND;
     const int N_PACKETS=60;
 
-    // start the receiver
+    // start the receiver in its own thread
     UDPReceiver udpReceiver{nullptr,6001,"LTUdpRec",0,validateReceivedData,0};
     udpReceiver.startReceiving();
     // Wait a bit such that the OS can start the receiver before we start sending data
