@@ -20,9 +20,10 @@ public:
     typedef std::function<void(const std::string)> SOURCE_IP_CALLBACK;
 public:
     /**
-     * @param javaVm used to set thread priority (attach and then detach),nullptr when priority doesnt matter
+     * @param javaVm used to set thread priority (attach and then detach) for android,
+       nullptr when priority doesn't matter/not using android
      * @param port : The port to listen on
-     * @param CPUPriority: The priority the receiver thread will run with
+     * @param CPUPriority: The priority the receiver thread will run with if javaVm!=nullptr
      * @param onDataReceivedCallback: called every time new data is received
      * @param WANTED_RCVBUF_SIZE: The buffer allocated by the OS might not be sufficient to buffer incoming data when receiving at a high data rate
      * If @param WANTED_RCVBUF_SIZE is bigger than the size allocated by the OS a bigger buffer is requested, but it is not

@@ -191,7 +191,7 @@ std::string VideoPlayer::getInfoString()const{
 // Create a buffer filled with random data of size sizeByes
 std::vector<uint8_t> createRandomDataBuffer(const ssize_t sizeBytes){
   std::vector<uint8_t> buf(sizeBytes);
-  for (uint32_t j = 0; j < sizeBytes; ++j) {
+  for (uint32_t j = 0; j < sizeBytes; j++) {
     buf[j] = rand() % 255;
   }
   return buf;
@@ -212,7 +212,7 @@ void writeSequenceNumberAndTimestamp(std::vector<uint8_t>& data){
     packetInfoData->timestamp= std::chrono::steady_clock::now();
 }
 
-PacketInfoData getSequenceNumberAndTimestamp(std::vector<uint8_t>& data){
+PacketInfoData getSequenceNumberAndTimestamp(const std::vector<uint8_t>& data){
     assert(data.size()>=sizeof(PacketInfoData));
     PacketInfoData packetInfoData;
     memcpy(&packetInfoData,data.data(),sizeof(PacketInfoData));
@@ -238,14 +238,8 @@ static void generateDataPackets(std::function<void(std::vector<uint8_t>&)> cb,co
 
 #include <UDPSender.h>
 static void test_latency(){
-    // Emulate a camera that spits out a new Frame every N seconds
-    //const int WANTED_FPS=60;
-    // wanted bits per second
-    //const int WANTED_BITRATE=5*1024*1024; // 5 mbit/s
-    // Size of one camera frame such that we get the bitrate when camera is running at N fps
-    //const int CAMERA_FRAME_SIZE=WANTED_BITRATE/WANTED_FPS;
-    //const int WANTED_BITRATE=5*1024*1024;
-    // For a packet size of 1024 bytes 1024 packets per second equals 1 MB/s or 8 MBit/s
+    // For a packet size of 1024 bytes, 1024 packets per second equals 1 MB/s or 8 MBit/s
+    // 8 MBit/s is a just enough for encoded 720p video
     const int PACKET_SIZE=1024;
     const int WANTED_PACKETS_PER_SECOND=1*1024;
     const std::chrono::nanoseconds TIME_BETWEEN_PACKETS=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::seconds(1))/WANTED_PACKETS_PER_SECOND;
@@ -260,31 +254,28 @@ static void test_latency(){
     UDPSender udpSender{"127.0.0.1",6001};
     currentSequenceNumber=0;
     avgUDPProcessingTime.reset();
-    AvgCalculator avgCameraFrameTime;
 
     const std::chrono::steady_clock::time_point testBegin=std::chrono::steady_clock::now();
-
-   // emulate a ideal running camera
-   std::chrono::steady_clock::time_point firstPacketTimePoint=std::chrono::steady_clock::now();
-   std:size_t writtenBytes=0;
-   std::size_t writtenPackets=0;
-   for(int i=0;i<N_PACKETS;i++){
+    std::chrono::steady_clock::time_point firstPacketTimePoint=std::chrono::steady_clock::now();
+    std:size_t writtenBytes=0;
+    std::size_t writtenPackets=0;
+    for(int i=0;i<N_PACKETS;i++){
         auto buff=createRandomDataBuffer(PACKET_SIZE);
         writeSequenceNumberAndTimestamp(buff);
         udpSender.mySendTo(buff.data(),buff.size());
         writtenBytes+=PACKET_SIZE;
         writtenPackets+=1;
         currentSequenceNumber++;
+        // wait until as much time is elapsed such that we hit the target packets per seconds
         const auto timePointReadyToSendNextPacket=firstPacketTimePoint+i*TIME_BETWEEN_PACKETS;
         while(std::chrono::steady_clock::now()<timePointReadyToSendNextPacket){
             //busy wait
         }
-   }
-   const auto testEnd=std::chrono::steady_clock::now();
-   const double testTimeSeconds=(testEnd-testBegin).count()/1000.0f/1000.0f/1000.0f;
-   const double actualPacketsPerSecond=(double)N_PACKETS/testTimeSeconds;
-   const double actualMBytesPerSecond=(double)writtenBytes/testTimeSeconds/1024.0f/1024;
-
+    }
+    const auto testEnd=std::chrono::steady_clock::now();
+    const double testTimeSeconds=(testEnd-testBegin).count()/1000.0f/1000.0f/1000.0f;
+    const double actualPacketsPerSecond=(double)N_PACKETS/testTimeSeconds;
+    const double actualMBytesPerSecond=(double)writtenBytes/testTimeSeconds/1024.0f/1024;
 
    // Wait for any packet that might be still in transit
    std::this_thread::sleep_for(std::chrono::seconds(1));
