@@ -6,12 +6,15 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <jni.h>
 #include <iostream>
 #include <thread>
 #include <atomic>
 //
-
+#ifdef __ANDROID__
+#include <jni.h>
+#else
+using JavaVM=void*;
+#endif
 //Starts a new thread that continuously checks for new data on UDP port
 
 class UDPReceiver {

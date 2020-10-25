@@ -1,7 +1,5 @@
 
 #include "UDPReceiver.h"
-#include <AndroidThreadPrioValues.hpp>
-#include <NDKThreadHelper.hpp>
 #include <arpa/inet.h>
 #include <utility>
 #include <vector>
@@ -9,6 +7,10 @@
 #include <array>
 #include <StringHelper.hpp>
 
+#ifdef __ANDROID__
+#include <AndroidThreadPrioValues.hpp>
+#include <NDKThreadHelper.hpp>
+#endif
 
 UDPReceiver::UDPReceiver(JavaVM* javaVm,int port,std::string name,int CPUPriority,DATA_CALLBACK  onDataReceivedCallback,size_t WANTED_RCVBUF_SIZE):
         mPort(port),mName(std::move(name)),WANTED_RCVBUF_SIZE(WANTED_RCVBUF_SIZE),mCPUPriority(CPUPriority),onDataReceivedCallback(std::move(onDataReceivedCallback)),javaVm(javaVm){
@@ -29,7 +31,9 @@ std::string UDPReceiver::getSourceIPAddress()const {
 void UDPReceiver::startReceiving() {
     receiving=true;
     mUDPReceiverThread=std::make_unique<std::thread>([this]{this->receiveFromUDPLoop();} );
+#ifdef __ANDROID__
     NDKThreadHelper::setName(mUDPReceiverThread->native_handle(),mName.c_str());
+#endif
 }
 
 void UDPReceiver::stopReceiving() {
@@ -66,7 +70,9 @@ void UDPReceiver::receiveFromUDPLoop() {
         MLOGD<<"Wanted "<<StringHelper::memorySizeReadable(WANTED_RCVBUF_SIZE)<<" Set "<<StringHelper::memorySizeReadable(recvBufferSize);
     }
     if(javaVm!=nullptr){
-        NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm, mCPUPriority, mName.c_str());
+#ifdef __ANDROID__
+         NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm, mCPUPriority, mName.c_str());
+#endif
     }
     struct sockaddr_in myaddr;
     memset((uint8_t *) &myaddr, 0, sizeof(myaddr));

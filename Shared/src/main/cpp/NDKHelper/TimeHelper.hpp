@@ -51,7 +51,7 @@ private:
     T min=std::numeric_limits<T>::max();
     T max{};
 public:
-    BaseAvgCalculator() = default;
+    BaseAvgCalculator(){reset();};
     void add(const T& value){
         if(value<T(0)){
             MLOGE<<"Cannot add negative value";
@@ -88,7 +88,12 @@ public:
     void reset(){
         sum={};
         nSamples=0;
-        min=std::numeric_limits<T>::max();
+        // Workaround for std::numeric_limits returning 0 for std::chrono::nanoseconds
+        if constexpr (std::is_same_v<T,std::chrono::nanoseconds>){
+            min=std::chrono::nanoseconds::max();
+        }else{
+            min=std::numeric_limits<T>::max();
+        }
         max={};
     }
     // Merges two AvgCalculator(s) that hold the same types of samples together
@@ -195,6 +200,13 @@ public:
         ss<<"min="<<MyTimeHelper::R(getMin())<<" max="<<MyTimeHelper::R(getMax())<<" avg="<<MyTimeHelper::R(getAvg())<<" N samples="<<samples.size();
         return ss.str();
     }
+    std::string getAllSamplesAsString(){
+         std::stringstream ss;
+         for(const auto& sample:samples){
+            ss<<" "<<MyTimeHelper::R(sample);
+         }
+         return ss.str();
+    }
     size_t getNSamples()const{
         return samples.size();
     }
@@ -246,6 +258,24 @@ public:
     void reset(){
         sum=0;
         sumAtLastCall=0;
+    }
+};
+
+namespace TEST_TIME_HELPER{
+    static void test(){
+        std::vector<std::chrono::nanoseconds> testData={
+            std::chrono::nanoseconds(1),
+            std::chrono::nanoseconds(100),
+            std::chrono::nanoseconds(5),
+        };
+        AvgCalculator avgCalculator;
+        avgCalculator.reset();
+        MLOGD<<"XMIN"<<MyTimeHelper::R(avgCalculator.getMin())<<"  "<<MyTimeHelper::R(std::numeric_limits<std::chrono::nanoseconds>::max())<<"  "<<MyTimeHelper::R(std::chrono::nanoseconds::max());
+        for(const auto t:testData){
+            avgCalculator.add(t);
+        }
+        assert(avgCalculator.getMin()==std::chrono::nanoseconds(1));
+        assert(avgCalculator.getMax()==std::chrono::nanoseconds(100));
     }
 };
 
