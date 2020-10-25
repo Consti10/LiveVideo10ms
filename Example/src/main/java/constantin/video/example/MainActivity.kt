@@ -15,6 +15,7 @@ import constantin.uvcintegration.TranscodeService
 import constantin.video.core.AVideoSettings
 import constantin.video.core.IsConnected
 import constantin.video.core.TestFEC
+import constantin.video.core.player.VideoPlayer
 import constantin.video.core.player.VideoSettings
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
@@ -84,7 +85,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             startActivity(i)
         }
         findViewById<View>(R.id.b_TestFEC).setOnClickListener {
-            TestFEC.nativeTestFec();
+            //TestFEC.nativeTestFec();
+            VideoPlayer.testLatency();
         }
     }
 

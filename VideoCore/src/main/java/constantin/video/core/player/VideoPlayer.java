@@ -192,6 +192,10 @@ public class VideoPlayer implements IVideoParamsChanged{
     //This initiates a 'call back' for the IVideoParams
     public static native <T extends IVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
 
+    //
+    public static native void testLatency();
+
+
     public static void verifyApplicationThread() {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             Log.w(TAG, "Player is accessed on the wrong thread.");

@@ -20,7 +20,7 @@ public:
     typedef std::function<void(const std::string)> SOURCE_IP_CALLBACK;
 public:
     /**
-     * @param javaVm used to set thread priority (attach and then detach)
+     * @param javaVm used to set thread priority (attach and then detach),nullptr when priority doesnt matter
      * @param port : The port to listen on
      * @param CPUPriority: The priority the receiver thread will run with
      * @param onDataReceivedCallback: called every time new data is received
