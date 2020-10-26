@@ -370,7 +370,9 @@ int main(int argc, char *argv[])
     int wantedTime=5; // 5 seconds
 	int input_port=6001;
 	int output_port=6001;
-    while ((opt = getopt(argc, argv, "s:p:t:i:o:")) != -1) {
+	// default localhost
+	int mode=0;
+    while ((opt = getopt(argc, argv, "s:p:t:i:o:m:")) != -1) {
         switch (opt) {
         case 's':
             ps = atoi(optarg);
@@ -387,16 +389,22 @@ int main(int argc, char *argv[])
 		case 'o':
 			output_port=atoi(optarg);
 			break;
+		case 'm':
+			mode=atoi(optarg);
+			break;
         default: /* '?' */
         show_usage:
-            MLOGD<<"Usage: [-s=packet size in bytes] [-p=packets per second] [-t=time to run in seconds] [-i=input udp port] [-o=output udp port]\n";
+            MLOGD<<"Usage: [-s=packet size in bytes] [-p=packets per second] [-t=time to run in seconds]"
+			<<"[-i=input udp port] [-o=output udp port] [-m= mode 0 for sendto localhost else airpi]\n";
             return 1;
         }
     }
+	const Options options0{ps,pps,pps*wantedTime,input_port,output_port,"127.0.0.1"};
+	const Options options1{ps,pps,pps*wantedTime,input_port,output_port,"192.168.0.14"};
+	const Options options = (mode==0) ? options0 : options1;
 
     // For a packet size of 1024 bytes, 1024 packets per second equals 1 MB/s or 8 MBit/s
     // 8 MBit/s is a just enough for encoded 720p video
-	const Options options{ps,pps,pps*wantedTime,input_port,output_port,"192.168.0.14"};
 	MLOGD<<"Selected input: "<<options.INPUT_PORT<<"\n";
 	MLOGD<<"Selected output: "<<options.DESTINATION_IP<<" OUTPUT_PORT"<<options.OUTPUT_PORT<<"\n";
 	test_latency(options);
