@@ -37,6 +37,18 @@ namespace MyTimeHelper{
     static std::string ReadableNS(uint64_t nanoseconds){
         return R(std::chrono::nanoseconds(nanoseconds));
     }
+    static std::string timeSamplesAsString(const std::vector<std::chrono::nanoseconds>& samples){
+        std::stringstream ss;
+        int counter=0;
+        for(const auto& sample:samples){
+           ss<<","<<MyTimeHelper::R(sample);
+           counter++;
+           if(counter%10==0){
+             ss<<"\n";
+           }
+        }
+        return ss.str();
+    }
 };
 
 // Use this class to compare many samples of the same kind
@@ -159,6 +171,7 @@ private:
     const size_t sampleSize;
     std::deque<std::chrono::nanoseconds> samples;
 public:
+    // Use zero for infinite n of recorded samples
     AvgCalculator2(size_t sampleSize=60):sampleSize(sampleSize){};
     //
     void add(const std::chrono::nanoseconds& value){
@@ -168,7 +181,7 @@ public:
         }
         samples.push_back(value);
         // Remove the oldest sample if needed
-        if(samples.size()>sampleSize){
+        if(sampleSize!=0 &&samples.size()>sampleSize){
             samples.pop_front();
         }
     }
@@ -209,6 +222,29 @@ public:
     }
     size_t getNSamples()const{
         return samples.size();
+    }
+    // Sort all the samples from low to high
+    std::vector<std::chrono::nanoseconds> getSamplesSorted(){
+        auto ret=std::vector<std::chrono::nanoseconds>(samples.begin(),samples.end());
+        std::sort(ret.begin(), ret.end());
+        return ret;
+    }
+    std::string getAllSamplesSortedAsString(){
+        const auto valuesSorted=getSamplesSorted();
+        return MyTimeHelper::timeSamplesAsString(valuesSorted);
+    }
+    std::string getOnePercentLowHigh(){
+        auto valuesSorted=getSamplesSorted();
+        const auto sizeOnePercent=valuesSorted.size()/100;
+        const auto onePercentLow=std::vector<std::chrono::nanoseconds>(valuesSorted.begin(),valuesSorted.begin()+sizeOnePercent);
+        const auto tmpBegin=valuesSorted.begin()+valuesSorted.size()-sizeOnePercent;
+        const auto onePercentHigh=std::vector<std::chrono::nanoseconds>(tmpBegin,valuesSorted.end());
+        std::stringstream ss;
+        ss<<"One Percent low:\n";
+        ss<<MyTimeHelper::timeSamplesAsString(onePercentLow);
+        ss<<"\nOne Percent high:";
+        ss<<MyTimeHelper::timeSamplesAsString(onePercentHigh);
+        return ss.str();
     }
 };
 
