@@ -37,20 +37,23 @@ namespace MyTimeHelper{
     static std::string ReadableNS(uint64_t nanoseconds){
         return R(std::chrono::nanoseconds(nanoseconds));
     }
-    static std::string timeSamplesAsString(const std::vector<std::chrono::nanoseconds>& samples){
-        std::stringstream ss;
-        int counter=0;
-        for(const auto& sample:samples){
-           ss<<","<<MyTimeHelper::R(sample);
-           counter++;
-           if(counter%10==0){
-             ss<<"\n";
-           }
-        }
-        return ss.str();
-    }
+   static std::string timeSamplesAsString(const std::vector<std::chrono::nanoseconds>& samples){
+   		std::stringstream ss;
+   		int counter=0;
+       for(const auto& sample:samples){
+          ss<<","<<MyTimeHelper::R(sample);
+          counter++;
+          if(counter%10==0){
+            ss<<"\n";
+          }
+       }
+   	   return ss.str();
+   }
 };
 
+// Use this class to compare many samples of the same kind
+// Saves the minimum,maximum and average of all the samples
+// The type of the samples is for example std::chrono::nanoseconds when measuring time intervalls
 // Use this class to compare many samples of the same kind
 // Saves the minimum,maximum and average of all the samples
 // The type of the samples is for example std::chrono::nanoseconds when measuring time intervalls
@@ -162,7 +165,6 @@ using AvgCalculator=BaseAvgCalculator<std::chrono::nanoseconds>;
 using AvgCalculatorSize=BaseAvgCalculator<std::size_t>;
 
 
-
 // Instead of storing only the min, max and average this stores
 // The last n samples in a queue. However, this makes calculating the min/max/avg values much more expensive
 // And therefore should only be used with a small sample size.
@@ -242,12 +244,12 @@ public:
         std::stringstream ss;
         ss<<"One Percent low:\n";
         ss<<MyTimeHelper::timeSamplesAsString(onePercentLow);
-        ss<<"\nOne Percent high:";
+        ss<<"\nOne Percent high:\n";
         ss<<MyTimeHelper::timeSamplesAsString(onePercentHigh);
+		ss<<"\n";
         return ss.str();
     }
 };
-
 
 class Chronometer:public AvgCalculator {
 public:
