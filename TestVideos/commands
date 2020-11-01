@@ -1,0 +1,5 @@
+gst-launch-1.0 -v ximagesrc ! videoscale ! video/x-raw,framerate=20/1, width=1280, height=720 ! videoconvert ! x264enc tune=zerolatency bitrate=5000 speed-preset=superfast ! rtph264pay ! udpsink host=192.168.1.100 port=5600
+
+
+
+gst-launch-1.0 udpsrc port=5600 ! "application/x-rtp, payload=127" ! rtph264depay ! decodebin ! glimagesink
