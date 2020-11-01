@@ -123,6 +123,7 @@ public class AVideoTransmitter extends AppCompatActivity{
             final int W=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX(this);
             final int H=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_H_PX(this);
             MediaFormat format = MediaFormat.createVideoFormat("video/avc",W,H);
+            //MediaFormat format = MediaFormat.createVideoFormat("video/hevc",W,H);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
 
             //final int MDEIACODEC_TARGET_KEY_BIT_RATE=5*1024*1024;

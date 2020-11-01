@@ -208,7 +208,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
         rtp_hdr->padding = 0;
         rtp_hdr->version = 2;
         rtp_hdr->payload = H264;
-        // rtp_hdr->marker = (pstStream->u32PackCount - 1 == i) ? 1 : 0;   /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
+        // rtp_hdr->marker = (pstStream->u32PackCount - 1 == i) ? 1 : 0;   /* If the packet is the end of a frame, set it to 1, otherwise it is 0. rfc 1889 does not specify the purpose of this bit*/
         rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
         rtp_hdr->timestamp = htonl(ts_current);
         rtp_hdr->sources = htonl(SSRC_NUM);
@@ -265,7 +265,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
                 rtp_hdr->payload = H264;
-                rtp_hdr->marker = 0;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
+                rtp_hdr->marker = 0;    /* If the packet is the end of a frame, set it to 1, otherwise it is 0. rfc 1889 does not specify the purpose of this bit*/
                 rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
                 rtp_hdr->sources = htonl(SSRC_NUM);
