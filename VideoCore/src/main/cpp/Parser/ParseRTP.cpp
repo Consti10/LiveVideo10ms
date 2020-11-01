@@ -51,8 +51,8 @@ typedef struct fu_indicator {
     uint8_t nri:    2;
     uint8_t f:      1;
 } __attribute__ ((packed)) fu_indicator_t; /* 1 bytes */
-static constexpr auto H264=96;
-static constexpr auto SSRC_NUM=10;
+static constexpr auto RTP_PAYLOAD_TYPE_H264=96;
+static constexpr auto MY_SSRC_NUM=10;
 
 
 RTPDecoder::RTPDecoder(NALU_DATA_CALLBACK cb): cb(std::move(cb)){
@@ -98,6 +98,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
             mNALU_DATA_LENGTH+= data_length - 14;
             if(!flagPacketHasGoneMissing){
+                // To better measure latency we can actually use the timestamp from when the first bytes for this packet were received
                 forwardNALU(timePointStartOfReceivingNALU);
             }
             mNALU_DATA_LENGTH=0;
@@ -207,11 +208,13 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
         rtp_hdr->extension = 0;
         rtp_hdr->padding = 0;
         rtp_hdr->version = 2;
-        rtp_hdr->payload = H264;
+        rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
         // rtp_hdr->marker = (pstStream->u32PackCount - 1 == i) ? 1 : 0;   /* If the packet is the end of a frame, set it to 1, otherwise it is 0. rfc 1889 does not specify the purpose of this bit*/
+        rtp_hdr->marker=0;
         rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
         rtp_hdr->timestamp = htonl(ts_current);
-        rtp_hdr->sources = htonl(SSRC_NUM);
+        //rtp_hdr->timestamp=0;
+        rtp_hdr->sources = htonl(MY_SSRC_NUM);
         /*
          * Set rtp load single nal unit header
          */
@@ -232,7 +235,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
         //MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
         //MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
-        //assert(false);
+        assert(false);
         /*
          * FU-A segmentation
          */
@@ -264,11 +267,11 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload = H264;
+                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
                 rtp_hdr->marker = 0;    /* If the packet is the end of a frame, set it to 1, otherwise it is 0. rfc 1889 does not specify the purpose of this bit*/
                 rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
-                rtp_hdr->sources = htonl(SSRC_NUM);
+                rtp_hdr->sources = htonl(MY_SSRC_NUM);
                 /*
                  * 2. 设置 rtp 荷载头部
                  */
@@ -298,11 +301,11 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload = H264;
+                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
                 rtp_hdr->marker = 0;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
                 rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
-                rtp_hdr->sources = htonl(SSRC_NUM);
+                rtp_hdr->sources = htonl(MY_SSRC_NUM);
                 /*
                  * 2. 设置 rtp 荷载头部
                  */
@@ -331,11 +334,11 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload = H264;
+                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
                 rtp_hdr->marker = 1;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
                 rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
-                rtp_hdr->sources = htonl(SSRC_NUM);
+                rtp_hdr->sources = htonl(MY_SSRC_NUM);
                 /*
                  * 2. 设置 rtp 荷载头部
                  */

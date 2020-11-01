@@ -49,7 +49,7 @@ public:
     int SEND_EACH_RTP_PACKET_MULTIPLE_TIMES=0;
 private:
     // RTP parser splits into packets of this maximum size
-    static constexpr const size_t MY_RTP_PACKET_MAX_SIZE=1024;
+    static constexpr const size_t MY_RTP_PACKET_MAX_SIZE=65507;//TODO remove
     UDPSender mUDPSender;
     static constexpr const size_t MAX_VIDEO_DATA_PACKET_SIZE=1024-sizeof(uint32_t);
     int32_t sequenceNumber=0;
