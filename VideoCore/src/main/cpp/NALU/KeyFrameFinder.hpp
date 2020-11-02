@@ -9,21 +9,24 @@
 #include <vector>
 #include <AndroidLogger.hpp>
 #include <media/NdkMediaFormat.h>
+#include <memory>
 
 // Takes a continuous stream of NALUs and save SPS / PPS data
 // For later use
 class KeyFrameFinder{
 private:
-    NALU* CSD0=nullptr;
-    NALU* CSD1=nullptr;
+    //NALU* CSD0=nullptr;
+    //NALU* CSD1=nullptr;
+    std::unique_ptr<NALU> CSD0;
+    std::unique_ptr<NALU> CSD1;
 public:
     void saveIfKeyFrame(const NALU &nalu){
         if(nalu.getSize()<=0)return;
         if(nalu.isSPS()){
-            CSD0=new NALU(nalu);
+            CSD0=std::make_unique<NALU>(nalu);
             //MLOGD<<"SPS found";
         }else if(nalu.isPPS()){
-            CSD1=new NALU(nalu);
+            CSD1=std::make_unique<NALU>(nalu);
             //MLOGD<<"PPS found";
         }
     }

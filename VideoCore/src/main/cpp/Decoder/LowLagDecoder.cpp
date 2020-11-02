@@ -122,7 +122,6 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     //static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
     //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
 
-
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
     AMediaFormat_delete(format);
     format=AMediaCodec_getOutputFormat(decoder.codec);
