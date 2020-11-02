@@ -3,3 +3,5 @@ gst-launch-1.0 -v ximagesrc ! videoscale ! video/x-raw,framerate=20/1, width=128
 
 
 gst-launch-1.0 udpsrc port=5600 ! "application/x-rtp, payload=127" ! rtph264depay ! decodebin ! glimagesink
+
+! rtph264pay pt=96 config-interval=5
