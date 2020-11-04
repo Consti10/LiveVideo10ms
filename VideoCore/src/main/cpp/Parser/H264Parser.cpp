@@ -9,10 +9,32 @@
 #include <thread>
 #include <StringHelper.hpp>
 
+void logIfNull(void * ptr,std::string message){
+    if(ptr==nullptr){
+        MLOGE<<message<<" is null";
+    }
+}
+
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
         onNewNALU(std::move(onNewNALU)),
         mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
         mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
+    // ffmpeg stuff
+    m_codec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    logIfNull(m_codec,"avcodec_find_decoder");
+    if (!(m_codec_ctx = avcodec_alloc_context3(m_codec))) {
+        MLOGE<<"avcodec_alloc_context3";
+    }
+    if (avcodec_open2(m_codec_ctx, m_codec, nullptr) < 0) {
+        MLOGE<<"Error opening the decoding codec";
+    }
+    m_codec_parser_context = av_parser_init(AV_CODEC_ID_H264);
+    logIfNull(m_codec_parser_context,"av_parser_init");
+
+
+
+    //pkt=av_packet_alloc();
+
 }
 
 void H264Parser::reset(){
@@ -29,6 +51,10 @@ void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_len
     //LOGD("H264Parser::parse_raw_h264_stream %d",data_length);
     mParseRAW.parseData(data,data_length);
 }
+void H264Parser::parse_raw_h265_stream(const uint8_t *data,const size_t data_length) {
+    //LOGD("H264Parser::parse_raw_h264_stream %d",data_length);
+    mParseRAW.parseData(data,data_length,true);
+}
 
 void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
     //const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
@@ -39,6 +65,12 @@ void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data
 void H264Parser::parseDjiLiveVideoData(const uint8_t *data,const size_t data_length) {
     //LOGD("H264Parser::parseDjiLiveVideoData %d",data_length);
     mParseRAW.parseDjiLiveVideoData(data,data_length);
+}
+
+void H264Parser::parse_rtp_h264_stream_ffmpeg(const uint8_t* rtp_data,const size_t data_len) {
+    //auto ret=av_parser_parse2(m_pCodecPaser, m_codec_ctx, &pkt->data,&pkt->size,
+    //                                m_packet.data,m_packet.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+
 }
 
 void H264Parser::setLimitFPS(int maxFPS1) {
@@ -156,3 +188,4 @@ void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t 
         mDecodeRTP.parseRTPtoNALU(obuf.data(),obuf.size());
     }*/
 }
+

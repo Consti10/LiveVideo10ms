@@ -19,6 +19,8 @@
 #include <variant>
 #include <optional>
 
+#include "H26X.hpp"
+
 //A NALU consists of
 //a) DATA buffer
 //b) buffer length
@@ -41,10 +43,12 @@ public:
     // Copy constructor allocates new buffer for data (heavy)
     NALU(const NALU& nalu):
     ownedData(std::vector<uint8_t>(nalu.getData(),nalu.getData()+nalu.getSize())),
-    data(ownedData->data()),data_len(nalu.getSize()),creationTime(nalu.creationTime){}
+    data(ownedData->data()),data_len(nalu.getSize()),creationTime(nalu.creationTime),IS_H265_PACKET(nalu.IS_H265_PACKET){
+        //MLOGD<<"NALU copy constructor";
+    }
     // Default constructor does not allocate a new buffer,only stores some pointer (light)
-    NALU(const NALU_BUFFER& data1,const size_t data_length,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data1.data()),data_len(data_length),creationTime{creationTime}{
+    NALU(const NALU_BUFFER& data1,const size_t data_length,const bool IS_H265_PACKET1=false,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1.data()),data_len(data_length),creationTime{creationTime},IS_H265_PACKET(IS_H265_PACKET1){
     };
     ~NALU()= default;
 private:
@@ -56,6 +60,7 @@ private:
     const uint8_t* data;
     const size_t data_len;
 public:
+    const bool IS_H265_PACKET;
     const std::chrono::steady_clock::time_point creationTime;
 public:
     const uint8_t* getData()const{
@@ -72,6 +77,9 @@ public:
     }
     int get_nal_unit_type()const{
         if(getSize()<5)return -1;
+        if(IS_H265_PACKET){
+            return (getData()[4] & 0x7E)>>1;
+        }
         return getData()[4]&0x1f;
     }
     //not safe if data_length<=4;
@@ -83,35 +91,12 @@ public:
         if(getSize()<=4)return 0;
         return getSize()-4;
     }
-    static std::string get_nal_name(int nal_unit_type){
-       std::string nal_unit_type_name;
-       switch (nal_unit_type)
-       {
-           case  NAL_UNIT_TYPE_UNSPECIFIED :                   nal_unit_type_name = "Unspecified"; break;
-           case  NAL_UNIT_TYPE_CODED_SLICE_NON_IDR :           nal_unit_type_name = "Coded slice of a non-IDR picture"; break;
-           case  NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A :  nal_unit_type_name = "Coded slice data partition A"; break;
-           case  NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_B :  nal_unit_type_name = "Coded slice data partition B"; break;
-           case  NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_C :  nal_unit_type_name = "Coded slice data partition C"; break;
-           case  NAL_UNIT_TYPE_CODED_SLICE_IDR :               nal_unit_type_name = "Coded slice of an IDR picture"; break;
-           case  NAL_UNIT_TYPE_SEI :                           nal_unit_type_name = "Supplemental enhancement information (SEI)"; break;
-           case  NAL_UNIT_TYPE_SPS :                           nal_unit_type_name = "Sequence parameter set"; break;
-           case  NAL_UNIT_TYPE_PPS :                           nal_unit_type_name = "Picture parameter set"; break;
-           case  NAL_UNIT_TYPE_AUD :                           nal_unit_type_name = "Access unit delimiter"; break;
-           case  NAL_UNIT_TYPE_END_OF_SEQUENCE :               nal_unit_type_name = "End of sequence"; break;
-           case  NAL_UNIT_TYPE_END_OF_STREAM :                 nal_unit_type_name = "End of stream"; break;
-           case  NAL_UNIT_TYPE_FILLER :                        nal_unit_type_name = "Filler data"; break;
-           case  NAL_UNIT_TYPE_SPS_EXT :                       nal_unit_type_name = "Sequence parameter set extension"; break;
-               // 14..18    // Reserved
-           case  NAL_UNIT_TYPE_CODED_SLICE_AUX :               nal_unit_type_name = "Coded slice of an auxiliary coded picture without partitioning"; break;
-               // 20..23    // Reserved
-               // 24..31    // Unspecified
-           default :                                           nal_unit_type_name = std::string("Unknown")+std::to_string(nal_unit_type); break;
-       }
-       return nal_unit_type_name;
-   };
 
     std::string get_nal_name()const{
-        return get_nal_name(get_nal_unit_type());
+        if(IS_H265_PACKET){
+            return H265::get_nal_name(get_nal_unit_type());
+        }
+        return H264::get_nal_name(get_nal_unit_type());
     }
 
     //returns true if starts with 0001, false otherwise

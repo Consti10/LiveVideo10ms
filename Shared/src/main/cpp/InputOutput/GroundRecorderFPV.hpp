@@ -65,6 +65,7 @@ public:
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_EZWB=5;
     static constexpr uint8_t PACKET_TYPE_TELEMETRY_ANDROD_GPS=6;
     static constexpr uint8_t PACKET_TYPE_MJPEG_ROTG02=7;
+    static constexpr uint8_t PACKET_TYPE_VIDEO_H265=8;
     using PACKET_TYPE=uint8_t;
     using TIMESTAMP_MS=unsigned int;
     // Each time I write raw data to the file it is prefixed by this header

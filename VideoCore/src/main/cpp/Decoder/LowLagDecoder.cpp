@@ -61,7 +61,9 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-    //LOGD("%s",nalu.get_nal_name().c_str());
+    MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
+    MLOGD<<"NALU type "<<nalu.get_nal_name();
+    //return;
     //we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface
     std::lock_guard<std::mutex> lock(mMutexInputPipe);
     decodingInfo.nNALU++;
@@ -69,6 +71,9 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         //No data in NALU (e.g at the beginning of a stream)
         return;
     }
+    //if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD){
+    //    return;
+    //}
     nNALUBytesFed.add(nalu.getSize());
     if(inputPipeClosed){
         //A feedD thread (e.g. file or udp) thread might be running even tough no output surface was set
@@ -77,6 +82,12 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         return;
     }
     if(decoder.configured){
+        //if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_SPS || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_PPS || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
+        //    return;
+        //}
+        if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
+            return;
+        }
         feedDecoder(nalu);
         decodingInfo.nNALUSFeeded++;
     }else{
@@ -114,7 +125,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     AMediaFormat_setBuffer(format,"csd-0",sps.getData(),sps.getSize());
     AMediaFormat_setBuffer(format,"csd-1",pps.getData(),pps.getSize());
 
-    //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,50*1024*1024);
+    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,5*1024*1024);
     //static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
     //AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
     // Lower values mean higher priority

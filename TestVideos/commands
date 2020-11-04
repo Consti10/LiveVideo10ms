@@ -1,5 +1,15 @@
+localhost=127.0.0.1
+
 gst-launch-1.0 -v ximagesrc ! videoscale ! video/x-raw,framerate=20/1, width=1280, height=720 ! videoconvert ! x264enc tune=zerolatency bitrate=5000 speed-preset=superfast ! rtph264pay ! udpsink host=192.168.1.100 port=5600
 
 gst-launch-1.0 udpsrc port=5600 ! "application/x-rtp, payload=127" ! rtph264depay ! decodebin ! glimagesink
 
 ! rtph264pay pt=96 config-interval=5
+
+
+
+gst-launch-1.0 -v videotestsrc ! x264enc speed-preset=superfast ! video/x-h264, profile=baseline, framerate=1/1 ! rtph264pay ! udpsink host=192.168.1.100 port=5600
+
+gst-launch-1.0 -v videotestsrc ! x264enc speed-preset=superfast byte-stream=true ! video/x-h264, profile=baseline, framerate=1/1,bitrate=1000,format=byte-stream ! filesink location=testX.h264
+
+gst-launch-1.0 filesrc location=TestVideos/x264/testVideo.h264 ! h264parse ! decodebin ! glimagesink

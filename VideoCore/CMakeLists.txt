@@ -122,6 +122,12 @@ target_link_libraries( VideoNative
         OpenMAXAL
         h264bitstream
         XFEC_lib
+        # XX
+        avcodec-lib
+        avformat-lib
+        avutil-lib
+        swresample-lib
+        # XX
         )
 
 # the transmitter stuff

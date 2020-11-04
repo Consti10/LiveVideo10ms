@@ -38,6 +38,7 @@ void FileReader::startReading(AAssetManager *assetManager1,std::string FILEPATH1
     std::lock_guard<std::mutex> lock(mMutexStartStop);
     if(started)
         return;
+    MLOGD<<"Receive from file "<<FILEPATH1;
     this->assetManager=assetManager1;
     this->FILEPATH=std::move(FILEPATH1);
     started=true;
@@ -92,7 +93,14 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
     }else if(FileHelper::endsWith(FILEPATH, ".h264")){
         //raw video ends with .h264
         FileReaderRAW::readRawInChunks(assetManager, FILEPATH, [this,&shouldTerminate](const uint8_t *data, size_t data_length) {
+            MLOGD<<"Raw chunck";
             splitDataInChunks(shouldTerminate,data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
+        },shouldTerminate);
+    }else if(FileHelper::endsWith(FILEPATH, ".h265")){
+        //raw video ends with .h264
+        FileReaderRAW::readRawInChunks(assetManager, FILEPATH, [this,&shouldTerminate](const uint8_t *data, size_t data_length) {
+            MLOGD<<"Raw chunck";
+            splitDataInChunks(shouldTerminate,data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H265);
         },shouldTerminate);
     }else if(isTelemetryFilename(FILEPATH) != -1) {
         //Telemetry ends with .ltm, .mavlink usw

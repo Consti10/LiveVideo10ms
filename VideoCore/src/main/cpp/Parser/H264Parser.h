@@ -28,12 +28,22 @@
 #include <list>
 #include <TimeHelper.hpp>
 #include <wifibroadcast/fec.hh>
+//
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavformat/avio.h>
+//#include <rtpdec.h>
+
+}
 
 class H264Parser {
 public:
     H264Parser(NALU_DATA_CALLBACK onNewNALU);
     void parse_raw_h264_stream(const uint8_t* data,const size_t data_length);
+    void parse_raw_h265_stream(const uint8_t* data,const size_t data_length);
     void parse_rtp_h264_stream(const uint8_t* rtp_data,const size_t data_len);
+    void parse_rtp_h264_stream_ffmpeg(const uint8_t* rtp_data,const size_t data_len);
     void parseDjiLiveVideoData(const uint8_t* data,const size_t data_len);
     //
     void parseCustom(const uint8_t* data,const size_t data_len);
@@ -79,6 +89,13 @@ private:
     FECDecoder mFECDecoder;
     //
     std::vector<std::size_t> receivedDataPacketsSize;
+private:
+    // FFMPEG stuff
+    AVCodec *m_codec=nullptr;
+    AVCodecContext  *m_codec_ctx;
+    AVCodecParserContext *m_codec_parser_context=nullptr;
+    AVPacket* pkt=nullptr;
+
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

@@ -63,18 +63,34 @@ void RTPDecoder::reset(){
     //nalu_data.reserve(NALU::NALU_MAXLEN);
 }
 
+static void debugRtpHeader(const rtp_header_t* rtp_header){
+    std::stringstream ss;
+    ss<<"cc"<<(int)rtp_header->cc<<"\n";
+    ss<<"extension"<<(int)rtp_header->extension<<"\n";
+    ss<<"padding"<<(int)rtp_header->padding<<"\n";
+    ss<<"version"<<(int)rtp_header->version<<"\n";
+    ss<<"payload"<<(int)rtp_header->payload<<"\n";
+    ss<<"marker"<<(int)rtp_header->marker<<"\n";
+    ss<<"sequence"<<(int)rtp_header->sequence<<"\n";
+    ss<<"timestamp"<<(int)rtp_header->timestamp<<"\n";
+    ss<<"sources"<<(int)rtp_header->sources<<"\n";
+    MLOGD<<"RTP Header: "<<ss.str();
+}
+
 void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length){
     //12 rtp header bytes and 1 nalu_header_t type byte
     if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
         MLOGD<<"Not enough rtp data";
         return;
     }
+    MLOGD<<"Got rtp data";
     // Testing regarding sequence numbers.This stuff an be removed without issues
     const int seqNr=getSequenceNumber(rtp_data,data_length);
     if(seqNr==lastSequenceNumber){
         // duplicate. This should never happen for 'normal' rtp streams, but can be usefully when testing bitrates
         // (Since you can send the same packet multiple times to emulate a higher bitrate)
-        return;
+        MLOGD<<"Same seqNr";
+        //return;
     }
     if(lastSequenceNumber==-1){
         // first packet in stream
@@ -84,14 +100,17 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         if(seqNr != ((lastSequenceNumber+1) % UINT16_MAX)){
             // We are missing a Packet !
             MLOGD<<"missing a packet. Last:"<<lastSequenceNumber<<" Curr:"<<seqNr<<" Diff:"<<(seqNr-(int)lastSequenceNumber);
-            flagPacketHasGoneMissing=true;
+            //flagPacketHasGoneMissing=true;
         }
     }
     lastSequenceNumber=seqNr;
 
-    const nalu_header_t *nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
+    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    debugRtpHeader(rtp_header);
+    const auto* nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
 
     if (nalu_header->type == 28) { /* FU-A */
+        MLOGD<<"Got partial NALU";
         const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
         if (fu_header->e == 1) {
             /* end of fu-a */
@@ -129,13 +148,13 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         }
         //LOGV("partially nalu");
     } else if(nalu_header->type>0 && nalu_header->type<24){
+        MLOGD<<"Got full nalu";
         timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
         // Full NALU - we can remove the 'drop packet' flag
         if(flagPacketHasGoneMissing){
             MLOGD<<"Got full NALU - clearing missing packet flag";
             flagPacketHasGoneMissing= false;
         }
-        //MLOGD<<"Got full NALU";
         /* full nalu */
         mNALU_DATA[0]=0;
         mNALU_DATA[1]=0;
@@ -151,7 +170,6 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         mNALU_DATA_LENGTH+= data_length - 13;
         forwardNALU(timePointStartOfReceivingNALU);
         mNALU_DATA_LENGTH=0;
-        //LOGV("full nalu");
     }else{
         //MLOGD<<"header:"<<nalu_header->type;
     }
@@ -159,7 +177,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
 
 void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime) {
     if(cb!= nullptr){
-        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,creationTime);
+        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,false,creationTime);
         //nalu_data.resize(nalu_data_length);
         //NALU nalu(nalu_data);
         cb(nalu);
@@ -199,8 +217,8 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
         /**
          * Set pointer for headers
          */
-        rtp_header_t* rtp_hdr= (rtp_header_t *)mRTP_BUFF_SEND;
-        nalu_header_t *nalu_hdr = (nalu_header_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t)];
+        auto* rtp_hdr= (rtp_header_t *)mRTP_BUFF_SEND;
+        auto* nalu_hdr = (nalu_header_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t)];
         /**
          * Write rtp header
          */
@@ -235,7 +253,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
         //MLOGD<<"NALU <RTP_PAYLOAD_MAX_SIZE";
     } else {    /* nalu_len > RTP_PAYLOAD_MAX_SIZE */
         //MLOGD<<"NALU >RTP_PAYLOAD_MAX_SIZE";
-        assert(false);
+        //assert(false);
         /*
          * FU-A segmentation
          */
@@ -253,9 +271,9 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
         for (int fu_seq = 0; fu_seq < fu_pack_num; fu_seq++) {
             memset(mRTP_BUFF_SEND, 0, sizeof(rtp_header_t) + sizeof(fu_indicator_t) + sizeof(fu_header_t));
             //
-            rtp_header_t* rtp_hdr = (rtp_header_t *)mRTP_BUFF_SEND;
-            fu_indicator_t *fu_ind = (fu_indicator_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t)];
-            fu_header_t *fu_hdr = (fu_header_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t) + sizeof(fu_indicator_t)];
+            auto* rtp_hdr = (rtp_header_t *)mRTP_BUFF_SEND;
+            auto* fu_ind = (fu_indicator_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t)];
+            auto* fu_hdr = (fu_header_t *)&mRTP_BUFF_SEND[sizeof(rtp_header_t) + sizeof(fu_indicator_t)];
             /*
              * 根据FU-A的类型设置不同的rtp头和rtp荷载头
              */
