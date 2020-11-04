@@ -53,7 +53,7 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
         case VIDEO_DATA_TYPE::DJI:
             mParser.parseDjiLiveVideoData(data,data_length);
             break;
-        case VIDEO_DATA_TYPE::XH265:
+        case VIDEO_DATA_TYPE::RAW_H265:
             mParser.parse_raw_h265_stream(data,data_length);
             break;
     }
@@ -127,7 +127,7 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
                 if (packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H264) {
                     onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW);
                 }else if(packetType == GroundRecorderFPV::PACKET_TYPE_VIDEO_H265){
-                    onNewVideoData(data, data_length,VIDEO_DATA_TYPE::XH265);
+                    onNewVideoData(data, data_length,VIDEO_DATA_TYPE::RAW_H265);
                 }
             };
             mFileReceiver.setCallBack(0,cb);

@@ -47,7 +47,8 @@ struct VideoRatio{
     }
 };
 
-//Handles decoding of .h264 video
+//Handles decoding of .h264 and .h265 video
+// (Second one not tested well yet)
 class LowLagDecoder {
 private:
     struct Decoder{
@@ -120,7 +121,7 @@ private:
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,64
     };
     KeyFrameFinder mKeyFrameFinder;
-    const bool IS_H265= false;
+    bool IS_H265= false;
 };
 
 #endif //LOW_LAG_DECODER

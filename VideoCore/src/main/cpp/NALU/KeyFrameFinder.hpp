@@ -17,6 +17,7 @@ class KeyFrameFinder{
 private:
     std::unique_ptr<NALU> SPS;
     std::unique_ptr<NALU> PPS;
+    // VPS are only used in H265
     std::unique_ptr<NALU> VPS;
 public:
     void saveIfKeyFrame(const NALU &nalu){
@@ -29,6 +30,7 @@ public:
             //MLOGD<<"PPS found";
         }else if(nalu.IS_H265_PACKET && nalu.isVPS()){
             VPS=std::make_unique<NALU>(nalu);
+            //MLOGD<<"VPS found";
         }
     }
     bool allKeyFramesAvailable(){
@@ -68,6 +70,7 @@ public:
     void reset(){
         SPS=nullptr;
         PPS=nullptr;
+        VPS=nullptr;
     }
 };
 

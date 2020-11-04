@@ -61,8 +61,14 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-    MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
-    MLOGD<<"NALU type "<<nalu.get_nal_name();
+    // TODO: RN switching between h264 / h265 requires re-setting the surface
+    if(nalu.IS_H265_PACKET){
+        IS_H265=true;
+    }else{
+        IS_H265=false;
+    }
+    //MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
+    //MLOGD<<"NALU type "<<nalu.get_nal_name();
     //return;
     //we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface
     std::lock_guard<std::mutex> lock(mMutexInputPipe);

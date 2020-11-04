@@ -21,12 +21,12 @@
 
 #include "H26X.hpp"
 
-//A NALU consists of
-//a) DATA buffer
-//b) buffer length
-//c) creation time
-//Does NOT own the data
 
+/**
+ * A NALU either contains H264 data (default) or H265 data
+ * NOTE: Only when copy constructing a NALU it owns the data, else it only holds a data pointer (that might get overwritten by the parser if you hold onto a NALU)
+ * Also, H264 and H265 is slightly different
+ */
 class NALU{
 private:
     static uint8_t* makeOwnedCopy(const uint8_t* data,size_t data_len){
