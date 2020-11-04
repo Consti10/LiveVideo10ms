@@ -310,11 +310,11 @@ JNI_METHOD(void,nativeCallBack)
         if(p->latestDecodingInfoChanged){
             jclass jcDecodingInfo = env->FindClass("constantin/video/core/player/DecodingInfo");
             assert(jcDecodingInfo!=nullptr);
-            jmethodID jcDecodingInfoConstructor = env->GetMethodID(jcDecodingInfo, "<init>", "(FFFFFII)V");
+            jmethodID jcDecodingInfoConstructor = env->GetMethodID(jcDecodingInfo, "<init>", "(FFFFFIII)V");
             assert(jcDecodingInfoConstructor!= nullptr);
             const auto info=p->latestDecodingInfo;
             auto decodingInfo=env->NewObject(jcDecodingInfo,jcDecodingInfoConstructor,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
-                           (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded);
+                           (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded,(jint)info.nDecodedFrames);
             assert(decodingInfo!=nullptr);
             jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(Lconstantin/video/core/player/DecodingInfo;)V");
             assert(onDecodingInfoChangedJAVA!=nullptr);

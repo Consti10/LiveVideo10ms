@@ -76,7 +76,7 @@ public class UVCReceiverDecoder {
 
     public DecodingInfo getDecodingInfo(){
         return new DecodingInfo(30,0,0,0,
-                nativeGetDecodingTime(nativeInstance),0,0);
+                nativeGetDecodingTime(nativeInstance),0,0,0);
     }
 
     /**

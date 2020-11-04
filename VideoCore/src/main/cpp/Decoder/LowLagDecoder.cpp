@@ -256,6 +256,7 @@ void LowLagDecoder::checkOutputLoop() {
             decodingInfo.avgDecodingTime_ms=decodingTime.getAvg_ms();
             decodingInfo.avgParsingTime_ms=parsingTime.getAvg_ms();
             decodingInfo.avgWaitForInputBTime_ms=waitForInputB.getAvg_ms();
+            decodingInfo.nDecodedFrames=nDecodedFrames.getAbsolute();
             printAvgLog();
             if(onDecodingInfoChangedCallback!= nullptr){
                 onDecodingInfoChangedCallback(decodingInfo);

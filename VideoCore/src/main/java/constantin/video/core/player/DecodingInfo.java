@@ -14,6 +14,7 @@ public class DecodingInfo {
     public final float avgTotalDecodingTime_ms;
     public final int nNALU;
     public final int nNALUSFeeded;
+    public final int nDecodedFrames;
 
     public DecodingInfo(){
         currentFPS=0;
@@ -24,10 +25,11 @@ public class DecodingInfo {
         nNALU=0;
         nNALUSFeeded=0;
         avgTotalDecodingTime_ms =0;
+        nDecodedFrames=0;
     }
 
     public DecodingInfo(float currentFPS, float currentKiloBitsPerSecond,float avgParsingTime_ms,float avgWaitForInputBTime_ms,float avgHWDecodingTime_ms,
-                        int nNALU,int nNALUSFeeded){
+                        int nNALU,int nNALUSFeeded,int nDecodedFrames){
         this.currentFPS=currentFPS;
         this.currentKiloBitsPerSecond=currentKiloBitsPerSecond;
         this.avgParsingTime_ms=avgParsingTime_ms;
@@ -36,6 +38,7 @@ public class DecodingInfo {
         this.avgTotalDecodingTime_ms =avgParsingTime_ms+avgWaitForInputBTime_ms+avgHWDecodingTime_ms;
         this.nNALU=nNALU;
         this.nNALUSFeeded=nNALUSFeeded;
+        this.nDecodedFrames=nDecodedFrames;
     }
 
     public Map<String,Object> toMap(){
@@ -48,6 +51,7 @@ public class DecodingInfo {
         decodingInfo.put("currentKiloBitsPerSecond",currentKiloBitsPerSecond);
         decodingInfo.put("nNALU",nNALU);
         decodingInfo.put("nNALUSFeeded",nNALUSFeeded);
+        decodingInfo.put("nDecodedFrames",nDecodedFrames);
         return decodingInfo;
     }
 

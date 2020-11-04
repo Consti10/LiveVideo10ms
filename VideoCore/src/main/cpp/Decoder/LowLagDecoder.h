@@ -22,6 +22,7 @@ struct DecodingInfo{
     std::chrono::steady_clock::time_point lastCalculation=std::chrono::steady_clock::now();
     long nNALU=0;
     long nNALUSFeeded=0;
+    long nDecodedFrames=0;
     float currentFPS=0;
     float currentKiloBitsPerSecond=0;
     float avgParsingTime_ms=0;
