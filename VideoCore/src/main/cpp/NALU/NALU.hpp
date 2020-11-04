@@ -70,10 +70,20 @@ public:
         return data_len;
     }
     bool isSPS()const{
+        if(IS_H265_PACKET){
+            return get_nal_unit_type()==H265::NAL_UNIT_SPS;
+        }
         return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);
     }
     bool isPPS()const{
+        if(IS_H265_PACKET){
+            return get_nal_unit_type()==H265::NAL_UNIT_PPS;
+        }
         return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
+    }
+    bool isVPS()const{
+        assert(IS_H265_PACKET);
+        return get_nal_unit_type()==H265::NAL_UNIT_VPS;
     }
     int get_nal_unit_type()const{
         if(getSize()<5)return -1;
@@ -114,16 +124,21 @@ public:
 
     //Returns video width and height if the NALU is an SPS
     std::array<int,2> getVideoWidthHeightSPS()const{
-        if(!isSPS()){
-            return {-1,-1};
+        assert(isSPS());
+        //if(!isSPS()){
+        //    return {-1,-1};
+        //}
+        if(IS_H265_PACKET){
+            return {640,480};
+        }else{
+            h264_stream_t* h = h264_new();
+            read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
+            sps_t* sps=h->sps;
+            int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
+            int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
+            h264_free(h);
+            return {Width,Height};
         }
-        h264_stream_t* h = h264_new();
-        read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
-        sps_t* sps=h->sps;
-        int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
-        int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
-        h264_free(h);
-        return {Width,Height};
     }
 
     //Don't forget to free the h264 stream

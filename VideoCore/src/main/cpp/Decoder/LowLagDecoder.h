@@ -120,6 +120,7 @@ private:
             0,0,0,1,103,66,192,40,217,0,120,2,39,229,64
     };
     KeyFrameFinder mKeyFrameFinder;
+    const bool IS_H265=true;
 };
 
 #endif //LOW_LAG_DECODER

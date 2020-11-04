@@ -91,7 +91,8 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         feedDecoder(nalu);
         decodingInfo.nNALUSFeeded++;
     }else{
-        //store sps / pps data. As soon as enough data has been buffered to initialize the decoder,do so.
+        //Store sps,pps, vps(H265 only)
+        // As soon as enough data has been buffered to initialize the decoder,do so.
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         if(mKeyFrameFinder.allKeyFramesAvailable()){
             configureStartDecoder(mKeyFrameFinder.getCSD0(),mKeyFrameFinder.getCSD1());
@@ -100,10 +101,11 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
 }
 
 void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
+    const std::string MIME=IS_H265 ? "video/hevc" : "video/avc";
     if(USE_SW_DECODER_INSTEAD){
         decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
     }else {
-        decoder.codec = AMediaCodec_createDecoderByType("video/avc");
+        decoder.codec = AMediaCodec_createDecoderByType(MIME.c_str());
         //decoder.codec = AMediaCodec_createDecoderByType("video/mjpeg");
         //const std::string s=(decoder.codec== nullptr ? "No" : "YES");
         //MDebug::log("Created decoder"+s);
@@ -113,25 +115,28 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         //AMediaCodec_releaseName(decoder.codec,name);
     }
     AMediaFormat* format=AMediaFormat_new();
-    AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,"video/avc");
-    const auto videoWH= sps.getVideoWidthHeightSPS();
-    MLOGD<<"Video W:"<<videoWH[0]<<" H:"<<videoWH[1];
-    //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
-    //AVCProfileBaseline==1
-    //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
-    //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
-    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
-    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-    AMediaFormat_setBuffer(format,"csd-0",sps.getData(),sps.getSize());
-    AMediaFormat_setBuffer(format,"csd-1",pps.getData(),pps.getSize());
-
-    AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,5*1024*1024);
-    //static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
-    //AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
-    // Lower values mean higher priority
-    // Works on pixel 3 (look at output format description)
-    //static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
-    //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
+    AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,MIME.c_str());
+    if(IS_H265){
+        mKeyFrameFinder.setVPS_SPS_PPS_WIDTH_HEIGHT(format);
+    }else{
+        const auto videoWH= sps.getVideoWidthHeightSPS();
+        MLOGD<<"Video W:"<<videoWH[0]<<" H:"<<videoWH[1];
+        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
+        //AVCProfileBaseline==1
+        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
+        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
+        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
+        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
+        AMediaFormat_setBuffer(format,"csd-0",sps.getData(),sps.getSize());
+        AMediaFormat_setBuffer(format,"csd-1",pps.getData(),pps.getSize());
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,5*1024*1024);
+        //static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
+        //AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
+        // Lower values mean higher priority
+        // Works on pixel 3 (look at output format description)
+        //static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
+    }
 
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
     AMediaFormat_delete(format);

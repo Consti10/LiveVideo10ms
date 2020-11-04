@@ -7,6 +7,9 @@
 
 #include <h264_stream.h>
 
+// namespaces for H264 H265 helper
+// A H265 NALU is only similar to a H264 NALU in that it has the same [0,0,0,1] prefix
+
 namespace H264{
     static std::string get_nal_name(int nal_unit_type){
         std::string nal_unit_type_name;

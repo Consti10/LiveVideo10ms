@@ -15,31 +15,32 @@
 // For later use
 class KeyFrameFinder{
 private:
-    //NALU* CSD0=nullptr;
-    //NALU* CSD1=nullptr;
-    std::unique_ptr<NALU> CSD0;
-    std::unique_ptr<NALU> CSD1;
+    std::unique_ptr<NALU> SPS;
+    std::unique_ptr<NALU> PPS;
+    std::unique_ptr<NALU> VPS;
 public:
     void saveIfKeyFrame(const NALU &nalu){
         if(nalu.getSize()<=0)return;
         if(nalu.isSPS()){
-            CSD0=std::make_unique<NALU>(nalu);
+            SPS=std::make_unique<NALU>(nalu);
             //MLOGD<<"SPS found";
         }else if(nalu.isPPS()){
-            CSD1=std::make_unique<NALU>(nalu);
+            PPS=std::make_unique<NALU>(nalu);
             //MLOGD<<"PPS found";
+        }else if(nalu.IS_H265_PACKET && nalu.isVPS()){
+            VPS=std::make_unique<NALU>(nalu);
         }
     }
     bool allKeyFramesAvailable(){
-        return CSD0!=nullptr && CSD1!=nullptr;
+        return SPS != nullptr && PPS != nullptr;
     }
     //SPS
     const NALU& getCSD0()const{
-        return *CSD0;
+        return *SPS;
     }
     //PPS
     const NALU& getCSD1()const{
-        return *CSD1;
+        return *PPS;
     }
     void setSPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
         const auto sps=getCSD0();
@@ -50,9 +51,23 @@ public:
         AMediaFormat_setBuffer(format,"csd-0",sps.getData(),(size_t)sps.getSize());
         AMediaFormat_setBuffer(format,"csd-1",pps.getData(),(size_t)pps.getSize());
     }
+    static void appendNaluData(std::vector<uint8_t>& buff,const NALU& nalu){
+        buff.insert(buff.begin(),nalu.getData(),nalu.getData()+nalu.getSize());
+    }
+    void setVPS_SPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
+        std::vector<uint8_t> buff={};
+        buff.reserve(SPS->getSize()+PPS->getSize()+VPS->getSize());
+        appendNaluData(buff,*VPS);
+        appendNaluData(buff,*SPS);
+        appendNaluData(buff,*PPS);
+        const auto videoWH= getCSD0().getVideoWidthHeightSPS();
+        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
+        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
+        AMediaFormat_setBuffer(format,"csd-0",buff.data(),buff.size());
+    }
     void reset(){
-        CSD0=nullptr;
-        CSD1=nullptr;
+        SPS=nullptr;
+        PPS=nullptr;
     }
 };
 
