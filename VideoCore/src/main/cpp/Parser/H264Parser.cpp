@@ -51,6 +51,7 @@ void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_len
     //LOGD("H264Parser::parse_raw_h264_stream %d",data_length);
     mParseRAW.parseData(data,data_length);
 }
+
 void H264Parser::parse_raw_h265_stream(const uint8_t *data,const size_t data_length) {
     //LOGD("H264Parser::parse_raw_h264_stream %d",data_length);
     mParseRAW.parseData(data,data_length,true);

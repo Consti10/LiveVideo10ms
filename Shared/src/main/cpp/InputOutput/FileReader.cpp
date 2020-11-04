@@ -93,13 +93,13 @@ void FileReader::receiveLoop(std::future<void> shouldTerminate) {
     }else if(FileHelper::endsWith(FILEPATH, ".h264")){
         //raw video ends with .h264
         FileReaderRAW::readRawInChunks(assetManager, FILEPATH, [this,&shouldTerminate](const uint8_t *data, size_t data_length) {
-            MLOGD<<"Raw chunck";
+            //MLOGD<<"Raw chunck h264";
             splitDataInChunks(shouldTerminate,data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
         },shouldTerminate);
     }else if(FileHelper::endsWith(FILEPATH, ".h265")){
         //raw video ends with .h264
         FileReaderRAW::readRawInChunks(assetManager, FILEPATH, [this,&shouldTerminate](const uint8_t *data, size_t data_length) {
-            MLOGD<<"Raw chunck";
+           // MLOGD<<"Raw chunck h265";
             splitDataInChunks(shouldTerminate,data, data_length,GroundRecorderFPV::PACKET_TYPE_VIDEO_H265);
         },shouldTerminate);
     }else if(isTelemetryFilename(FILEPATH) != -1) {
