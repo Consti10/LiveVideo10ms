@@ -40,12 +40,12 @@ public class DecodingInfo {
 
     public Map<String,Object> toMap(){
         Map<String, Object> decodingInfo = new ArrayMap<>();
-        decodingInfo.put("currentFPS",currentFPS);
-        decodingInfo.put("currentKiloBitsPerSecond",currentKiloBitsPerSecond);
+        decodingInfo.put("avgTotalDecodingTime_ms", avgTotalDecodingTime_ms);
         decodingInfo.put("avgParsingTime_ms",avgParsingTime_ms);
         decodingInfo.put("avgWaitForInputBTime_ms",avgWaitForInputBTime_ms);
         decodingInfo.put("avgHWDecodingTime_ms", avgHWDecodingTime_ms);
-        decodingInfo.put("avgTotalDecodingTime_ms", avgTotalDecodingTime_ms);
+        decodingInfo.put("currentFPS",currentFPS);
+        decodingInfo.put("currentKiloBitsPerSecond",currentKiloBitsPerSecond);
         decodingInfo.put("nNALU",nNALU);
         decodingInfo.put("nNALUSFeeded",nNALUSFeeded);
         return decodingInfo;
