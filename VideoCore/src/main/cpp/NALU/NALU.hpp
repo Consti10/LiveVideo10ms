@@ -63,11 +63,22 @@ public:
     const bool IS_H265_PACKET;
     const std::chrono::steady_clock::time_point creationTime;
 public:
+    // pointer to the NALU data with 0001 prefix
     const uint8_t* getData()const{
-        return data;//.data();
+        return data;
     }
+    // size of the NALU data with 0001 prefix
     const size_t getSize()const{
         return data_len;
+    }
+    //pointer to the NALU data without 0001 prefix
+    const uint8_t* getDataWithoutPrefix()const{
+        return &getData()[4];
+    }
+    //size of the NALU data without 0001 prefix
+    const ssize_t getDataSizeWithoutPrefix()const{
+        if(getSize()<=4)return 0;
+        return getSize()-4;
     }
     bool isSPS()const{
         if(IS_H265_PACKET){
@@ -92,16 +103,6 @@ public:
         }
         return getData()[4]&0x1f;
     }
-    //not safe if data_length<=4;
-    //returns pointer to data without the 0001 prefix
-    const uint8_t* getDataWithoutPrefix()const{
-        return &getData()[4];
-    }
-    const ssize_t getDataSizeWithoutPrefix()const{
-        if(getSize()<=4)return 0;
-        return getSize()-4;
-    }
-
     std::string get_nal_name()const{
         if(IS_H265_PACKET){
             return H265::get_nal_name(get_nal_unit_type());
