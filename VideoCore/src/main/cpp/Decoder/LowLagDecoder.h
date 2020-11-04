@@ -78,7 +78,7 @@ public:
     void registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_CALLBACK decodingInfoChangedCallback);
     //If the decoder has been configured, feed NALU. Else search for configuration data and
     //configure as soon as possible
-    // If the input pipe was closed, only buffer key frames
+    // If the input pipe was closed (surface has been removed or is not set yet), only buffer key frames
     void interpretNALU(const NALU& nalu);
 private:
     //Initialize decoder with provided SPS/PPS data.
