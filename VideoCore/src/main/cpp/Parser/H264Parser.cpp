@@ -20,7 +20,7 @@ H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
         mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
         mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
     // ffmpeg stuff
-    m_codec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    /*m_codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     logIfNull(m_codec,"avcodec_find_decoder");
     if (!(m_codec_ctx = avcodec_alloc_context3(m_codec))) {
         MLOGE<<"avcodec_alloc_context3";
@@ -30,11 +30,7 @@ H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
     }
     m_codec_parser_context = av_parser_init(AV_CODEC_ID_H264);
     logIfNull(m_codec_parser_context,"av_parser_init");
-
-
-
-    //pkt=av_packet_alloc();
-
+    //pkt=av_packet_alloc();*/
 }
 
 void H264Parser::reset(){
@@ -61,6 +57,12 @@ void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data
     //const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
     //debugSequenceNumbers(seqNr);
     mDecodeRTP.parseRTPtoNALU(rtp_data, data_length);
+}
+
+void H264Parser::parse_rtp_h265_stream(const uint8_t *rtp_data,const size_t data_length) {
+    //const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
+    //debugSequenceNumbers(seqNr);
+    mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
 }
 
 void H264Parser::parseDjiLiveVideoData(const uint8_t *data,const size_t data_length) {

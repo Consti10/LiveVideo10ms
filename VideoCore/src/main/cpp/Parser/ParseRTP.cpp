@@ -54,6 +54,10 @@ typedef struct fu_indicator {
 static constexpr auto RTP_PAYLOAD_TYPE_H264=96;
 static constexpr auto MY_SSRC_NUM=10;
 
+typedef struct nalu_header_h265{
+    uint16_t payloadHdr;
+    uint16_t donl;
+}__attribute__ ((packed)) nalu_header_h265_t;
 
 RTPDecoder::RTPDecoder(NALU_DATA_CALLBACK cb): cb(std::move(cb)){
 }
@@ -71,7 +75,7 @@ static void debugRtpHeader(const rtp_header_t* rtp_header){
     ss<<"version"<<(int)rtp_header->version<<"\n";
     ss<<"payload"<<(int)rtp_header->payload<<"\n";
     ss<<"marker"<<(int)rtp_header->marker<<"\n";
-    ss<<"sequence"<<(int)rtp_header->sequence<<"\n";
+    ss<<"sequence"<<(int)htons(rtp_header->sequence)<<"\n";
     ss<<"timestamp"<<(int)rtp_header->timestamp<<"\n";
     ss<<"sources"<<(int)rtp_header->sources<<"\n";
     MLOGD<<"RTP Header: "<<ss.str();
@@ -107,6 +111,12 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
 
     const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
     debugRtpHeader(rtp_header);
+    //  24576
+    if(rtp_header->payload==96){
+        MLOGD<<"Is h264";
+    }else if(rtp_header->payload==97){
+        MLOGD<<"Is h265";
+    }
     const auto* nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
 
     if (nalu_header->type == 28) { /* FU-A */
@@ -175,9 +185,58 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
     }
 }
 
-void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime) {
+void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length){
+    //12 rtp header bytes and 1 nalu_header_t type byte
+    if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
+        MLOGD<<"Not enough rtp data";
+        return;
+    }
+    MLOGD<<"Got rtp data";
+    // Testing regarding sequence numbers.This stuff an be removed without issues
+    const int seqNr=getSequenceNumber(rtp_data,data_length);
+    if(seqNr==lastSequenceNumber){
+        // duplicate. This should never happen for 'normal' rtp streams, but can be usefully when testing bitrates
+        // (Since you can send the same packet multiple times to emulate a higher bitrate)
+        MLOGD<<"Same seqNr";
+        //return;
+    }
+    if(lastSequenceNumber==-1){
+        // first packet in stream
+        flagPacketHasGoneMissing=false;
+    }else{
+        // Don't forget that the sequence number loops every UINT16_MAX packets
+        if(seqNr != ((lastSequenceNumber+1) % UINT16_MAX)){
+            // We are missing a Packet !
+            MLOGD<<"missing a packet. Last:"<<lastSequenceNumber<<" Curr:"<<seqNr<<" Diff:"<<(seqNr-(int)lastSequenceNumber);
+            //flagPacketHasGoneMissing=true;
+        }
+    }
+    lastSequenceNumber=seqNr;
+
+    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    debugRtpHeader(rtp_header);
+    //  24576
+    if(rtp_header->payload==96){
+        MLOGD<<"Is payload type 96";
+    }
+    const auto* nalu_header=(nalu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
+    const auto* nalUnitPayloadData=&rtp_data[sizeof(rtp_header_t) + sizeof(nalu_header_h265_t)];
+    const size_t nalUnitPayloadDataSize= data_length - sizeof(rtp_header_t) + sizeof(nalu_header_h265_t);
+
+    MLOGD<<"H265 NALU hdr: "<<((int)nalu_header->payloadHdr)<<" "<<((int)nalu_header->donl);
+    mNALU_DATA[0]=0;
+    mNALU_DATA[1]=0;
+    mNALU_DATA[2]=0;
+    mNALU_DATA[3]=1;
+    mNALU_DATA_LENGTH=4;
+    memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], nalUnitPayloadData, nalUnitPayloadDataSize);
+    mNALU_DATA_LENGTH+=nalUnitPayloadDataSize;
+    forwardNALU(std::chrono::steady_clock::now(),true);
+}
+
+void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime,const bool isH265) {
     if(cb!= nullptr){
-        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,false,creationTime);
+        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,isH265,creationTime);
         //nalu_data.resize(nalu_data_length);
         //NALU nalu(nalu_data);
         cb(nalu);

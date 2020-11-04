@@ -6,6 +6,9 @@
         <item>RAW H264</item>
         <item>CUSTOM</item>
         <item>CUSTOM2</item>
+        <item>DJI</item>
+        <item>RTP H265</item>
+        <item>RAW H265</item>
     </string-array>
 
     <string-array name="entriesVIDEO_SOURCE" >

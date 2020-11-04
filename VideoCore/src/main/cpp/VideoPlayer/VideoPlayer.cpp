@@ -56,6 +56,9 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
         case VIDEO_DATA_TYPE::RAW_H265:
             mParser.parse_raw_h265_stream(data,data_length);
             break;
+        case VIDEO_DATA_TYPE::RTP_H265:
+            mParser.parse_rtp_h265_stream(data,data_length);
+            break;
     }
 }
 

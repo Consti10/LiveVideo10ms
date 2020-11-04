@@ -68,7 +68,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         IS_H265=false;
     }
     //MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
-    //MLOGD<<"NALU type "<<nalu.get_nal_name();
+    MLOGD<<"NALU type "<<nalu.get_nal_name();
     //return;
     //we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface
     std::lock_guard<std::mutex> lock(mMutexInputPipe);

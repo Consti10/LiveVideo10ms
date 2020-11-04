@@ -6,9 +6,10 @@ gst-launch-1.0 udpsrc port=5600 ! "application/x-rtp, payload=127" ! rtph264depa
 
 ! rtph264pay pt=96 config-interval=5
 
+// This one works for streaming h264 to android via rtp
+gst-launch-1.0 -v videotestsrc ! video/x-raw, framerate=1/1,width=640,height=480 ! x264enc speed-preset=superfast bitrate=1 ! video/x-h264, profile=baseline ! rtph264pay ! udpsink host=192.168.1.100 port=5600
 
 
-gst-launch-1.0 -v videotestsrc ! x264enc speed-preset=superfast ! video/x-h264, profile=baseline, framerate=1/1 ! rtph264pay ! udpsink host=192.168.1.100 port=5600
 
 gst-launch-1.0 -v videotestsrc ! video/x-raw, framerate=1/1,width=640,height=480  ! x264enc speed-preset=superfast  bitrate=1000 ! video/x-h264, profile=baseline,stream-format=byte-stream ! filesink location=testX.h264
 
