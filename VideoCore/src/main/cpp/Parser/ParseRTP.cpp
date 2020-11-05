@@ -185,6 +185,9 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
     }
 }
 
+// https://github.com/ireader/media-server/blob/master/librtp/payload/rtp-h265-unpack.c
+#define H265_TYPE(v) ((v >> 1) & 0x3f)
+
 void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length){
     //12 rtp header bytes and 1 nalu_header_t type byte
     if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
@@ -217,26 +220,47 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     debugRtpHeader(rtp_header);
     //  24576
     if(rtp_header->payload==96){
-        MLOGD<<"Is payload type 96";
+        //MLOGD<<"Is payload type 96";
+    }else{
+        assert(false);
     }
-    const auto* nalu_header=(nalu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
-    const auto* nalUnitPayloadData=&rtp_data[sizeof(rtp_header_t) + sizeof(nalu_header_h265_t)];
-    const size_t nalUnitPayloadDataSize= data_length - sizeof(rtp_header_t) + sizeof(nalu_header_h265_t);
-
-    MLOGD<<"H265 NALU hdr: "<<((int)nalu_header->payloadHdr)<<" "<<((int)nalu_header->donl);
-    mNALU_DATA[0]=0;
-    mNALU_DATA[1]=0;
-    mNALU_DATA[2]=0;
-    mNALU_DATA[3]=1;
-    mNALU_DATA_LENGTH=4;
-    memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], nalUnitPayloadData, nalUnitPayloadDataSize);
-    mNALU_DATA_LENGTH+=nalUnitPayloadDataSize;
-    forwardNALU(std::chrono::steady_clock::now(),true);
+    const int nal = H265_TYPE(rtp_data[sizeof(rtp_header_t)]);
+    MLOGD<<"XNAL "<<nal;
+    if (nal > 50){
+        MLOGE<<"Unsupported (HEVC) NAL type";
+        return;
+    }
+    if(nal==48){
+        MLOGE<<"Unsupprted RTP H265 packet";
+        return;
+    }else if(nal==49){
+        // FU
+        MLOGD<<"Got partial nal";
+        return;
+    }else{
+        // single NAL unit
+        MLOGD<<"Got single nal";
+        const size_t offset=sizeof(rtp_header_t)+2;
+        const auto* nalUnitPayloadData=&rtp_data[offset];
+        const size_t nalUnitPayloadDataSize= data_length - offset;
+        mNALU_DATA[0]=0;
+        mNALU_DATA[1]=0;
+        mNALU_DATA[2]=0;
+        mNALU_DATA[3]=1;
+        mNALU_DATA_LENGTH=4;
+        memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],&rtp_data[sizeof(rtp_header_t)],2);
+        mNALU_DATA_LENGTH+=2;
+        memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], nalUnitPayloadData, nalUnitPayloadDataSize);
+        mNALU_DATA_LENGTH+=nalUnitPayloadDataSize;
+        forwardNALU(std::chrono::steady_clock::now(),true);
+    }
+    //MLOGD<<"H265 NALU hdr: "<<((int)nalu_header->payloadHdr)<<" "<<((int)nalu_header->donl);
 }
 
 void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime,const bool isH265) {
     if(cb!= nullptr){
         NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,isH265,creationTime);
+        MLOGD<<"NALU type "<<nalu.get_nal_name();
         //nalu_data.resize(nalu_data_length);
         //NALU nalu(nalu_data);
         cb(nalu);

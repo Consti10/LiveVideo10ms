@@ -145,17 +145,17 @@ namespace H265{
                 nal_unit_type_name="NAL_UNIT_CODED_SLICE_RASL_R";break;
 
             case NalUnitType::NAL_UNIT_RESERVED_VCL_N10:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL_N10";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL_R11:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL_R11";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL_N12:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL_N12";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL_R13:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL_R13";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL_N14:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL_N14";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL_R15:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL_R15";break;
 
             case NalUnitType::NAL_UNIT_CODED_SLICE_BLA_W_LP:
                 nal_unit_type_name="NAL_UNIT_CODED_SLICE_BLA_W_LP";break;
@@ -172,24 +172,24 @@ namespace H265{
             case NalUnitType::NAL_UNIT_RESERVED_IRAP_VCL22:
                 nal_unit_type_name="NAL_UNIT_RESERVED_IRAP_VCL22";break;
             case NalUnitType:: NAL_UNIT_RESERVED_IRAP_VCL23:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_IRAP_VCL23";break;
 
             case NalUnitType::NAL_UNIT_RESERVED_VCL24:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL24";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL25:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL25";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL26:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL26";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL27:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL27";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL28:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL28";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL29:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL29";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL30:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL30";break;
             case NalUnitType::NAL_UNIT_RESERVED_VCL31:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_VCL31";break;
 
             case NalUnitType::NAL_UNIT_VPS:
                 nal_unit_type_name="NAL_UNIT_VPS";break;
@@ -210,51 +210,51 @@ namespace H265{
             case NalUnitType::NAL_UNIT_SUFFIX_SEI:
                 nal_unit_type_name="NAL_UNIT_SUFFIX_SEI";break;
             case NalUnitType::NAL_UNIT_RESERVED_NVCL41:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_NVCL41";break;
             case NalUnitType::NAL_UNIT_RESERVED_NVCL42:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_NVCL42";break;
             case NalUnitType::NAL_UNIT_RESERVED_NVCL43:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_NVCL43";break;
             case NalUnitType::NAL_UNIT_RESERVED_NVCL44:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_NVCL44";break;
             case NalUnitType:: NAL_UNIT_RESERVED_NVCL45:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_NVCL45";break;
             case NalUnitType:: NAL_UNIT_RESERVED_NVCL46:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_NVCL46";break;
             case NalUnitType::NAL_UNIT_RESERVED_NVCL47:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_RESERVED_NVCL47";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_48:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_48";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_49:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_49";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_50:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_50";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_51:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_51";break;
             case NalUnitType:: NAL_UNIT_UNSPECIFIED_52:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_52";break;
             case NalUnitType:: NAL_UNIT_UNSPECIFIED_53:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_53";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_54:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_54";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_55:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_55";break;
             case NalUnitType:: NAL_UNIT_UNSPECIFIED_56:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_56";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_57:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_57";break;
             case NalUnitType:: NAL_UNIT_UNSPECIFIED_58:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_58";break;
             case NalUnitType:: NAL_UNIT_UNSPECIFIED_59:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_59";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_60:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_60";break;
             case NalUnitType:: NAL_UNIT_UNSPECIFIED_61:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_61";break;
             case NalUnitType::NAL_UNIT_UNSPECIFIED_62:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_62";break;
             case NalUnitType:: NAL_UNIT_UNSPECIFIED_63:
-                nal_unit_type_name="";break;
+                nal_unit_type_name="NAL_UNIT_UNSPECIFIED_63";break;
             case NalUnitType:: NAL_UNIT_INVALID:
                 nal_unit_type_name="NAL_UNIT_INVALID";break;
             default :
