@@ -67,10 +67,10 @@ static constexpr auto MY_SSRC_NUM=10;
 //  |F|   Type    |  LayerId  | TID |
 //  +-------------+-----------------+
 typedef struct nal_unit_header_h265{
-    uint8_t tid:    3;
-    uint8_t layerId:6;
-    uint8_t type:   6;
     uint8_t f:      1;
+    uint8_t type:   6;
+    uint8_t layerId:6;
+    uint8_t tid:    3;
 }__attribute__ ((packed)) nal_unit_header_h265_t;
 // defined in 4.4.3 FU Header
 //+---------------+
@@ -148,6 +148,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         MLOGD<<"Got partial NALU";
         const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
         if (fu_header->e == 1) {
+            MLOGD<<"End of fu-a";
             /* end of fu-a */
             memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
             mNALU_DATA_LENGTH+= data_length - 14;
@@ -157,6 +158,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             }
             mNALU_DATA_LENGTH=0;
         } else if (fu_header->s == 1) {
+            MLOGD<<"Start of fu-a";
             timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
             // Beginning of new fu sequence - we can remove the 'drop packet' flag
             if(flagPacketHasGoneMissing){
@@ -177,6 +179,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
             mNALU_DATA_LENGTH+= data_length - 14;
         } else {
+            MLOGD<<"Middle of fu-a";
             /* middle of fu-a */
             memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
             mNALU_DATA_LENGTH+= data_length - 14;
@@ -212,6 +215,10 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
 
 // https://github.com/ireader/media-server/blob/master/librtp/payload/rtp-h265-unpack.c
 #define H265_TYPE(v) ((v >> 1) & 0x3f)
+//
+#define FU_START(v) (v & 0x80)
+#define FU_END(v)	(v & 0x40)
+#define FU_NAL(v)	(v & 0x3F)
 
 void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length){
     // 12 rtp header bytes and 1 nalu_header_t type byte
@@ -247,7 +254,13 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         MLOGE<<"Unsupported RTP payload "<<(int)rtp_header->payload;
         return;
     }
-    const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
+    //const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
+    static_assert(sizeof(uint16_t)==sizeof(nal_unit_header_h265_t));
+    uint16_t tmp;
+    memcpy(&tmp,&rtp_data[sizeof(rtp_header_t)],sizeof(uint16_t));
+    tmp=htons(tmp);
+    const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&tmp;
+
     const int nal = H265_TYPE(rtp_data[sizeof(rtp_header_t)]);
     MLOGD<<"XNAL "<<nal<<" And other "<<(int)nal_unit_header_h265->type;
     if (nal > 50){
@@ -255,21 +268,41 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         return;
     }
     if(nal==48){
-        MLOGE<<"Unsupprted RTP H265 packet";
+        // Aggregation packets are not supported yet (and never used in gstreamer / ffmpeg anyways)
+        MLOGE<<"Unsupprted RTP H265 packet (Aggregation packet)";
         return;
     }else if(nal==49){
         // FU-X packet
         MLOGD<<"Got partial nal";
+        const uint8_t xFu=rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
+        //MLOGD<<"Fu start "<<((int)FU_START(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
+        //MLOGD<<"Fu end "<<((int)FU_END(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
+
         const auto* fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
         const auto size1=sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)+sizeof(fu_header_h265_t);
         const uint8_t* fu_payload=&rtp_data[size1];
         const size_t fu_payload_size=data_length-size1;
-        if(fu_header->e==1){
+        if(FU_END(xFu)){
             MLOGD<<"end of fu packetization";
-        }else if(fu_header->s==1){
+            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],fu_payload,fu_payload_size);
+            mNALU_DATA_LENGTH+=fu_payload_size;
+            forwardNALU(std::chrono::steady_clock::now(),true);
+        }else if(FU_START(xFu)){
             MLOGD<<"start of fu packetization";
+            mNALU_DATA[0]=0;
+            mNALU_DATA[1]=0;
+            mNALU_DATA[2]=0;
+            mNALU_DATA[3]=1;
+            mNALU_DATA_LENGTH=4;
+            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],&rtp_data[sizeof(rtp_header_t)],2);
+            mNALU_DATA_LENGTH+=2;
+            // copy the rest of the data
+            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],fu_payload,fu_payload_size);
+            mNALU_DATA_LENGTH+=fu_payload_size;
         }else{
             MLOGD<<"middle of fu packetization";
+            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],fu_payload,fu_payload_size);
+            mNALU_DATA_LENGTH+=fu_payload_size;
         }
         return;
     }else{
