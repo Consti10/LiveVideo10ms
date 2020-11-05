@@ -61,7 +61,7 @@ void LowLagDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_
 }
 
 void LowLagDecoder::interpretNALU(const NALU& nalu){
-    return;
+    //return;
     // TODO: RN switching between h264 / h265 requires re-setting the surface
     if(decoder.configured){
         assert(nalu.IS_H265_PACKET==IS_H265);
