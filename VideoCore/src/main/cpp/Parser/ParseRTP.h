@@ -21,6 +21,8 @@ public:
     void reset();
     // Returns the sequence number of an RTP packet
     static int getSequenceNumber(const uint8_t* rtp_data,const size_t data_len);
+    // copy data into the NALU buffer and increase mNALU_DATA_LENGTH
+    void copyNaluData(const uint8_t* data,size_t data_len);
 private:
     // Properly calls the cb function
     // Resets the mNALU_DATA_LENGTH to 0

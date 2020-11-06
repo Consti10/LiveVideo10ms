@@ -284,8 +284,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         const size_t fu_payload_size=data_length-size1;
         if(FU_END(xFu)){
             MLOGD<<"end of fu packetization";
-            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],fu_payload,fu_payload_size);
-            mNALU_DATA_LENGTH+=fu_payload_size;
+            copyNaluData(fu_payload,fu_payload_size);
             forwardNALU(std::chrono::steady_clock::now(),true);
         }else if(FU_START(xFu)){
             MLOGD<<"start of fu packetization";
@@ -294,17 +293,14 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             mNALU_DATA[2]=0;
             mNALU_DATA[3]=1;
             mNALU_DATA_LENGTH=4;
-            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],&rtp_data[sizeof(rtp_header_t)],2);
-            mNALU_DATA_LENGTH+=2;
+            // copy header
+            copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
             // copy the rest of the data
-            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],fu_payload,fu_payload_size);
-            mNALU_DATA_LENGTH+=fu_payload_size;
+            copyNaluData(fu_payload,fu_payload_size);
         }else{
             MLOGD<<"middle of fu packetization";
-            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],fu_payload,fu_payload_size);
-            mNALU_DATA_LENGTH+=fu_payload_size;
+            copyNaluData(fu_payload,fu_payload_size);
         }
-        return;
     }else{
         // single NAL unit
         MLOGD<<"Got single nal";
@@ -317,11 +313,9 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         mNALU_DATA[3]=1;
         mNALU_DATA_LENGTH=4;
         // copy the NALU header
-        memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],&rtp_data[sizeof(rtp_header_t)],2);
-        mNALU_DATA_LENGTH+=2;
+        copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
         // copy the rest of the data
-        memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], nalUnitPayloadData, nalUnitPayloadDataSize);
-        mNALU_DATA_LENGTH+=nalUnitPayloadDataSize;
+        copyNaluData(nalUnitPayloadData, nalUnitPayloadDataSize);
         forwardNALU(std::chrono::steady_clock::now(),true);
     }
 }
@@ -345,6 +339,11 @@ int RTPDecoder::getSequenceNumber(const uint8_t* rtp_data,const size_t data_len)
     const auto seqNr=rtp_header->sequence;
     return htons(seqNr);
     //return seqNr;
+}
+
+void RTPDecoder::copyNaluData(const uint8_t *data, size_t data_len) {
+    memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],data,data_len);
+    mNALU_DATA_LENGTH+=data_len;
 }
 
 
