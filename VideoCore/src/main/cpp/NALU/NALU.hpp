@@ -130,7 +130,16 @@ public:
         //    return {-1,-1};
         //}
         if(IS_H265_PACKET){
-            return {320,240};
+            //return {320,240};
+            //return {640,480};
+            // For some reason the h264_stream_t code also works for h265 sps packets
+            h264_stream_t* h = h264_new();
+            read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
+            sps_t* sps=h->sps;
+            int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
+            int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
+            h264_free(h);
+            return {Width,Height};
         }else{
             h264_stream_t* h = h264_new();
             read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
@@ -143,7 +152,7 @@ public:
     }
 
     //Don't forget to free the h264 stream
-    h264_stream_t* toH264Stream()const{
+    /*h264_stream_t* toH264Stream()const{
         h264_stream_t* h = h264_new();
         read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
         return h;
@@ -153,7 +162,7 @@ public:
         h264_stream_t* h = h264_new();
         read_debug_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
         h264_free(h);
-    }
+    }*/
 
     //Create a NALU from h264stream object
     //Only tested on PSP/PPS !!!!!!!!!!

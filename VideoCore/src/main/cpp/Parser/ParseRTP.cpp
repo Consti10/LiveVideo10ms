@@ -293,7 +293,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             mNALU_DATA[3]=1;
             mNALU_DATA_LENGTH=4;
             // copy header
-            copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
+            //copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
             // copy the rest of the data
             copyNaluData(fu_payload,fu_payload_size);
         }else{
