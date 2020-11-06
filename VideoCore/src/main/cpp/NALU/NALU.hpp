@@ -21,6 +21,11 @@
 
 #include "H26X.hpp"
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavformat/avio.h>
+}
 
 /**
  * A NALU either contains H264 data (default) or H265 data
@@ -131,9 +136,20 @@ public:
         //}
         if(IS_H265_PACKET){
             //TODO doesn't work with H265 yet
+            AVCodec* avCodec=avcodec_find_decoder(AV_CODEC_ID_H264);
+            AVCodecParserContext* avCodecParserContext = av_parser_init(AV_CODEC_ID_H264);
+            AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
+            AVPacket avPacket;
+            av_init_packet(&avPacket);
+            auto ret = av_parser_parse2(avCodecParserContext,avCodecContext, &avPacket.data,&avPacket.size,
+                                        getData(),getSize(), AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+            MLOGD<<"Ret:"<<ret<<" "<<getSize();
+            MLOGD<<"Codec context W H "<<avCodecContext->width<<" "<<avCodecContext->height;
+            MLOGD<<"AVCodec context W H "<<avCodecParserContext->width<<" "<<avCodecParserContext->height;
+            avcodec_free_context(&avCodecContext);
             //return {320,240};
-            //return {640,480};
-            return {180,120};
+            return {640,480};
+            //return {180,120};
             // For some reason the h264_stream_t code also works for h265 sps packets
             h264_stream_t* h = h264_new();
             read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
@@ -143,6 +159,20 @@ public:
             h264_free(h);
             return {Width,Height};
         }else{
+            //
+            AVCodec* avCodec=avcodec_find_decoder(AV_CODEC_ID_H264);
+            AVCodecParserContext* avCodecParserContext = av_parser_init(AV_CODEC_ID_H264);
+            AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
+            AVPacket avPacket;
+            av_init_packet(&avPacket);
+            auto ret = av_parser_parse2(avCodecParserContext,avCodecContext, &avPacket.data,&avPacket.size,
+                                        getData(),getSize(), AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+            MLOGD<<"Ret:"<<ret<<" "<<getSize();
+            MLOGD<<"Codec context W H "<<avCodecContext->width<<" "<<avCodecContext->height;
+            MLOGD<<"AVCodec context W H "<<avCodecParserContext->width<<" "<<avCodecParserContext->height;
+            avcodec_free_context(&avCodecContext);
+            //
+            //
             h264_stream_t* h = h264_new();
             read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
             sps_t* sps=h->sps;
