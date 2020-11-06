@@ -66,6 +66,7 @@ public:
         AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
         AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
         AMediaFormat_setBuffer(format,"csd-0",buff.data(),buff.size());
+        MLOGD<<"Video W:"<<videoWH[0]<<" H:"<<videoWH[1];
     }
     void reset(){
         SPS=nullptr;
