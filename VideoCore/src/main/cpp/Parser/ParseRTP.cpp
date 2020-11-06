@@ -277,8 +277,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         const uint8_t xFu=rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
         //MLOGD<<"Fu start "<<((int)FU_START(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
         //MLOGD<<"Fu end "<<((int)FU_END(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
-
-        const auto* fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
+        //const auto* fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
         const auto size1=sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)+sizeof(fu_header_h265_t);
         const uint8_t* fu_payload=&rtp_data[size1];
         const size_t fu_payload_size=data_length-size1;
@@ -312,10 +311,12 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         mNALU_DATA[2]=0;
         mNALU_DATA[3]=1;
         mNALU_DATA_LENGTH=4;
-        // copy the NALU header
-        copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
+        // copy the NALU header  and NALU data
+        // Looks like DONL is just not present ?!
+        copyNaluData(&rtp_data[sizeof(rtp_header_t)],data_length-sizeof(rtp_header_t));
+        //copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
         // copy the rest of the data
-        copyNaluData(nalUnitPayloadData, nalUnitPayloadDataSize);
+        //copyNaluData(nalUnitPayloadData, nalUnitPayloadDataSize);
         forwardNALU(std::chrono::steady_clock::now(),true);
     }
 }

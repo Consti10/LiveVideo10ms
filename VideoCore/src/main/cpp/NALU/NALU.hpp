@@ -130,7 +130,7 @@ public:
         //    return {-1,-1};
         //}
         if(IS_H265_PACKET){
-            return {640,480};
+            return {320,240};
         }else{
             h264_stream_t* h = h264_new();
             read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
