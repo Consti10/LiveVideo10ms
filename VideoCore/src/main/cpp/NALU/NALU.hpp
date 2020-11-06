@@ -130,8 +130,10 @@ public:
         //    return {-1,-1};
         //}
         if(IS_H265_PACKET){
+            //TODO doesn't work with H265 yet
             //return {320,240};
-            return {640,480};
+            //return {640,480};
+            return {180,120};
             // For some reason the h264_stream_t code also works for h265 sps packets
             h264_stream_t* h = h264_new();
             read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());

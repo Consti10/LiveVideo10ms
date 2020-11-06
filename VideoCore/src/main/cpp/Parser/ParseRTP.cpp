@@ -35,6 +35,7 @@ typedef struct rtp_header {
     uint32_t timestamp;       //  timestamp
     uint32_t sources;      // contributing sources
 } __attribute__ ((packed)) rtp_header_t; /* 12 bytes */
+static_assert(sizeof(rtp_header_t)==12);
 //NOTE: sequence,timestamp and sources has to be converted to the right endianness using htonl/htons regardless of the byte order
 
 //Taken from https://github.com/hmgle/h264_to_rtp/blob/master/h264tortp.h
@@ -72,6 +73,7 @@ typedef struct nal_unit_header_h265{
     uint8_t layerId:6;
     uint8_t tid:    3;
 }__attribute__ ((packed)) nal_unit_header_h265_t;
+static_assert(sizeof(nal_unit_header_h265_t)==2);
 // defined in 4.4.3 FU Header
 //+---------------+
 //|0|1|2|3|4|5|6|7|
@@ -262,7 +264,10 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&tmp;
 
     const int nal = H265_TYPE(rtp_data[sizeof(rtp_header_t)]);
-    MLOGD<<"XNAL "<<nal<<" And other "<<(int)nal_unit_header_h265->type;
+    MLOGD<<"XNAL "<<nal<<" And other "<<"f:"<<(int)nal_unit_header_h265->f<<" type:"<<((int)nal_unit_header_h265->type)<<" layerId:"<<(int)nal_unit_header_h265->layerId<<" tid:"<<nal_unit_header_h265->tid;
+    if(nal_unit_header_h265->type==49){
+        MLOGD<<"Is 49 too";
+    }
     if (nal > 50){
         MLOGE<<"Unsupported (HEVC) NAL type";
         return;
@@ -278,9 +283,9 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         //MLOGD<<"Fu start "<<((int)FU_START(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
         //MLOGD<<"Fu end "<<((int)FU_END(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
         //const auto* fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
-        const auto size1=sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)+sizeof(fu_header_h265_t);
-        const uint8_t* fu_payload=&rtp_data[size1];
-        const size_t fu_payload_size=data_length-size1;
+        const auto fuPayloadOffset= sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t);
+        const uint8_t* fu_payload=&rtp_data[fuPayloadOffset];
+        const size_t fu_payload_size= data_length - fuPayloadOffset;
         if(FU_END(xFu)){
             MLOGD<<"end of fu packetization";
             copyNaluData(fu_payload,fu_payload_size);
@@ -294,6 +299,12 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             mNALU_DATA_LENGTH=4;
             // copy header
             //copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
+            const uint8_t* ptr=&rtp_data[sizeof(rtp_header_t)];
+            uint8_t fuheader=rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
+            mNALU_DATA[mNALU_DATA_LENGTH] = (FU_NAL(fuheader) << 1) | (ptr[0] & 0x81); // replace NAL Unit Type Bits
+            mNALU_DATA_LENGTH++;
+            mNALU_DATA[mNALU_DATA_LENGTH] = ptr[1];
+            mNALU_DATA_LENGTH++;
             // copy the rest of the data
             copyNaluData(fu_payload,fu_payload_size);
         }else{
