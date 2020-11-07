@@ -280,16 +280,15 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     }else if(nal==49){
         // FU-X packet
         MLOGD<<"Got partial nal";
+        const auto fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
         const auto fuPayloadOffset= sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t);
         const uint8_t* fu_payload=&rtp_data[fuPayloadOffset];
         const size_t fu_payload_size= data_length - fuPayloadOffset;
-        const auto fuHeader=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
-        MLOGD<<"HAHU fuHeader "<<(int)fuHeader->s<<" "<<(int)fuHeader->e;
-        if(fuHeader->e){
+        if(fu_header->e){
             MLOGD<<"end of fu packetization";
             copyNaluData(fu_payload,fu_payload_size);
             forwardNALU(std::chrono::steady_clock::now(),true);
-        }else if(fuHeader->s){
+        }else if(fu_header->s){
             MLOGD<<"start of fu packetization";
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
             mNALU_DATA[0]=0;
@@ -297,8 +296,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             mNALU_DATA[2]=0;
             mNALU_DATA[3]=1;
             mNALU_DATA_LENGTH=4;
-            // copy header
-            //copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
+            // copy header and reconstruct ?!!!
             const uint8_t* ptr=&rtp_data[sizeof(rtp_header_t)];
             uint8_t variableNoIdea=rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
             // replace NAL Unit Type Bits - I have no idea how that works, but this manipulation works :)
@@ -314,7 +312,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         }
     }else{
         // single NAL unit
-        MLOGD<<"Got single nal";
+        //MLOGD<<"Got single nal";
         mNALU_DATA[0]=0;
         mNALU_DATA[1]=0;
         mNALU_DATA[2]=0;
