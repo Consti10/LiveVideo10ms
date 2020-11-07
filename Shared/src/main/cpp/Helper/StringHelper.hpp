@@ -81,11 +81,16 @@ public:
     static std::string vectorAsString(const std::vector<T>& v){
         std::stringstream ss;
         ss<<"[";
+        int count=0;
         for (const auto i:v) {
             if constexpr (std::is_same_v<T,uint8_t>){
-                ss << (int)i << ",";
+                ss << (int)i;
             }else{
-                ss << i << " ";
+                ss << i;
+            }
+            count++;
+            if(count!=v.size()){
+                ss<<",";
             }
         }
         ss<<"]";
