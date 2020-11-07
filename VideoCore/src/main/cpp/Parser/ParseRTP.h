@@ -24,7 +24,8 @@ public:
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
     // parse rtp h265 packet to NALU
     void parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length);
-    // copy data into the NALU buffer and increase mNALU_DATA_LENGTH
+    // copy data_len bytes into the mNALU_DATA buffer at the current position
+    // and increase mNALU_DATA_LENGTH by data_len
     void copyNaluData(const uint8_t* data,size_t data_len);
     // reset mNALU_DATA_LENGTH to 0
     void reset();
