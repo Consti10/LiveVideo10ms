@@ -48,13 +48,14 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         return;
     }
     //MLOGD<<"Got rtp data";
-    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    const RTPPacket rtpPacket(rtp_data,data_length);
     //MLOGD<<"RTP Header: "<<rtp_header->asString();
-    if(!validateRTPPacket(*rtp_header)){
+    if(!validateRTPPacket(rtpPacket.header)){
         return;
     }
-    const auto* nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
-    if (nalu_header->type == 28) { /* FU-A */
+    //const auto* nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
+    const auto nalu_header=rtpPacket.getNALUHeaderH264();
+    if (nalu_header.type == 28) { /* FU-A */
         //MLOGD<<"Got partial NALU";
         const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
         if (fu_header->e == 1) {
@@ -81,8 +82,8 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             mNALU_DATA[3]=1;
             mNALU_DATA_LENGTH=4;
             const uint8_t h264_nal_header = (uint8_t)(fu_header->type & 0x1f)
-                                            | (nalu_header->nri << 5)
-                                            | (nalu_header->f << 7);
+                                            | (nalu_header.nri << 5)
+                                            | (nalu_header.f << 7);
             mNALU_DATA[4]=h264_nal_header;
             mNALU_DATA_LENGTH++;
             appendNALUData(&rtp_data[14], (size_t) data_length - 14);
@@ -91,7 +92,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
             /* middle of fu-a */
             appendNALUData(&rtp_data[14], (size_t) data_length - 14);
         }
-    } else if(nalu_header->type>0 && nalu_header->type<24){
+    } else if(nalu_header.type>0 && nalu_header.type<24){
         //MLOGD<<"Got full nalu";
         timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
         // Full NALU - we can remove the 'drop packet' flag
@@ -105,9 +106,9 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         mNALU_DATA[2]=0;
         mNALU_DATA[3]=1;
         mNALU_DATA_LENGTH=4;
-        const uint8_t h264_nal_header = (uint8_t )(nalu_header->type & 0x1f)
-                                        | (nalu_header->nri << 5)
-                                        | (nalu_header->f << 7);
+        const uint8_t h264_nal_header = (uint8_t )(nalu_header.type & 0x1f)
+                                        | (nalu_header.nri << 5)
+                                        | (nalu_header.f << 7);
         mNALU_DATA[4]=h264_nal_header;
         mNALU_DATA_LENGTH++;
         memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[13], (size_t)data_length - 13);
@@ -133,21 +134,21 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         return;
     }
     //MLOGD<<"Got rtp data";
-    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    const RTPPacket rtpPacket(rtp_data,data_length);
     //MLOGD<<"RTP Header: "<<rtp_header->asString();
-    if(!validateRTPPacket(*rtp_header)){
+    if(!validateRTPPacket(rtpPacket.header)){
         return;
     }
-    const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
-    if (nal_unit_header_h265->type > 50){
+    const auto nal_unit_header_h265=rtpPacket.getNALUHeaderH265();
+    if (nal_unit_header_h265.type > 50){
         MLOGE<<"Unsupported (HEVC) NAL type";
         return;
     }
-    if(nal_unit_header_h265->type==48){
+    if(nal_unit_header_h265.type==48){
         // Aggregation packets are not supported yet (and never used in gstreamer / ffmpeg anyways)
         MLOGE<<"Unsupprted RTP H265 packet (Aggregation packet)";
         return;
-    }else if(nal_unit_header_h265->type==49){
+    }else if(nal_unit_header_h265.type==49){
         // FU-X packet
         //MLOGD<<"Got partial nal";
         const auto fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
@@ -163,6 +164,10 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             //MLOGD<<"start of fu packetization";
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
             timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
+            if(flagPacketHasGoneMissing){
+                MLOGD<<"Got fu-a start - clearing missing packet flag";
+                flagPacketHasGoneMissing=false;
+            }
             mNALU_DATA[0]=0;
             mNALU_DATA[1]=0;
             mNALU_DATA[2]=0;
@@ -185,16 +190,18 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     }else{
         // single NAL unit
         //MLOGD<<"Got single nal";
+        if(flagPacketHasGoneMissing){
+            MLOGD<<"Got full NALU - clearing missing packet flag";
+            flagPacketHasGoneMissing= false;
+        }
         mNALU_DATA[0]=0;
         mNALU_DATA[1]=0;
         mNALU_DATA[2]=0;
         mNALU_DATA[3]=1;
         mNALU_DATA_LENGTH=4;
         // I do not know what about the 'DONL' field but it seems to be never present
-        // copy the NALU header and NALU data, other than h264 here I do not have to reconstruct anything ?!
-        const auto* nalUnitPayloadData=&rtp_data[sizeof(rtp_header_t)];
-        const size_t nalUnitPayloadDataSize= data_length-sizeof(rtp_header_t);
-        appendNALUData(nalUnitPayloadData, nalUnitPayloadDataSize);
+        // copy the NALU header and NALU data, other than h264 here nothing has to be 'reconstructed'
+        appendNALUData(rtpPacket.payload,rtpPacket.payloadSize);
         forwardNALU(std::chrono::steady_clock::now(),true);
         mNALU_DATA_LENGTH=0;
     }

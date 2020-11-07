@@ -63,6 +63,7 @@ typedef struct rtp_header {
 } __attribute__ ((packed)) rtp_header_t; /* 12 bytes */
 static_assert(sizeof(rtp_header_t)==12);
 
+
 //******************************************************** H264 ********************************************************
 // https://tools.ietf.org/html/rfc6184
 //+---------------+
@@ -130,5 +131,38 @@ static_assert(sizeof(fu_header_h265_t)==1);
 // Unfortunately the payload header is the same for h264 and h265
 static constexpr auto RTP_PAYLOAD_TYPE_H264_H265=96;
 static constexpr auto MY_SSRC_NUM=10;
+
+// A RTP packet consists of the header and payload
+// The payload also first holds another header (the NALU header) for h264 and h265
+// And depending on this header there might be another header,but this depth is left to the parser
+class RTPPacket{
+public:
+    // construct from raw data (e.g. received via UDP)
+    RTPPacket(const uint8_t* rtp_data, const size_t data_length):
+    header(*((rtp_header_t*)rtp_data))
+    {
+        assert(data_length>=sizeof(rtp_header_t));
+        payload=&rtp_data[sizeof(rtp_header_t)];
+        payloadSize=data_length-sizeof(rtp_header_t);
+    }
+    // reference to the rtp header
+    const rtp_header_t& header;
+    // pointer to the rtp payload
+    const uint8_t *payload;
+    // size of the rtp payload
+    std::size_t payloadSize;
+    // The NALU header for h264 and h265 comes directly after the rtp header
+    // pointer to the NALU header if packet type is H264
+    const nalu_header_t& getNALUHeaderH264()const{
+        assert(payloadSize>=sizeof(nalu_header_t));
+        return *(nalu_header_t*)payload;
+    }
+    // pointer to the NALU header if packet type is H265
+    const nal_unit_header_h265_t& getNALUHeaderH265()const{
+        assert(payloadSize>=sizeof(nal_unit_header_h265_t));
+        return *(nal_unit_header_h265_t*)payload;
+    }
+};
+
 
 #endif //LIVEVIDEO10MS_RTP_HPP
