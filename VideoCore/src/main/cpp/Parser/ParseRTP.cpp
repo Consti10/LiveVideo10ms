@@ -258,14 +258,13 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         MLOGE<<"Unsupported RTP payload "<<(int)rtp_header->payload;
         return;
     }
-    //const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
     uint16_t tmp;
     memcpy(&tmp,&rtp_data[sizeof(rtp_header_t)],sizeof(uint16_t));
     tmp=htons(tmp);
     const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&tmp;
 
     const int nal = H265_TYPE(rtp_data[sizeof(rtp_header_t)]);
-    MLOGD<<"XNAL "<<nal<<" And other "<<"f:"<<(int)nal_unit_header_h265->f<<" type:"<<((int)nal_unit_header_h265->type)<<" layerId:"<<(int)nal_unit_header_h265->layerId<<" tid:"<<nal_unit_header_h265->tid;
+    MLOGD<<"XNAL "<<nal<<" And other "<<"f:"<<(int)nal_unit_header_h265->f<<" type:"<<((int)nal_unit_header_h265->type)<<" layerId:"<<(int)nal_unit_header_h265->layerId<<" tid:"<<(int)nal_unit_header_h265->tid;
     if(nal_unit_header_h265->type==49){
         MLOGD<<"Is 49 too";
     }
@@ -285,11 +284,11 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         const uint8_t* fu_payload=&rtp_data[fuPayloadOffset];
         const size_t fu_payload_size= data_length - fuPayloadOffset;
         if(fu_header->e){
-            MLOGD<<"end of fu packetization";
+            //MLOGD<<"end of fu packetization";
             copyNaluData(fu_payload,fu_payload_size);
             forwardNALU(std::chrono::steady_clock::now(),true);
         }else if(fu_header->s){
-            MLOGD<<"start of fu packetization";
+            //MLOGD<<"start of fu packetization";
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
             mNALU_DATA[0]=0;
             mNALU_DATA[1]=0;
@@ -307,12 +306,12 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             // copy the rest of the data
             copyNaluData(fu_payload,fu_payload_size);
         }else{
-            MLOGD<<"middle of fu packetization";
+            //MLOGD<<"middle of fu packetization";
             copyNaluData(fu_payload,fu_payload_size);
         }
     }else{
         // single NAL unit
-        //MLOGD<<"Got single nal";
+        MLOGD<<"Got single nal";
         mNALU_DATA[0]=0;
         mNALU_DATA[1]=0;
         mNALU_DATA[2]=0;
@@ -330,7 +329,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
 void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime,const bool isH265) {
     if(cb!= nullptr){
         NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,isH265,creationTime);
-        MLOGD<<"NALU type "<<nalu.get_nal_name();
+        //MLOGD<<"NALU type "<<nalu.get_nal_name();
         //MLOGD<<"DATA:"<<nalu.dataAsString();
         //nalu_data.resize(nalu_data_length);
         //NALU nalu(nalu_data);
