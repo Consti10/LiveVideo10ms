@@ -93,12 +93,6 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         return;
     }
     if(decoder.configured){
-        //if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_SPS || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_PPS || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
-        //    return;
-        //}
-        if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
-            return;
-        }
         feedDecoder(nalu);
         decodingInfo.nNALUSFeeded++;
     }else{
