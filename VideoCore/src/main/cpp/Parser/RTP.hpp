@@ -142,27 +142,43 @@ public:
     header(*((rtp_header_t*)rtp_data))
     {
         assert(data_length>=sizeof(rtp_header_t));
-        payload=&rtp_data[sizeof(rtp_header_t)];
-        payloadSize=data_length-sizeof(rtp_header_t);
+        rtpPayload=&rtp_data[sizeof(rtp_header_t)];
+        rtpPayloadSize= data_length - sizeof(rtp_header_t);
     }
     // reference to the rtp header
     const rtp_header_t& header;
     // pointer to the rtp payload
-    const uint8_t *payload;
+    const uint8_t *rtpPayload;
     // size of the rtp payload
-    std::size_t payloadSize;
-    // The NALU header for h264 and h265 comes directly after the rtp header
-    // pointer to the NALU header if packet type is H264
+    std::size_t rtpPayloadSize;
+};
+
+// The NALU header for h264 and h265 comes directly after the rtp header
+
+class RTPPacketH264: public RTPPacket{
+public:
+    using RTPPacket::RTPPacket;
+    // reference to the NALU header if packet type is H264
     const nalu_header_t& getNALUHeaderH264()const{
-        assert(payloadSize>=sizeof(nalu_header_t));
-        return *(nalu_header_t*)payload;
-    }
-    // pointer to the NALU header if packet type is H265
-    const nal_unit_header_h265_t& getNALUHeaderH265()const{
-        assert(payloadSize>=sizeof(nal_unit_header_h265_t));
-        return *(nal_unit_header_h265_t*)payload;
+        assert(rtpPayloadSize >= sizeof(nalu_header_t));
+        return *(nalu_header_t*)rtpPayload;
     }
 };
+
+class RTPPacketH265: public RTPPacket{
+public:
+    using RTPPacket::RTPPacket;
+    //  reference to the NALU header if packet type is H265
+    const nal_unit_header_h265_t& getNALUHeaderH265()const{
+        assert(rtpPayloadSize >= sizeof(nal_unit_header_h265_t));
+        return *(nal_unit_header_h265_t*)rtpPayload;
+    }
+    const fu_header_h265_t& getFuHeader()const{
+        assert(getNALUHeaderH265().type==49);
+        return *(fu_header_h265_t*)&rtpPayload[sizeof(nal_unit_header_h265_t)];
+    }
+};
+
 
 
 #endif //LIVEVIDEO10MS_RTP_HPP

@@ -48,7 +48,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         return;
     }
     //MLOGD<<"Got rtp data";
-    const RTPPacket rtpPacket(rtp_data,data_length);
+    const RTPPacketH264 rtpPacket(rtp_data,data_length);
     //MLOGD<<"RTP Header: "<<rtp_header->asString();
     if(!validateRTPPacket(rtpPacket.header)){
         return;
@@ -134,7 +134,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         return;
     }
     //MLOGD<<"Got rtp data";
-    const RTPPacket rtpPacket(rtp_data,data_length);
+    const RTPPacketH265 rtpPacket(rtp_data,data_length);
     //MLOGD<<"RTP Header: "<<rtp_header->asString();
     if(!validateRTPPacket(rtpPacket.header)){
         return;
@@ -201,7 +201,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         mNALU_DATA_LENGTH=4;
         // I do not know what about the 'DONL' field but it seems to be never present
         // copy the NALU header and NALU data, other than h264 here nothing has to be 'reconstructed'
-        appendNALUData(rtpPacket.payload,rtpPacket.payloadSize);
+        appendNALUData(rtpPacket.rtpPayload, rtpPacket.rtpPayloadSize);
         forwardNALU(std::chrono::steady_clock::now(),true);
         mNALU_DATA_LENGTH=0;
     }
