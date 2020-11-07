@@ -174,6 +174,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             //MLOGD<<"end of fu packetization";
             copyNaluData(fu_payload,fu_payload_size);
             forwardNALU(timePointStartOfReceivingNALU,true);
+            mNALU_DATA_LENGTH=0;
         }else if(fu_header->s){
             //MLOGD<<"start of fu packetization";
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
@@ -211,6 +212,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         const size_t nalUnitPayloadDataSize= data_length-sizeof(rtp_header_t);
         copyNaluData(nalUnitPayloadData,nalUnitPayloadDataSize);
         forwardNALU(std::chrono::steady_clock::now(),true);
+        mNALU_DATA_LENGTH=0;
     }
 }
 

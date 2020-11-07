@@ -10,22 +10,24 @@
 #include "RTP.hpp"
 
 /*********************************************
- ** Parses a stream of rtp h264 data into NALUs
+ ** Parses a stream of rtp h26X data into NALUs
 **********************************************/
 class RTPDecoder{
 public:
     RTPDecoder(NALU_DATA_CALLBACK cb);
 public:
-    //Decoding
     // check if a packet is missing by using the rtp sequence number and
     // if the payload is dynamic (h264 or h265)
     // Returns false if something is wrong (packet should be discarded)
     bool validateRTPPacket(const rtp_header_t& rtpHeader);
+    // parse rtp h24 packet to NALU
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
+    // parse rtp h265 packet to NALU
     void parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length);
-    void reset();
     // copy data into the NALU buffer and increase mNALU_DATA_LENGTH
     void copyNaluData(const uint8_t* data,size_t data_len);
+    // reset mNALU_DATA_LENGTH to 0
+    void reset();
 private:
     // Properly calls the cb function
     // Resets the mNALU_DATA_LENGTH to 0
