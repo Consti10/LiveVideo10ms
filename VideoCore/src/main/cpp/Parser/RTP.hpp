@@ -6,7 +6,7 @@
 #define LIVEVIDEO10MS_RTP_HPP
 
 #include <arpa/inet.h>
-
+#include <sstream>
 // This code is written for little endian (aka ARM) byte order
 static_assert(__BYTE_ORDER__==__LITTLE_ENDIAN);
 // Same for both h264 and h265
@@ -45,6 +45,19 @@ typedef struct rtp_header {
     }
     uint32_t getSources()const{
         return htonl(sources);
+    }
+    std::string asString()const{
+        std::stringstream ss;
+        ss<<"cc"<<(int)cc<<"\n";
+        ss<<"extension"<<(int)extension<<"\n";
+        ss<<"padding"<<(int)padding<<"\n";
+        ss<<"version"<<(int)version<<"\n";
+        ss<<"payload"<<(int)payload<<"\n";
+        ss<<"marker"<<(int)marker<<"\n";
+        ss<<"sequence"<<(int)getSequence()<<"\n";
+        ss<<"timestamp"<<(int)getTimestamp()<<"\n";
+        ss<<"sources"<<(int)getSources()<<"\n";
+        return ss.str();
     }
 } __attribute__ ((packed)) rtp_header_t; /* 12 bytes */
 static_assert(sizeof(rtp_header_t)==12);

@@ -26,7 +26,7 @@ public:
     void parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length);
     // copy data_len bytes into the mNALU_DATA buffer at the current position
     // and increase mNALU_DATA_LENGTH by data_len
-    void copyNaluData(const uint8_t* data,size_t data_len);
+    void appendNALUData(const uint8_t* data, size_t data_len);
     // reset mNALU_DATA_LENGTH to 0
     void reset();
 private:

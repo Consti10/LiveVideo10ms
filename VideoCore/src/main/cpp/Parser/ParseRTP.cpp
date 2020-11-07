@@ -13,20 +13,6 @@ void RTPDecoder::reset(){
     //nalu_data.reserve(NALU::NALU_MAXLEN);
 }
 
-static void debugRtpHeader(const rtp_header_t* rtp_header){
-    std::stringstream ss;
-    ss<<"cc"<<(int)rtp_header->cc<<"\n";
-    ss<<"extension"<<(int)rtp_header->extension<<"\n";
-    ss<<"padding"<<(int)rtp_header->padding<<"\n";
-    ss<<"version"<<(int)rtp_header->version<<"\n";
-    ss<<"payload"<<(int)rtp_header->payload<<"\n";
-    ss<<"marker"<<(int)rtp_header->marker<<"\n";
-    ss<<"sequence"<<(int)rtp_header->getSequence()<<"\n";
-    ss<<"timestamp"<<(int)rtp_header->getTimestamp()<<"\n";
-    ss<<"sources"<<(int)rtp_header->getSources()<<"\n";
-    MLOGD<<"RTP Header: "<<ss.str();
-}
-
 bool RTPDecoder::validateRTPPacket(const rtp_header_t& rtp_header) {
     if(rtp_header.payload!=RTP_PAYLOAD_TYPE_H264_H265){
         MLOGE<<"Unsupported payload type "<<(int)rtp_header.payload;
@@ -61,29 +47,27 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         MLOGE<<"Not enough rtp data";
         return;
     }
-    MLOGD<<"Got rtp data";
+    //MLOGD<<"Got rtp data";
     const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    //MLOGD<<"RTP Header: "<<rtp_header->asString();
     if(!validateRTPPacket(*rtp_header)){
         return;
     }
-    debugRtpHeader(rtp_header);
-
     const auto* nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
-
     if (nalu_header->type == 28) { /* FU-A */
-        MLOGD<<"Got partial NALU";
+        //MLOGD<<"Got partial NALU";
         const fu_header_t* fu_header = (fu_header_t*)&rtp_data[13];
         if (fu_header->e == 1) {
-            MLOGD<<"End of fu-a";
+            //MLOGD<<"End of fu-a";
             /* end of fu-a */
-            copyNaluData(&rtp_data[14], (size_t)data_length - 14);
+            appendNALUData(&rtp_data[14], (size_t) data_length - 14);
             if(!flagPacketHasGoneMissing){
                 // To better measure latency we can actually use the timestamp from when the first bytes for this packet were received
                 forwardNALU(timePointStartOfReceivingNALU);
             }
             mNALU_DATA_LENGTH=0;
         } else if (fu_header->s == 1) {
-            MLOGD<<"Start of fu-a";
+            //MLOGD<<"Start of fu-a";
             timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
             // Beginning of new fu sequence - we can remove the 'drop packet' flag
             if(flagPacketHasGoneMissing){
@@ -101,14 +85,14 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
                                             | (nalu_header->f << 7);
             mNALU_DATA[4]=h264_nal_header;
             mNALU_DATA_LENGTH++;
-            copyNaluData(&rtp_data[14], (size_t)data_length - 14);
+            appendNALUData(&rtp_data[14], (size_t) data_length - 14);
         } else {
-            MLOGD<<"Middle of fu-a";
+            //MLOGD<<"Middle of fu-a";
             /* middle of fu-a */
-            copyNaluData(&rtp_data[14], (size_t)data_length - 14);
+            appendNALUData(&rtp_data[14], (size_t) data_length - 14);
         }
     } else if(nalu_header->type>0 && nalu_header->type<24){
-        MLOGD<<"Got full nalu";
+        //MLOGD<<"Got full nalu";
         timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
         // Full NALU - we can remove the 'drop packet' flag
         if(flagPacketHasGoneMissing){
@@ -148,12 +132,12 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         MLOGE<<"Not enough rtp data";
         return;
     }
-    MLOGD<<"Got rtp data";
+    //MLOGD<<"Got rtp data";
     const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    //MLOGD<<"RTP Header: "<<rtp_header->asString();
     if(!validateRTPPacket(*rtp_header)){
         return;
     }
-
     const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
     if (nal_unit_header_h265->type > 50){
         MLOGE<<"Unsupported (HEVC) NAL type";
@@ -165,14 +149,14 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         return;
     }else if(nal_unit_header_h265->type==49){
         // FU-X packet
-        MLOGD<<"Got partial nal";
+        //MLOGD<<"Got partial nal";
         const auto fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
         const auto fuPayloadOffset= sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t);
         const uint8_t* fu_payload=&rtp_data[fuPayloadOffset];
         const size_t fu_payload_size= data_length - fuPayloadOffset;
         if(fu_header->e){
             //MLOGD<<"end of fu packetization";
-            copyNaluData(fu_payload,fu_payload_size);
+            appendNALUData(fu_payload, fu_payload_size);
             forwardNALU(timePointStartOfReceivingNALU,true);
             mNALU_DATA_LENGTH=0;
         }else if(fu_header->s){
@@ -193,14 +177,14 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             mNALU_DATA[mNALU_DATA_LENGTH] = ptr[1];
             mNALU_DATA_LENGTH++;
             // copy the rest of the data
-            copyNaluData(fu_payload,fu_payload_size);
+            appendNALUData(fu_payload, fu_payload_size);
         }else{
             //MLOGD<<"middle of fu packetization";
-            copyNaluData(fu_payload,fu_payload_size);
+            appendNALUData(fu_payload, fu_payload_size);
         }
     }else{
         // single NAL unit
-        MLOGD<<"Got single nal";
+        //MLOGD<<"Got single nal";
         mNALU_DATA[0]=0;
         mNALU_DATA[1]=0;
         mNALU_DATA[2]=0;
@@ -210,7 +194,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         // copy the NALU header and NALU data, other than h264 here I do not have to reconstruct anything ?!
         const auto* nalUnitPayloadData=&rtp_data[sizeof(rtp_header_t)];
         const size_t nalUnitPayloadDataSize= data_length-sizeof(rtp_header_t);
-        copyNaluData(nalUnitPayloadData,nalUnitPayloadDataSize);
+        appendNALUData(nalUnitPayloadData, nalUnitPayloadDataSize);
         forwardNALU(std::chrono::steady_clock::now(),true);
         mNALU_DATA_LENGTH=0;
     }
@@ -229,7 +213,7 @@ void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creatio
 }
 
 
-void RTPDecoder::copyNaluData(const uint8_t *data, size_t data_len) {
+void RTPDecoder::appendNALUData(const uint8_t *data, size_t data_len) {
     memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],data,data_len);
     mNALU_DATA_LENGTH+=data_len;
 }
