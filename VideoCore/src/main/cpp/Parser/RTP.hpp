@@ -48,7 +48,8 @@ typedef struct rtp_header {
     }
 } __attribute__ ((packed)) rtp_header_t; /* 12 bytes */
 static_assert(sizeof(rtp_header_t)==12);
-// H264 RTP structs
+
+//******************************************************** H264 ********************************************************
 //Taken from https://github.com/hmgle/h264_to_rtp/blob/master/h264tortp.h
 typedef struct nalu_header {
     uint8_t type:   5;
@@ -70,7 +71,7 @@ typedef struct fu_indicator {
 } __attribute__ ((packed)) fu_indicator_t; /* 1 bytes */
 static_assert(sizeof(fu_indicator_t)==1);
 
-// H265 RTP sructs
+//******************************************************** H265 ********************************************************
 // defined in 1.1.4.  NAL Unit Header https://tools.ietf.org/html/rfc7798
 //  +---------------+---------------+
 //  |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
@@ -97,7 +98,7 @@ typedef struct fu_header_h265{
 }__attribute__ ((packed)) fu_header_h265_t;
 static_assert(sizeof(fu_header_h265_t)==1);
 
-
+// Unfortunately the payload header is the same for h264 and h265
 static constexpr auto RTP_PAYLOAD_TYPE_H264_H265=96;
 static constexpr auto MY_SSRC_NUM=10;
 
