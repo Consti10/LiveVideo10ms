@@ -80,9 +80,15 @@ public:
     template<typename T>
     static std::string vectorAsString(const std::vector<T>& v){
         std::stringstream ss;
+        ss<<"[";
         for (const auto i:v) {
-            ss << i << " ";
+            if constexpr (std::is_same_v<T,uint8_t>){
+                ss << (int)i << ",";
+            }else{
+                ss << i << " ";
+            }
         }
+        ss<<"]";
         return ss.str();
     }
 

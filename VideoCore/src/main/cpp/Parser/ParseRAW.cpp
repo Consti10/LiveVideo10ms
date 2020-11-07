@@ -32,7 +32,7 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length,const bool
     //if(nalu_data== nullptr){
     //    nalu_data=new uint8_t[NALU::NALU_MAXLEN];
     //}
-    MLOGD<<"NALU data "<<data_length;
+    //MLOGD<<"NALU data "<<data_length;
     for (size_t i = 0; i < data_length; ++i) {
         nalu_data[nalu_data_position++] = data[i];
         if (nalu_data_position >= NALU::NALU_MAXLEN - 1) {
