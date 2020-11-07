@@ -17,6 +17,10 @@ public:
     RTPDecoder(NALU_DATA_CALLBACK cb);
 public:
     //Decoding
+    // check if a packet is missing by using the rtp sequence number and
+    // if the payload is dynamic (h264 or h265)
+    // Returns false if something is wrong (packet should be discarded)
+    bool validateRTPPacket(const rtp_header_t& rtpHeader);
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
     void parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length);
     void reset();

@@ -50,13 +50,34 @@ typedef struct rtp_header {
 static_assert(sizeof(rtp_header_t)==12);
 
 //******************************************************** H264 ********************************************************
-//Taken from https://github.com/hmgle/h264_to_rtp/blob/master/h264tortp.h
+// https://tools.ietf.org/html/rfc6184
+//+---------------+
+//|0|1|2|3|4|5|6|7|
+//+-+-+-+-+-+-+-+-+
+//|F|NRI|  Type   |
+//+---------------+
 typedef struct nalu_header {
     uint8_t type:   5;
     uint8_t nri:    2;
     uint8_t f:      1;
 } __attribute__ ((packed)) nalu_header_t;
 static_assert(sizeof(nalu_header_t)==1);
+//+---------------+
+//|0|1|2|3|4|5|6|7|
+//+-+-+-+-+-+-+-+-+
+//|F|NRI|  Type   |
+//+---------------+
+typedef struct fu_indicator {
+    uint8_t type:   5;
+    uint8_t nri:    2;
+    uint8_t f:      1;
+} __attribute__ ((packed)) fu_indicator_t; /* 1 bytes */
+static_assert(sizeof(fu_indicator_t)==1);
+//+---------------+
+//|0|1|2|3|4|5|6|7|
+//+-+-+-+-+-+-+-+-+
+//|S|E|R|  Type   |
+//+---------------+
 typedef struct fu_header {
     uint8_t type:   5;
     uint8_t r:      1;
@@ -64,12 +85,6 @@ typedef struct fu_header {
     uint8_t s:      1;
 } __attribute__ ((packed)) fu_header_t;
 static_assert(sizeof(fu_header_t)==1);
-typedef struct fu_indicator {
-    uint8_t type:   5;
-    uint8_t nri:    2;
-    uint8_t f:      1;
-} __attribute__ ((packed)) fu_indicator_t; /* 1 bytes */
-static_assert(sizeof(fu_indicator_t)==1);
 
 //******************************************************** H265 ********************************************************
 // defined in 1.1.4.  NAL Unit Header https://tools.ietf.org/html/rfc7798

@@ -21,31 +21,24 @@ static void debugRtpHeader(const rtp_header_t* rtp_header){
     ss<<"version"<<(int)rtp_header->version<<"\n";
     ss<<"payload"<<(int)rtp_header->payload<<"\n";
     ss<<"marker"<<(int)rtp_header->marker<<"\n";
-    ss<<"sequence"<<(int)htons(rtp_header->sequence)<<"\n";
-    ss<<"timestamp"<<(int)rtp_header->timestamp<<"\n";
-    ss<<"sources"<<(int)rtp_header->sources<<"\n";
+    ss<<"sequence"<<(int)rtp_header->getSequence()<<"\n";
+    ss<<"timestamp"<<(int)rtp_header->getTimestamp()<<"\n";
+    ss<<"sources"<<(int)rtp_header->getSources()<<"\n";
     MLOGD<<"RTP Header: "<<ss.str();
 }
 
-void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length){
-    //12 rtp header bytes and 1 nalu_header_t type byte
-    if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
-        MLOGD<<"Not enough rtp data";
-        return;
+bool RTPDecoder::validateRTPPacket(const rtp_header_t& rtp_header) {
+    if(rtp_header.payload!=RTP_PAYLOAD_TYPE_H264_H265){
+        MLOGE<<"Unsupported payload type "<<(int)rtp_header.payload;
+        return false;
     }
-    MLOGD<<"Got rtp data";
-    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
-    if(rtp_header->payload!=RTP_PAYLOAD_TYPE_H264_H265){
-        MLOGE<<"Unsupported payload type "<<(int)rtp_header->payload;
-        return;
-    }
-    // Testing regarding sequence numbers.This stuff an be removed without issues
-    const int seqNr=rtp_header->getSequence();
+    // Testing regarding sequence numbers.This stuff can be removed without issues
+    const int seqNr=rtp_header.getSequence();
     if(seqNr==lastSequenceNumber){
         // duplicate. This should never happen for 'normal' rtp streams, but can be usefully when testing bitrates
         // (Since you can send the same packet multiple times to emulate a higher bitrate)
         MLOGD<<"Same seqNr";
-        //return;
+        return false;
     }
     if(lastSequenceNumber==-1){
         // first packet in stream
@@ -59,14 +52,22 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         }
     }
     lastSequenceNumber=seqNr;
+    return true;
+}
 
-    debugRtpHeader(rtp_header);
-    //  24576
-    if(rtp_header->payload==96){
-        MLOGD<<"Is h264";
-    }else if(rtp_header->payload==97){
-        MLOGD<<"Is h265";
+void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length){
+    //12 rtp header bytes and 1 nalu_header_t type byte
+    if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
+        MLOGE<<"Not enough rtp data";
+        return;
     }
+    MLOGD<<"Got rtp data";
+    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    if(!validateRTPPacket(*rtp_header)){
+        return;
+    }
+    debugRtpHeader(rtp_header);
+
     const auto* nalu_header=(nalu_header_t *)&rtp_data[sizeof(rtp_header_t)];
 
     if (nalu_header->type == 28) { /* FU-A */
@@ -143,43 +144,17 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
 #include <StringHelper.hpp>
 void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length){
     // 12 rtp header bytes and 1 nalu_header_t type byte
-    if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
-        MLOGD<<"Not enough rtp data";
+    if(data_length <= sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)){
+        MLOGE<<"Not enough rtp data";
         return;
     }
     MLOGD<<"Got rtp data";
     const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
-    if(rtp_header->payload!=RTP_PAYLOAD_TYPE_H264_H265){
-        MLOGE<<"Unsupported payload type "<<(int)rtp_header->payload;
+    if(!validateRTPPacket(*rtp_header)){
         return;
     }
-    // Testing regarding sequence numbers.This stuff an be removed without issues
-    const int seqNr=rtp_header->getSequence();
-    if(seqNr==lastSequenceNumber){
-        // duplicate. This should never happen for 'normal' rtp streams, but can be usefully when testing bitrates
-        // (Since you can send the same packet multiple times to emulate a higher bitrate)
-        MLOGD<<"Same seqNr";
-        //return;
-    }
-    if(lastSequenceNumber==-1){
-        // first packet in stream
-        flagPacketHasGoneMissing=false;
-    }else{
-        // Don't forget that the sequence number loops every UINT16_MAX packets
-        if(seqNr != ((lastSequenceNumber+1) % UINT16_MAX)){
-            // We are missing a Packet !
-            MLOGD<<"missing a packet. Last:"<<lastSequenceNumber<<" Curr:"<<seqNr<<" Diff:"<<(seqNr-(int)lastSequenceNumber);
-            //flagPacketHasGoneMissing=true;
-        }
-    }
-    lastSequenceNumber=seqNr;
-    //debugRtpHeader(rtp_header);
-    if(rtp_header->payload!=96){
-        MLOGE<<"Unsupported RTP payload "<<(int)rtp_header->payload;
-        return;
-    }
-    const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
 
+    const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
     if (nal_unit_header_h265->type > 50){
         MLOGE<<"Unsupported (HEVC) NAL type";
         return;
@@ -198,10 +173,11 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         if(fu_header->e){
             //MLOGD<<"end of fu packetization";
             copyNaluData(fu_payload,fu_payload_size);
-            forwardNALU(std::chrono::steady_clock::now(),true);
+            forwardNALU(timePointStartOfReceivingNALU,true);
         }else if(fu_header->s){
             //MLOGD<<"start of fu packetization";
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
+            timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
             mNALU_DATA[0]=0;
             mNALU_DATA[1]=0;
             mNALU_DATA[2]=0;
@@ -255,6 +231,7 @@ void RTPDecoder::copyNaluData(const uint8_t *data, size_t data_len) {
     memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],data,data_len);
     mNALU_DATA_LENGTH+=data_len;
 }
+
 
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxx RTPEncoder part xxxxxxxxxxxxxxxxxxxxxxxxxxx
