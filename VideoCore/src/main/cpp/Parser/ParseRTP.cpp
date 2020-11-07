@@ -75,8 +75,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         if (fu_header->e == 1) {
             MLOGD<<"End of fu-a";
             /* end of fu-a */
-            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
-            mNALU_DATA_LENGTH+= data_length - 14;
+            copyNaluData(&rtp_data[14], (size_t)data_length - 14);
             if(!flagPacketHasGoneMissing){
                 // To better measure latency we can actually use the timestamp from when the first bytes for this packet were received
                 forwardNALU(timePointStartOfReceivingNALU);
@@ -101,15 +100,12 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
                                             | (nalu_header->f << 7);
             mNALU_DATA[4]=h264_nal_header;
             mNALU_DATA_LENGTH++;
-            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
-            mNALU_DATA_LENGTH+= data_length - 14;
+            copyNaluData(&rtp_data[14], (size_t)data_length - 14);
         } else {
             MLOGD<<"Middle of fu-a";
             /* middle of fu-a */
-            memcpy(&mNALU_DATA[mNALU_DATA_LENGTH], &rtp_data[14], (size_t)data_length - 14);
-            mNALU_DATA_LENGTH+= data_length - 14;
+            copyNaluData(&rtp_data[14], (size_t)data_length - 14);
         }
-        //LOGV("partially nalu");
     } else if(nalu_header->type>0 && nalu_header->type<24){
         MLOGD<<"Got full nalu";
         timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
@@ -139,8 +135,7 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
 }
 
 // https://github.com/ireader/media-server/blob/master/librtp/payload/rtp-h265-unpack.c
-#define H265_TYPE(v) ((v >> 1) & 0x3f)
-//
+
 #define FU_START(v) (v & 0x80)
 #define FU_END(v)	(v & 0x40)
 #define FU_NAL(v)	(v & 0x3F)
