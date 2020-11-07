@@ -7,6 +7,7 @@
 
 #include <cstdio>
 #include "../NALU/NALU.hpp"
+#include "RTP.hpp"
 
 /*********************************************
  ** Parses a stream of rtp h264 data into NALUs
@@ -19,8 +20,6 @@ public:
     void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
     void parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length);
     void reset();
-    // Returns the sequence number of an RTP packet
-    static int getSequenceNumber(const uint8_t* rtp_data,const size_t data_len);
     // copy data into the NALU buffer and increase mNALU_DATA_LENGTH
     void copyNaluData(const uint8_t* data,size_t data_len);
 private:

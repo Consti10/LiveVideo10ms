@@ -4,88 +4,6 @@
 
 #include "ParseRTP.h"
 #include <AndroidLogger.hpp>
-#include <arpa/inet.h>
-
-// This code is written for little endian (aka ARM) byte order
-static_assert(__BYTE_ORDER__==__LITTLE_ENDIAN);
-// Same for both h264 and h265
-// Defined in https://tools.ietf.org/html/rfc3550
-//0                   1                   2                   3
-//0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//|V=2|P|X|  CC   |M|     PT      |       sequence number         |
-//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//|                           timestamp                           |
-//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//|           synchronization source (SSRC) identifier            |
-//+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-//|            contributing source (CSRC) identifiers             |
-//|                             ....                              |
-//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-typedef struct rtp_header {
-    //For little endian
-    uint8_t cc:4;            // CSRC count
-    uint8_t extension:1;     // Extension bit
-    uint8_t padding:1;       // Padding bit
-    uint8_t version:2;       // Version, currently 2
-    uint8_t payload:7;       // Payload type
-    uint8_t marker:1;        // Marker bit
-    //
-    uint16_t sequence;        // sequence number
-    uint32_t timestamp;       //  timestamp
-    uint32_t sources;      // contributing sources
-} __attribute__ ((packed)) rtp_header_t; /* 12 bytes */
-static_assert(sizeof(rtp_header_t)==12);
-//NOTE: sequence,timestamp and sources has to be converted to the right endianness using htonl/htons regardless of the byte order
-
-//Taken from https://github.com/hmgle/h264_to_rtp/blob/master/h264tortp.h
-typedef struct nalu_header {
-    uint8_t type:   5;
-    uint8_t nri:    2;
-    uint8_t f:      1;
-} __attribute__ ((packed)) nalu_header_t; /* 1 bytes */
-typedef struct fu_header {
-    uint8_t type:   5;
-    uint8_t r:      1;
-    uint8_t e:      1;
-    uint8_t s:      1;
-} __attribute__ ((packed)) fu_header_t; /* 1 bytes */
-
-//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-typedef struct fu_indicator {
-    /* byte 0 */
-    uint8_t type:   5;
-    uint8_t nri:    2;
-    uint8_t f:      1;
-} __attribute__ ((packed)) fu_indicator_t; /* 1 bytes */
-static constexpr auto RTP_PAYLOAD_TYPE_H264=96;
-static constexpr auto MY_SSRC_NUM=10;
-
-// defined in 1.1.4.  NAL Unit Header https://tools.ietf.org/html/rfc7798
-//  +---------------+---------------+
-//  |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//  |F|   Type    |  LayerId  | TID |
-//  +-------------+-----------------+
-typedef struct nal_unit_header_h265{
-    uint8_t f:      1;
-    uint8_t type:   6;
-    uint8_t layerId:6;
-    uint8_t tid:    3;
-}__attribute__ ((packed)) nal_unit_header_h265_t;
-static_assert(sizeof(nal_unit_header_h265_t)==2);
-// defined in 4.4.3 FU Header
-//+---------------+
-//|0|1|2|3|4|5|6|7|
-//+-+-+-+-+-+-+-+-+
-//|S|E|  FuType   |
-//+---------------+
-typedef struct fu_header_h265{
-    uint8_t fuType:6;
-    uint8_t e:1;
-    uint8_t s:1;
-}__attribute__ ((packed)) fu_header_h265_t;
-static_assert(sizeof(fu_header_h265_t)==1);
 
 RTPDecoder::RTPDecoder(NALU_DATA_CALLBACK cb): cb(std::move(cb)){
 }
@@ -116,8 +34,13 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
         return;
     }
     MLOGD<<"Got rtp data";
+    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    if(rtp_header->payload!=RTP_PAYLOAD_TYPE_H264_H265){
+        MLOGE<<"Unsupported payload type "<<(int)rtp_header->payload;
+        return;
+    }
     // Testing regarding sequence numbers.This stuff an be removed without issues
-    const int seqNr=getSequenceNumber(rtp_data,data_length);
+    const int seqNr=rtp_header->getSequence();
     if(seqNr==lastSequenceNumber){
         // duplicate. This should never happen for 'normal' rtp streams, but can be usefully when testing bitrates
         // (Since you can send the same packet multiple times to emulate a higher bitrate)
@@ -137,7 +60,6 @@ void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_lengt
     }
     lastSequenceNumber=seqNr;
 
-    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
     debugRtpHeader(rtp_header);
     //  24576
     if(rtp_header->payload==96){
@@ -231,8 +153,13 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         return;
     }
     MLOGD<<"Got rtp data";
+    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
+    if(rtp_header->payload!=RTP_PAYLOAD_TYPE_H264_H265){
+        MLOGE<<"Unsupported payload type "<<(int)rtp_header->payload;
+        return;
+    }
     // Testing regarding sequence numbers.This stuff an be removed without issues
-    const int seqNr=getSequenceNumber(rtp_data,data_length);
+    const int seqNr=rtp_header->getSequence();
     if(seqNr==lastSequenceNumber){
         // duplicate. This should never happen for 'normal' rtp streams, but can be usefully when testing bitrates
         // (Since you can send the same packet multiple times to emulate a higher bitrate)
@@ -251,32 +178,22 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         }
     }
     lastSequenceNumber=seqNr;
-
-    const auto* rtp_header=(rtp_header_t*)&rtp_data[0];
     //debugRtpHeader(rtp_header);
     if(rtp_header->payload!=96){
         MLOGE<<"Unsupported RTP payload "<<(int)rtp_header->payload;
         return;
     }
-    uint16_t tmp;
-    memcpy(&tmp,&rtp_data[sizeof(rtp_header_t)],sizeof(uint16_t));
-    tmp=htons(tmp);
-    const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&tmp;
+    const auto* nal_unit_header_h265=(nal_unit_header_h265_t*)&rtp_data[sizeof(rtp_header_t)];
 
-    const int nal = H265_TYPE(rtp_data[sizeof(rtp_header_t)]);
-    MLOGD<<"XNAL "<<nal<<" And other "<<"f:"<<(int)nal_unit_header_h265->f<<" type:"<<((int)nal_unit_header_h265->type)<<" layerId:"<<(int)nal_unit_header_h265->layerId<<" tid:"<<(int)nal_unit_header_h265->tid;
-    if(nal_unit_header_h265->type==49){
-        MLOGD<<"Is 49 too";
-    }
-    if (nal > 50){
+    if (nal_unit_header_h265->type > 50){
         MLOGE<<"Unsupported (HEVC) NAL type";
         return;
     }
-    if(nal==48){
+    if(nal_unit_header_h265->type==48){
         // Aggregation packets are not supported yet (and never used in gstreamer / ffmpeg anyways)
         MLOGE<<"Unsupprted RTP H265 packet (Aggregation packet)";
         return;
-    }else if(nal==49){
+    }else if(nal_unit_header_h265->type==49){
         // FU-X packet
         MLOGD<<"Got partial nal";
         const auto fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
@@ -338,15 +255,6 @@ void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creatio
     mNALU_DATA_LENGTH=0;
 }
 
-int RTPDecoder::getSequenceNumber(const uint8_t* rtp_data,const size_t data_len) {
-    if(data_len<sizeof(rtp_header_t)){
-        return -1;
-    }
-    const rtp_header_t* rtp_header=(rtp_header_t*)rtp_data;
-    const auto seqNr=rtp_header->sequence;
-    return htons(seqNr);
-    //return seqNr;
-}
 
 void RTPDecoder::copyNaluData(const uint8_t *data, size_t data_len) {
     memcpy(&mNALU_DATA[mNALU_DATA_LENGTH],data,data_len);
@@ -384,7 +292,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
         rtp_hdr->extension = 0;
         rtp_hdr->padding = 0;
         rtp_hdr->version = 2;
-        rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
+        rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264_H265;
         // rtp_hdr->marker = (pstStream->u32PackCount - 1 == i) ? 1 : 0;   /* If the packet is the end of a frame, set it to 1, otherwise it is 0. rfc 1889 does not specify the purpose of this bit*/
         rtp_hdr->marker=0;
         rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
@@ -443,7 +351,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
+                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264_H265;
                 rtp_hdr->marker = 0;    /* If the packet is the end of a frame, set it to 1, otherwise it is 0. rfc 1889 does not specify the purpose of this bit*/
                 rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
@@ -477,7 +385,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
+                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264_H265;
                 rtp_hdr->marker = 0;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
                 rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);
@@ -510,7 +418,7 @@ int RTPEncoder::parseNALtoRTP(int framerate, const uint8_t *nalu_data, const siz
                 rtp_hdr->extension = 0;
                 rtp_hdr->padding = 0;
                 rtp_hdr->version = 2;
-                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264;
+                rtp_hdr->payload = RTP_PAYLOAD_TYPE_H264_H265;
                 rtp_hdr->marker = 1;    /* 该包为一帧的结尾则置为1, 否则为0. rfc 1889 没有规定该位的用途 */
                 rtp_hdr->sequence = htons(++seq_num % UINT16_MAX);
                 rtp_hdr->timestamp = htonl(ts_current);

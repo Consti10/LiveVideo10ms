@@ -174,7 +174,8 @@ void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t 
         const size_t sblkDataLength=sblk->data_length();
         if(sblkDataLength>10){
             MLOGD<<"Parsing rtp "<<sblkDataLength;
-            const auto seqNr=RTPDecoder::getSequenceNumber(sblkData,sblkDataLength);
+            const auto* rtp_header=(rtp_header_t*)sblkData;
+            const auto seqNr=rtp_header->getSequence();
             debugSequenceNumbers(seqNr);
             mDecodeRTP.parseRTPtoNALU(sblkData,sblkDataLength);
         }else{
