@@ -280,21 +280,16 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     }else if(nal==49){
         // FU-X packet
         MLOGD<<"Got partial nal";
-        const uint8_t xFu=rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
-        //MLOGD<<"Fu start "<<((int)FU_START(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
-        //MLOGD<<"Fu end "<<((int)FU_END(rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)]));
-        //const auto* fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
         const auto fuPayloadOffset= sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t);
-        static_assert((sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t))==15); //should be 15
         const uint8_t* fu_payload=&rtp_data[fuPayloadOffset];
         const size_t fu_payload_size= data_length - fuPayloadOffset;
         const auto fuHeader=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
         MLOGD<<"HAHU fuHeader "<<(int)fuHeader->s<<" "<<(int)fuHeader->e;
-        if(FU_END(xFu)){
+        if(fuHeader->e){
             MLOGD<<"end of fu packetization";
             copyNaluData(fu_payload,fu_payload_size);
             forwardNALU(std::chrono::steady_clock::now(),true);
-        }else if(FU_START(xFu)){
+        }else if(fuHeader->s){
             MLOGD<<"start of fu packetization";
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
             mNALU_DATA[0]=0;
@@ -305,13 +300,11 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
             // copy header
             //copyNaluData(&rtp_data[sizeof(rtp_header_t)],2);
             const uint8_t* ptr=&rtp_data[sizeof(rtp_header_t)];
-            uint8_t fuheader=rtp_data[sizeof(rtp_header_t)+sizeof(nal_unit_header_h265_t)];
-            mNALU_DATA[mNALU_DATA_LENGTH] = (FU_NAL(fuheader) << 1) | (ptr[0] & 0x81); // replace NAL Unit Type Bits
+            uint8_t variableNoIdea=rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
+            mNALU_DATA[mNALU_DATA_LENGTH] = (FU_NAL(variableNoIdea) << 1) | (ptr[0] & 0x81); // replace NAL Unit Type Bits
             mNALU_DATA_LENGTH++;
             mNALU_DATA[mNALU_DATA_LENGTH] = ptr[1];
             mNALU_DATA_LENGTH++;
-            //
-            //mNALU_DATA_LENGTH+=2;
             // copy the rest of the data
             copyNaluData(fu_payload,fu_payload_size);
         }else{
