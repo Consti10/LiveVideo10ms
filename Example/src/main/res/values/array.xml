@@ -3,8 +3,9 @@
 <resources>
 
     <string-array name="video_test_files">
+        <item>jetson/1/test.h264</item>
+        <item>jetson/2/test.h264</item>
         <item>x265/testZ.h265</item>
-        <item>omxh264enc/omxh264enc1.h264</item>
         <item>x264/testVideo.h264</item>
         <item>rpi_cam/rpi.h264</item>
         <item>webcam/720p_usb.h264"</item>

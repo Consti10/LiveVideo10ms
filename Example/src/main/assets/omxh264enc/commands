@@ -1,3 +1,0 @@
-gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh264enc control-rate=2 bitrate=4000000 profile=baseline ! video/x-h264, stream-format=byte-stream ! filesink location=omxh264enc1.h264
-
-
