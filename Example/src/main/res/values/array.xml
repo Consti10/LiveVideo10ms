@@ -5,6 +5,8 @@
     <string-array name="video_test_files">
         <item>jetson/1/test.h264</item>
         <item>jetson/2/test.h264</item>
+        <item>jetson/3/test.h264</item>
+        <item>jetson/4/test.h264</item>
         <item>x265/testZ.h265</item>
         <item>x264/testVideo.h264</item>
         <item>rpi_cam/rpi.h264</item>
