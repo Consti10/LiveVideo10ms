@@ -42,7 +42,8 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
             mParser.parse_rtp_h264_stream(data,data_length);
             break;
         case VIDEO_DATA_TYPE::RAW:
-            mParser.parse_raw_h264_stream(data,data_length);
+            //mParser.parse_raw_h264_stream(data,data_length);
+            mParser.parseJetsonRawSliced(data,data_length);
             break;
         case VIDEO_DATA_TYPE::CUSTOM:
             mParser.parseCustom(data,data_length);
@@ -69,7 +70,6 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     mLowLagDecoder.interpretNALU(nalu);
     mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
 }
-
 
 void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
     //reset the parser so the statistics start again from 0

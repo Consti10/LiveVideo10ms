@@ -12,6 +12,7 @@
 #include <cmath>
 #include <iomanip>
 
+// Various helper functions to create / modify strings
 class StringHelper{
 private:
     // Return the n of digits without the sign
@@ -30,6 +31,7 @@ private:
         return std::to_string(n).length();
     }
 public:
+    // convert std::wstring to std::string
     static const std::string normalS(std::wstring& input){
         return std::string(input.begin(),input.end());
     }
@@ -77,6 +79,10 @@ public:
         sAfterCome=fractional;
     }
 
+    /**
+     * Convert a std::vector into a nice readable representation.
+     * Example: input std::vector<int>{0,1,2} -> output [0,1,2]
+    **/
     template<typename T>
     static std::string vectorAsString(const std::vector<T>& v){
         std::stringstream ss;
@@ -97,6 +103,9 @@ public:
         return ss.str();
     }
 
+    /**
+     * If @param sizeBytes exceeds 1 mB / 1 kB use mB / kB as unit
+    **/
     static std::string memorySizeReadable(const size_t sizeBytes){
         // more than one MB
         if(sizeBytes>1024*1024){
@@ -110,7 +119,8 @@ public:
         }
         return std::to_string(sizeBytes)+"B";
     }
-
+public:
+// Some simple testing
     static void testCountDigits(){
         std::srand(std::time(nullptr));
         MLOGD<<"testCountDigits() start";

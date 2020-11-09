@@ -46,6 +46,7 @@ public:
     void parse_rtp_h265_stream(const uint8_t* rtp_data,const size_t data_len);
     //void parse_rtp_h264_stream_ffmpeg(const uint8_t* rtp_data,const size_t data_len);
     void parseDjiLiveVideoData(const uint8_t* data,const size_t data_len);
+    void parseJetsonRawSliced(const uint8_t* data,const size_t data_len);
     //
     void parseCustom(const uint8_t* data,const size_t data_len);
     void parseCustomRTPinsideFEC(const uint8_t* data, const size_t data_len);

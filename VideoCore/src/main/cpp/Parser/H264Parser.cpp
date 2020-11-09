@@ -70,6 +70,10 @@ void H264Parser::parseDjiLiveVideoData(const uint8_t *data,const size_t data_len
     mParseRAW.parseDjiLiveVideoData(data,data_length);
 }
 
+void H264Parser::parseJetsonRawSliced(const uint8_t *data,const size_t data_length) {
+    //LOGD("H264Parser::parseDjiLiveVideoData %d",data_length);
+    mParseRAW.parseJetsonRawSliced(data,data_length);
+}
 /*void H264Parser::parse_rtp_h264_stream_ffmpeg(const uint8_t* rtp_data,const size_t data_len) {
     //auto ret=av_parser_parse2(m_pCodecPaser, m_codec_ctx, &pkt->data,&pkt->size,
     //                                m_packet.data,m_packet.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);

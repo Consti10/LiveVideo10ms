@@ -18,6 +18,7 @@
 #include <AndroidLogger.hpp>
 #include <variant>
 #include <optional>
+#include <StringHelper.hpp>
 
 #include "H26X.hpp"
 
@@ -96,9 +97,16 @@ public:
         }
         return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
     }
+    // VPS NALUs are only possible in H265
     bool isVPS()const{
         assert(IS_H265_PACKET);
         return get_nal_unit_type()==H265::NAL_UNIT_VPS;
+    }
+    bool isAUD()const{
+        if(IS_H265_PACKET){
+            return get_nal_unit_type()==H265:: NAL_UNIT_ACCESS_UNIT_DELIMITER;
+        }
+        return (get_nal_unit_type() == NAL_UNIT_TYPE_AUD);
     }
     int get_nal_unit_type()const{
         if(getSize()<5)return -1;
@@ -118,13 +126,9 @@ public:
     bool hasValidPrefix()const{
         return data[0]==0 && data[1]==0 &&data[2]==0 &&data[3]==1;
     }
-
+    // For debugging, return the whole NALU data as a big string for logging
     std::string dataAsString()const{
-        std::stringstream ss;
-        for(int i=0;i<getSize();i++){
-            ss<<(int)data[i]<<",";
-        }
-        return ss.str();
+        return StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
     }
 
     //Returns video width and height if the NALU is an SPS
