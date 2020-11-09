@@ -113,6 +113,8 @@ public:
         if(IS_H265_PACKET){
             return (getData()[4] & 0x7E)>>1;
         }
+        const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
+        assert(lol->nal_unit_type==(getData()[4]&0x1f));
         return getData()[4]&0x1f;
     }
     std::string get_nal_name()const{
@@ -130,6 +132,15 @@ public:
     std::string dataAsString()const{
         return StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
     }
+    void debug()const{
+        const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
+        MLOGD<<lol->asString();
+        if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
+            const auto lol2=(H264::slice_header_t*)&getDataWithoutPrefix()[1];
+            MLOGD<<lol2->asString();
+        }
+    }
+
 
     //Returns video width and height if the NALU is an SPS
     std::array<int,2> getVideoWidthHeightSPS()const{

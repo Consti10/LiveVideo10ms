@@ -8,7 +8,7 @@
 #include <h264_stream.h>
 
 // namespaces for H264 H265 helper
-// A H265 NALU is only similar to a H264 NALU in that it has the same [0,0,0,1] prefix
+// A H265 NALU is kind of similar to a H264 NALU in that it has the same [0,0,0,1] prefix
 
 namespace H264{
     static std::string get_nal_name(int nal_unit_type){
@@ -42,7 +42,25 @@ namespace H264{
         uint8_t nal_unit_type:5;
         uint8_t nal_ref_idc:2;
         uint8_t forbidden_zero_bit:1;
+        std::string asString()const{
+            std::stringstream ss;
+            ss<<"nal_unit_type:"<<(int)nal_unit_type<<" nal_ref_idc:"<<(int)nal_ref_idc<<" forbidden_zero_bit:"<<(int)forbidden_zero_bit;
+            return ss.str();
+        }
     }__attribute__ ((packed)) nal_unit_header_t;
+    static_assert(sizeof(nal_unit_header_t)==1);
+    typedef struct slice_header{
+        uint8_t frame_num:2;
+        uint8_t pic_parameter_set_id:2;
+        uint8_t slice_type:2;
+        uint8_t first_mb_in_slice:2 ;
+        std::string asString()const{
+            std::stringstream ss;
+            ss<<"first_mb_in_slice:"<<(int)first_mb_in_slice<<" slice_type:"<<(int)slice_type<<" pic_parameter_set_id:"<<(int)pic_parameter_set_id<<" frame_num:"<<(int)frame_num;
+            return ss.str();
+        }
+    }__attribute__ ((packed)) slice_header_t;
+    static_assert(sizeof(slice_header_t)==1);
 }
 
 namespace H265{
