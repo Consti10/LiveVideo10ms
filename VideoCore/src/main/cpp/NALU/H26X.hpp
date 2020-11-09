@@ -37,6 +37,12 @@ namespace H264{
         }
         return nal_unit_type_name;
     };
+    // reverse order due to architecture
+    typedef struct nal_unit_header{
+        uint8_t nal_unit_type:5;
+        uint8_t nal_ref_idc:2;
+        uint8_t forbidden_zero_bit:1;
+    }__attribute__ ((packed)) nal_unit_header_t;
 }
 
 namespace H265{
