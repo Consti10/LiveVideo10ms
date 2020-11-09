@@ -72,6 +72,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         IS_H265=false;
     }
     //MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
+    MLOGD<<"NALU size "<<StringHelper::memorySizeReadable(nalu.getSize());
     MLOGD<<"NALU type "<<nalu.get_nal_name();
     //MLOGD<<"DATA:"<<nalu.dataAsString();
     //return;
