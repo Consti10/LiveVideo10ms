@@ -54,9 +54,6 @@ namespace MyTimeHelper{
 // Use this class to compare many samples of the same kind
 // Saves the minimum,maximum and average of all the samples
 // The type of the samples is for example std::chrono::nanoseconds when measuring time intervalls
-// Use this class to compare many samples of the same kind
-// Saves the minimum,maximum and average of all the samples
-// The type of the samples is for example std::chrono::nanoseconds when measuring time intervalls
 template<typename T>
 class BaseAvgCalculator{
 private:
