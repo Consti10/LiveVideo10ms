@@ -21,7 +21,7 @@ gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, heig
 Test 6:
 gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh264enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=1 bit-packetization=1 slice-header-spacing=1024 insert-aud=true ! video/x-h264, stream-format=byte-stream ! filesink location=6/test.h264
 
-// Use iframeintervall of 10
+// add AUDs and set iframeintervall of 10
 Test 7:
 gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh264enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 bit-packetization=1 slice-header-spacing=1024 insert-aud=true ! video/x-h264, stream-format=byte-stream ! filesink location=7/test.h264
 
