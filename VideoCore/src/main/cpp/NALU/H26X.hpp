@@ -89,7 +89,6 @@ namespace H264{
         ss<<"]";
         return ss.str();
     }
-
     static std::string spsAsString(const uint8_t* nalu_data,size_t data_len){
         h264_stream_t* h = h264_new();
         read_nal_unit(h,&nalu_data[4],(int)data_len-4);
@@ -99,7 +98,6 @@ namespace H264{
         h264_free(h);
         return ret;
     }
-
     static std::array<int,2> spsGetWidthHeight(const uint8_t* nalu_data,size_t data_len){
         h264_stream_t* h = h264_new();
         read_nal_unit(h,&nalu_data[4],(int)data_len-4);
