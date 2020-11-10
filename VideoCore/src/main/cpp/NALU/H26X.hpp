@@ -61,6 +61,55 @@ namespace H264{
         }
     }__attribute__ ((packed)) slice_header_t;
     static_assert(sizeof(slice_header_t)==1);
+
+    static std::string spsAsString(sps_t* sps){
+        std::stringstream ss;
+        ss<<"[";
+        ss<<"profile_idc="<<sps->profile_idc<<",";
+        ss<<"constraint_set0_flag="<<sps->constraint_set0_flag<<",";
+        ss<<"constraint_set1_flag="<<sps->constraint_set1_flag<<",";
+        ss<<"constraint_set2_flag="<<sps->constraint_set2_flag<<",";
+        ss<<"constraint_set3_flag="<<sps->constraint_set3_flag<<",";
+        ss<<"constraint_set4_flag="<<sps->constraint_set4_flag<<",";
+        ss<<"constraint_set5_flag="<<sps->constraint_set5_flag<<",";
+        ss<<"reserved_zero_2bits="<<sps->reserved_zero_2bits<<",";
+        ss<<"level_idc="<<sps->level_idc<<",";
+        ss<<"seq_parameter_set_id="<<sps->seq_parameter_set_id<<",";
+        ss<<"chroma_format_idc="<<sps->chroma_format_idc<<",";
+        ss<<"residual_colour_transform_flag="<<sps->residual_colour_transform_flag<<",";
+        ss<<"bit_depth_luma_minus8="<<sps->bit_depth_luma_minus8<<",";
+        ss<<"bit_depth_chroma_minus8="<<sps->bit_depth_chroma_minus8<<",";
+        ss<<"qpprime_y_zero_transform_bypass_flag="<<sps->qpprime_y_zero_transform_bypass_flag<<",";
+        ss<<"seq_scaling_matrix_present_flag="<<sps->seq_scaling_matrix_present_flag<<",";
+        ss<<"log2_max_frame_num_minus4="<<sps->log2_max_frame_num_minus4<<",";
+        ss<<"pic_order_cnt_type="<<sps->pic_order_cnt_type<<",";
+        ss<<"log2_max_pic_order_cnt_lsb_minus4="<<sps->log2_max_pic_order_cnt_lsb_minus4<<",";
+        ss<<"delta_pic_order_always_zero_flag="<<sps->delta_pic_order_always_zero_flag<<",";
+        //ss<<"="<<sps-><<",";
+        ss<<"]";
+        return ss.str();
+    }
+
+    static std::string spsAsString(const uint8_t* nalu_data,size_t data_len){
+        h264_stream_t* h = h264_new();
+        read_nal_unit(h,&nalu_data[4],(int)data_len-4);
+        sps_t* sps=h->sps;
+        assert(sps!= nullptr);
+        auto ret=spsAsString(sps);
+        h264_free(h);
+        return ret;
+    }
+
+    static std::array<int,2> spsGetWidthHeight(const uint8_t* nalu_data,size_t data_len){
+        h264_stream_t* h = h264_new();
+        read_nal_unit(h,&nalu_data[4],(int)data_len-4);
+        sps_t* sps=h->sps;
+        assert(sps!= nullptr);
+        int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
+        int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
+        h264_free(h);
+        return {Width,Height};
+    }
 }
 
 namespace H265{
@@ -286,6 +335,13 @@ namespace H265{
         }
         return nal_unit_type_name;
     }
+    typedef struct nal_unit_header{
+        uint8_t forbidden_zero_bit:1;
+        uint8_t nal_unit_type:6;
+        uint8_t nuh_layer_id:6;
+        uint8_t nuh_temporal_id_plus1:3;
+    }__attribute__ ((packed)) nal_unit_header_t;
+    static_assert(sizeof(nal_unit_header_t)==2);
 }
 
 #endif //LIVEVIDEO10MS_H264_H

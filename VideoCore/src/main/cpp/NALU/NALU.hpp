@@ -133,11 +133,17 @@ public:
         return StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
     }
     void debug()const{
+        if(IS_H265_PACKET){
+            return;
+        }
         const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
         MLOGD<<lol->asString();
         if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
             const auto lol2=(H264::slice_header_t*)&getDataWithoutPrefix()[1];
             MLOGD<<lol2->asString();
+        }
+        if(get_nal_unit_type()==NAL_UNIT_TYPE_SPS){
+            MLOGD<<H264::spsAsString(getData(),getSize());
         }
     }
 
@@ -172,13 +178,7 @@ public:
             h264_free(h);
             return {Width,Height};
         }else{
-            h264_stream_t* h = h264_new();
-            read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
-            sps_t* sps=h->sps;
-            int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
-            int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
-            h264_free(h);
-            return {Width,Height};
+            return H264::spsGetWidthHeight(getData(),getSize());
         }
     }
 
