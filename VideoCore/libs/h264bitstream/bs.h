@@ -400,4 +400,60 @@ static inline uint8_t bs_read_u4(bs_t* b){
 }
 #endif
 
+#ifdef __cplusplus
+
+// C++ wrapper around the c code
+class BitStream{
+private:
+    std::vector<uint8_t> data;
+    bs_t * b;
+public:
+    BitStream(std::vector<uint8_t> data1):data(data1){
+        b=bs_new(data.data(),data.size());
+    }
+    ~BitStream(){
+        bs_free(b);
+    }
+public:
+    // for backwards compability
+    bs_t* bs_t(){
+        return b;
+    }
+    uint32_t read_u(std::size_t n){
+        assert(n<=32);
+        return bs_read_u(b,n);
+    }
+    uint8_t read_u1(){
+        return read_u(1);
+    }
+    uint8_t read_u2(){
+        return read_u(2);
+    }
+    uint8_t read_u3(){
+        return read_u(3);
+    }
+    uint8_t read_u4(){
+        return read_u(4);
+    }
+    uint8_t read_u5(){
+        return read_u(5);
+    }
+    uint8_t read_u6(){
+        return read_u(6);
+    }
+    uint8_t read_u7(){
+        return read_u(7);
+    }
+    uint8_t read_u8(){
+        return read_u(8);
+    }
+    uint16_t read_u16(){
+        return read_u(16);
+    }
+    uint32_t read_u32(){
+        return read_u(32);
+    }
+};
+#endif
+
 #endif
