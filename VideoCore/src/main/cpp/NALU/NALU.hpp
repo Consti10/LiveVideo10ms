@@ -129,6 +129,11 @@ public:
     bool hasValidPrefix()const{
         return data[0]==0 && data[1]==0 &&data[2]==0 &&data[3]==1;
     }
+    //returns true if NALU is at least N bytes big,false otherwise
+    bool hasValidSize()const{
+        // A NALU should have at least 6 bytes - 4 bytes prefix, 1 byte header for h264, 2 byte header for h265
+        return getSize()>6;
+    }
     // For debugging, return the whole NALU data as a big string for logging
     std::string dataAsString()const{
         return StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
@@ -144,47 +149,19 @@ public:
             MLOGD<<lol2->asString();
         }
         if(get_nal_unit_type()==NAL_UNIT_TYPE_SPS){
-            MLOGD<<"XX1:"<<H264::spsAsString(getData(),getSize());
-            H264::SPS sps(getData(),getSize());
-            MLOGD<<"XX2:"<<H264::spsAsString(&sps.parsed);
-            const std::string s1=H264::spsAsString(getData(),getSize());
-            const std::string s2=H264::spsAsString(&sps.parsed);
-            assert(s1.compare(s2)==0);
+            auto sps=H264::SPS(getData(),getSize());
+            MLOGD<<"SPS:"<<sps.asString();
         }
     }
-
 
     //Returns video width and height if the NALU is an SPS
     std::array<int,2> getVideoWidthHeightSPS()const{
         assert(isSPS());
-        //if(!isSPS()){
-        //    return {-1,-1};
-        //}
         if(IS_H265_PACKET){
-            //TODO doesn't work with H265 yet
-            AVCodec* avCodec=avcodec_find_decoder(AV_CODEC_ID_H264);
-            AVCodecParserContext* avCodecParserContext = av_parser_init(AV_CODEC_ID_H264);
-            AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
-            AVPacket avPacket;
-            av_init_packet(&avPacket);
-            auto ret = av_parser_parse2(avCodecParserContext,avCodecContext, &avPacket.data,&avPacket.size,
-                                        getData(),getSize(), AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
-            MLOGD<<"Ret:"<<ret<<" "<<getSize();
-            MLOGD<<"Codec context W H "<<avCodecContext->width<<" "<<avCodecContext->height;
-            MLOGD<<"AVCodec context W H "<<avCodecParserContext->width<<" "<<avCodecParserContext->height;
-            avcodec_free_context(&avCodecContext);
-            //return {320,240};
             return {640,480};
-            //return {180,120};
-            h264_stream_t* h = h264_new();
-            read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
-            sps_t* sps=h->sps;
-            int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
-            int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
-            h264_free(h);
-            return {Width,Height};
         }else{
-            return H264::spsGetWidthHeight(getData(),getSize());
+            const auto sps=H264::SPS(getData(),getSize());
+            return sps.getWidthHeightPx();
         }
     }
 

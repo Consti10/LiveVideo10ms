@@ -1,0 +1,22 @@
+//TODO doesn't work with H265 yet
+            AVCodec* avCodec=avcodec_find_decoder(AV_CODEC_ID_H264);
+            AVCodecParserContext* avCodecParserContext = av_parser_init(AV_CODEC_ID_H264);
+            AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
+            AVPacket avPacket;
+            av_init_packet(&avPacket);
+            auto ret = av_parser_parse2(avCodecParserContext,avCodecContext, &avPacket.data,&avPacket.size,
+                                        getData(),getSize(), AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+            MLOGD<<"Ret:"<<ret<<" "<<getSize();
+            MLOGD<<"Codec context W H "<<avCodecContext->width<<" "<<avCodecContext->height;
+            MLOGD<<"AVCodec context W H "<<avCodecParserContext->width<<" "<<avCodecParserContext->height;
+            avcodec_free_context(&avCodecContext);
+            //return {320,240};
+            return {640,480};
+            //return {180,120};
+            h264_stream_t* h = h264_new();
+            read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
+            sps_t* sps=h->sps;
+            int Width = ((sps->pic_width_in_mbs_minus1 +1)*16) -sps->frame_crop_right_offset *2 -sps->frame_crop_left_offset *2;
+            int Height = ((2 -sps->frame_mbs_only_flag)* (sps->pic_height_in_map_units_minus1 +1) * 16) - (sps->frame_crop_bottom_offset* 2) - (sps->frame_crop_top_offset* 2);
+            h264_free(h);
+            return {Width,Height};
