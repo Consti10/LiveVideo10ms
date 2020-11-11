@@ -159,50 +159,6 @@ public:
             return sps.getWidthHeightPx();
         }
     }
-
-    //Don't forget to free the h264 stream
-    /*h264_stream_t* toH264Stream()const{
-        h264_stream_t* h = h264_new();
-        read_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
-        return h;
-    }
-
-    void debugX()const{
-        h264_stream_t* h = h264_new();
-        read_debug_nal_unit(h,getDataWithoutPrefix(),(int)getDataSizeWithoutPrefix());
-        h264_free(h);
-    }*/
-
-    //Create a NALU from h264stream object
-    //Only tested on PSP/PPS !!!!!!!!!!
-    //After copying data into the new NALU the h264_stream object is deleted
-    //If the oldNALU!=nullptr the function checks if the new created nalu has the exact same length and also uses its creation timestamp
-    //Example modifying sps:
-    //if(nalu.isSPS()){
-    //    h264_stream_t* h=nalu.toH264Stream();
-    //    //Do manipulations to h->sps...
-    //    modNALU=NALU::fromH264StreamAndFree(h,&nalu);
-    //}
-    /*static NALU* fromH264StreamAndFree(h264_stream_t* h,const NALU* oldNALU= nullptr){
-        //The write function seems to be a bit buggy, e.g. its input buffer size needs to be stupid big
-        std::vector<uint8_t> tmp(1024);
-        int writeRet=write_nal_unit(h,tmp.data(),1024);
-        tmp.insert(tmp.begin(),0);
-        tmp.insert(tmp.begin(),0);
-        tmp.insert(tmp.begin(),0);
-        tmp.at(3)=1;
-        writeRet+=3;
-        //allocate memory for the new NALU
-        uint8_t* newNaluData=new uint8_t[writeRet];
-        memcpy(newNaluData,tmp.data(),(size_t)writeRet);
-        if(oldNALU!= nullptr){
-            if(oldNALU->data.size()!=writeRet){
-                __android_log_print(ANDROID_LOG_ERROR,"NALU","Error h264bitstream %d %d",(int)oldNALU->data.size(),writeRet);
-            }
-            return new NALU(newNaluData,(size_t)writeRet,oldNALU->creationTime);
-        }
-        return new NALU(newNaluData,(size_t)writeRet);
-    }*/
 };
 
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;
