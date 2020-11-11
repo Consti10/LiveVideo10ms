@@ -21,6 +21,7 @@
 #include <StringHelper.hpp>
 
 #include "H26X.hpp"
+#include "NALUnitType.hpp"
 
 /**
  * A NALU either contains H264 data (default) or H265 data
@@ -81,24 +82,24 @@ public:
     }
     bool isSPS()const{
         if(IS_H265_PACKET){
-            return get_nal_unit_type()==H265::NAL_UNIT_SPS;
+            return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_SPS;
         }
         return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);
     }
     bool isPPS()const{
         if(IS_H265_PACKET){
-            return get_nal_unit_type()==H265::NAL_UNIT_PPS;
+            return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_PPS;
         }
         return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
     }
     // VPS NALUs are only possible in H265
     bool isVPS()const{
         assert(IS_H265_PACKET);
-        return get_nal_unit_type()==H265::NAL_UNIT_VPS;
+        return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_VPS;
     }
     bool isAUD()const{
         if(IS_H265_PACKET){
-            return get_nal_unit_type()==H265:: NAL_UNIT_ACCESS_UNIT_DELIMITER;
+            return get_nal_unit_type()==NALUnitType::H265:: NAL_UNIT_ACCESS_UNIT_DELIMITER;
         }
         return (get_nal_unit_type() == NAL_UNIT_TYPE_AUD);
     }
@@ -114,9 +115,9 @@ public:
     }
     std::string get_nal_name()const{
         if(IS_H265_PACKET){
-            return H265::get_nal_name(get_nal_unit_type());
+            return NALUnitType::H265::get_nal_name(get_nal_unit_type());
         }
-        return H264::get_nal_name(get_nal_unit_type());
+        return NALUnitType::H264::get_nal_name(get_nal_unit_type());
     }
 
     //returns true if starts with 0001, false otherwise
