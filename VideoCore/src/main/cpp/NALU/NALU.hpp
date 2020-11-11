@@ -108,6 +108,7 @@ public:
         }
         return (get_nal_unit_type() == NAL_UNIT_TYPE_AUD);
     }
+    // return the nal unit type (quick)
     int get_nal_unit_type()const{
         if(getSize()<5)return -1;
         if(IS_H265_PACKET){
@@ -143,7 +144,12 @@ public:
             MLOGD<<lol2->asString();
         }
         if(get_nal_unit_type()==NAL_UNIT_TYPE_SPS){
-            MLOGD<<H264::spsAsString(getData(),getSize());
+            MLOGD<<"XX1:"<<H264::spsAsString(getData(),getSize());
+            H264::SPS sps(getData(),getSize());
+            MLOGD<<"XX2:"<<H264::spsAsString(&sps.parsed);
+            const std::string s1=H264::spsAsString(getData(),getSize());
+            const std::string s2=H264::spsAsString(&sps.parsed);
+            assert(s1.compare(s2)==0);
         }
     }
 

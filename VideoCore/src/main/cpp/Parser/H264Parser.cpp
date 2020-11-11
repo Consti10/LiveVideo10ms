@@ -56,7 +56,7 @@ void H264Parser::parse_raw_h265_stream(const uint8_t *data,const size_t data_len
 void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
     //const auto seqNr=RTPDecoder::getSequenceNumber(rtp_data,data_length);
     //debugSequenceNumbers(seqNr);
-    mDecodeRTP.parseRTPtoNALU(rtp_data, data_length);
+    mDecodeRTP.parseRTPH264toNALU(rtp_data, data_length);
 }
 
 void H264Parser::parse_rtp_h265_stream(const uint8_t *rtp_data,const size_t data_length) {
@@ -181,7 +181,7 @@ void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t 
             const auto* rtp_header=(rtp_header_t*)sblkData;
             const auto seqNr=rtp_header->getSequence();
             debugSequenceNumbers(seqNr);
-            mDecodeRTP.parseRTPtoNALU(sblkData,sblkDataLength);
+            mDecodeRTP.parseRTPH264toNALU(sblkData, sblkDataLength);
         }else{
             MLOGD<<"Weird packet"<<sblkDataLength;
         }

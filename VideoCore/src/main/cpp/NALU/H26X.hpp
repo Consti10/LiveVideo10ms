@@ -108,14 +108,35 @@ namespace H264{
         h264_free(h);
         return {Width,Height};
     }
+    // Parse raw NALU data into an sps struct (using the h264bitstream library)
     class SPS{
     public:
         nal_unit_header_t nal_header;
+        std::vector<uint8_t> createRbspBuffer(const uint8_t* nalu_data, size_t data_len)const{
+            int nal_size = data_len-4;
+            const uint8_t* nal_data=&nalu_data[4];
+            int rbsp_size=nal_size;
+            std::vector<uint8_t> rbsp_buf;
+            rbsp_buf.resize(rbsp_size);
+            int rc = nal_to_rbsp(nal_data, &nal_size, rbsp_buf.data(), &rbsp_size);
+            assert(rc>0);
+            assert(rbsp_buf.size()==rbsp_size);
+            return rbsp_buf;
+        }
         sps_t parsed;
     public:
         SPS(const uint8_t* nalu_data,size_t data_len){
-            int nal_size = data_len-4;
-            //int rc = nal_to_rbsp(nalu_data, &nal_size, rbsp_buf, &rbsp_size);
+            auto rbsp_buf= createRbspBuffer(nalu_data, data_len);
+            bs_t* b = bs_new(rbsp_buf.data(), rbsp_buf.size());
+            /* forbidden_zero_bit */
+            nal_header.forbidden_zero_bit=bs_read_u1(b);
+            nal_header.nal_ref_idc = bs_read_u(b, 2);
+            nal_header.nal_unit_type = bs_read_u(b, 5);
+            assert(nal_header.forbidden_zero_bit==0);
+            assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_SPS);
+            read_seq_parameter_set_rbsp(&parsed, b);
+            read_rbsp_trailing_bits(b);
+            bs_free(b);
         }
     };
 }

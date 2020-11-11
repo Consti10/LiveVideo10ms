@@ -22,7 +22,7 @@ public:
     // sets the 'missing packet' flag to true if packet got lost
     bool validateRTPPacket(const rtp_header_t& rtpHeader);
     // parse rtp h24 packet to NALU
-    void parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length);
+    void parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_length);
     // parse rtp h265 packet to NALU
     void parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length);
     // copy data_len bytes into the mNALU_DATA buffer at the current position

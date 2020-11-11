@@ -41,7 +41,7 @@ bool RTPDecoder::validateRTPPacket(const rtp_header_t& rtp_header) {
     return true;
 }
 
-void RTPDecoder::parseRTPtoNALU(const uint8_t* rtp_data, const size_t data_length){
+void RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_length){
     //12 rtp header bytes and 1 nalu_header_t type byte
     if(data_length <= sizeof(rtp_header_t)+sizeof(nalu_header_t)){
         MLOGE<<"Not enough rtp data";
@@ -445,7 +445,7 @@ void TestEncodeDecodeRTP::testEncodeDecodeRTP(const NALU& nalu) {
 }
 
 void TestEncodeDecodeRTP::onRTP(const RTPEncoder::RTPPacket &packet) {
-    decoder->parseRTPtoNALU(packet.data,packet.data_len);
+    decoder->parseRTPH264toNALU(packet.data, packet.data_len);
 }
 
 void TestEncodeDecodeRTP::onNALU(const NALU &nalu) {
