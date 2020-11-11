@@ -64,10 +64,6 @@ static uint32_t bs_read_f(bs_t* b, int n);
 static uint32_t bs_read_u8(bs_t* b);
 static uint32_t bs_read_ue(bs_t* b);
 static int32_t  bs_read_se(bs_t* b);
-// added
-static uint8_t bs_read_u2(bs_t* b);
-static uint8_t bs_read_u3(bs_t* b);
-static uint8_t bs_read_u4(bs_t* b);
 
 static void bs_write_u1(bs_t* b, uint32_t v);
 static void bs_write_u(bs_t* b, int n, uint32_t v);
@@ -383,17 +379,6 @@ static inline uint64_t bs_next_bytes(bs_t* bs, int nbytes)
    return val;
 }
 
-static inline uint8_t bs_read_u2(bs_t* b){
-    return bs_read_u(b,2);
-}
-static inline uint8_t bs_read_u3(bs_t* b){
-    return bs_read_u(b,3);
-}
-static inline uint8_t bs_read_u4(bs_t* b){
-    return bs_read_u(b,4);
-}
-
-
 #define bs_print_state(b) fprintf( stderr,  "%s:%d@%s: b->p=0x%02hhX, b->left = %d\n", __FILE__, __LINE__, __FUNCTION__, *b->p, b->bits_left )
 
 #ifdef __cplusplus
@@ -414,6 +399,7 @@ public:
     ~BitStream(){
         bs_free(b);
     }
+    BitStream(BitStream& b)=delete;
 public:
     // for backwards compability
     bs_t* bs_t(){
