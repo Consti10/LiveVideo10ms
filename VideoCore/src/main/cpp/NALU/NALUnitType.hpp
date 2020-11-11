@@ -9,9 +9,10 @@
 
 // h264 types come from h264_stream ( #define since it is a c library)
 // h265 types are declared here
+// This is just a lot of boilerplate code so I put it into its own .hpp file
 namespace NALUnitType{
     namespace H264{
-        static std::string get_nal_name(const int nal_unit_type){
+        static std::string unitTypeName(const int nal_unit_type){
             std::string nal_unit_type_name;
             switch (nal_unit_type)
             {
@@ -114,7 +115,7 @@ namespace NALUnitType{
             NAL_UNIT_UNSPECIFIED_63,
             NAL_UNIT_INVALID,
         };
-        static std::string get_nal_name(const int nal_unit_type){
+        static std::string unitTypeName(const int nal_unit_type){
             std::string nal_unit_type_name="Unimpl";
             switch (nal_unit_type){
                 case NalUnitType::NAL_UNIT_CODED_SLICE_TRAIL_N:

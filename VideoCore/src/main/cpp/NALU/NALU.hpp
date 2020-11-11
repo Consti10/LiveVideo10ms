@@ -115,9 +115,9 @@ public:
     }
     std::string get_nal_name()const{
         if(IS_H265_PACKET){
-            return NALUnitType::H265::get_nal_name(get_nal_unit_type());
+            return NALUnitType::H265::unitTypeName(get_nal_unit_type());
         }
-        return NALUnitType::H264::get_nal_name(get_nal_unit_type());
+        return NALUnitType::H264::unitTypeName(get_nal_unit_type());
     }
 
     //returns true if starts with 0001, false otherwise
