@@ -22,12 +22,6 @@
 
 #include "H26X.hpp"
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavformat/avio.h>
-}
-
 /**
  * A NALU either contains H264 data (default) or H265 data
  * NOTE: Only when copy constructing a NALU it owns the data, else it only holds a data pointer (that might get overwritten by the parser if you hold onto a NALU)
