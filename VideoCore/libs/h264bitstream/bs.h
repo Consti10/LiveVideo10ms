@@ -400,17 +400,19 @@ public:
         bs_free(b);
     }
     BitStream(BitStream& b)=delete;
-public:
-    // for backwards compability
+    // for backwards compability with h264bitstream lib
     bs_t* bs_t(){
         return b;
     }
+// all the read_uX functions where X is the number of bits
+public:
     uint32_t read_u(std::size_t n){
         assert(n<=32);
         return bs_read_u(b,n);
     }
     uint8_t read_u1(){
-        return read_u(1);
+        //return read_u(1);
+        return bs_read_u1(b);
     }
     uint8_t read_u2(){
         return read_u(2);
@@ -431,13 +433,31 @@ public:
         return read_u(7);
     }
     uint8_t read_u8(){
-        return read_u(8);
+        //return read_u(8);
+        return bs_read_u8(b);
     }
     uint16_t read_u16(){
         return read_u(16);
     }
     uint32_t read_u32(){
         return read_u(32);
+    }
+// All the special ones
+public:
+    uint32_t read_ue(){
+        return bs_read_ue(b);
+    }
+    uint32_t read_se(){
+        return bs_read_se(b);
+    }
+    uint32_t read_f(std::size_t n){
+        return bs_read_f(b,n);
+    }
+    std::vector<uint8_t> read_bytes(std::size_t n){
+        std::vector<uint8_t> ret;
+        ret.resize(n);
+        bs_read_bytes(b,ret.data(),n);
+        return ret;
     }
 };
 #endif
