@@ -115,8 +115,7 @@ namespace H264{
     public:
         SPS(const uint8_t* nalu_data,size_t data_len){
             int nal_size = data_len-4;
-
-            int rc = nal_to_rbsp(nalu_data, &nal_size, rbsp_buf, &rbsp_size);
+            //int rc = nal_to_rbsp(nalu_data, &nal_size, rbsp_buf, &rbsp_size);
         }
     };
 }
