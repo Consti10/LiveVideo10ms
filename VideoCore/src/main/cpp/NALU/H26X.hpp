@@ -22,7 +22,9 @@ namespace AnnexBHelper{
         rbsp_buf.resize(rbsp_size);
         int rc = nal_to_rbsp(nal_data, &nal_size, rbsp_buf.data(), &rbsp_size);
         assert(rc>0);
-        assert(rbsp_buf.size()==rbsp_size);
+        //MLOGD<<"X "<<rbsp_buf.size()<<" Y"<<rbsp_size;
+        //assert(rbsp_buf.size()==rbsp_size);
+        rbsp_buf.resize(rbsp_size);
         return rbsp_buf;
     }
     static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const uint8_t* nalu_data, std::size_t nalu_data_size){
@@ -122,43 +124,69 @@ namespace H265{
     static_assert(sizeof(nal_unit_header_t)==2);
 
     struct h265_sps{
-        uint8_t sps_video_parameter_set_id;
-        uint8_t sps_max_sub_layers_minus1;
-        uint8_t sps_temporal_id_nesting_flag;
-        uint8_t sps_seq_parameter_set_id;
-        uint8_t chroma_format_idc;
-        uint8_t pic_width_in_luma_samples;
-        uint8_t pic_height_in_luma_samples;
-        uint8_t conformance_window_flag;
-        uint8_t bit_depth_luma_minus8;
-        uint8_t bit_depth_chroma_minus8;
-        uint8_t log2_max_pic_order_cnt_lsb_minus4;
-        uint8_t sps_sub_layer_ordering_info_present_flag;
-        uint8_t log2_min_luma_coding_block_size_minus3;
-        uint8_t log2_diff_max_min_luma_coding_block_size;
-        uint8_t log2_min_luma_transform_block_size_minus2;
-        uint8_t log2_diff_max_min_luma_transform_block_size;
-        uint8_t max_transform_hierarchy_depth_inter;
-        uint8_t max_transform_hierarchy_depth_intra;
-        uint8_t scaling_list_enabled_flag;
-        uint8_t amp_enabled_flag;
-        uint8_t sample_adaptive_offset_enabled_flag;
-        uint8_t pcm_enabled_flag;
-        uint8_t num_short_term_ref_pic_sets;
+        int sps_video_parameter_set_id;
+        int sps_max_sub_layers_minus1;
+        int sps_temporal_id_nesting_flag;
+        // profile_tier_level
+        int sps_seq_parameter_set_id;
+        int chroma_format_idc;
+        //if( chroma_format_idc = = 3 )
+        int separate_colour_plane_flag;
+        int pic_width_in_luma_samples;
+        int pic_height_in_luma_samples;
+        int conformance_window_flag;
+        //if( conformance_window_flag ) { u(1)
+        int     conf_win_left_offset;
+        int     conf_win_right_offset;
+        int     conf_win_top_offset;
+        int     conf_win_bottom_offset;
+        int bit_depth_luma_minus8;
+        int bit_depth_chroma_minus8;
+        int log2_max_pic_order_cnt_lsb_minus4;
+        int sps_sub_layer_ordering_info_present_flag;
+        int log2_min_luma_coding_block_size_minus3;
+        int log2_diff_max_min_luma_coding_block_size;
+        int log2_min_luma_transform_block_size_minus2;
+        int log2_diff_max_min_luma_transform_block_size;
+        int max_transform_hierarchy_depth_inter;
+        int max_transform_hierarchy_depth_intra;
+        int scaling_list_enabled_flag;
+        int amp_enabled_flag;
+        int sample_adaptive_offset_enabled_flag;
+        int pcm_enabled_flag;
+        int num_short_term_ref_pic_sets;
     };
+    static void read_h265_profile_tier_level(BitStream& b,int profilePresentFlag,int maxNumSubLayersMinus1){
+        if(profilePresentFlag){
+            //TODO
+        }
+    }
     static void read_h265_seq_parameter_set_rbsp(h265_sps& sps,BitStream& b){
         memset(&sps, 0, sizeof(sps_t));
-        sps.sps_video_parameter_set_id=b.read_u1();
-        sps.sps_max_sub_layers_minus1 = b.read_u1();
+        sps.sps_video_parameter_set_id=b.read_u4();
+        sps.sps_max_sub_layers_minus1 = b.read_u3();
         sps.sps_temporal_id_nesting_flag = b.read_u1();
-        sps.sps_seq_parameter_set_id = b.read_u1();
-        sps.chroma_format_idc = b.read_u1();
-        sps.pic_width_in_luma_samples = b.read_u1();
-        sps.pic_height_in_luma_samples = b.read_u1();
+        read_h265_profile_tier_level(b,1,sps.sps_max_sub_layers_minus1);
+        sps.sps_seq_parameter_set_id = b.read_ue();
+        sps.chroma_format_idc = b.read_ue();
+        if(sps.chroma_format_idc==3){
+            MLOGD<<"Got separate_colour_plane_flag";
+            sps.separate_colour_plane_flag=b.read_u1();
+        }else{
+            sps.separate_colour_plane_flag=0;
+        }
+        sps.pic_width_in_luma_samples = b.read_ue();
+        sps.pic_height_in_luma_samples = b.read_ue();
         sps.conformance_window_flag =b.read_u1();
-        sps.bit_depth_luma_minus8 =b.read_u1();
-        sps.bit_depth_chroma_minus8 = b.read_u1();
-        sps.log2_max_pic_order_cnt_lsb_minus4 =b.read_u1();
+        if(sps.conformance_window_flag){
+            sps.conf_win_left_offset=b.read_ue();
+            sps.conf_win_right_offset=b.read_ue();
+            sps.conf_win_top_offset=b.read_ue();
+            sps.conf_win_bottom_offset=b.read_ue();
+        }
+        sps.bit_depth_luma_minus8 =b.read_ue();
+        sps.bit_depth_chroma_minus8 = b.read_ue();
+        sps.log2_max_pic_order_cnt_lsb_minus4 =b.read_ue();
         sps.sps_sub_layer_ordering_info_present_flag = b.read_u1();
     }
 
@@ -178,6 +206,14 @@ namespace H265{
             assert(nal_header.forbidden_zero_bit==0);
             assert(nal_header.nal_unit_type==NALUnitType::H265::NAL_UNIT_SPS);
             read_h265_seq_parameter_set_rbsp(parsed,b);
+        }
+        std::string lol(){
+            std::stringstream ss;
+            ss<<"[";
+            ss<<"pic_width_in_luma_samples:"<<parsed.pic_width_in_luma_samples<<",";
+            ss<<"pic_height_in_luma_samples:"<<parsed.pic_height_in_luma_samples<<",";
+            ss<<"]";
+            return ss.str();
         }
     };
 }

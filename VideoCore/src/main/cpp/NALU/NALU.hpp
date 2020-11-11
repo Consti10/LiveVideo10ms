@@ -135,17 +135,22 @@ public:
     }
     void debug()const{
         if(IS_H265_PACKET){
+            if(isSPS()){
+                auto sps=H265::SPS(getData(),getSize());
+                MLOGD<<"XSPS "<<sps.lol();
+            }
             return;
-        }
-        const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
-        MLOGD<<lol->asString();
-        if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-            const auto lol2=(H264::slice_header_t*)&getDataWithoutPrefix()[1];
-            MLOGD<<lol2->asString();
-        }
-        if(get_nal_unit_type()==NAL_UNIT_TYPE_SPS){
-            auto sps=H264::SPS(getData(),getSize());
-            MLOGD<<"SPS:"<<sps.asString();
+        }else{
+            const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
+            MLOGD<<lol->asString();
+            if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
+                const auto lol2=(H264::slice_header_t*)&getDataWithoutPrefix()[1];
+                MLOGD<<lol2->asString();
+            }
+            if(get_nal_unit_type()==NAL_UNIT_TYPE_SPS){
+                auto sps=H264::SPS(getData(),getSize());
+                MLOGD<<"SPS:"<<sps.asString();
+            }
         }
     }
 
