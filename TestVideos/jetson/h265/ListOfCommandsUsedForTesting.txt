@@ -1,0 +1,21 @@
+Test 1:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh265enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 ! video/x-h265, stream-format=byte-stream ! filesink location=1/test.h265
+
+Test 2:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh265enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=1 ! video/x-h265, stream-format=byte-stream ! filesink location=2/test.h265
+
+//watch out: for nvv4l2h26Xenc the control rate needs to be 1 for constant bitrate
+Test 3:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc control-rate=1 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 ! video/x-h265, stream-format=byte-stream ! filesink location=3/test.h265
+
+Test 4:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc control-rate=1 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=1 ! video/x-h265, stream-format=byte-stream ! filesink location=4/test.h265
+
+Test 5:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc bitrate=4000000 ! video/x-h265, stream-format=byte-stream ! filesink location=5/test.h265
+
+Test 6:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc bitrate=4000000 bit-packetization=1 slice-header-spacing=1024 insert-aud=true ! video/x-h265, stream-format=byte-stream ! filesink location=6/test.h265
+
+Test 7:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc bitrate=4000000 bit-packetization=1 slice-header-spacing=1024 insert-aud=true iframeinterval=1 ! video/x-h265, stream-format=byte-stream ! filesink location=7/test.h265
