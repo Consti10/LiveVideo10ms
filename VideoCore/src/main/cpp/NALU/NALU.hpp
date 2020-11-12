@@ -23,17 +23,8 @@
 #include "H26X.hpp"
 #include "NALUnitType.hpp"
 
-namespace absl{
-    template<class T>
-    using optional=std::optional<T>;
+#include "../../libs/h265nal/src/h265_sps_parser.h"
 
-    //template<class T>
-    //using nullopt=std::optional;
-    //typedef decltype(nullopt) nullptr_t;
-    //inline constexpr std::nullopt nullopt{/*unspecified*/};
-    //struct nullopt_t{/* see description */};
-    inline constexpr auto nullopt=std::nullopt;
-}
 
 /**
  * A NALU either contains H264 data (default) or H265 data
@@ -176,13 +167,7 @@ public:
             return sps.getWidthHeightPx();
         }
     }
-
-//#define absl::optional std::optional
-//using absl::optional = std::optional;
-    absl::optional<int> x(){
-        //return absl::nullopt;
-        return absl::nullopt;
-    }
+    h265nal::H265SpsParser* x;
 };
 
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;

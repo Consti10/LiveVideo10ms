@@ -70,6 +70,9 @@ set(H265NAL_SRC_DIR ${H265NAL_DIR}/src)
 #include_directories(${H265NAL_DIR}/absl)
 add_subdirectory(${H265NAL_DIR}/webrtc)
 add_subdirectory(${H265NAL_DIR}/src)
+include_directories(${H265NAL_DIR}/webrtc)
+include_directories(${H265NAL_DIR}/src)
+
 #add_library(h265nal
 #        ${H265NAL_SRC_DIR}/h265_common.h ${H265NAL_SRC_DIR}/h265_common.cc
         #h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
