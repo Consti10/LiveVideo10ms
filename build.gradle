@@ -32,7 +32,7 @@ allprojects {
         androidxpreferenceVersion='1.1.1'
         mGvrVersion = '1.180.0'
         //myNdkVersion = '21.0.6113669'
-        myNdkVersion = '20.0.5594570'
+        //myNdkVersion = '20.0.5594570'
         myPrefsPlusVersion = '3.0.4'
     }
 }
