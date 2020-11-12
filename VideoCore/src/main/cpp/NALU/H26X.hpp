@@ -146,19 +146,25 @@ namespace H265{
         int sps_seq_parameter_set_id;
         int chroma_format_idc;
         //if( chroma_format_idc = = 3 )
-        int separate_colour_plane_flag;
+        int _separate_colour_plane_flag;
         int pic_width_in_luma_samples;
         int pic_height_in_luma_samples;
         int conformance_window_flag;
-        //if( conformance_window_flag ) { u(1)
-        int     conf_win_left_offset;
-        int     conf_win_right_offset;
-        int     conf_win_top_offset;
-        int     conf_win_bottom_offset;
+        //if( conformance_window_flag ) {
+        int _conf_win_left_offset;
+        int _conf_win_right_offset;
+        int _conf_win_top_offset;
+        int _conf_win_bottom_offset;
         int bit_depth_luma_minus8;
         int bit_depth_chroma_minus8;
         int log2_max_pic_order_cnt_lsb_minus4;
         int sps_sub_layer_ordering_info_present_flag;
+        //for( i = ( sps_sub_layer_ordering_info_present_flag ? 0 : sps_max_sub_layers_minus1 );
+        //i <= sps_max_sub_layers_minus1; i++ ) {
+        std::vector<int> sps_max_dec_pic_buffering_minus1{};
+        std::vector<int> sps_max_num_reorder_pics{};
+        std::vector<int> sps_max_latency_increase_plus1{};
+
         int log2_min_luma_coding_block_size_minus3;
         int log2_diff_max_min_luma_coding_block_size;
         int log2_min_luma_transform_block_size_minus2;
@@ -201,33 +207,48 @@ namespace H265{
         }
     }
 
-    static void read_h265_seq_parameter_set_rbsp(h265_sps& sps,BitStream& b){
-        memset(&sps, 0, sizeof(sps_t));
-        sps.sps_video_parameter_set_id=b.read_u4();
-        sps.sps_max_sub_layers_minus1 = b.read_u3();
-        sps.sps_temporal_id_nesting_flag = b.read_u1();
-        read_h265_profile_tier_level(sps.profileTierLevel,b,1,sps.sps_max_sub_layers_minus1);
-        sps.sps_seq_parameter_set_id = b.read_ue();
-        sps.chroma_format_idc = b.read_ue();
-        if(sps.chroma_format_idc==3){
+    static void read_h265_seq_parameter_set_rbsp(h265_sps& s, BitStream& b){
+        memset(&s, 0, sizeof(sps_t));
+        s.sps_video_parameter_set_id=b.read_u4();
+        s.sps_max_sub_layers_minus1 = b.read_u3();
+        s.sps_temporal_id_nesting_flag = b.read_u1();
+        read_h265_profile_tier_level(s.profileTierLevel, b, 1, s.sps_max_sub_layers_minus1);
+        s.sps_seq_parameter_set_id = b.read_ue();
+        s.chroma_format_idc = b.read_ue();
+        if(s.chroma_format_idc == 3){
             MLOGD<<"Got separate_colour_plane_flag";
-            sps.separate_colour_plane_flag=b.read_u1();
+            s._separate_colour_plane_flag=b.read_u1();
         }else{
-            sps.separate_colour_plane_flag=0;
+            s._separate_colour_plane_flag=0;
         }
-        sps.pic_width_in_luma_samples = b.read_ue();
-        sps.pic_height_in_luma_samples = b.read_ue();
-        sps.conformance_window_flag =b.read_u1();
-        if(sps.conformance_window_flag){
-            sps.conf_win_left_offset=b.read_ue();
-            sps.conf_win_right_offset=b.read_ue();
-            sps.conf_win_top_offset=b.read_ue();
-            sps.conf_win_bottom_offset=b.read_ue();
+        s.pic_width_in_luma_samples = b.read_ue();
+        s.pic_height_in_luma_samples = b.read_ue();
+        s.conformance_window_flag =b.read_u1();
+        if(s.conformance_window_flag){
+            s._conf_win_left_offset=b.read_ue();
+            s._conf_win_right_offset=b.read_ue();
+            s._conf_win_top_offset=b.read_ue();
+            s._conf_win_bottom_offset=b.read_ue();
         }
-        sps.bit_depth_luma_minus8 =b.read_ue();
-        sps.bit_depth_chroma_minus8 = b.read_ue();
-        sps.log2_max_pic_order_cnt_lsb_minus4 =b.read_ue();
-        sps.sps_sub_layer_ordering_info_present_flag = b.read_u1();
+        s.bit_depth_luma_minus8 =b.read_ue();
+        s.bit_depth_chroma_minus8 = b.read_ue();
+        s.log2_max_pic_order_cnt_lsb_minus4 =b.read_ue();
+        s.sps_sub_layer_ordering_info_present_flag = b.read_u1();
+        //
+        s.sps_max_dec_pic_buffering_minus1.resize(s.sps_max_sub_layers_minus1+1);
+        s.sps_max_num_reorder_pics.resize(s.sps_max_sub_layers_minus1+1);
+        s.sps_max_latency_increase_plus1.resize(s.sps_max_sub_layers_minus1+1);
+        for(int i=(s.sps_sub_layer_ordering_info_present_flag ? 0 : s.sps_max_sub_layers_minus1);
+            i<=s.sps_max_sub_layers_minus1;i++){
+            s.sps_max_dec_pic_buffering_minus1[i]=b.read_ue();
+            s.sps_max_num_reorder_pics[i]=b.read_ue();
+            s.sps_max_latency_increase_plus1[i]=b.read_ue();
+        }
+        s.log2_min_luma_coding_block_size_minus3=b.read_ue();
+        s.log2_diff_max_min_luma_coding_block_size=b.read_ue();
+        s.log2_min_luma_transform_block_size_minus2=b.read_ue();
+        s.log2_diff_max_min_luma_transform_block_size=b.read_ue();
+        s.scaling_list_enabled_flag=b.read_u1();
     }
 
     class SPS{
