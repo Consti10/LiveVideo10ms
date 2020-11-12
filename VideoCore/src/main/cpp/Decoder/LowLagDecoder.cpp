@@ -123,7 +123,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         //MDebug::log("Created decoder"+s);
         //char* name;
         //AMediaCodec_getName(decoder.codec,&name);
-        //MLOGD("Created decoder %s",name);
+        //MLOGD<<"Created decoder "<<std::string(name);
         //AMediaCodec_releaseName(decoder.codec,name);
     }
     AMediaFormat* format=AMediaFormat_new();
