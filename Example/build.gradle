@@ -30,9 +30,9 @@ android {
     //        storeFile file("C:\\Users\\geier\\Desktop\\FPV_VR\\YOther\\safety\\keystore.jks")
     //   }
     //}
-    //sourceSets {
-    //    main.assets.srcDirs += '../TestVideos/jetson'
-    //}
+    sourceSets {
+        main.assets.srcDirs += '../TestVideos2'
+    }
 }
 
 dependencies {
