@@ -168,6 +168,7 @@ public:
     std::array<int,2> getVideoWidthHeightSPS()const{
         assert(isSPS());
         if(IS_H265_PACKET){
+            return {1280,720};
             auto sps=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
             if(sps!=absl::nullopt){
                 std::array<int,2> ret={(int)sps->pic_width_in_luma_samples,(int)sps->pic_height_in_luma_samples};

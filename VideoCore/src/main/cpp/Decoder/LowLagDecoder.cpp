@@ -110,7 +110,12 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
 void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     const std::string MIME=IS_H265 ? "video/hevc" : "video/avc";
     if(USE_SW_DECODER_INSTEAD){
-        decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
+        if(IS_H265){
+            // Not sure if google.hevc.decoder is even SW ?!
+            decoder.codec = AMediaCodec_createCodecByName("OMX.google.hevc.decoder");
+        }else{
+            decoder.codec = AMediaCodec_createCodecByName("OMX.google.h264.decoder");
+        }
     }else {
         decoder.codec = AMediaCodec_createDecoderByType(MIME.c_str());
         //decoder.codec = AMediaCodec_createDecoderByType("video/mjpeg");
