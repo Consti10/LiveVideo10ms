@@ -23,6 +23,18 @@
 #include "H26X.hpp"
 #include "NALUnitType.hpp"
 
+namespace absl{
+    template<class T>
+    using optional=std::optional<T>;
+
+    //template<class T>
+    //using nullopt=std::optional;
+    //typedef decltype(nullopt) nullptr_t;
+    //inline constexpr std::nullopt nullopt{/*unspecified*/};
+    //struct nullopt_t{/* see description */};
+    inline constexpr auto nullopt=std::nullopt;
+}
+
 /**
  * A NALU either contains H264 data (default) or H265 data
  * NOTE: Only when copy constructing a NALU it owns the data, else it only holds a data pointer (that might get overwritten by the parser if you hold onto a NALU)
@@ -163,6 +175,13 @@ public:
             const auto sps=H264::SPS(getData(),getSize());
             return sps.getWidthHeightPx();
         }
+    }
+
+//#define absl::optional std::optional
+//using absl::optional = std::optional;
+    absl::optional<int> x(){
+        //return absl::nullopt;
+        return absl::nullopt;
     }
 };
 
