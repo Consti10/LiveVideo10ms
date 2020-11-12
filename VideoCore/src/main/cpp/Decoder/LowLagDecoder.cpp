@@ -101,7 +101,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         //Store sps,pps, vps(H265 only)
         // As soon as enough data has been buffered to initialize the decoder,do so.
         mKeyFrameFinder.saveIfKeyFrame(nalu);
-        if(mKeyFrameFinder.allKeyFramesAvailable()){
+        if(mKeyFrameFinder.allKeyFramesAvailable(IS_H265)){
             configureStartDecoder(mKeyFrameFinder.getCSD0(),mKeyFrameFinder.getCSD1());
         }
     }

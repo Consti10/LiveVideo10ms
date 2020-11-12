@@ -33,7 +33,12 @@ public:
             //MLOGD<<"VPS found";
         }
     }
-    bool allKeyFramesAvailable(){
+    // H264 needs sps and pps
+    // H265 needs sps,pps and vps
+    bool allKeyFramesAvailable(const bool IS_H265=false){
+        if(IS_H265){
+            return SPS != nullptr && PPS != nullptr && VPS!=nullptr;
+        }
         return SPS != nullptr && PPS != nullptr;
     }
     //SPS
