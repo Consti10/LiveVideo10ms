@@ -141,9 +141,10 @@ public:
             if(isSPS()){
                 //auto sps=H265::SPS(getData(),getSize());
                 //MLOGD<<"XSPS "<<sps.lol();
-                auto tmp=h265nal::H265SpsParser::ParseSps(getDataWithoutPrefix(),getDataSizeWithoutPrefix());
-                if(tmp){
+                auto tmp=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
+                if(tmp!=absl::nullopt){
                     MLOGD<<"GotZ";
+                    MLOGD<<"Pic size"<<tmp->getPicSizeInCtbsY();
                 }else{
                     MLOGD<<"GotNZ";
                 }
