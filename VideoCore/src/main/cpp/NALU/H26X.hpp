@@ -58,33 +58,6 @@ namespace H264{
     }__attribute__ ((packed)) slice_header_t;
     static_assert(sizeof(slice_header_t)==1);
 
-    static std::string spsAsString(const sps_t* sps){
-        std::stringstream ss;
-        ss<<"[";
-        ss<<"profile_idc="<<sps->profile_idc<<",";
-        ss<<"constraint_set0_flag="<<sps->constraint_set0_flag<<",";
-        ss<<"constraint_set1_flag="<<sps->constraint_set1_flag<<",";
-        ss<<"constraint_set2_flag="<<sps->constraint_set2_flag<<",";
-        ss<<"constraint_set3_flag="<<sps->constraint_set3_flag<<",";
-        ss<<"constraint_set4_flag="<<sps->constraint_set4_flag<<",";
-        ss<<"constraint_set5_flag="<<sps->constraint_set5_flag<<",";
-        ss<<"reserved_zero_2bits="<<sps->reserved_zero_2bits<<",";
-        ss<<"level_idc="<<sps->level_idc<<",";
-        ss<<"seq_parameter_set_id="<<sps->seq_parameter_set_id<<",";
-        ss<<"chroma_format_idc="<<sps->chroma_format_idc<<",";
-        ss<<"residual_colour_transform_flag="<<sps->residual_colour_transform_flag<<",";
-        ss<<"bit_depth_luma_minus8="<<sps->bit_depth_luma_minus8<<",";
-        ss<<"bit_depth_chroma_minus8="<<sps->bit_depth_chroma_minus8<<",";
-        ss<<"qpprime_y_zero_transform_bypass_flag="<<sps->qpprime_y_zero_transform_bypass_flag<<",";
-        ss<<"seq_scaling_matrix_present_flag="<<sps->seq_scaling_matrix_present_flag<<",";
-        ss<<"log2_max_frame_num_minus4="<<sps->log2_max_frame_num_minus4<<",";
-        ss<<"pic_order_cnt_type="<<sps->pic_order_cnt_type<<",";
-        ss<<"log2_max_pic_order_cnt_lsb_minus4="<<sps->log2_max_pic_order_cnt_lsb_minus4<<",";
-        ss<<"delta_pic_order_always_zero_flag="<<sps->delta_pic_order_always_zero_flag<<",";
-        //ss<<"="<<sps-><<",";
-        ss<<"]";
-        return ss.str();
-    }
     // Parse raw NALU data into an sps struct (using the h264bitstream library)
     class SPS{
     public:
@@ -109,7 +82,8 @@ namespace H264{
             return {Width,Height};
         }
         std::string asString()const{
-            return spsAsString(&parsed);
+            //return spsAsString(&parsed);
+            return H264Stream::spsAsString(&parsed);
         }
     };
 }

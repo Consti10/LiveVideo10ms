@@ -144,7 +144,7 @@ public:
                 auto tmp=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
                 if(tmp!=absl::nullopt){
                     MLOGD<<"GotZ";
-                    MLOGD<<"Pic size"<<tmp->getPicSizeInCtbsY();
+                    MLOGD<<"Pic size"<<tmp->getPicSizeInCtbsY()<<" NN:"<<tmp->pic_width_in_luma_samples<<","<<tmp->pic_height_in_luma_samples;
                 }else{
                     MLOGD<<"GotNZ";
                 }

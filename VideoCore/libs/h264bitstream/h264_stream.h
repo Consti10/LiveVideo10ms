@@ -34,8 +34,7 @@
 extern "C" {
 #endif
 
-typedef struct
-{
+typedef struct {
     int cpb_cnt_minus1;
     int bit_rate_scale;
     int cpb_size_scale;
@@ -56,8 +55,7 @@ typedef struct
    @see write_seq_parameter_set_rbsp
    @see debug_sps
 */
-typedef struct
-{
+typedef struct {
     int profile_idc;
     int constraint_set0_flag;
     int constraint_set1_flag;
@@ -74,11 +72,11 @@ typedef struct
     int bit_depth_chroma_minus8;
     int qpprime_y_zero_transform_bypass_flag;
     int seq_scaling_matrix_present_flag;
-      int seq_scaling_list_present_flag[12];
-      int ScalingList4x4[6][16];
-      int UseDefaultScalingMatrix4x4Flag[6];
-      int ScalingList8x8[6][64];
-      int UseDefaultScalingMatrix8x8Flag[6];
+    int seq_scaling_list_present_flag[12];
+    int ScalingList4x4[6][16];
+    int UseDefaultScalingMatrix4x4Flag[6];
+    int ScalingList8x8[6][64];
+    int UseDefaultScalingMatrix8x8Flag[6];
     int log2_max_frame_num_minus4;
     int pic_order_cnt_type;
     int log2_max_pic_order_cnt_lsb_minus4;
@@ -100,9 +98,8 @@ typedef struct
     int frame_crop_top_offset;
     int frame_crop_bottom_offset;
     int vui_parameters_present_flag;
-    
-    struct
-    {
+
+    struct {
         int aspect_ratio_info_present_flag;
         int aspect_ratio_idc;
         int sar_width;
@@ -136,7 +133,7 @@ typedef struct
         int num_reorder_frames;
         int max_dec_frame_buffering;
     } vui;
-    
+
     hrd_t hrd_nal;
     hrd_t hrd_vcl;
 
@@ -149,8 +146,7 @@ typedef struct
  @see write_seq_parameter_set_svc_extension_rbsp
  @see debug_sps
  */
-typedef struct
-{
+typedef struct {
     bool inter_layer_deblocking_filter_control_present_flag;
     unsigned char extended_spatial_scalability_idc;
     bool chroma_phase_x_plus1_flag;
@@ -165,7 +161,7 @@ typedef struct
     bool adaptive_tcoeff_level_prediction_flag;
     bool slice_header_restriction_flag;
     bool svc_vui_parameters_present_flag;
-    
+
     struct {
         unsigned short vui_ext_num_entries_minus1;
         unsigned char vui_ext_dependency_id[MAX_J];
@@ -191,11 +187,10 @@ typedef struct
  @see write_seq_parameter_set_svc_extension_rbsp
  @see debug_sps
  */
-typedef struct
-{
+typedef struct {
     sps_t *sps;
     union {
-        sps_svc_ext_t* sps_svc_ext;
+        sps_svc_ext_t *sps_svc_ext;
     };
     bool additional_extension2_flag;
 } sps_subset_t;
@@ -208,8 +203,7 @@ typedef struct
    @see write_pic_parameter_set_rbsp
    @see debug_pps
 */
-typedef struct 
-{
+typedef struct {
     int pic_parameter_set_id;
     int seq_parameter_set_id;
     int entropy_coding_mode_flag;
@@ -239,11 +233,11 @@ typedef struct
 
     int transform_8x8_mode_flag;
     int pic_scaling_matrix_present_flag;
-       int pic_scaling_list_present_flag[8];
-       int ScalingList4x4[6][16];
-       int UseDefaultScalingMatrix4x4Flag[6];
-       int ScalingList8x8[2][64];
-       int UseDefaultScalingMatrix8x8Flag[2];
+    int pic_scaling_list_present_flag[8];
+    int ScalingList4x4[6][16];
+    int UseDefaultScalingMatrix4x4Flag[6];
+    int ScalingList8x8[2][64];
+    int UseDefaultScalingMatrix8x8Flag[2];
     int second_chroma_qp_index_offset;
 } pps_t;
 
@@ -255,8 +249,7 @@ typedef struct
   @see write_slice_header_rbsp
   @see debug_slice_header_rbsp
 */
-typedef struct
-{
+typedef struct {
     int first_mb_in_slice;
     int slice_type;
     int pic_parameter_set_id;
@@ -267,7 +260,7 @@ typedef struct
     int idr_pic_id;
     int pic_order_cnt_lsb;
     int delta_pic_order_cnt_bottom;
-    int delta_pic_order_cnt[ 2 ];
+    int delta_pic_order_cnt[2];
     int redundant_pic_cnt;
     int direct_spatial_mv_pred_flag;
     int num_ref_idx_active_override_flag;
@@ -283,8 +276,7 @@ typedef struct
     int slice_group_change_cycle;
 
 
-    struct
-    {
+    struct {
         int luma_log2_weight_denom;
         int chroma_log2_weight_denom;
         int luma_weight_l0_flag[64];
@@ -303,26 +295,22 @@ typedef struct
 
     // TODO check max index
     // TODO array of structs instead of struct of arrays
-    struct
-    {
+    struct {
         int ref_pic_list_reordering_flag_l0;
-        struct
-        {
+        struct {
             int reordering_of_pic_nums_idc[64];
             int abs_diff_pic_num_minus1[64];
             int long_term_pic_num[64];
         } reorder_l0;
         int ref_pic_list_reordering_flag_l1;
-        struct
-        {
+        struct {
             int reordering_of_pic_nums_idc[64];
             int abs_diff_pic_num_minus1[64];
             int long_term_pic_num[64];
         } reorder_l1;
     } rplr; // ref pic list reorder
 
-    struct
-    {
+    struct {
         int no_output_of_prior_pics_flag;
         int long_term_reference_flag;
         int adaptive_ref_pic_marking_mode_flag;
@@ -342,8 +330,7 @@ typedef struct
   @see write_slice_header_in_scalable_extension
   @see debug_slice_header_in_scalable_extension
 */
-typedef struct
-{
+typedef struct {
     bool base_pred_weight_table_flag;
     bool store_ref_base_pic_flag;
     int slice_group_change_cycle;
@@ -369,7 +356,7 @@ typedef struct
     bool tcoeff_level_prediction_flag;
     unsigned char scan_idx_start;
     unsigned char scan_idx_end;
-    
+
     //dec_ref_base_pic_marking
     bool adaptive_ref_base_pic_marking_mode_flag;
     int memory_management_base_control_operation;
@@ -385,8 +372,7 @@ typedef struct
    @see write_nal_unit
    @see debug_nal
 */
-typedef struct
-{
+typedef struct {
     int primary_pic_type;
 } aud_t;
 
@@ -397,8 +383,7 @@ typedef struct
    @see write_nal_unit_header_svc_extension
    @see debug_nal_unit_header_svc_extension
 */
-typedef struct
-{
+typedef struct {
     bool idr_flag;
     unsigned char priority_id;
     bool no_inter_layer_pred_flag;
@@ -417,8 +402,7 @@ typedef struct
     @see read_prefix_nal_unit_svc
     @see write_prefix_nal_unit_svc
 */
-typedef struct
-{
+typedef struct {
     bool store_ref_base_pic_flag;
     bool additional_prefix_nal_unit_extension_flag;
     bool additional_prefix_nal_unit_extension_data_flag;
@@ -428,7 +412,7 @@ typedef struct
     int difference_of_base_pic_nums_minus1;
     int long_term_base_pic_num;
 } prefix_nal_svc_t;
-    
+
 /**
    Network Abstraction Layer (NAL) unit
    @see 7.3.1 NAL unit syntax
@@ -436,32 +420,29 @@ typedef struct
    @see write_nal_unit
    @see debug_nal
 */
-typedef struct
-{
+typedef struct {
     int forbidden_zero_bit;
     int nal_ref_idc;
     int nal_unit_type;
     bool svc_extension_flag;
     bool avc_3d_extension_flag;
-    nal_svc_ext_t* nal_svc_ext;
-    prefix_nal_svc_t* prefix_nal_svc;
-    void* parsed; // FIXME
+    nal_svc_ext_t *nal_svc_ext;
+    prefix_nal_svc_t *prefix_nal_svc;
+    void *parsed; // FIXME
     int sizeof_parsed;
 
     //uint8_t* rbsp_buf;
     //int rbsp_size;
 } nal_t;
 
-typedef struct
-{
+typedef struct {
     int _is_initialized;
     int sps_id;
     int initial_cpb_removal_delay;
     int initial_cpb_delay_offset;
 } sei_buffering_t;
 
-typedef struct
-{
+typedef struct {
     int clock_timestamp_flag;
     int ct_type;
     int nuit_field_based_flag;
@@ -482,8 +463,7 @@ typedef struct
     int time_offset;
 } picture_timestamp_t;
 
-typedef struct
-{
+typedef struct {
     int _is_initialized;
     int cpb_removal_delay;
     int dpb_output_delay;
@@ -492,10 +472,9 @@ typedef struct
 } sei_picture_timing_t;
 
 
-typedef struct
-{
+typedef struct {
     int rbsp_size;
-    uint8_t* rbsp_buf;
+    uint8_t *rbsp_buf;
 } slice_data_rbsp_t;
 
 /**
@@ -505,130 +484,171 @@ typedef struct
    The reason why they are all contained in one place is that some of them depend on others, we need to 
    have all of them available to read or write correctly.
  */
-typedef struct
-{
-    nal_t* nal;
-    sps_t* sps;
-    sps_subset_t* sps_subset;  // refer to subset
-    pps_t* pps;
-    aud_t* aud;
-    sei_t* sei; //This is a TEMP pointer at whats in h->seis...    
+typedef struct {
+    nal_t *nal;
+    sps_t *sps;
+    sps_subset_t *sps_subset;  // refer to subset
+    pps_t *pps;
+    aud_t *aud;
+    sei_t *sei; //This is a TEMP pointer at whats in h->seis...
     int num_seis;
-    slice_header_t* sh;
-    slice_header_svc_ext_t* sh_svc_ext;
-    
-    slice_data_rbsp_t* slice_data;
-    
-    sps_t* sps_table[32];
-    sps_subset_t* sps_subset_table[64];  //refer to base SPS
-    pps_t* pps_table[256];
-    sei_t** seis;
+    slice_header_t *sh;
+    slice_header_svc_ext_t *sh_svc_ext;
+
+    slice_data_rbsp_t *slice_data;
+
+    sps_t *sps_table[32];
+    sps_subset_t *sps_subset_table[64];  //refer to base SPS
+    pps_t *pps_table[256];
+    sei_t **seis;
 
 } h264_stream_t;
 
-h264_stream_t* h264_new();
-void h264_free(h264_stream_t* h);
+h264_stream_t *h264_new();
 
-int find_nal_unit(uint8_t* buf, int size, int* nal_start, int* nal_end);
+void h264_free(h264_stream_t *h);
 
-int rbsp_to_nal(const uint8_t* rbsp_buf, const int* rbsp_size, uint8_t* nal_buf, int* nal_size);
-int nal_to_rbsp(const uint8_t* nal_buf, int* nal_size, uint8_t* rbsp_buf, int* rbsp_size);
+int find_nal_unit(uint8_t *buf, int size, int *nal_start, int *nal_end);
 
-int read_nal_unit(h264_stream_t* h,const uint8_t* buf, int size);
-int peek_nal_unit(h264_stream_t* h, uint8_t* buf, int size);
+int rbsp_to_nal(const uint8_t *rbsp_buf, const int *rbsp_size, uint8_t *nal_buf, int *nal_size);
 
-void read_seq_parameter_set_rbsp(sps_t* sps, bs_t* b);
-void read_scaling_list(bs_t* b, int* scalingList, int sizeOfScalingList, int* useDefaultScalingMatrixFlag );
-void read_vui_parameters(sps_t* sps, bs_t* b);
-void read_hrd_parameters(hrd_t* hrd, bs_t* b);
+int nal_to_rbsp(const uint8_t *nal_buf, int *nal_size, uint8_t *rbsp_buf, int *rbsp_size);
 
-void read_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b);
+int read_nal_unit(h264_stream_t *h, const uint8_t *buf, int size);
 
-void read_sei_rbsp(h264_stream_t* h, bs_t* b);
-void read_sei_message(h264_stream_t* h, bs_t* b);
-void read_access_unit_delimiter_rbsp(h264_stream_t* h, bs_t* b);
-void read_end_of_seq_rbsp(h264_stream_t* h, bs_t* b);
-void read_end_of_stream_rbsp(h264_stream_t* h, bs_t* b);
-void read_filler_data_rbsp(h264_stream_t* h, bs_t* b);
+int peek_nal_unit(h264_stream_t *h, uint8_t *buf, int size);
 
-void read_slice_layer_rbsp(h264_stream_t* h, bs_t* b);
-void read_rbsp_slice_trailing_bits(h264_stream_t* h, bs_t* b);
-void read_rbsp_trailing_bits(bs_t* b);
-void read_slice_header(h264_stream_t* h, bs_t* b);
-void read_ref_pic_list_reordering(h264_stream_t* h, bs_t* b);
-void read_pred_weight_table(h264_stream_t* h, bs_t* b);
-void read_dec_ref_pic_marking(h264_stream_t* h, bs_t* b);
+void read_seq_parameter_set_rbsp(sps_t *sps, bs_t *b);
 
-int more_rbsp_trailing_data(h264_stream_t* h, bs_t* b);
+void read_scaling_list(bs_t *b, int *scalingList, int sizeOfScalingList,
+                       int *useDefaultScalingMatrixFlag);
 
-int write_nal_unit(const h264_stream_t* h, uint8_t* buf, int size);
+void read_vui_parameters(sps_t *sps, bs_t *b);
 
-void write_seq_parameter_set_rbsp(sps_t* sps, bs_t* b);
-void write_scaling_list(bs_t* b, int* scalingList, int sizeOfScalingList, int* useDefaultScalingMatrixFlag );
-void write_vui_parameters(sps_t* sps, bs_t* b);
-void write_hrd_parameters(hrd_t* hrd, bs_t* b);
+void read_hrd_parameters(hrd_t *hrd, bs_t *b);
 
-void write_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b);
+void read_pic_parameter_set_rbsp(h264_stream_t *h, bs_t *b);
 
-void write_sei_rbsp(h264_stream_t* h, bs_t* b);
-void write_sei_message(h264_stream_t* h, bs_t* b);
-void write_access_unit_delimiter_rbsp(h264_stream_t* h, bs_t* b);
-void write_end_of_seq_rbsp(h264_stream_t* h, bs_t* b);
-void write_end_of_stream_rbsp(h264_stream_t* h, bs_t* b);
-void write_filler_data_rbsp(h264_stream_t* h, bs_t* b);
+void read_sei_rbsp(h264_stream_t *h, bs_t *b);
 
-void write_slice_layer_rbsp(h264_stream_t* h, bs_t* b);
-void write_rbsp_slice_trailing_bits(h264_stream_t* h, bs_t* b);
-void write_rbsp_trailing_bits(bs_t* b);
-void write_slice_header(h264_stream_t* h, bs_t* b);
-void write_ref_pic_list_reordering(h264_stream_t* h, bs_t* b);
-void write_pred_weight_table(h264_stream_t* h, bs_t* b);
-void write_dec_ref_pic_marking(h264_stream_t* h, bs_t* b);
+void read_sei_message(h264_stream_t *h, bs_t *b);
 
-int read_debug_nal_unit(h264_stream_t* h,const uint8_t* buf, int size);
+void read_access_unit_delimiter_rbsp(h264_stream_t *h, bs_t *b);
 
-void debug_sps(sps_t* sps);
-void debug_pps(pps_t* pps);
-void debug_slice_header(slice_header_t* sh);
-void debug_nal(h264_stream_t* h, nal_t* nal);
+void read_end_of_seq_rbsp(h264_stream_t *h, bs_t *b);
 
-void debug_bytes(uint8_t* buf, int len);
+void read_end_of_stream_rbsp(h264_stream_t *h, bs_t *b);
 
-void read_sei_payload( h264_stream_t* h, bs_t* b);
-void read_debug_sei_payload( h264_stream_t* h, bs_t* b);
-void write_sei_payload( h264_stream_t* h, bs_t* b);
+void read_filler_data_rbsp(h264_stream_t *h, bs_t *b);
 
+void read_slice_layer_rbsp(h264_stream_t *h, bs_t *b);
+
+void read_rbsp_slice_trailing_bits(h264_stream_t *h, bs_t *b);
+
+void read_rbsp_trailing_bits(bs_t *b);
+
+void read_slice_header(h264_stream_t *h, bs_t *b);
+
+void read_ref_pic_list_reordering(h264_stream_t *h, bs_t *b);
+
+void read_pred_weight_table(h264_stream_t *h, bs_t *b);
+
+void read_dec_ref_pic_marking(h264_stream_t *h, bs_t *b);
+
+int more_rbsp_trailing_data(h264_stream_t *h, bs_t *b);
+
+int write_nal_unit(const h264_stream_t *h, uint8_t *buf, int size);
+
+void write_seq_parameter_set_rbsp(sps_t *sps, bs_t *b);
+
+void write_scaling_list(bs_t *b, int *scalingList, int sizeOfScalingList,
+                        int *useDefaultScalingMatrixFlag);
+
+void write_vui_parameters(sps_t *sps, bs_t *b);
+
+void write_hrd_parameters(hrd_t *hrd, bs_t *b);
+
+void write_pic_parameter_set_rbsp(h264_stream_t *h, bs_t *b);
+
+void write_sei_rbsp(h264_stream_t *h, bs_t *b);
+
+void write_sei_message(h264_stream_t *h, bs_t *b);
+
+void write_access_unit_delimiter_rbsp(h264_stream_t *h, bs_t *b);
+
+void write_end_of_seq_rbsp(h264_stream_t *h, bs_t *b);
+
+void write_end_of_stream_rbsp(h264_stream_t *h, bs_t *b);
+
+void write_filler_data_rbsp(h264_stream_t *h, bs_t *b);
+
+void write_slice_layer_rbsp(h264_stream_t *h, bs_t *b);
+
+void write_rbsp_slice_trailing_bits(h264_stream_t *h, bs_t *b);
+
+void write_rbsp_trailing_bits(bs_t *b);
+
+void write_slice_header(h264_stream_t *h, bs_t *b);
+
+void write_ref_pic_list_reordering(h264_stream_t *h, bs_t *b);
+
+void write_pred_weight_table(h264_stream_t *h, bs_t *b);
+
+void write_dec_ref_pic_marking(h264_stream_t *h, bs_t *b);
+
+int read_debug_nal_unit(h264_stream_t *h, const uint8_t *buf, int size);
+
+void debug_sps(sps_t *sps);
+
+void debug_pps(pps_t *pps);
+
+void debug_slice_header(slice_header_t *sh);
+
+void debug_nal(h264_stream_t *h, nal_t *nal);
+
+void debug_bytes(uint8_t *buf, int len);
+
+void read_sei_payload(h264_stream_t *h, bs_t *b);
+
+void read_debug_sei_payload(h264_stream_t *h, bs_t *b);
+
+void write_sei_payload(h264_stream_t *h, bs_t *b);
+
+enum{
 //NAL ref idc codes
-#define NAL_REF_IDC_PRIORITY_HIGHEST    3
-#define NAL_REF_IDC_PRIORITY_HIGH       2
-#define NAL_REF_IDC_PRIORITY_LOW        1
-#define NAL_REF_IDC_PRIORITY_DISPOSABLE 0
+    NAL_REF_IDC_PRIORITY_DISPOSABLE=0,
+    NAL_REF_IDC_PRIORITY_LOW       =1,
+    NAL_REF_IDC_PRIORITY_HIGH      =2,
+    NAL_REF_IDC_PRIORITY_HIGHEST   =3,
+};
 
-//Table 7-1 NAL unit type codes
-#define NAL_UNIT_TYPE_UNSPECIFIED                    0    // Unspecified
-#define NAL_UNIT_TYPE_CODED_SLICE_NON_IDR            1    // Coded slice of a non-IDR picture
-#define NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A   2    // Coded slice data partition A
-#define NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_B   3    // Coded slice data partition B
-#define NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_C   4    // Coded slice data partition C
-#define NAL_UNIT_TYPE_CODED_SLICE_IDR                5    // Coded slice of an IDR picture
-#define NAL_UNIT_TYPE_SEI                            6    // Supplemental enhancement information (SEI)
-#define NAL_UNIT_TYPE_SPS                            7    // Sequence parameter set
-#define NAL_UNIT_TYPE_PPS                            8    // Picture parameter set
-#define NAL_UNIT_TYPE_AUD                            9    // Access unit delimiter
-#define NAL_UNIT_TYPE_END_OF_SEQUENCE               10    // End of sequence
-#define NAL_UNIT_TYPE_END_OF_STREAM                 11    // End of stream
-#define NAL_UNIT_TYPE_FILLER                        12    // Filler data
-#define NAL_UNIT_TYPE_SPS_EXT                       13    // Sequence parameter set extension
-#define NAL_UNIT_TYPE_PREFIX_NAL                    14    // Prefix NAL unit
-#define NAL_UNIT_TYPE_SUBSET_SPS                    15    // Subset Sequence parameter set
-#define NAL_UNIT_TYPE_DPS                           16    // Depth Parameter Set
-                                             // 17..18    // Reserved
-#define NAL_UNIT_TYPE_CODED_SLICE_AUX               19    // Coded slice of an auxiliary coded picture without partitioning
-#define NAL_UNIT_TYPE_CODED_SLICE_SVC_EXTENSION     20    // Coded slice of SVC extension
-                                             // 20..23    // Reserved
-                                             // 24..31    // Unspecified
+enum {
+    //Table 7-1 NAL unit type codes
+    NAL_UNIT_TYPE_UNSPECIFIED                    =0,    // Unspecified
+    NAL_UNIT_TYPE_CODED_SLICE_NON_IDR            =1,    // Coded slice of a non-IDR picture
+    NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A   =2,    // Coded slice data partition A
+    NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_B   =3,    // Coded slice data partition B
+    NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_C   =4,    // Coded slice data partition C
+    NAL_UNIT_TYPE_CODED_SLICE_IDR                =5,    // Coded slice of an IDR picture
+    NAL_UNIT_TYPE_SEI                            =6,    // Supplemental enhancement information (SEI)
+    NAL_UNIT_TYPE_SPS                            =7,    // Sequence parameter set
+    NAL_UNIT_TYPE_PPS                            =8,    // Picture parameter set
+    NAL_UNIT_TYPE_AUD                            =9,    // Access unit delimiter
+    NAL_UNIT_TYPE_END_OF_SEQUENCE               =10,    // End of sequence
+    NAL_UNIT_TYPE_END_OF_STREAM                 =11,    // End of stream
+    NAL_UNIT_TYPE_FILLER                        =12,    // Filler data
+    NAL_UNIT_TYPE_SPS_EXT                       =13,    // Sequence parameter set extension
+    NAL_UNIT_TYPE_PREFIX_NAL                    =14,    // Prefix NAL unit
+    NAL_UNIT_TYPE_SUBSET_SPS                    =15,    // Subset Sequence parameter set
+    NAL_UNIT_TYPE_DPS                           =16,    // Depth Parameter Set
+    // 17..18    // Reserved
+    NAL_UNIT_TYPE_CODED_SLICE_AUX               =19,    // Coded slice of an auxiliary coded picture without partitioning
+    NAL_UNIT_TYPE_CODED_SLICE_SVC_EXTENSION     =20,    // Coded slice of SVC extension
+    // 20..23    // Reserved
+    // 24..31    // Unspecified
+};
 
- 
+
 
 //7.4.3 Table 7-6. Name association to slice_type
 #define SH_SLICE_TYPE_P        0        // P (P slice)
@@ -701,6 +721,38 @@ void write_sei_payload( h264_stream_t* h, bs_t* b);
 extern FILE* h264_dbgfile;
 
 #ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+namespace H264Stream{
+    static std::string spsAsString(const sps_t* sps){
+        std::stringstream ss;
+        ss<<"[";
+        ss<<"profile_idc="<<sps->profile_idc<<",";
+        ss<<"constraint_set0_flag="<<sps->constraint_set0_flag<<",";
+        ss<<"constraint_set1_flag="<<sps->constraint_set1_flag<<",";
+        ss<<"constraint_set2_flag="<<sps->constraint_set2_flag<<",";
+        ss<<"constraint_set3_flag="<<sps->constraint_set3_flag<<",";
+        ss<<"constraint_set4_flag="<<sps->constraint_set4_flag<<",";
+        ss<<"constraint_set5_flag="<<sps->constraint_set5_flag<<",";
+        ss<<"reserved_zero_2bits="<<sps->reserved_zero_2bits<<",";
+        ss<<"level_idc="<<sps->level_idc<<",";
+        ss<<"seq_parameter_set_id="<<sps->seq_parameter_set_id<<",";
+        ss<<"chroma_format_idc="<<sps->chroma_format_idc<<",";
+        ss<<"residual_colour_transform_flag="<<sps->residual_colour_transform_flag<<",";
+        ss<<"bit_depth_luma_minus8="<<sps->bit_depth_luma_minus8<<",";
+        ss<<"bit_depth_chroma_minus8="<<sps->bit_depth_chroma_minus8<<",";
+        ss<<"qpprime_y_zero_transform_bypass_flag="<<sps->qpprime_y_zero_transform_bypass_flag<<",";
+        ss<<"seq_scaling_matrix_present_flag="<<sps->seq_scaling_matrix_present_flag<<",";
+        ss<<"log2_max_frame_num_minus4="<<sps->log2_max_frame_num_minus4<<",";
+        ss<<"pic_order_cnt_type="<<sps->pic_order_cnt_type<<",";
+        ss<<"log2_max_pic_order_cnt_lsb_minus4="<<sps->log2_max_pic_order_cnt_lsb_minus4<<",";
+        ss<<"delta_pic_order_always_zero_flag="<<sps->delta_pic_order_always_zero_flag<<",";
+        //ss<<"="<<sps-><<",";
+        ss<<"]";
+        return ss.str();
+    }
 }
 #endif
 
