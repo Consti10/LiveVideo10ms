@@ -3,19 +3,22 @@
 <resources>
 
     <string-array name="video_test_files">
-        <item>jetson/1/test.h264</item>
-        <item>jetson/2/test.h264</item>
-        <item>jetson/3/test.h264</item>
-        <item>jetson/4/test.h264</item>
-        <item>jetson/5/test.h264</item>
-        <item>jetson/6/test.h264</item>
-        <item>jetson/7/test.h264</item>
-        <item>jetson/8/test.h265</item>
-        <item>jetson/9/test.h265</item>
-        <item>jetson/10/test.h265</item>
-        <item>jetson/11/test.h265</item>
-        <item>jetson/12/test.h265</item>
-        <item>jetson/13/test.h265</item>
+        <item>jetson/h264/1/test.h264</item>
+        <item>jetson/h264/2/test.h264</item>
+        <item>jetson/h264/3/test.h264</item>
+        <item>jetson/h264/4/test.h264</item>
+        <item>jetson/h264/5/test.h264</item>
+        <item>jetson/h264/6/test.h264</item>
+        <item>jetson/h264/7/test.h264</item>
+
+        <item>jetson/h265/1/test.h265</item>
+        <item>jetson/h265/2/test.h265</item>
+        <item>jetson/h265/3/test.h265</item>
+        <item>jetson/h265/4/test.h265</item>
+        <item>jetson/h265/5/test.h265</item>
+        <item>jetson/h265/6/test.h265</item>
+        <item>jetson/h265/7/test.h265</item>
+
 
         <item>x265/testZ.h265</item>
         <item>x264/testVideo.h264</item>
