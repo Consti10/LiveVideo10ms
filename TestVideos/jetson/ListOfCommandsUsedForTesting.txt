@@ -32,3 +32,11 @@ gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, heig
 Test 9:
 gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh265enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=1 ! video/x-h265, stream-format=byte-stream ! filesink location=9/test.h265
 
+//watch out: for nvv4l2h26Xenc the control rate needs to be 1 for constant bitrate
+Test 10:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc control-rate=1 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 ! video/x-h265, stream-format=byte-stream ! filesink location=10/test.h265
+
+Test 11:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc control-rate=1 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=1 ! video/x-h265, stream-format=byte-stream ! filesink location=11/test.h265
+
+
