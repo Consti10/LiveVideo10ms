@@ -232,6 +232,7 @@ void LowLagDecoder::checkOutputLoop() {
             int width=0,height=0;
             AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_WIDTH,&width);
             AMediaFormat_getInt32(format,AMEDIAFORMAT_KEY_HEIGHT,&height);
+            MLOGD<<"Actual Width and Height in output "<<width<<","<<height;
             if(onDecoderRatioChangedCallback!= nullptr && width != 0 && height != 0){
                 onDecoderRatioChangedCallback({width, height});
             }

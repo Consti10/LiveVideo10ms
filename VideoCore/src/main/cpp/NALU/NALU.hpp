@@ -23,7 +23,7 @@
 #include "H26X.hpp"
 #include "NALUnitType.hpp"
 
-#include "../../libs/h265nal/src/h265_sps_parser.h"
+#include <h265_sps_parser.h>
 
 
 /**
