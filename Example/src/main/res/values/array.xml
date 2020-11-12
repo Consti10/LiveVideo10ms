@@ -10,7 +10,10 @@
         <item>jetson/5/test.h264</item>
         <item>jetson/6/test.h264</item>
         <item>jetson/7/test.h264</item>
-
+        <item>jetson/8/test.h265</item>
+        <item>jetson/9/test.h265</item>
+        <item>jetson/10/test.h265</item>
+        <item>jetson/11/test.h265</item>
 
         <item>x265/testZ.h265</item>
         <item>x264/testVideo.h264</item>
