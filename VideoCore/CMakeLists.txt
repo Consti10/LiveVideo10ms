@@ -160,6 +160,7 @@ target_link_libraries( VideoNative
         avutil-lib
         swresample-lib
         # XX
+        h265nal
         )
 
 # the transmitter stuff

@@ -139,8 +139,14 @@ public:
     void debug()const{
         if(IS_H265_PACKET){
             if(isSPS()){
-                auto sps=H265::SPS(getData(),getSize());
-                MLOGD<<"XSPS "<<sps.lol();
+                //auto sps=H265::SPS(getData(),getSize());
+                //MLOGD<<"XSPS "<<sps.lol();
+                auto tmp=h265nal::H265SpsParser::ParseSps(getDataWithoutPrefix(),getDataSizeWithoutPrefix());
+                if(tmp){
+                    MLOGD<<"GotZ";
+                }else{
+                    MLOGD<<"GotNZ";
+                }
             }
             return;
         }else{
@@ -167,7 +173,6 @@ public:
             return sps.getWidthHeightPx();
         }
     }
-    h265nal::H265SpsParser* x;
 };
 
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;
