@@ -39,4 +39,10 @@ gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, heig
 Test 11:
 gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc control-rate=1 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=1 ! video/x-h265, stream-format=byte-stream ! filesink location=11/test.h265
 
+Test 12:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc bitrate=4000000 ! video/x-h265, stream-format=byte-stream ! filesink location=12/test.h265
+
+Test 13:
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h265enc bitrate=4000000 bit-packetization=1 slice-header-spacing=1024 insert-aud=true ! video/x-h265, stream-format=byte-stream ! filesink location=13/test.h265
+
 
