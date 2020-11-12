@@ -128,6 +128,21 @@ namespace H265{
         int sps_max_sub_layers_minus1;
         int sps_temporal_id_nesting_flag;
         // profile_tier_level
+        struct profile_tier_level{
+            int general_profile_space;
+            int general_tier_flag;
+            int general_profile_idc;
+            std::array<int,32> general_profile_compatibility_flag;
+            int general_progressive_source_flag;
+            int general_interlaced_source_flag;
+            int general_non_packed_constraint_flag;
+            int general_frame_only_constraint_flag;
+            // weird if else
+            int general_level_idc;
+            std::vector<int> sub_layer_profile_present_flag{};
+            std::vector<int> sub_layer_level_present_flag{};
+        };
+        profile_tier_level profileTierLevel;
         int sps_seq_parameter_set_id;
         int chroma_format_idc;
         //if( chroma_format_idc = = 3 )
@@ -156,17 +171,42 @@ namespace H265{
         int pcm_enabled_flag;
         int num_short_term_ref_pic_sets;
     };
-    static void read_h265_profile_tier_level(BitStream& b,int profilePresentFlag,int maxNumSubLayersMinus1){
+    static void read_h265_profile_tier_level(h265_sps::profile_tier_level& ptl, BitStream& b,int profilePresentFlag,int maxNumSubLayersMinus1){
         if(profilePresentFlag){
+            ptl.general_profile_space=b.read_u2();
+            ptl.general_tier_flag=b.read_u1();
+            ptl.general_profile_idc=b.read_u5();
+            for(int j=0;j<32;j++){
+                ptl.general_profile_compatibility_flag[j]=b.read_u1();
+            }
+            ptl.general_progressive_source_flag=b.read_u1();
+            ptl.general_interlaced_source_flag=b.read_u1();
+            ptl.general_non_packed_constraint_flag=b.read_u1();
+            ptl.general_frame_only_constraint_flag=b.read_u1();
             //TODO
+            // skip 43 bits
+            b.read_u32();
+            b.read_u(11);
+            // skip 1 bit
+            b.read_u1();
+            //
+            ptl.general_level_idc=b.read_u8();
+            //
+            ptl.sub_layer_profile_present_flag.resize(maxNumSubLayersMinus1);
+            ptl.sub_layer_level_present_flag.resize(maxNumSubLayersMinus1);
+            for(int i=0;i<maxNumSubLayersMinus1;i++){
+                ptl.sub_layer_profile_present_flag[i]=b.read_u1();
+                ptl.sub_layer_level_present_flag[i]=b.read_u1();
+            }
         }
     }
+    
     static void read_h265_seq_parameter_set_rbsp(h265_sps& sps,BitStream& b){
         memset(&sps, 0, sizeof(sps_t));
         sps.sps_video_parameter_set_id=b.read_u4();
         sps.sps_max_sub_layers_minus1 = b.read_u3();
         sps.sps_temporal_id_nesting_flag = b.read_u1();
-        read_h265_profile_tier_level(b,1,sps.sps_max_sub_layers_minus1);
+        read_h265_profile_tier_level(sps.profileTierLevel,b,1,sps.sps_max_sub_layers_minus1);
         sps.sps_seq_parameter_set_id = b.read_ue();
         sps.chroma_format_idc = b.read_ue();
         if(sps.chroma_format_idc==3){
