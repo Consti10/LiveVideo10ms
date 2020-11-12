@@ -173,6 +173,7 @@ public:
                 std::array<int,2> ret={(int)sps->pic_width_in_luma_samples,(int)sps->pic_height_in_luma_samples};
                 return ret;
             }
+            MLOGE<<"Couldn't parse h265 sps";
             return {640,480};
         }else{
             const auto sps=H264::SPS(getData(),getSize());
