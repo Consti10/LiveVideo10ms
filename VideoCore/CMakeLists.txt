@@ -61,37 +61,14 @@ target_link_libraries(h264bitstream
         log
         android)
 include_directories(${H264_BITSTREAM_DIR})
+
 # add the h265nal library
 set(H265NAL_DIR ${CMAKE_SOURCE_DIR}/libs/h265nal)
 set(H265NAL_SRC_DIR ${H265NAL_DIR}/src)
-#add_library(webrtc_lib
-#        ${H265NAL_DIR}/webrtc/rtc_base/bit_buffer.cc
-#        )
-#include_directories(${H265NAL_DIR}/absl)
 add_subdirectory(${H265NAL_DIR}/webrtc)
 add_subdirectory(${H265NAL_DIR}/src)
 include_directories(${H265NAL_DIR}/webrtc)
 include_directories(${H265NAL_DIR}/src)
-
-#add_library(h265nal
-#        ${H265NAL_SRC_DIR}/h265_common.h ${H265NAL_SRC_DIR}/h265_common.cc
-        #h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
-        #h265_vps_parser.h h265_vps_parser.cc
-        #h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
-        #h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
-        #h265_sps_parser.h h265_sps_parser.cc
-        #h265_pps_parser.h h265_pps_parser.cc
-        #h265_aud_parser.h h265_aud_parser.cc
-        #h265_rtp_ap_parser.h h265_rtp_ap_parser.cc
-        #h265_rtp_fu_parser.h h265_rtp_fu_parser.cc
-        #h265_rtp_single_parser.h h265_rtp_single_parser.cc
-        #h265_rtp_parser.h h265_rtp_parser.cc
-        #h265_slice_parser.h h265_slice_parser.cc
-        #h265_bitstream_parser_state.h
-        #h265_bitstream_parser.h h265_bitstream_parser.cc
-        #h265_nal_unit_parser.h h265_nal_unit_parser.cc
-#        )
-
 
 
 #######################################################
