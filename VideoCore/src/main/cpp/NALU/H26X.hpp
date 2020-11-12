@@ -200,7 +200,7 @@ namespace H265{
             }
         }
     }
-    
+
     static void read_h265_seq_parameter_set_rbsp(h265_sps& sps,BitStream& b){
         memset(&sps, 0, sizeof(sps_t));
         sps.sps_video_parameter_set_id=b.read_u4();
