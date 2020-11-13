@@ -93,7 +93,6 @@ public:
     }
     //size of the NALU data without 0001 prefix
     const ssize_t getDataSizeWithoutPrefix()const{
-        if(getSize()<=4)return 0;
         return getSize()-4;
     }
     bool isSPS()const{
@@ -121,7 +120,6 @@ public:
     }
     // return the nal unit type (quick)
     int get_nal_unit_type()const{
-        if(getSize()<5)return -1;
         if(IS_H265_PACKET){
             return (getData()[4] & 0x7E)>>1;
         }
