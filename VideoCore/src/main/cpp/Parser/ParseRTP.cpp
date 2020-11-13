@@ -209,12 +209,17 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
 
 void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creationTime,const bool isH265) {
     if(cb!= nullptr){
-        NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,isH265,creationTime);
-        //MLOGD<<"NALU type "<<nalu.get_nal_name();
-        //MLOGD<<"DATA:"<<nalu.dataAsString();
-        //nalu_data.resize(nalu_data_length);
-        //NALU nalu(nalu_data);
-        cb(nalu);
+        const size_t minNaluSize=NALU::getMinimumNaluSize(isH265);
+        if(mNALU_DATA_LENGTH>=minNaluSize){
+            NALU nalu(mNALU_DATA, mNALU_DATA_LENGTH,isH265,creationTime);
+            //MLOGD<<"NALU type "<<nalu.get_nal_name();
+            //MLOGD<<"DATA:"<<nalu.dataAsString();
+            //nalu_data.resize(nalu_data_length);
+            //NALU nalu(nalu_data);
+            cb(nalu);
+        }else{
+            MLOGE<<"RTP parser produced NALU with insueficient data size";
+        }
     }
     mNALU_DATA_LENGTH=0;
 }
