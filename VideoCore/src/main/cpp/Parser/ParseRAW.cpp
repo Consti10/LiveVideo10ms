@@ -156,7 +156,7 @@ void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_l
                         const size_t naluLen=nalu_data_position-4;
                         const size_t minNaluSize=NALU::getMinimumNaluSize(false);
                         if(naluLen>=minNaluSize){
-                            NALU nalu(nalu_data,nalu_data_position-4);
+                            NALU nalu(nalu_data,naluLen);
                             MLOGD<<"ParseRawJ NALU type:"<<nalu.get_nal_name();
                             if(nalu.isSPS() || nalu.isPPS()){
                                 cb(nalu);
