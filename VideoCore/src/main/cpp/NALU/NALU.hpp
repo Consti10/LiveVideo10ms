@@ -24,6 +24,7 @@
 #include "NALUnitType.hpp"
 
 #include <h265_sps_parser.h>
+#include <h265_vps_parser.h>
 
 
 /**
@@ -149,12 +150,18 @@ public:
             if(isSPS()){
                 //auto sps=H265::SPS(getData(),getSize());
                 //MLOGD<<"XSPS "<<sps.lol();
-                auto tmp=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
-                if(tmp!=absl::nullopt){
-                    MLOGD<<"GotZ";
-                    MLOGD<<"Pic size"<<tmp->getPicSizeInCtbsY()<<" NN:"<<tmp->pic_width_in_luma_samples<<","<<tmp->pic_height_in_luma_samples;
+                auto sps=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
+                if(sps!=absl::nullopt){
+                    MLOGD<<"SPS:"<<sps->getPicSizeInCtbsY()<<" NN:"<<sps->pic_width_in_luma_samples<<","<<sps->pic_height_in_luma_samples;
                 }else{
-                    MLOGD<<"GotNZ";
+                    MLOGD<<"SPS parse error";
+                }
+            }else if(isVPS()){
+                auto vps=h265nal::H265VpsParser::ParseVps(&getData()[6],getSize()-6);
+                if(vps!=absl::nullopt){
+                    MLOGD<<"VPS:"<<vps->vps_num_units_in_tick;
+                }else{
+                    MLOGD<<"VPS parse error";
                 }
             }
             return;
