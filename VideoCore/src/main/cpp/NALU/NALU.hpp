@@ -152,10 +152,11 @@ public:
             return;
         }else{
             const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
-            MLOGD<<lol->asString();
+            //MLOGD<<lol->asString();
+            MLOGD<<get_nal_name();
             if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-                const auto lol2=(H264::slice_header_t*)&getDataWithoutPrefix()[1];
-                MLOGD<<lol2->asString();
+                const auto sliceHeader=getSliceHeaderH264();
+                MLOGD<<"Slice header:"<<sliceHeader.asString();
             }
             if(get_nal_unit_type()==NAL_UNIT_TYPE_SPS){
                 auto sps=H264::SPS(getData(),getSize());
@@ -185,6 +186,14 @@ public:
             const auto sps=H264::SPS(getData(),getSize());
             return sps.getWidthHeightPx();
         }
+    }
+    H264::slice_header_t getSliceHeaderH264()const{
+        assert(!IS_H265_PACKET);
+        assert(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR);
+        assert(getSize()>6);
+        H264::slice_header_t ret;
+        memcpy(&ret,&getDataWithoutPrefix()[1],sizeof(H264::slice_header_t));
+        return ret;
     }
 };
 

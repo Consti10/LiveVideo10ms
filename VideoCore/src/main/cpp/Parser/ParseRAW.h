@@ -21,7 +21,9 @@ public:
     // Special parsing method, where AUD determine the end of sliced data packets that cannot decoded individually
     void parseDjiLiveVideoData(const uint8_t* data,const size_t data_length);
     // similar to above but for jetson (testing)
-     void parseJetsonRawSliced(const uint8_t* data,const size_t data_length);
+    void parseJetsonRawSliced(const uint8_t* data,const size_t data_length);
+    void accumulateSlicedNALUsByAUD(const NALU& nalu);
+    void accumulateSlicedNALUsBySliceHeader(const NALU& nalu);
     void reset();
 private:
     const NALU_DATA_CALLBACK cb;
