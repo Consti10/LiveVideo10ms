@@ -86,6 +86,27 @@ namespace H264{
             return H264Stream::spsAsString(&parsed);
         }
     };
+    class PPS{
+        public:
+            nal_unit_header_t nal_header;
+            pps_t parsed;
+        public:
+            // data buffer= NALU data with prefix
+            PPS(const uint8_t* nalu_data,size_t data_len){
+                auto rbsp_buf= AnnexBHelper::nalu_annexB_to_rbsp_buff(nalu_data, data_len);
+                BitStream b(rbsp_buf);
+                nal_header.forbidden_zero_bit=b.read_u1();
+                nal_header.nal_ref_idc = b.read_u2();
+                nal_header.nal_unit_type = b.read_u5();
+                assert(nal_header.forbidden_zero_bit==0);
+                assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_PPS);
+                read_pic_parameter_set_rbsp(&parsed, b.bs_t());
+                read_rbsp_trailing_bits(b.bs_t());
+            }
+            std::string asString()const{
+                return H264Stream::ppsAsString(parsed);
+            }
+        };
 }
 
 namespace H265{

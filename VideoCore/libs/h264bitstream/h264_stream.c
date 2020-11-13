@@ -141,7 +141,7 @@ void read_seq_parameter_set_svc_extension(sps_subset_t* sps_subset, bs_t* b);
 void read_svc_vui_parameters_extension(sps_svc_ext_t* sps_svc_ext, bs_t* b);
 void read_vui_parameters(sps_t* sps, bs_t* b);
 void read_hrd_parameters(hrd_t* hrd, bs_t* b);
-void read_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b);
+void read_pic_parameter_set_rbsp(pps_t* pps, bs_t* b);
 void read_sei_rbsp(h264_stream_t* h, bs_t* b);
 void read_sei_message(h264_stream_t* h, bs_t* b);
 void read_access_unit_delimiter_rbsp(h264_stream_t* h, bs_t* b);
@@ -323,7 +323,7 @@ int read_nal_unit(h264_stream_t* h,const uint8_t* buf, int size)
             break;
 
         case NAL_UNIT_TYPE_PPS:   
-            read_pic_parameter_set_rbsp(h, b);
+            read_pic_parameter_set_rbsp(h->pps, b);
             read_rbsp_trailing_bits(b);
             break;
 
@@ -801,9 +801,9 @@ int read_seq_parameter_set_extension_rbsp(bs_t* b, sps_ext_t* sps_ext) {
 */
 
 //7.3.2.2 Picture parameter set RBSP syntax
-void read_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b)
+void read_pic_parameter_set_rbsp(pps_t* pps, bs_t* b)
 {
-    pps_t* pps = h->pps;
+    //pps_t* pps = h->pps;
     if( 1 )
     {
         memset(pps, 0, sizeof(pps_t));
@@ -897,7 +897,7 @@ void read_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b)
 
     if( 1 )
     {
-        memcpy(h->pps_table[pps->pic_parameter_set_id], h->pps, sizeof(pps_t));
+        //X memcpy(h->pps_table[pps->pic_parameter_set_id], h->pps, sizeof(pps_t));
     }
 }
 

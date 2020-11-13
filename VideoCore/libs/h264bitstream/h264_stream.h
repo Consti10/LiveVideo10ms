@@ -527,7 +527,7 @@ void read_vui_parameters(sps_t *sps, bs_t *b);
 
 void read_hrd_parameters(hrd_t *hrd, bs_t *b);
 
-void read_pic_parameter_set_rbsp(h264_stream_t *h, bs_t *b);
+void read_pic_parameter_set_rbsp(pps_t* pps, bs_t *b);
 
 void read_sei_rbsp(h264_stream_t *h, bs_t *b);
 
@@ -782,6 +782,35 @@ namespace H264Stream{
          ss<<"]";
          return ss.str();
      }
+      static std::string ppsAsString(const pps_t& pps){
+         std::stringstream ss;
+         ss<<"[";
+         ss<<"pic_parameter_set_id="<<pps.pic_parameter_set_id<<",";
+         ss<<"seq_parameter_set_id="<<pps.seq_parameter_set_id<<",";
+         ss<<"entropy_coding_mode_flag="<<pps.entropy_coding_mode_flag<<",";
+         ss<<"pic_order_present_flag="<<pps.pic_order_present_flag<<",";
+         ss<<"num_slice_groups_minus1="<<pps.num_slice_groups_minus1<<",";
+         ss<<"slice_group_map_type="<<pps.slice_group_map_type<<",";
+         //int run_length_minus1[8]; // up to num_slice_groups_minus1, which is <= 7 in Baseline and Extended, 0 otheriwse
+         //int top_left[8];
+         //int bottom_right[8];
+         ss<<"slice_group_change_direction_flag="<<pps.slice_group_change_direction_flag<<",";
+         ss<<"slice_group_change_rate_minus1="<<pps.slice_group_change_rate_minus1<<",";
+         ss<<"pic_size_in_map_units_minus1="<<pps.pic_size_in_map_units_minus1<<",";
+         //int slice_group_id[256]; // FIXME what size?
+         ss<<"num_ref_idx_l0_active_minus1="<<pps.num_ref_idx_l0_active_minus1<<",";
+         ss<<"num_ref_idx_l1_active_minus1="<<pps.num_ref_idx_l1_active_minus1<<",";
+         ss<<"weighted_pred_flag="<<pps.weighted_pred_flag<<",";
+         ss<<"weighted_bipred_idc="<<pps.weighted_bipred_idc<<",";
+         ss<<"pic_init_qp_minus26="<<pps.pic_init_qp_minus26<<",";
+         ss<<"chroma_qp_index_offset="<<pps.chroma_qp_index_offset<<",";
+         ss<<"deblocking_filter_control_present_flag="<<pps.deblocking_filter_control_present_flag<<",";
+         ss<<"constrained_intra_pred_flag="<<pps.constrained_intra_pred_flag<<",";
+         ss<<"redundant_pic_cnt_present_flag="<<pps.redundant_pic_cnt_present_flag<<",";
+         //ss<<"="<<pps.<<",";
+         ss<<"]";
+         return ss.str();
+      }
 }
 #endif
 
