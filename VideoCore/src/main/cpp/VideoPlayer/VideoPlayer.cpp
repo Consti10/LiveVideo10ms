@@ -67,9 +67,12 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     //MLOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
     //nalu.debugX();
     //mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
-    /*if(true){
+    const bool EXP_SPS_FIX=false;
+    if(EXP_SPS_FIX){
         if(nalu.isSPS()){
             auto sps=H264::SPS(nalu.getData(),nalu.getSize());
+            //sps.increaseLatency();
+            //sps.experiment();
             sps.decreaseLatency();
             auto tmp=sps.asNALU();
             NALU nalu1(tmp.data(),tmp.size());
@@ -77,9 +80,10 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
         }else{
             mLowLagDecoder.interpretNALU(nalu);
         }
-    }*/
-    mLowLagDecoder.interpretNALU(nalu);
-    mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
+    }else{
+        mLowLagDecoder.interpretNALU(nalu);
+        mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
+    }
 }
 
 void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
