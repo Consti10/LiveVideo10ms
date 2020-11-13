@@ -59,12 +59,12 @@ void H264Parser::parse_rtp_h265_stream(const uint8_t *rtp_data,const size_t data
     mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
 }
 
-void H264Parser::parseDjiLiveVideoData(const uint8_t *data,const size_t data_length) {
-    mParseRAW.parseDjiLiveVideoData(data,data_length);
+void H264Parser::parseDjiLiveVideoDataH264(const uint8_t *data,const size_t data_length) {
+    mParseRAW.parseDjiLiveVideoDataH264(data,data_length);
 }
 
-void H264Parser::parseJetsonRawSliced(const uint8_t *data,const size_t data_length) {
-    mParseRAW.parseJetsonRawSliced(data,data_length);
+void H264Parser::parseJetsonRawSlicedH264(const uint8_t *data,const size_t data_length) {
+    mParseRAW.parseJetsonRawSlicedH264(data,data_length);
 }
 
 /*void H264Parser::parse_rtp_h264_stream_ffmpeg(const uint8_t* rtp_data,const size_t data_len) {

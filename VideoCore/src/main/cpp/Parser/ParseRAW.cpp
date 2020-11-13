@@ -80,7 +80,7 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length,const bool
     }
 }
 
-void ParseRAW::parseDjiLiveVideoData(const uint8_t* data,const size_t data_length){
+void ParseRAW::parseDjiLiveVideoDataH264(const uint8_t* data,const size_t data_length){
     for (size_t i = 0; i < data_length; ++i) {
         nalu_data[nalu_data_position++] = data[i];
         if (nalu_data_position >= NALU::NALU_MAXLEN - 1) {
@@ -103,7 +103,7 @@ void ParseRAW::parseDjiLiveVideoData(const uint8_t* data,const size_t data_lengt
                     nalu_data[3] = 1;
                     if(cb!=nullptr && nalu_data_position>=4){
                         const size_t naluLen=nalu_data_position-4;
-                        const size_t minNaluSize=NALU::getMinimumNaluSize(isH265);
+                        const size_t minNaluSize=NALU::getMinimumNaluSize(false);
                         if(naluLen>=minNaluSize){
                             NALU nalu(nalu_data,naluLen);
                             if(nalu.isSPS() || nalu.isPPS()){
@@ -131,7 +131,7 @@ void ParseRAW::parseDjiLiveVideoData(const uint8_t* data,const size_t data_lengt
     }
 }
 
-void ParseRAW::parseJetsonRawSliced(const uint8_t* data,const size_t data_length){
+void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_length){
     for (size_t i = 0; i < data_length; ++i) {
         nalu_data[nalu_data_position++] = data[i];
         if (nalu_data_position >= NALU::NALU_MAXLEN - 1) {
@@ -154,7 +154,7 @@ void ParseRAW::parseJetsonRawSliced(const uint8_t* data,const size_t data_length
                     nalu_data[3] = 1;
                     if(cb!=nullptr && nalu_data_position>=4){
                         const size_t naluLen=nalu_data_position-4;
-                        const size_t minNaluSize=NALU::getMinimumNaluSize(isH265);
+                        const size_t minNaluSize=NALU::getMinimumNaluSize(false);
                         if(naluLen>=minNaluSize){
                             NALU nalu(nalu_data,nalu_data_position-4);
                             MLOGD<<"ParseRawJ NALU type:"<<nalu.get_nal_name();
