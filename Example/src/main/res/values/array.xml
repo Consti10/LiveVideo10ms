@@ -15,6 +15,7 @@
         <item>jetson/h264/10/test.h264</item>
         <item>jetson/h264/11/test.h264</item>
         <item>jetson/h264/12/test.h264</item>
+        <item>jetson/h264/13/test.h264</item>
 
         <item>jetson/h265/1/test.h265</item>
         <item>jetson/h265/2/test.h265</item>
