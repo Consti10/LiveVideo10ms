@@ -43,3 +43,8 @@ gst-launch-1.0 -e nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, heig
 
 Test 13:
 gst-launch-1.0 -e nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h264enc bitrate=4000000 profile=0 iframeinterval=1 ! video/x-h264, stream-format=byte-stream, profile=baseline ! filesink location=13/test.h264
+
+Test 14:
+gst-launch-1.0 -e nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h264enc bitrate=4000000 profile=0 iframeinterval=1 num-Ref-Frames=0 ! video/x-h264, stream-format=byte-stream, profile=baseline ! filesink location=14/test.h264
+
+
