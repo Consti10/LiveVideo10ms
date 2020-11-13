@@ -164,6 +164,9 @@ public:
                 MLOGD<<"SPS:"<<sps.asString();
                 MLOGD<<"Has vui"<<sps.parsed.vui_parameters_present_flag;
                 MLOGD<<"SPS Latency:"<<H264Stream::latencyAffectingValues(&sps.parsed);
+
+                H264::testSPSConversion(getData(),getSize());
+
             }else if(get_nal_unit_type()==NAL_UNIT_TYPE_PPS){
                 //auto pps=H264::PPS(getData(),getSize());
                 //MLOGD<<"PPS:"<<pps.asString();

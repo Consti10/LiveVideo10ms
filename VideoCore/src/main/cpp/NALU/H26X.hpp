@@ -88,7 +88,12 @@ namespace H264{
         std::vector<uint8_t> asNALU()const{
             std::vector<uint8_t> rbspBuff;
             rbspBuff.resize(sizeof(sps_t));
+            MLOGD<<"rbspbuffSize"<<rbspBuff.size();
             BitStream b(rbspBuff);
+            //
+            bs_write_u(b.bs_t(), 2, nal_header.nal_ref_idc);
+            bs_write_u(b.bs_t(), 5,nal_header.nal_unit_type);
+            //
             write_seq_parameter_set_rbsp(&parsed,b.bs_t());
             write_rbsp_trailing_bits(b.bs_t());
             auto rbsp_size = bs_pos(b.bs_t());
@@ -102,6 +107,13 @@ namespace H264{
             return naluBuff;
         }
     };
+    static void testSPSConversion(const uint8_t* nalu_data,size_t data_len){
+        auto sps=H264::SPS(nalu_data,data_len);
+        auto naluBuff=sps.asNALU();
+        MLOGD<<"Z1:"<<StringHelper::vectorAsString(std::vector<uint8_t>(nalu_data,nalu_data+data_len));
+        MLOGD<<"Z2:"<<StringHelper::vectorAsString(naluBuff);
+    }
+
     class PPS{
         public:
             nal_unit_header_t nal_header;
