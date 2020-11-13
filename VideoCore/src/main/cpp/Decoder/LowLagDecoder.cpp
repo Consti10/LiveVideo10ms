@@ -148,6 +148,7 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
         // Works on pixel 3 (look at output format description)
         //static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
         //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
+        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
     }
 
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
