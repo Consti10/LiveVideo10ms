@@ -62,7 +62,7 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length,const bool
                     nalu_data[3] = 1;
                     // Forward NALU only if it has enough data
                     //if(cb!=nullptr && nalu_data_position>=4){
-                    if(cb!=nullptr){
+                    if(cb!=nullptr && nalu_data_position>=4 ){
                         const size_t naluLen=nalu_data_position-4;
                         const size_t minNaluSize=NALU::getMinimumNaluSize(isH265);
                         if(naluLen>=minNaluSize){
@@ -102,19 +102,23 @@ void ParseRAW::parseDjiLiveVideoData(const uint8_t* data,const size_t data_lengt
                     nalu_data[2] = 0;
                     nalu_data[3] = 1;
                     if(cb!=nullptr && nalu_data_position>=4){
-                        NALU nalu(nalu_data,nalu_data_position-4);
-                        if(nalu.isSPS() || nalu.isPPS()){
-                            cb(nalu);
-                            dji_data_buff_size=0;
-                        }else if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD){
-                            if(dji_data_buff_size>0){
-                                NALU nalu2(dji_data_buff,dji_data_buff_size);
-                                cb(nalu2);
+                        const size_t naluLen=nalu_data_position-4;
+                        const size_t minNaluSize=NALU::getMinimumNaluSize(isH265);
+                        if(naluLen>=minNaluSize){
+                            NALU nalu(nalu_data,naluLen);
+                            if(nalu.isSPS() || nalu.isPPS()){
+                                cb(nalu);
                                 dji_data_buff_size=0;
+                            }else if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD){
+                                if(dji_data_buff_size>0){
+                                    NALU nalu2(dji_data_buff,dji_data_buff_size);
+                                    cb(nalu2);
+                                    dji_data_buff_size=0;
+                                }
+                            }else if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
+                                memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
+                                dji_data_buff_size+=nalu.getSize();
                             }
-                        }else if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-                            memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
-                                                            dji_data_buff_size+=nalu.getSize();
                         }
                     }
                     nalu_data_position = 4;
@@ -149,14 +153,18 @@ void ParseRAW::parseJetsonRawSliced(const uint8_t* data,const size_t data_length
                     nalu_data[2] = 0;
                     nalu_data[3] = 1;
                     if(cb!=nullptr && nalu_data_position>=4){
-                        NALU nalu(nalu_data,nalu_data_position-4);
-                        MLOGD<<"ParseRawJ NALU type:"<<nalu.get_nal_name();
-                        if(nalu.isSPS() || nalu.isPPS()){
-                            cb(nalu);
-                            //dji_data_buff_size=0;
-                        }else{
-                            //accumulateSlicedNALUsByAUD(nalu);
-                            accumulateSlicedNALUsBySliceHeader(nalu);
+                        const size_t naluLen=nalu_data_position-4;
+                        const size_t minNaluSize=NALU::getMinimumNaluSize(isH265);
+                        if(naluLen>=minNaluSize){
+                            NALU nalu(nalu_data,nalu_data_position-4);
+                            MLOGD<<"ParseRawJ NALU type:"<<nalu.get_nal_name();
+                            if(nalu.isSPS() || nalu.isPPS()){
+                                cb(nalu);
+                                //dji_data_buff_size=0;
+                            }else{
+                                //accumulateSlicedNALUsByAUD(nalu);
+                                accumulateSlicedNALUsBySliceHeader(nalu);
+                            }
                         }
                     }
                     nalu_data_position = 4;

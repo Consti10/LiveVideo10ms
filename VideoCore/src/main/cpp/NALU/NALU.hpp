@@ -30,6 +30,7 @@
  * A NALU either contains H264 data (default) or H265 data
  * NOTE: Only when copy constructing a NALU it owns the data, else it only holds a data pointer (that might get overwritten by the parser if you hold onto a NALU)
  * Also, H264 and H265 is slightly different
+ * The constructor of the NALU does some really basic validation - make sure the parser never produces a NALU where this validation would fail
  */
 class NALU{
 private:
