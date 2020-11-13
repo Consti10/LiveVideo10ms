@@ -58,6 +58,13 @@ public:
         assert(hasValidPrefix());
         assert(getSize()>=getMinimumNaluSize(IS_H265_PACKET1));
     };
+    // tmp
+    NALU(const uint8_t* data1,size_t data_len1,const bool IS_H265_PACKET1=false,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            data(data1),data_len(data_len1),creationTime{creationTime},IS_H265_PACKET(IS_H265_PACKET1)
+    {
+        assert(hasValidPrefix());
+        assert(getSize()>=getMinimumNaluSize(IS_H265_PACKET1));
+    }
     ~NALU()= default;
 private:
     // With the default constructor a NALU does not own its memory. This saves us one memcpy. However, storing a NALU after the lifetime of the

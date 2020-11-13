@@ -67,6 +67,17 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     //MLOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
     //nalu.debugX();
     //mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
+    /*if(true){
+        if(nalu.isSPS()){
+            auto sps=H264::SPS(nalu.getData(),nalu.getSize());
+            sps.decreaseLatency();
+            auto tmp=sps.asNALU();
+            NALU nalu1(tmp.data(),tmp.size());
+            mLowLagDecoder.interpretNALU(nalu1);
+        }else{
+            mLowLagDecoder.interpretNALU(nalu);
+        }
+    }*/
     mLowLagDecoder.interpretNALU(nalu);
     mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
 }

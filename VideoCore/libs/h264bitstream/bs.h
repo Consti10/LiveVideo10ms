@@ -390,10 +390,10 @@ static inline uint64_t bs_next_bytes(bs_t* bs, int nbytes)
 // C++ wrapper around the c code
 class BitStream{
 private:
-    std::vector<uint8_t> data;
+    std::vector<uint8_t>& data;
     bs_t * b;
 public:
-    BitStream(std::vector<uint8_t> data1):data(data1){
+    BitStream(std::vector<uint8_t>& data1):data(data1){
         b=bs_new(data.data(),data.size());
     }
     ~BitStream(){

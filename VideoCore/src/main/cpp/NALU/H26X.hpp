@@ -85,26 +85,51 @@ namespace H264{
             //return spsAsString(&parsed);
             return H264Stream::spsAsString(&parsed);
         }
+// --------------------------------------------- crude hacking --------------------------------------------
         std::vector<uint8_t> asNALU()const{
             std::vector<uint8_t> rbspBuff;
-            rbspBuff.resize(sizeof(sps_t));
+            rbspBuff.resize(14+6);
             MLOGD<<"rbspbuffSize"<<rbspBuff.size();
             BitStream b(rbspBuff);
             //
+            /* forbidden_zero_bit */
+            bs_write_u(b.bs_t(), 1, 0);
             bs_write_u(b.bs_t(), 2, nal_header.nal_ref_idc);
             bs_write_u(b.bs_t(), 5,nal_header.nal_unit_type);
             //
             write_seq_parameter_set_rbsp(&parsed,b.bs_t());
             write_rbsp_trailing_bits(b.bs_t());
+
+            if (bs_overrun(b.bs_t())) {
+                MLOGE<<"BS overrun ";
+            }
             auto rbsp_size = bs_pos(b.bs_t());
             rbspBuff.resize(rbsp_size);
+
+            //MLOGD<<"Z0:"<<StringHelper::vectorAsString(rbspBuff);
             std::vector<uint8_t> naluBuff;
+            naluBuff.resize(4);
+            naluBuff[0]=0;
+            naluBuff[1]=0;
+            naluBuff[2]=0;
+            naluBuff[3]=1;
+            naluBuff.insert(naluBuff.end(), rbspBuff.begin(), rbspBuff.end());
+            return naluBuff;
+            /*std::vector<uint8_t> naluBuff;
             naluBuff.resize(rbspBuff.size()+10);
             int nal_size=naluBuff.size();
             int rc = rbsp_to_nal(rbspBuff.data(), &rbsp_size, naluBuff.data(), &nal_size);
             assert(rc==nal_size);
             naluBuff.resize(nal_size);
-            return naluBuff;
+            return naluBuff;*/
+        }
+        void increaseLatency(){
+            parsed.pic_order_cnt_type=0;
+            parsed.log2_max_pic_order_cnt_lsb_minus4=4;
+        }
+        void decreaseLatency(){
+            parsed.pic_order_cnt_type=2;
+            parsed.log2_max_pic_order_cnt_lsb_minus4=0;
         }
     };
     static void testSPSConversion(const uint8_t* nalu_data,size_t data_len){
@@ -113,6 +138,8 @@ namespace H264{
         MLOGD<<"Z1:"<<StringHelper::vectorAsString(std::vector<uint8_t>(nalu_data,nalu_data+data_len));
         MLOGD<<"Z2:"<<StringHelper::vectorAsString(naluBuff);
     }
+// --------------------------------------------- crude hacking --------------------------------------------
+
 
     class PPS{
         public:
