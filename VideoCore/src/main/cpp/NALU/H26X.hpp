@@ -128,7 +128,7 @@ namespace H264{
             parsed.log2_max_pic_order_cnt_lsb_minus4=4;
         }
         void decreaseLatency(){
-            parsed.level_idc=40;
+            //parsed.level_idc=40;
             parsed.pic_order_cnt_type=2;
             parsed.log2_max_pic_order_cnt_lsb_minus4=0;
         }
