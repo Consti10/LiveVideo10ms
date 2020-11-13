@@ -749,10 +749,39 @@ namespace H264Stream{
         ss<<"pic_order_cnt_type="<<sps->pic_order_cnt_type<<",";
         ss<<"log2_max_pic_order_cnt_lsb_minus4="<<sps->log2_max_pic_order_cnt_lsb_minus4<<",";
         ss<<"delta_pic_order_always_zero_flag="<<sps->delta_pic_order_always_zero_flag<<",";
+        ss<<"offset_for_non_ref_pic="<<sps->offset_for_non_ref_pic<<",";
+         ss<<"offset_for_top_to_bottom_field="<<sps-> offset_for_top_to_bottom_field<<",";
+        ss<<"num_ref_frames_in_pic_order_cnt_cycle="<<sps->num_ref_frames_in_pic_order_cnt_cycle<<",";
+        ss<<"\n";
+        //
+        ss<<"num_ref_frames="<<sps->num_ref_frames<<",";
+        ss<<"gaps_in_frame_num_value_allowed_flag="<<sps->gaps_in_frame_num_value_allowed_flag<<",";
+        ss<<"pic_width_in_mbs_minus1="<<sps->pic_width_in_mbs_minus1<<",";
+        ss<<"pic_height_in_map_units_minus1="<<sps->pic_height_in_map_units_minus1<<",";
+        ss<<"frame_mbs_only_flag="<<sps->frame_mbs_only_flag<<",";
+        ss<<"mb_adaptive_frame_field_flag="<<sps->mb_adaptive_frame_field_flag<<",";
+        ss<<"direct_8x8_inference_flag="<<sps->direct_8x8_inference_flag<<",";
+        ss<<"frame_cropping_flag="<<sps->frame_cropping_flag<<",";
+        ss<<"frame_crop_left_offset="<<sps->frame_crop_left_offset<<",";
+        ss<<"frame_crop_right_offset="<<sps->frame_crop_right_offset<<",";
+        ss<<" frame_crop_top_offset="<<sps-> frame_crop_top_offset<<",";
+        ss<<"frame_crop_bottom_offset="<<sps->frame_crop_bottom_offset<<",";
+        ss<<"vui_parameters_present_flag="<<sps->vui_parameters_present_flag<<",";
         //ss<<"="<<sps-><<",";
         ss<<"]";
         return ss.str();
     }
+     static std::string latencyAffectingValues(const sps_t* sps){
+         std::stringstream ss;
+         ss<<"[";
+         ss<<"profile_idc="<<sps->profile_idc<<",";
+         ss<<"level_idc="<<sps->level_idc<<",";
+         ss<<"pic_order_cnt_type="<<sps->pic_order_cnt_type<<",";
+         ss<<"log2_max_pic_order_cnt_lsb_minus4="<<sps->log2_max_pic_order_cnt_lsb_minus4<<",";
+         ss<<"num_ref_frames="<<sps->num_ref_frames<<",";
+         ss<<"]";
+         return ss.str();
+     }
 }
 #endif
 
