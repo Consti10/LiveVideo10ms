@@ -85,6 +85,22 @@ namespace H264{
             //return spsAsString(&parsed);
             return H264Stream::spsAsString(&parsed);
         }
+        std::vector<uint8_t> asNALU()const{
+            std::vector<uint8_t> rbspBuff;
+            rbspBuff.resize(sizeof(sps_t));
+            BitStream b(rbspBuff);
+            write_seq_parameter_set_rbsp(&parsed,b.bs_t());
+            write_rbsp_trailing_bits(b.bs_t());
+            auto rbsp_size = bs_pos(b.bs_t());
+            rbspBuff.resize(rbsp_size);
+            std::vector<uint8_t> naluBuff;
+            naluBuff.resize(rbspBuff.size()+10);
+            int nal_size=naluBuff.size();
+            int rc = rbsp_to_nal(rbspBuff.data(), &rbsp_size, naluBuff.data(), &nal_size);
+            assert(rc==nal_size);
+            naluBuff.resize(nal_size);
+            return naluBuff;
+        }
     };
     class PPS{
         public:

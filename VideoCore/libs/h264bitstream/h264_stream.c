@@ -1558,7 +1558,7 @@ void read_dec_ref_base_pic_marking(nal_t* nal, bs_t* b)
 void write_nal_unit_header_svc_extension(nal_svc_ext_t* nal_svc_ext, bs_t* b);
 void write_prefix_nal_unit_svc(nal_t* nal, bs_t* b);
 void write_prefix_nal_unit_rbsp(nal_t* nal, bs_t* b);
-void write_seq_parameter_set_rbsp(sps_t* sps, bs_t* b);
+void write_seq_parameter_set_rbsp(const sps_t* sps, bs_t* b);
 void write_scaling_list(bs_t* b, int* scalingList, int sizeOfScalingList, int* useDefaultScalingMatrixFlag );
 void write_subset_seq_parameter_set_rbsp(sps_subset_t* sps_subset, bs_t* b);
 void write_seq_parameter_set_svc_extension(sps_subset_t* sps_subset, bs_t* b);
@@ -1785,16 +1785,10 @@ void write_prefix_nal_unit_rbsp(nal_t* nal, bs_t* b)
 }
 
 //7.3.2.1 Sequence parameter set RBSP syntax
-void write_seq_parameter_set_rbsp(sps_t* sps, bs_t* b)
+void write_seq_parameter_set_rbsp(const sps_t* sps, bs_t* b)
 {
     int i;
 
-    if( 0 )
-    {
-        memset(sps, 0, sizeof(sps_t));
-        sps->chroma_format_idc = 1; 
-    }
- 
     bs_write_u8(b, sps->profile_idc);
     bs_write_u1(b, sps->constraint_set0_flag);
     bs_write_u1(b, sps->constraint_set1_flag);

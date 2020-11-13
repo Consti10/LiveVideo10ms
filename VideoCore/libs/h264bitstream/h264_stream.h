@@ -559,7 +559,7 @@ int more_rbsp_trailing_data(h264_stream_t *h, bs_t *b);
 
 int write_nal_unit(const h264_stream_t *h, uint8_t *buf, int size);
 
-void write_seq_parameter_set_rbsp(sps_t *sps, bs_t *b);
+void write_seq_parameter_set_rbsp(const sps_t *sps, bs_t *b);
 
 void write_scaling_list(bs_t *b, int *scalingList, int sizeOfScalingList,
                         int *useDefaultScalingMatrixFlag);
