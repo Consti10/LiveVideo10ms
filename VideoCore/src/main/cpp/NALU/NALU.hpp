@@ -53,6 +53,8 @@ public:
     // Default constructor does not allocate a new buffer,only stores some pointer (light)
     NALU(const NALU_BUFFER& data1,const size_t data_length,const bool IS_H265_PACKET1=false,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
             data(data1.data()),data_len(data_length),creationTime{creationTime},IS_H265_PACKET(IS_H265_PACKET1){
+        assert(hasValidPrefix());
+        assert(hasValidSize());
     };
     ~NALU()= default;
 private:
@@ -65,6 +67,20 @@ private:
 public:
     const bool IS_H265_PACKET;
     const std::chrono::steady_clock::time_point creationTime;
+public:
+    // returns true if starts with 0001, false otherwise
+    bool hasValidPrefix()const{
+        return data[0]==0 && data[1]==0 &&data[2]==0 &&data[3]==1;
+    }
+    // returns true if NALU is at least N bytes big,false otherwise
+    bool hasValidSize()const{
+        // 4 bytes prefix, 1 byte header for h264, 2 byte header for h265
+        if(IS_H265_PACKET){
+            return getSize()>=6;
+        }else{
+            return getSize()>=5;
+        }
+    }
 public:
     // pointer to the NALU data with 0001 prefix
     const uint8_t* getData()const{
@@ -121,16 +137,6 @@ public:
             return NALUnitType::H265::unitTypeName(get_nal_unit_type());
         }
         return NALUnitType::H264::unitTypeName(get_nal_unit_type());
-    }
-
-    //returns true if starts with 0001, false otherwise
-    bool hasValidPrefix()const{
-        return data[0]==0 && data[1]==0 &&data[2]==0 &&data[3]==1;
-    }
-    //returns true if NALU is at least N bytes big,false otherwise
-    bool hasValidSize()const{
-        // A NALU should have at least 6 bytes - 4 bytes prefix, 1 byte header for h264, 2 byte header for h265
-        return getSize()>6;
     }
     // For debugging, return the whole NALU data as a big string for logging
     std::string dataAsString()const{

@@ -62,10 +62,13 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length,const bool
                     nalu_data[3] = 1;
                     // Forward NALU only if it has enough data
                     //if(cb!=nullptr && nalu_data_position>=4){
-                    if(cb!=nullptr && nalu_data_position>=6){
+                    if(cb!=nullptr){
                         const size_t naluLen=nalu_data_position-4;
-                        NALU nalu(nalu_data,naluLen,isH265);
-                        cb(nalu);
+                        const size_t minNaluSize=isH265 ? 6 : 5;
+                        if(naluLen>=minNaluSize){
+                            NALU nalu(nalu_data,naluLen,isH265);
+                            cb(nalu);
+                        }
                     }
                     nalu_data_position = 4;
                 }
