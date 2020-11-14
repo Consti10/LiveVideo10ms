@@ -30,8 +30,6 @@ private:
     NALU::NALU_BUFFER nalu_data;
     //std::vector<uint8_t> nalu_data;
     //std::shared_ptr<NALU::NALU_BUFFER> nalu_data;
-    std::mutex mBufferMutex;
-    std::vector<NALU::NALU_BUFFER> allocatedBuffers{10};
 
     size_t nalu_data_position=4;
     int nalu_search_state=0;
@@ -39,7 +37,6 @@ private:
     std::array<uint8_t,NALU::NALU_MAXLEN> dji_data_buff;
     std::size_t dji_data_buff_size=0;
     //
-    void getAvailableBuffer();
     // This time point is as 'early as possible' to debug the parsing time as accurately as possible.
     // E.g not the time when the 'ending' sequence was detected, but the first byte of this nalu was received / parsed
     std::chrono::steady_clock::time_point timePointStartOfReceivingNALU;

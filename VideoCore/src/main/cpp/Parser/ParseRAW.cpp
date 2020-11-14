@@ -21,13 +21,6 @@ void ParseRAW::reset(){
     nalu_data.push_back(1);*/
 }
 
-void ParseRAW::getAvailableBuffer(){
-    std::lock_guard<std::mutex> lock(mBufferMutex);
-    for(const auto buff:allocatedBuffers){
-
-    }
-}
-
 void ParseRAW::parseData(const uint8_t* data,const size_t data_length,const bool isH265){
     //if(nalu_data== nullptr){
     //    nalu_data=new uint8_t[NALU::NALU_MAXLEN];
