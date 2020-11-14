@@ -1,0 +1,5 @@
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh264enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 ! video/x-h264, stream-format=byte-stream ! rtph264pay ! udpsink host=192.168.240.215 port=5600
+
+
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh265enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 ! video/x-h265, stream-format=byte-stream ! rtph265pay ! udpsink host=192.168.240.215 port=5600
+
