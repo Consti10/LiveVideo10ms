@@ -34,7 +34,6 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavformat/avio.h>
 //#include <rtpdec.h>
-
 }
 
 class H264Parser {

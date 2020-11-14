@@ -14,11 +14,6 @@ void ParseRAW::reset(){
     nalu_data_position=4;
     nalu_search_state=0;
     dji_data_buff_size=0;
-    /*nalu_data.reserve(NALU::NALU_MAXLEN);
-    nalu_data.push_back(0);
-    nalu_data.push_back(0);
-    nalu_data.push_back(0);
-    nalu_data.push_back(1);*/
 }
 
 void ParseRAW::parseData(const uint8_t* data,const size_t data_length,const bool isH265){
