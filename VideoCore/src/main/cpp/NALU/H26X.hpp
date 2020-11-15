@@ -7,6 +7,7 @@
 
 #include <h264_stream.h>
 #include "NALUnitType.hpp"
+#include <h265_common.h>
 
 // namespaces for H264 H265 helper
 // A H265 NALU is kind of similar to a H264 NALU in that it has the same [0,0,0,1] prefix
@@ -14,18 +15,25 @@
 namespace AnnexBHelper{
     // The rbsp buffer starts after the 0,0,0,1 header
     // This function *reverts' the fact that a NAL unit mustn't contain the [0,0,0,1] pattern (Annex B)
-    static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const std::vector<uint8_t>& naluData){
+    /*static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const std::vector<uint8_t>& naluData){
         int nal_size = naluData.size()-4;
         const uint8_t* nal_data=&naluData[4];
         int rbsp_size=nal_size;
         std::vector<uint8_t> rbsp_buf;
-        rbsp_buf.resize(rbsp_size+2);
+        rbsp_buf.resize(rbsp_size+64);
         int rc = nal_to_rbsp(nal_data, &nal_size, rbsp_buf.data(), &rbsp_size);
         assert(rc>0);
         //MLOGD<<"X "<<rbsp_buf.size()<<" Y"<<rbsp_size;
         //assert(rbsp_buf.size()==rbsp_size);
         rbsp_buf.resize(rbsp_size);
         return rbsp_buf;
+    }
+    static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const uint8_t* nalu_data, std::size_t nalu_data_size){
+        return nalu_annexB_to_rbsp_buff(std::vector<uint8_t>(nalu_data, nalu_data + nalu_data_size));
+    }*/
+    // the h264bitstream nal_to_rbsp function is buggy !
+    static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const std::vector<uint8_t>& naluData){
+        return h265nal::UnescapeRbsp(&naluData.data()[4],naluData.size()-4);
     }
     static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const uint8_t* nalu_data, std::size_t nalu_data_size){
         return nalu_annexB_to_rbsp_buff(std::vector<uint8_t>(nalu_data, nalu_data + nalu_data_size));
