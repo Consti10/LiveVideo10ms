@@ -49,6 +49,9 @@ public:
     const NALU& getCSD1()const{
         return *PPS;
     }
+    static void appendNaluData(std::vector<uint8_t>& buff,const NALU& nalu){
+        buff.insert(buff.begin(),nalu.getData(),nalu.getData()+nalu.getSize());
+    }
     void setSPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
         const auto sps=getCSD0();
         const auto pps=getCSD1();
@@ -58,9 +61,6 @@ public:
         AMediaFormat_setBuffer(format,"csd-0",sps.getData(),(size_t)sps.getSize());
         AMediaFormat_setBuffer(format,"csd-1",pps.getData(),(size_t)pps.getSize());
         MLOGD<<"Video WH:"<<videoWH[0]<<" H:"<<videoWH[1];
-    }
-    static void appendNaluData(std::vector<uint8_t>& buff,const NALU& nalu){
-        buff.insert(buff.begin(),nalu.getData(),nalu.getData()+nalu.getSize());
     }
     void setVPS_SPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
         std::vector<uint8_t> buff={};
