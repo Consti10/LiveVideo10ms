@@ -69,12 +69,12 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     //mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
     const bool EXP_SPS_FIX=true;
     if(EXP_SPS_FIX){
-        if(nalu.isSPS()){
+        if((!nalu.IS_H265_PACKET) && nalu.isSPS()){
             auto sps=H264::SPS(nalu.getData(),nalu.getSize());
             //sps.increaseLatency();
             //sps.experiment();
             //sps.decreaseLatency();
-            //sps.addVUI();
+            sps.addVUI();
             auto tmp=sps.asNALU();
             NALU nalu1(tmp.data(),tmp.size());
             mLowLagDecoder.interpretNALU(nalu1);

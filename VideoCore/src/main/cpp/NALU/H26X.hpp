@@ -85,10 +85,10 @@ namespace H264{
         // data buffer= NALU data with prefix
         SPS(const uint8_t* nalu_data,size_t data_len){
             memcpy(&nal_header,&nalu_data[4],1);
-            auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
-            BitStream b(rbsp_buf);
             assert(nal_header.forbidden_zero_bit==0);
             assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_SPS);
+            auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
+            BitStream b(rbsp_buf);
             read_seq_parameter_set_rbsp(&parsed, b.bs_t());
             read_rbsp_trailing_bits(b.bs_t());
         }
@@ -98,7 +98,6 @@ namespace H264{
             return {Width,Height};
         }
         std::string asString()const{
-            //return spsAsString(&parsed);
             return H264Stream::spsAsString(&parsed);
         }
 // --------------------------------------------- crude hacking --------------------------------------------
@@ -196,10 +195,10 @@ namespace H264{
             // data buffer= NALU data with prefix
             PPS(const uint8_t* nalu_data,size_t data_len){
                 memcpy(&nal_header,&nalu_data[4],1);
-                auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
-                BitStream b(rbsp_buf);
                 assert(nal_header.forbidden_zero_bit==0);
                 assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_PPS);
+                auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
+                BitStream b(rbsp_buf);
                 read_pic_parameter_set_rbsp(&parsed, b.bs_t());
                 read_rbsp_trailing_bits(b.bs_t());
             }
