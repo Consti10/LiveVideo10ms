@@ -12,31 +12,41 @@
 // namespaces for H264 H265 helper
 // A H265 NALU is kind of similar to a H264 NALU in that it has the same [0,0,0,1] prefix
 
-namespace AnnexBHelper{
-    // The rbsp buffer starts after the 0,0,0,1 header
-    // This function *reverts' the fact that a NAL unit mustn't contain the [0,0,0,1] pattern (Annex B)
-    /*static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const std::vector<uint8_t>& naluData){
-        int nal_size = naluData.size()-4;
-        const uint8_t* nal_data=&naluData[4];
-        int rbsp_size=nal_size;
-        std::vector<uint8_t> rbsp_buf;
-        rbsp_buf.resize(rbsp_size+64);
-        int rc = nal_to_rbsp(nal_data, &nal_size, rbsp_buf.data(), &rbsp_size);
-        assert(rc>0);
-        //MLOGD<<"X "<<rbsp_buf.size()<<" Y"<<rbsp_size;
-        //assert(rbsp_buf.size()==rbsp_size);
-        rbsp_buf.resize(rbsp_size);
-        return rbsp_buf;
+namespace RBSPHelper{
+    // The rbsp buffer starts after 5 bytes for h264 (4 bytes prefix and 1 byte unit header)
+    // and after 6 bytes for h265 (4 bytes prefix and 2 byte unit header)
+    // the h264bitstream nal_to_rbsp function is buggy ! -> use the one from h265nal library
+    // escaping/unescaping rbsp is the same for h264 and h265
+
+    static std::vector<uint8_t> unescapeRbsp(const uint8_t* rbsp_buff,const std::size_t rbsp_buff_size){
+        auto ret=h265nal::UnescapeRbsp(rbsp_buff,rbsp_buff_size);
+        return ret;
     }
-    static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const uint8_t* nalu_data, std::size_t nalu_data_size){
-        return nalu_annexB_to_rbsp_buff(std::vector<uint8_t>(nalu_data, nalu_data + nalu_data_size));
-    }*/
-    // the h264bitstream nal_to_rbsp function is buggy !
-    static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const std::vector<uint8_t>& naluData){
-        return h265nal::UnescapeRbsp(&naluData.data()[4],naluData.size()-4);
+    static std::vector<uint8_t> unescapeRbsp(const std::vector<uint8_t>& rbspData){
+        return unescapeRbsp(rbspData.data(),rbspData.size());
     }
-    static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const uint8_t* nalu_data, std::size_t nalu_data_size){
-        return nalu_annexB_to_rbsp_buff(std::vector<uint8_t>(nalu_data, nalu_data + nalu_data_size));
+
+    static std::vector<uint8_t> escapeRbsp(const std::vector<uint8_t>& rbspBuff){
+        std::vector<uint8_t> naluBuff;
+        naluBuff.resize(rbspBuff.size()+32);
+        int rbspSize=rbspBuff.size();
+        int nalSize=naluBuff.size();
+        auto tmp=rbsp_to_nal(rbspBuff.data(),&rbspSize,naluBuff.data(),&nalSize);
+        assert(tmp>0);
+        naluBuff.resize(tmp);
+        // workaround h264bitstream library
+        return std::vector<uint8_t>(&naluBuff.data()[1],&naluBuff.data()[1]+naluBuff.size()-1);
+    }
+
+    static void test_unescape_escape(const std::vector<uint8_t>& rbspData){
+        auto unescapedData=unescapeRbsp(rbspData.data(),rbspData.size());
+        auto unescapedThenEscapedData=escapeRbsp(unescapedData);
+        MLOGD<<"Y1:"<<StringHelper::vectorAsString(rbspData);
+        MLOGD<<"Y2:"<<StringHelper::vectorAsString(unescapedData);
+        MLOGD<<"Y3:"<<StringHelper::vectorAsString(unescapedThenEscapedData);
+        // check if the data stayed the same after unescaping then escaping it again
+        assert(rbspData.size()==unescapedThenEscapedData.size());
+        assert(std::memcmp(rbspData.data(),unescapedThenEscapedData.data(),rbspData.size())==0);
     }
 }
 
@@ -74,11 +84,9 @@ namespace H264{
     public:
         // data buffer= NALU data with prefix
         SPS(const uint8_t* nalu_data,size_t data_len){
-            auto rbsp_buf= AnnexBHelper::nalu_annexB_to_rbsp_buff(nalu_data, data_len);
+            memcpy(&nal_header,&nalu_data[4],1);
+            auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
             BitStream b(rbsp_buf);
-            nal_header.forbidden_zero_bit=b.read_u1();
-            nal_header.nal_ref_idc = b.read_u2();
-            nal_header.nal_unit_type = b.read_u5();
             assert(nal_header.forbidden_zero_bit==0);
             assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_SPS);
             read_seq_parameter_set_rbsp(&parsed, b.bs_t());
@@ -95,15 +103,19 @@ namespace H264{
         }
 // --------------------------------------------- crude hacking --------------------------------------------
         std::vector<uint8_t> asNALU()const{
+            std::vector<uint8_t> naluBuff;
+            // write prefix and nalu header
+            naluBuff.resize(5);
+            naluBuff[0]=0;
+            naluBuff[1]=0;
+            naluBuff[2]=0;
+            naluBuff[3]=1;
+            std::memcpy(&naluBuff.data()[4],&nal_header,1);
+            // write sps payload into rbspBuff
             std::vector<uint8_t> rbspBuff;
             rbspBuff.resize(14+64*4);
-            MLOGD<<"rbspbuffSize"<<rbspBuff.size();
+            //MLOGD<<"rbspbuffSize"<<rbspBuff.size();
             BitStream b(rbspBuff);
-            //
-            /* forbidden_zero_bit */
-            bs_write_u(b.bs_t(), 1, 0);
-            bs_write_u(b.bs_t(), 2, nal_header.nal_ref_idc);
-            bs_write_u(b.bs_t(), 5,nal_header.nal_unit_type);
             //
             write_seq_parameter_set_rbsp(&parsed,b.bs_t());
             write_rbsp_trailing_bits(b.bs_t());
@@ -113,23 +125,10 @@ namespace H264{
             }
             auto rbsp_size = bs_pos(b.bs_t());
             rbspBuff.resize(rbsp_size);
-
-            //MLOGD<<"Z0:"<<StringHelper::vectorAsString(rbspBuff);
-            std::vector<uint8_t> naluBuff;
-            naluBuff.resize(4);
-            naluBuff[0]=0;
-            naluBuff[1]=0;
-            naluBuff[2]=0;
-            naluBuff[3]=1;
-            naluBuff.insert(naluBuff.end(), rbspBuff.begin(), rbspBuff.end());
+            // escape sps payload and append to nalu buffer
+            auto rbspBuffEscaped=RBSPHelper::escapeRbsp(rbspBuff);
+            naluBuff.insert(naluBuff.end(), rbspBuffEscaped.begin(), rbspBuffEscaped.end());
             return naluBuff;
-            /*std::vector<uint8_t> naluBuff;
-            naluBuff.resize(rbspBuff.size()+10);
-            int nal_size=naluBuff.size();
-            int rc = rbsp_to_nal(rbspBuff.data(), &rbsp_size, naluBuff.data(), &nal_size);
-            assert(rc==nal_size);
-            naluBuff.resize(nal_size);
-            return naluBuff;*/
         }
         void increaseLatency(){
             parsed.pic_order_cnt_type=0;
@@ -184,9 +183,10 @@ namespace H264{
         auto naluBuff=sps.asNALU();
         MLOGD<<"Z1:"<<StringHelper::vectorAsString(std::vector<uint8_t>(nalu_data,nalu_data+data_len));
         MLOGD<<"Z2:"<<StringHelper::vectorAsString(naluBuff);
+        assert(data_len==naluBuff.size());
+        assert(std::memcmp(nalu_data,naluBuff.data(),data_len)==0);
     }
 // --------------------------------------------- crude hacking --------------------------------------------
-
 
     class PPS{
         public:
@@ -195,11 +195,9 @@ namespace H264{
         public:
             // data buffer= NALU data with prefix
             PPS(const uint8_t* nalu_data,size_t data_len){
-                auto rbsp_buf= AnnexBHelper::nalu_annexB_to_rbsp_buff(nalu_data, data_len);
+                memcpy(&nal_header,&nalu_data[4],1);
+                auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
                 BitStream b(rbsp_buf);
-                nal_header.forbidden_zero_bit=b.read_u1();
-                nal_header.nal_ref_idc = b.read_u2();
-                nal_header.nal_unit_type = b.read_u5();
                 assert(nal_header.forbidden_zero_bit==0);
                 assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_PPS);
                 read_pic_parameter_set_rbsp(&parsed, b.bs_t());

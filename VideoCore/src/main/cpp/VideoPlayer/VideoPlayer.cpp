@@ -74,6 +74,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
             //sps.increaseLatency();
             //sps.experiment();
             //sps.decreaseLatency();
+            sps.addVUI();
             auto tmp=sps.asNALU();
             NALU nalu1(tmp.data(),tmp.size());
             mLowLagDecoder.interpretNALU(nalu1);

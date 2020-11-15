@@ -235,3 +235,23 @@
                 return ss.str();
             }
         };
+
+
+
+
+        /*static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const std::vector<uint8_t>& naluData){
+                int nal_size = naluData.size()-4;
+                const uint8_t* nal_data=&naluData[4];
+                int rbsp_size=nal_size;
+                std::vector<uint8_t> rbsp_buf;
+                rbsp_buf.resize(rbsp_size+64);
+                int rc = nal_to_rbsp(nal_data, &nal_size, rbsp_buf.data(), &rbsp_size);
+                assert(rc>0);
+                //MLOGD<<"X "<<rbsp_buf.size()<<" Y"<<rbsp_size;
+                //assert(rbsp_buf.size()==rbsp_size);
+                rbsp_buf.resize(rbsp_size);
+                return rbsp_buf;
+            }
+            static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const uint8_t* nalu_data, std::size_t nalu_data_size){
+                return nalu_annexB_to_rbsp_buff(std::vector<uint8_t>(nalu_data, nalu_data + nalu_data_size));
+            }*/
