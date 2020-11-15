@@ -15,7 +15,8 @@
 namespace RBSPHelper{
     // The rbsp buffer starts after 5 bytes for h264 (4 bytes prefix and 1 byte unit header)
     // and after 6 bytes for h265 (4 bytes prefix and 2 byte unit header)
-    // the h264bitstream nal_to_rbsp function is buggy ! -> use the one from h265nal library
+    // the h264bitstream nal_to_rbsp function is buggy !
+    // Also, its implementation unescapes the NAL unit header which is wrong (only the payload should be unescaped)
     // escaping/unescaping rbsp is the same for h264 and h265
 
     static std::vector<uint8_t> unescapeRbsp(const uint8_t* rbsp_buff,const std::size_t rbsp_buff_size){
