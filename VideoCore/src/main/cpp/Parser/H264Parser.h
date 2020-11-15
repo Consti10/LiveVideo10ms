@@ -90,13 +90,6 @@ private:
     FECDecoder mFECDecoder;
     //
     std::vector<std::size_t> receivedDataPacketsSize;
-private:
-    // FFMPEG stuff
-    AVCodec *m_codec=nullptr;
-    AVCodecContext  *m_codec_ctx;
-    AVCodecParserContext *m_codec_parser_context=nullptr;
-    AVPacket* pkt=nullptr;
-
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

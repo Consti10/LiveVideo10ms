@@ -9,28 +9,11 @@
 #include <thread>
 #include <StringHelper.hpp>
 
-void logIfNull(void * ptr,std::string message){
-    if(ptr==nullptr){
-        MLOGE<<message<<" is null";
-    }
-}
 
 H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
         onNewNALU(std::move(onNewNALU)),
         mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
         mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
-    // ffmpeg stuff
-    /*m_codec = avcodec_find_decoder(AV_CODEC_ID_H264);
-    logIfNull(m_codec,"avcodec_find_decoder");
-    if (!(m_codec_ctx = avcodec_alloc_context3(m_codec))) {
-        MLOGE<<"avcodec_alloc_context3";
-    }
-    if (avcodec_open2(m_codec_ctx, m_codec, nullptr) < 0) {
-        MLOGE<<"Error opening the decoding codec";
-    }
-    m_codec_parser_context = av_parser_init(AV_CODEC_ID_H264);
-    logIfNull(m_codec_parser_context,"av_parser_init");
-    //pkt=av_packet_alloc();*/
 }
 
 void H264Parser::reset(){
@@ -66,11 +49,6 @@ void H264Parser::parseDjiLiveVideoDataH264(const uint8_t *data,const size_t data
 void H264Parser::parseJetsonRawSlicedH264(const uint8_t *data,const size_t data_length) {
     mParseRAW.parseJetsonRawSlicedH264(data,data_length);
 }
-
-/*void H264Parser::parse_rtp_h264_stream_ffmpeg(const uint8_t* rtp_data,const size_t data_len) {
-    //auto ret=av_parser_parse2(m_pCodecPaser, m_codec_ctx, &pkt->data,&pkt->size,
-    //                                m_packet.data,m_packet.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
-}*/
 
 void H264Parser::setLimitFPS(int maxFPS1) {
     this->maxFPS=maxFPS1;

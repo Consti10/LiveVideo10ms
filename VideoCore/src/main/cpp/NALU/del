@@ -255,3 +255,28 @@
             static std::vector<uint8_t> nalu_annexB_to_rbsp_buff(const uint8_t* nalu_data, std::size_t nalu_data_size){
                 return nalu_annexB_to_rbsp_buff(std::vector<uint8_t>(nalu_data, nalu_data + nalu_data_size));
             }*/
+
+
+
+            void logIfNull(void * ptr,std::string message){
+                if(ptr==nullptr){
+                    MLOGE<<message<<" is null";
+                }
+            }
+                AVCodec *m_codec=nullptr;
+                AVCodecContext  *m_codec_ctx;
+                AVCodecParserContext *m_codec_parser_context=nullptr;
+                AVPacket* pkt=nullptr;
+
+                // ffmpeg stuff
+                /*m_codec = avcodec_find_decoder(AV_CODEC_ID_H264);
+                logIfNull(m_codec,"avcodec_find_decoder");
+                if (!(m_codec_ctx = avcodec_alloc_context3(m_codec))) {
+                    MLOGE<<"avcodec_alloc_context3";
+                }
+                if (avcodec_open2(m_codec_ctx, m_codec, nullptr) < 0) {
+                    MLOGE<<"Error opening the decoding codec";
+                }
+                m_codec_parser_context = av_parser_init(AV_CODEC_ID_H264);
+                logIfNull(m_codec_parser_context,"av_parser_init");
+                //pkt=av_packet_alloc();*/
