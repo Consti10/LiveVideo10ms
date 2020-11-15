@@ -53,4 +53,10 @@ gst-launch-1.0 -e nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, heig
 Test 16:
 gst-launch-1.0 -e nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h264enc bitrate=4000000 vbv-size=40 ! video/x-h264, stream-format=byte-stream, profile=baseline! filesink location=16/test.h264
 
+Test 17:
+gst-launch-1.0 -e nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h264enc bitrate=4000000 insert-vui=1 ! video/x-h264, stream-format=byte-stream ! filesink location=17/test.h264
+
+// Doesn't work (param does not exist)
+gst-launch-1.0 -e nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! nvv4l2h264enc bitrate=4000000 poc-type=2 ! video/x-h264, stream-format=byte-stream, profile=baseline! filesink location=X/test.h264
+
 https://docs.nvidia.com/jetson/l4t/index.html#page/Tegra%20Linux%20Driver%20Package%20Development%20Guide/accelerated_gstreamer.html
