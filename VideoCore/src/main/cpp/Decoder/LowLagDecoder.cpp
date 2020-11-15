@@ -74,7 +74,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     //MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
     //MLOGD<<"NALU size "<<StringHelper::memorySizeReadable(nalu.getSize());
     //MLOGD<<"NALU type "<<nalu.get_nal_name();
-    //nalu.debug();
+    nalu.debug();
     //MLOGD<<"DATA:"<<nalu.dataAsString();
     //return;
     //we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface

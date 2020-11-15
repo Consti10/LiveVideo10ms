@@ -19,7 +19,7 @@ namespace AnnexBHelper{
         const uint8_t* nal_data=&naluData[4];
         int rbsp_size=nal_size;
         std::vector<uint8_t> rbsp_buf;
-        rbsp_buf.resize(rbsp_size);
+        rbsp_buf.resize(rbsp_size+2);
         int rc = nal_to_rbsp(nal_data, &nal_size, rbsp_buf.data(), &rbsp_size);
         assert(rc>0);
         //MLOGD<<"X "<<rbsp_buf.size()<<" Y"<<rbsp_size;
@@ -88,7 +88,7 @@ namespace H264{
 // --------------------------------------------- crude hacking --------------------------------------------
         std::vector<uint8_t> asNALU()const{
             std::vector<uint8_t> rbspBuff;
-            rbspBuff.resize(14+6);
+            rbspBuff.resize(14+64*4);
             MLOGD<<"rbspbuffSize"<<rbspBuff.size();
             BitStream b(rbspBuff);
             //
@@ -134,6 +134,41 @@ namespace H264{
         }
         void experiment(){
             //parsed.level_idc=40;
+        }
+        void addVUI(){
+            parsed.vui_parameters_present_flag=1;
+            parsed.vui.aspect_ratio_info_present_flag=0;
+            parsed.vui.aspect_ratio_idc=0;
+            parsed.vui.sar_width=0;
+            parsed.vui.sar_height=0;
+            parsed.vui.overscan_info_present_flag=0;
+            parsed.vui.overscan_appropriate_flag=0;
+            parsed.vui.video_signal_type_present_flag=1;
+            parsed.vui.video_format=5;
+            parsed.vui.video_full_range_flag=0;
+            parsed.vui.colour_description_present_flag=1;
+            parsed.vui.colour_primaries=0;
+            parsed.vui.transfer_characteristics=0;
+            parsed.vui.matrix_coefficients=5;
+            parsed.vui.chroma_loc_info_present_flag=0;
+            parsed.vui.chroma_sample_loc_type_top_field=0;
+            parsed.vui.chroma_sample_loc_type_bottom_field=0;
+            parsed.vui.timing_info_present_flag=1;
+            parsed.vui.num_units_in_tick=1;
+            parsed.vui.time_scale=120;
+            parsed.vui.fixed_frame_rate_flag=1;
+            parsed.vui.nal_hrd_parameters_present_flag=0;
+            parsed.vui.vcl_hrd_parameters_present_flag=0;
+            parsed.vui.low_delay_hrd_flag=0;
+            parsed.vui.pic_struct_present_flag=0;
+            parsed.vui.bitstream_restriction_flag=1;
+            parsed.vui.motion_vectors_over_pic_boundaries_flag=1;
+            parsed.vui.max_bytes_per_pic_denom=0;
+            parsed.vui.max_bits_per_mb_denom=0;
+            parsed.vui.log2_max_mv_length_horizontal=16;
+            parsed.vui.log2_max_mv_length_vertical=16;
+            parsed.vui.num_reorder_frames=0;
+            parsed.vui.max_dec_frame_buffering=1;
         }
     };
     static void testSPSConversion(const uint8_t* nalu_data,size_t data_len){
