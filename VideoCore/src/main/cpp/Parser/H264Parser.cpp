@@ -67,7 +67,8 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
     }
     //sps or pps NALUs do not count as frames, as well as AUD
     //E.g. they won't create a frame on the output pipe)
-    if(!(sps_or_pps || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD)){
+    const bool isNotARealFrame=nalu.IS_H265_PACKET ? (nalu.isSPS() || nalu.isPPS() || nalu.isVPS() || nalu.isAUD()) : (nalu.isSPS() || nalu.isPPS() || nalu.isAUD());
+    if(!(isNotARealFrame)){
         mFrameLimiter.limitFps(maxFPS);
     }
 }

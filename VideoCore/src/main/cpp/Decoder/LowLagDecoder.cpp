@@ -74,7 +74,7 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     //MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
     //MLOGD<<"NALU size "<<StringHelper::memorySizeReadable(nalu.getSize());
     //MLOGD<<"NALU type "<<nalu.get_nal_name();
-    nalu.debug();
+    //nalu.debug();
     //MLOGD<<"DATA:"<<nalu.dataAsString();
     //return;
     //we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface
@@ -153,6 +153,11 @@ void LowLagDecoder::configureStartDecoder(){
 }
 
 void LowLagDecoder::feedDecoder(const NALU& nalu){
+    if(IS_H265 && (nalu.isSPS() || nalu.isPPS() || nalu.isVPS())){
+        // looks like h265 doesn't like feeding sps/pps/vps during decoding
+        // it could also be that they have to be merged together, but for now just skip them
+        return;
+    }
     const auto now=std::chrono::steady_clock::now();
     const auto deltaParsing=now-nalu.creationTime;
     while(true){
