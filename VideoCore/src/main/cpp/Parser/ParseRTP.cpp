@@ -146,7 +146,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     }
     if(nal_unit_header_h265.type==48){
         // Aggregation packets are not supported yet (and never used in gstreamer / ffmpeg anyways)
-        MLOGE<<"Unsupprted RTP H265 packet (Aggregation packet)";
+        MLOGE<<"Unsupported RTP H265 packet (Aggregation packet)";
         return;
     }else if(nal_unit_header_h265.type==49){
         // FU-X packet
@@ -218,7 +218,7 @@ void RTPDecoder::forwardNALU(const std::chrono::steady_clock::time_point creatio
             //NALU nalu(nalu_data);
             cb(nalu);
         }else{
-            MLOGE<<"RTP parser produced NALU with insueficient data size";
+            MLOGE<<"RTP parser produced NALU with insufficient data size";
         }
     }
     mNALU_DATA_LENGTH=0;

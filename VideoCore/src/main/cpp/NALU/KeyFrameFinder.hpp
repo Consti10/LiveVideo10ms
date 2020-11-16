@@ -52,6 +52,12 @@ public:
     static void appendNaluData(std::vector<uint8_t>& buff,const NALU& nalu){
         buff.insert(buff.begin(),nalu.getData(),nalu.getData()+nalu.getSize());
     }
+    void reset(){
+        SPS=nullptr;
+        PPS=nullptr;
+        VPS=nullptr;
+    }
+public:
     void setSPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
         const auto sps=getCSD0();
         const auto pps=getCSD1();
@@ -73,11 +79,6 @@ public:
         AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
         AMediaFormat_setBuffer(format,"csd-0",buff.data(),buff.size());
         MLOGD<<"Video WH:"<<videoWH[0]<<" H:"<<videoWH[1];
-    }
-    void reset(){
-        SPS=nullptr;
-        PPS=nullptr;
-        VPS=nullptr;
     }
 };
 
