@@ -67,6 +67,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     //MLOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
     //nalu.debugX();
     //mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
+    const auto GROUND_RECORDER_PACKET_TYPE=nalu.IS_H265_PACKET ? GroundRecorderFPV::PACKET_TYPE_VIDEO_H265 : GroundRecorderFPV::PACKET_TYPE_VIDEO_H264;
     const bool EXP_SPS_FIX=true;
     if(EXP_SPS_FIX){
         if((!nalu.IS_H265_PACKET) && nalu.isSPS()){
@@ -78,12 +79,14 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
             auto tmp=sps.asNALU();
             NALU nalu1(tmp.data(),tmp.size());
             mLowLagDecoder.interpretNALU(nalu1);
+            mGroundRecorderFPV.writePacketIfStarted(nalu1.getData(),nalu1.getSize(),GROUND_RECORDER_PACKET_TYPE);
         }else{
             mLowLagDecoder.interpretNALU(nalu);
+            mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GROUND_RECORDER_PACKET_TYPE);
         }
     }else{
         mLowLagDecoder.interpretNALU(nalu);
-        mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GroundRecorderFPV::PACKET_TYPE_VIDEO_H264);
+        mGroundRecorderFPV.writePacketIfStarted(nalu.getData(),nalu.getSize(),GROUND_RECORDER_PACKET_TYPE);
     }
 }
 
