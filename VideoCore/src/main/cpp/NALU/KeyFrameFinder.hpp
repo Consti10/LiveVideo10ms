@@ -58,7 +58,7 @@ public:
         VPS=nullptr;
     }
 public:
-    void setSPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
+    void h264_configureAMediaFormat(AMediaFormat* format){
         const auto sps=getCSD0();
         const auto pps=getCSD1();
         const auto videoWH= sps.getVideoWidthHeightSPS();
@@ -67,8 +67,19 @@ public:
         AMediaFormat_setBuffer(format,"csd-0",sps.getData(),(size_t)sps.getSize());
         AMediaFormat_setBuffer(format,"csd-1",pps.getData(),(size_t)pps.getSize());
         MLOGD<<"Video WH:"<<videoWH[0]<<" H:"<<videoWH[1];
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,5*1024*1024);
+        //static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
+        //AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
+        // Lower values mean higher priority
+        // Works on pixel 3 (look at output format description)
+        //static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
+        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
+        //AVCProfileBaseline==1
+        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
+        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
     }
-    void setVPS_SPS_PPS_WIDTH_HEIGHT(AMediaFormat* format){
+    void h265_configureAMediaFormat(AMediaFormat* format){
         std::vector<uint8_t> buff={};
         buff.reserve(SPS->getSize()+PPS->getSize()+VPS->getSize());
         appendNaluData(buff,*VPS);

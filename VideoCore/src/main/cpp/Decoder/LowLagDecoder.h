@@ -81,9 +81,9 @@ public:
     // If the input pipe was closed (surface has been removed or is not set yet), only buffer key frames
     void interpretNALU(const NALU& nalu);
 private:
-    //Initialize decoder with provided SPS/PPS data.
+    //Initialize decoder with SPS / PPS data from KeyFrameFinder
     //Set Decoder.configured to true on success
-    void configureStartDecoder(const NALU& sps,const NALU& pps);
+    void configureStartDecoder();
     //Wait for input buffer to become available before feeding NALU
     void feedDecoder(const NALU& nalu);
     //Runs until EOS arrives at output buffer or decoder is stopped

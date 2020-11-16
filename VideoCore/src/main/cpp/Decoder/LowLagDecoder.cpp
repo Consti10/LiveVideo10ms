@@ -102,12 +102,12 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
         // As soon as enough data has been buffered to initialize the decoder,do so.
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         if(mKeyFrameFinder.allKeyFramesAvailable(IS_H265)){
-            configureStartDecoder(mKeyFrameFinder.getCSD0(),mKeyFrameFinder.getCSD1());
+            configureStartDecoder();
         }
     }
 }
 
-void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
+void LowLagDecoder::configureStartDecoder(){
     const std::string MIME=IS_H265 ? "video/hevc" : "video/avc";
     if(USE_SW_DECODER_INSTEAD){
         if(IS_H265){
@@ -129,26 +129,9 @@ void LowLagDecoder::configureStartDecoder(const NALU& sps,const NALU& pps){
     AMediaFormat* format=AMediaFormat_new();
     AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,MIME.c_str());
     if(IS_H265){
-        mKeyFrameFinder.setVPS_SPS_PPS_WIDTH_HEIGHT(format);
+        mKeyFrameFinder.h265_configureAMediaFormat(format);
     }else{
-        const auto videoWH= sps.getVideoWidthHeightSPS();
-        MLOGD<<"Video W:"<<videoWH[0]<<" H:"<<videoWH[1];
-        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
-        //AVCProfileBaseline==1
-        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
-        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-        AMediaFormat_setBuffer(format,"csd-0",sps.getData(),sps.getSize());
-        AMediaFormat_setBuffer(format,"csd-1",pps.getData(),pps.getSize());
-        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,5*1024*1024);
-        //static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
-        //AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
-        // Lower values mean higher priority
-        // Works on pixel 3 (look at output format description)
-        //static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
-        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
+        mKeyFrameFinder.h264_configureAMediaFormat(format);
     }
 
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
