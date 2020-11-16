@@ -112,6 +112,7 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
     const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
     const int VS_FILE_ONLY_LIMIT_FPS=mSettingsN.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS,60);
     const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
+    VS_ENABLE_H264_SPS_VUI_FIX=mSettingsN.getBoolean(IDV::VS_ENABLE_H264_SPS_VUI_FIX);
 
     //Add Ground recorder if enabled and needed
     if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){

@@ -82,6 +82,12 @@
             android:summary="FOV of 360° video"
             android:defaultValue="50"/>
 
+        <androidx.preference.SwitchPreference
+            android:key="@string/VS_ENABLE_H264_SPS_VUI_FIX"
+            android:title="@string/VS_ENABLE_H264_SPS_VUI_FIX"
+            android:summary="Decreases latency for select video streams(webcam,insta360)"
+            android:defaultValue="false" />
+
     </PreferenceCategory>
 
 
