@@ -58,6 +58,8 @@ public:
         VPS=nullptr;
     }
 public:
+    // Some of these params are only supported on the latest Android versions
+    // However,writing them has no negative affect on devices with older Android versions
     void writeAndroidPerformanceParams(AMediaFormat* format){
         static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
         AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
