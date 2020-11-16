@@ -28,26 +28,26 @@ namespace RBSPHelper{
     }
 
     static std::vector<uint8_t> escapeRbsp(const std::vector<uint8_t>& rbspBuff){
-        std::vector<uint8_t> naluBuff;
-        naluBuff.resize(rbspBuff.size()+32);
+        std::vector<uint8_t> rbspBuffEscaped;
+        rbspBuffEscaped.resize(rbspBuff.size()+32);
         int rbspSize=rbspBuff.size();
-        int nalSize=naluBuff.size();
-        auto tmp=rbsp_to_nal(rbspBuff.data(),&rbspSize,naluBuff.data(),&nalSize);
+        int rbspBuffEscapedSize=rbspBuffEscaped.size();
+        auto tmp=rbsp_to_nal(rbspBuff.data(),&rbspSize,rbspBuffEscaped.data(),&rbspBuffEscapedSize);
         assert(tmp>0);
-        naluBuff.resize(tmp);
+        rbspBuffEscaped.resize(tmp);
         // workaround h264bitstream library
-        return std::vector<uint8_t>(&naluBuff.data()[1],&naluBuff.data()[1]+naluBuff.size()-1);
+        return std::vector<uint8_t>(&rbspBuffEscaped.data()[1],&rbspBuffEscaped.data()[1]+rbspBuffEscaped.size()-1);
     }
 
-    static void test_unescape_escape(const std::vector<uint8_t>& rbspData){
-        auto unescapedData=unescapeRbsp(rbspData.data(),rbspData.size());
+    static void test_unescape_escape(const std::vector<uint8_t>& rbspDataEscaped){
+        auto unescapedData=unescapeRbsp(rbspDataEscaped.data(),rbspDataEscaped.size());
         auto unescapedThenEscapedData=escapeRbsp(unescapedData);
-        MLOGD<<"Y1:"<<StringHelper::vectorAsString(rbspData);
+        MLOGD<<"Y1:"<<StringHelper::vectorAsString(rbspDataEscaped);
         MLOGD<<"Y2:"<<StringHelper::vectorAsString(unescapedData);
         MLOGD<<"Y3:"<<StringHelper::vectorAsString(unescapedThenEscapedData);
         // check if the data stayed the same after unescaping then escaping it again
-        assert(rbspData.size()==unescapedThenEscapedData.size());
-        assert(std::memcmp(rbspData.data(),unescapedThenEscapedData.data(),rbspData.size())==0);
+        assert(rbspDataEscaped.size()==unescapedThenEscapedData.size());
+        assert(std::memcmp(rbspDataEscaped.data(),unescapedThenEscapedData.data(),rbspDataEscaped.size())==0);
     }
 }
 
