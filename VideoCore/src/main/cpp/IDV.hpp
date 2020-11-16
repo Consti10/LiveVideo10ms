@@ -14,7 +14,7 @@ public:
     static constexpr const char* VS_FFMPEG_URL="VS_FFMPEG_URL";
     static constexpr const char* VS_VIDEO_VIEW_TYPE="VS_VIDEO_VIEW_TYPE";
     static constexpr const char* VS_360_VIDEO_FOV="VS_360_VIDEO_FOV";
-    static constexpr const char* ENABLE_H264_SPS_VUI_FIX="ENABLE_H264_SPS_VUI_FIX";
+    static constexpr const char* VS_ENABLE_H264_SPS_VUI_FIX="VS_ENABLE_H264_SPS_VUI_FIX";
 };
 
 #endif //CONSTI_10_100_IDV
