@@ -66,14 +66,10 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     if(decoder.configured){
         assert(nalu.IS_H265_PACKET==IS_H265);
     }
-    if(nalu.IS_H265_PACKET){
-        IS_H265=true;
-    }else{
-        IS_H265=false;
-    }
+    IS_H265=nalu.IS_H265_PACKET;
     //MLOGD<<"Is H265 "<<nalu.IS_H265_PACKET;
-    //MLOGD<<"NALU size "<<StringHelper::memorySizeReadable(nalu.getSize());
-    //MLOGD<<"NALU type "<<nalu.get_nal_name();
+    MLOGD<<"NALU size "<<StringHelper::memorySizeReadable(nalu.getSize());
+    MLOGD<<"NALU type "<<nalu.get_nal_name();
     //nalu.debug();
     //MLOGD<<"DATA:"<<nalu.dataAsString();
     //return;
@@ -158,6 +154,10 @@ void LowLagDecoder::feedDecoder(const NALU& nalu){
         // it could also be that they have to be merged together, but for now just skip them
         return;
     }
+    // We do not need to feed AUDs (Access unit delimiter) to the decoder
+    if(nalu.isAUD()){
+        return;
+    }
     const auto now=std::chrono::steady_clock::now();
     const auto deltaParsing=now-nalu.creationTime;
     while(true){
@@ -165,6 +165,8 @@ void LowLagDecoder::feedDecoder(const NALU& nalu){
         if (index >=0) {
             size_t inputBufferSize;
             void* buf = AMediaCodec_getInputBuffer(decoder.codec,(size_t)index,&inputBufferSize);
+            // I have not seen any case where the input buffer returned by MediaCodec is too small to hold the NALU
+            // But better be safe than crashing with a memory exception
             if(nalu.getSize()>inputBufferSize){
                 MLOGD<<"Nalu too big"<<nalu.getSize();
                 return;

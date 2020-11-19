@@ -150,8 +150,8 @@ void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_l
                                 cb(nalu);
                                 //dji_data_buff_size=0;
                             }else{
-                                //accumulateSlicedNALUsByAUD(nalu);
-                                accumulateSlicedNALUsBySliceHeader(nalu);
+                                accumulateSlicedNALUsByAUD(nalu);
+                                //accumulateSlicedNALUsBySliceHeader(nalu);
                             }
                         }
                     }
