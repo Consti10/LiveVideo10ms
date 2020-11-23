@@ -207,7 +207,7 @@ public:
             return sps.getWidthHeightPx();
         }
     }
-    const H264::slice_header_t& getSliceHeaderH264()const{
+     const H264::slice_header_t& getSliceHeaderH264()const{
         assert(!IS_H265_PACKET);
         assert(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR);
         assert(getSize()>6);
