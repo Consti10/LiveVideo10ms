@@ -182,7 +182,7 @@ void ParseRAW::accumulateSlicedNALUsBySliceHeader(const NALU& nalu){
     if(!(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR)){
         return;
     }
-    auto sliceHeader=nalu.getSliceHeaderH264();
+    const auto sliceHeader=nalu.getSliceHeaderH264();
     if(sliceHeader.slice_type==3){
         if(dji_data_buff_size>0){
             NALU nalu2(dji_data_buff,dji_data_buff_size);

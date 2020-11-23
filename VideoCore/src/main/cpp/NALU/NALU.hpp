@@ -76,6 +76,7 @@ private:
     const size_t data_len;
 public:
     const bool IS_H265_PACKET;
+    // creation time is used to measure latency
     const std::chrono::steady_clock::time_point creationTime;
 public:
     // returns true if starts with 0001, false otherwise
@@ -206,13 +207,12 @@ public:
             return sps.getWidthHeightPx();
         }
     }
-    H264::slice_header_t getSliceHeaderH264()const{
+    const H264::slice_header_t& getSliceHeaderH264()const{
         assert(!IS_H265_PACKET);
         assert(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR);
         assert(getSize()>6);
-        H264::slice_header_t ret;
-        memcpy(&ret,&getDataWithoutPrefix()[1],sizeof(H264::slice_header_t));
-        return ret;
+        const H264::slice_header_t* ret1=static_cast<const H264::slice_header_t*>((const void*)&getDataWithoutPrefix()[1]);
+        return *ret1;
     }
 };
 
