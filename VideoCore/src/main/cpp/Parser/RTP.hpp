@@ -134,7 +134,7 @@ static constexpr auto MY_SSRC_NUM=10;
 
 // A RTP packet consists of the header and payload
 // The payload also first holds another header (the NALU header) for h264 and h265
-// And depending on this header there might be another header,but this depth is left to the parser
+// And depending on this header there might be another header,but this depth is left to the H264/H265 implementation (see below)
 // Constructing an RTP packet just reinterprets the memory in the right way, e.g. has no performance overhead
 class RTPPacket{
 public:
