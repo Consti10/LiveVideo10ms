@@ -135,6 +135,7 @@ static constexpr auto MY_SSRC_NUM=10;
 // A RTP packet consists of the header and payload
 // The payload also first holds another header (the NALU header) for h264 and h265
 // And depending on this header there might be another header,but this depth is left to the parser
+// Constructing an RTP packet just reinterprets the memory in the right way, e.g. has no performance overhead
 class RTPPacket{
 public:
     // construct from raw data (e.g. received via UDP)
@@ -145,7 +146,7 @@ public:
         rtpPayload=&rtp_data[sizeof(rtp_header_t)];
         rtpPayloadSize= data_length - sizeof(rtp_header_t);
     }
-    // reference to the rtp header
+    // const reference to the rtp header
     const rtp_header_t& header;
     // pointer to the rtp payload
     const uint8_t *rtpPayload;
@@ -163,6 +164,18 @@ public:
         assert(rtpPayloadSize >= sizeof(nalu_header_t));
         return *(nalu_header_t*)rtpPayload;
     }
+    // the fu header comes after the rtp header and after the nal_unit_header.
+    // WARNING: Call this function only for fu packets !
+    const fu_header_t& getFuHeader()const{
+        assert(getNALUHeaderH264().type==28);
+        return *(fu_header_t*)rtpPayload[sizeof(nalu_header_t)];
+    }
+    const uint8_t* getFuPayload()const{
+         return &rtpPayload[sizeof(nalu_header_t) + sizeof(fu_header_t)];
+    }
+    std::size_t getFuPayloadSize()const{
+        return rtpPayloadSize-(sizeof(nalu_header_t) + sizeof(fu_header_t));
+    }
 };
 
 class RTPPacketH265: public RTPPacket{
@@ -173,9 +186,17 @@ public:
         assert(rtpPayloadSize >= sizeof(nal_unit_header_h265_t));
         return *(nal_unit_header_h265_t*)rtpPayload;
     }
+    // the fu header comes after the rtp header and after the nal_unit_header.
+    // WARNING: Call this function only for fu packets !
     const fu_header_h265_t& getFuHeader()const{
         assert(getNALUHeaderH265().type==49);
         return *(fu_header_h265_t*)&rtpPayload[sizeof(nal_unit_header_h265_t)];
+    }
+    const uint8_t* getFuPayload()const{
+         return &rtpPayload[sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t)];
+    }
+    std::size_t getFuPayloadSize()const{
+        return rtpPayloadSize-(sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t));
     }
 };
 
