@@ -81,6 +81,7 @@ struct nalu_header_t {
 } __attribute__ ((packed));
 static_assert(sizeof(nalu_header_t)==1);
 // fu indicator and nalu_header are exactly the same !
+// only in a fu packet the nalu header is named fu indicator
 using fu_indicator_t=nalu_header_t;
 //+---------------+
 //|0|1|2|3|4|5|6|7|
