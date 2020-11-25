@@ -141,18 +141,18 @@ class RTPPacket{
 public:
     // construct from raw data (e.g. received via UDP)
     RTPPacket(const uint8_t* rtp_data, const size_t data_length):
-    header(*((rtp_header_t*)rtp_data))
+    header(*((rtp_header_t*)rtp_data)),
+    rtpPayload(&rtp_data[sizeof(rtp_header_t)]),
+    rtpPayloadSize(data_length - sizeof(rtp_header_t))
     {
         assert(data_length>=sizeof(rtp_header_t));
-        rtpPayload=&rtp_data[sizeof(rtp_header_t)];
-        rtpPayloadSize= data_length - sizeof(rtp_header_t);
     }
     // const reference to the rtp header
     const rtp_header_t& header;
     // pointer to the rtp payload
-    const uint8_t* rtpPayload;
+    const uint8_t* const rtpPayload;
     // size of the rtp payload
-    std::size_t rtpPayloadSize;
+    const std::size_t rtpPayloadSize;
 };
 
 // The NALU header for h264 and h265 comes directly after the rtp header
