@@ -24,7 +24,7 @@ static_assert(__BYTE_ORDER__==__LITTLE_ENDIAN);
 //|            contributing source (CSRC) identifiers             |
 //|                             ....                              |
 //+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-typedef struct rtp_header {
+struct rtp_header_t {
     //For little endian
     uint8_t cc:4;            // CSRC count
     uint8_t extension:1;     // Extension bit
@@ -60,7 +60,7 @@ typedef struct rtp_header {
         ss<<"sources"<<(int)getSources()<<"\n";
         return ss.str();
     }
-} __attribute__ ((packed)) rtp_header_t; /* 12 bytes */
+} __attribute__ ((packed)); /* 12 bytes */
 static_assert(sizeof(rtp_header_t)==12);
 
 
@@ -71,34 +71,34 @@ static_assert(sizeof(rtp_header_t)==12);
 //+-+-+-+-+-+-+-+-+
 //|F|NRI|  Type   |
 //+---------------+
-typedef struct nalu_header {
+struct nalu_header_t {
     uint8_t type:   5;
     uint8_t nri:    2;
     uint8_t f:      1;
-} __attribute__ ((packed)) nalu_header_t;
+} __attribute__ ((packed));
 static_assert(sizeof(nalu_header_t)==1);
 //+---------------+
 //|0|1|2|3|4|5|6|7|
 //+-+-+-+-+-+-+-+-+
 //|F|NRI|  Type   |
 //+---------------+
-typedef struct fu_indicator {
+typedef struct fu_indicator_t {
     uint8_t type:   5;
     uint8_t nri:    2;
     uint8_t f:      1;
-} __attribute__ ((packed)) fu_indicator_t; /* 1 bytes */
+} __attribute__ ((packed)); /* 1 bytes */
 static_assert(sizeof(fu_indicator_t)==1);
 //+---------------+
 //|0|1|2|3|4|5|6|7|
 //+-+-+-+-+-+-+-+-+
 //|S|E|R|  Type   |
 //+---------------+
-typedef struct fu_header {
+typedef struct fu_header_t {
     uint8_t type:   5;
     uint8_t r:      1;
     uint8_t e:      1;
     uint8_t s:      1;
-} __attribute__ ((packed)) fu_header_t;
+} __attribute__ ((packed));
 static_assert(sizeof(fu_header_t)==1);
 
 //******************************************************** H265 ********************************************************
@@ -108,12 +108,12 @@ static_assert(sizeof(fu_header_t)==1);
 //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //  |F|   Type    |  LayerId  | TID |
 //  +-------------+-----------------+
-typedef struct nal_unit_header_h265{
+struct nal_unit_header_h265_t{
     uint8_t f:      1;
     uint8_t type:   6;
     uint8_t layerId:6;
     uint8_t tid:    3;
-}__attribute__ ((packed)) nal_unit_header_h265_t;
+}__attribute__ ((packed));
 static_assert(sizeof(nal_unit_header_h265_t)==2);
 // defined in 4.4.3 FU Header
 //+---------------+
@@ -121,17 +121,18 @@ static_assert(sizeof(nal_unit_header_h265_t)==2);
 //+-+-+-+-+-+-+-+-+
 //|S|E|  FuType   |
 //+---------------+
-typedef struct fu_header_h265{
+struct fu_header_h265_t{
     uint8_t fuType:6;
     uint8_t e:1;
     uint8_t s:1;
-}__attribute__ ((packed)) fu_header_h265_t;
+}__attribute__ ((packed));
 static_assert(sizeof(fu_header_h265_t)==1);
 
 // Unfortunately the payload header is the same for h264 and h265
 static constexpr auto RTP_PAYLOAD_TYPE_H264_H265=96;
 static constexpr auto MY_SSRC_NUM=10;
 
+namespace RTP{
 // A RTP packet consists of the header and payload
 // The payload also first holds another header (the NALU header) for h264 and h265
 // And depending on this header there might be another header,but this depth is left to the H264/H265 implementation (see below)
@@ -198,7 +199,7 @@ public:
         return rtpPayloadSize-(sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t));
     }
 };
-
+}
 
 
 #endif //LIVEVIDEO10MS_RTP_HPP

@@ -48,7 +48,7 @@ void RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_l
         return;
     }
     //MLOGD<<"Got rtp data";
-    const RTPPacketH264 rtpPacket(rtp_data,data_length);
+    const RTP::RTPPacketH264 rtpPacket(rtp_data,data_length);
     //MLOGD<<"RTP Header: "<<rtp_header->asString();
     if(!validateRTPPacket(rtpPacket.header)){
         return;
@@ -135,7 +135,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         return;
     }
     //MLOGD<<"Got rtp data";
-    const RTPPacketH265 rtpPacket(rtp_data,data_length);
+    const RTP::RTPPacketH265 rtpPacket(rtp_data,data_length);
     //MLOGD<<"RTP Header: "<<rtp_header->asString();
     if(!validateRTPPacket(rtpPacket.header)){
         return;
