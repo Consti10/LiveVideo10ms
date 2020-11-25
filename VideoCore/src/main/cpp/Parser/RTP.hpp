@@ -167,7 +167,7 @@ public:
     // WARNING: Call this function only for fu packets !
     const fu_header_t& getFuHeader()const{
         assert(getNALUHeaderH264().type==28);
-        return *(fu_header_t*)rtpPayload[sizeof(nalu_header_t)];
+        return *(fu_header_t*)&rtpPayload[sizeof(nalu_header_t)];
     }
     const uint8_t* getFuPayload()const{
          return &rtpPayload[sizeof(nalu_header_t) + sizeof(fu_header_t)];
