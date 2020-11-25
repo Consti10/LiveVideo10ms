@@ -143,8 +143,7 @@ public:
     RTPPacket(const uint8_t* rtp_data, const size_t data_length):
     header(*((rtp_header_t*)rtp_data)),
     rtpPayload(&rtp_data[sizeof(rtp_header_t)]),
-    rtpPayloadSize(data_length - sizeof(rtp_header_t))
-    {
+    rtpPayloadSize(data_length - sizeof(rtp_header_t)){
         assert(data_length>=sizeof(rtp_header_t));
     }
     // const reference to the rtp header
