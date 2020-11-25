@@ -155,7 +155,6 @@ public:
 };
 
 // The NALU header for h264 and h265 comes directly after the rtp header
-
 class RTPPacketH264: public RTPPacket{
 public:
     using RTPPacket::RTPPacket;
