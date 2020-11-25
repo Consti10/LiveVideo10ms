@@ -10,6 +10,9 @@
 
 // This code is written for little endian (aka ARM) byte order
 static_assert(__BYTE_ORDER__==__LITTLE_ENDIAN);
+// RTP uses big endian (network) byte order. Therefore, most of the structs here
+// are actually declared in 'reverse order' such that the compiler can do the work
+// of 'interpreting bits the right way' for us
 // Same for both h264 and h265
 // Defined in https://tools.ietf.org/html/rfc3550
 //0                   1                   2                   3
@@ -77,17 +80,8 @@ struct nalu_header_t {
     uint8_t f:      1;
 } __attribute__ ((packed));
 static_assert(sizeof(nalu_header_t)==1);
-//+---------------+
-//|0|1|2|3|4|5|6|7|
-//+-+-+-+-+-+-+-+-+
-//|F|NRI|  Type   |
-//+---------------+
-typedef struct fu_indicator_t {
-    uint8_t type:   5;
-    uint8_t nri:    2;
-    uint8_t f:      1;
-} __attribute__ ((packed)); /* 1 bytes */
-static_assert(sizeof(fu_indicator_t)==1);
+// fu indicator and nalu_header are exactly the same !
+using fu_indicator_t=nalu_header_t;
 //+---------------+
 //|0|1|2|3|4|5|6|7|
 //+-+-+-+-+-+-+-+-+
