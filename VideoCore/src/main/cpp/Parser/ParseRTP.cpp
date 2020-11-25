@@ -53,10 +53,10 @@ void RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_l
     if(!validateRTPPacket(rtpPacket.header)){
         return;
     }
-    const auto nalu_header=rtpPacket.getNALUHeaderH264();
+    const auto& nalu_header=rtpPacket.getNALUHeaderH264();
     if (nalu_header.type == 28) { /* FU-A */
         //MLOGD<<"Got partial NALU";
-        const auto fu_header=rtpPacket.getFuHeader();
+        const auto& fu_header=rtpPacket.getFuHeader();
         const auto fu_payload=rtpPacket.getFuPayload();
         const auto fu_payload_size=rtpPacket.getFuPayloadSize();
         if (fu_header.e == 1) {
@@ -140,7 +140,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     if(!validateRTPPacket(rtpPacket.header)){
         return;
     }
-    const auto nal_unit_header_h265=rtpPacket.getNALUHeaderH265();
+    const auto& nal_unit_header_h265=rtpPacket.getNALUHeaderH265();
     if (nal_unit_header_h265.type > 50){
         MLOGE<<"Unsupported (HEVC) NAL type";
         return;
@@ -152,13 +152,9 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     }else if(nal_unit_header_h265.type==49){
         // FU-X packet
         //MLOGD<<"Got partial nal";
-        const auto fu_header=rtpPacket.getFuHeader();
+        const auto& fu_header=rtpPacket.getFuHeader();
         const auto fu_payload=rtpPacket.getFuPayload();
         const auto fu_payload_size=rtpPacket.getFuPayloadSize();
-        /*const auto fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
-        const auto fuPayloadOffset= sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t);
-        const uint8_t* fu_payload=&rtp_data[fuPayloadOffset];
-        const size_t fu_payload_size= data_length - fuPayloadOffset;*/
         if(fu_header.e){
             //MLOGD<<"end of fu packetization";
             appendNALUData(fu_payload, fu_payload_size);
