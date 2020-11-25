@@ -150,7 +150,7 @@ public:
     // const reference to the rtp header
     const rtp_header_t& header;
     // pointer to the rtp payload
-    const uint8_t *rtpPayload;
+    const uint8_t* rtpPayload;
     // size of the rtp payload
     std::size_t rtpPayloadSize;
 };
@@ -199,7 +199,7 @@ public:
         return rtpPayloadSize-(sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t));
     }
 };
-}
+}// namespace RTP
 
 
 #endif //LIVEVIDEO10MS_RTP_HPP
