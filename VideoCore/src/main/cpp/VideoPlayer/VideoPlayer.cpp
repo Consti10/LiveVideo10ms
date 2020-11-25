@@ -66,9 +66,9 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
 void VideoPlayer::onNewNALU(const NALU& nalu){
     //MLOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
     //nalu.debugX();
-    if(!nalu.IS_H265_PACKET){
-         mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
-    }
+    //if(!nalu.IS_H265_PACKET){
+    //     mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
+    //}
     if(VS_ENABLE_H264_SPS_VUI_FIX){
         if((!nalu.IS_H265_PACKET) && nalu.isSPS()){
             auto sps=H264::SPS(nalu.getData(),nalu.getSize());
