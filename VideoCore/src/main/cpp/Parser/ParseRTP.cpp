@@ -152,19 +152,19 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     }else if(nal_unit_header_h265.type==49){
         // FU-X packet
         //MLOGD<<"Got partial nal";
-        const auto fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
-        //const auto fu_header=rtpPacket.getFuHeader();
-        //const auto fu_payload=rtpPacket.getFuPayload();
-        //const auto fu_payload_size=rtpPacket.getFuPayloadSize();
+        const auto fu_header=rtpPacket.getFuHeader();
+        const auto fu_payload=rtpPacket.getFuPayload();
+        const auto fu_payload_size=rtpPacket.getFuPayloadSize();
+        /*const auto fu_header=(fu_header_h265_t*)&rtp_data[sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t)];
         const auto fuPayloadOffset= sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t) + sizeof(fu_header_h265_t);
         const uint8_t* fu_payload=&rtp_data[fuPayloadOffset];
-        const size_t fu_payload_size= data_length - fuPayloadOffset;
-        if(fu_header->e){
+        const size_t fu_payload_size= data_length - fuPayloadOffset;*/
+        if(fu_header.e){
             //MLOGD<<"end of fu packetization";
             appendNALUData(fu_payload, fu_payload_size);
             forwardNALU(timePointStartOfReceivingNALU,true);
             mNALU_DATA_LENGTH=0;
-        }else if(fu_header->s){
+        }else if(fu_header.s){
             //MLOGD<<"start of fu packetization";
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
             timePointStartOfReceivingNALU=std::chrono::steady_clock::now();
