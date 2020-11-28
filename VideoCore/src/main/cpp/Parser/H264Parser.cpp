@@ -55,7 +55,6 @@ void H264Parser::setLimitFPS(int maxFPS1) {
 }
 
 void H264Parser::newNaluExtracted(const NALU& nalu) {
-    using namespace std::chrono;
     //LOGD("H264Parser::newNaluExtracted");
     if(onNewNALU!= nullptr){
         onNewNALU(nalu);
