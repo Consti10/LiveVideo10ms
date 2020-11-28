@@ -44,7 +44,7 @@ void LowLagDecoder::setOutputSurface(JNIEnv* env,jobject surface,SharedPreferenc
         decoder.window=nullptr;
         resetStatistics();
     }else{
-        // Throw warning if th surface is set without clearing it first
+        // Throw warning if the surface is set without clearing it first
         assert(decoder.window==nullptr);
         decoder.window=ANativeWindow_fromSurface(env,surface);
         // open the input pipe - now the decoder will start as soon as enough data is available
