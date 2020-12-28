@@ -49,7 +49,7 @@ struct VideoRatio{
 };
 
 //Handles decoding of .h264 and .h265 video
-// (Second one not tested well yet)
+// with low latency. Uses the AMediaCodec api
 class LowLagDecoder {
 private:
     struct Decoder{
