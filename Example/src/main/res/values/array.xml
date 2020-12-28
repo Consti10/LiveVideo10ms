@@ -29,6 +29,7 @@
         <item>jetson/h265/6/test.h265</item>
         <item>jetson/h265/7/test.h265</item>
 
+        <item>runcam/runcam-h264.fpv</item>
 
         <item>x265/testZ.h265</item>
         <item>x264/testVideo.h264</item>
