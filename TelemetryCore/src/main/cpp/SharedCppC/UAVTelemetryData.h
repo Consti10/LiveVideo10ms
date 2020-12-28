@@ -12,6 +12,7 @@
  * This struct was once similar to the uav_telemetry_data in EZ-WB OSD, but it evolved a lot over time
  * and now has almost no similarities.
  */
+ // TODO: Ideally this would use the structs from mavlink (they are well documented with units) and ltm for example writes these values,too
 typedef struct {
     uint32_t validmsgsrx;
 
