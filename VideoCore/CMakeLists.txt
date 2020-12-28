@@ -115,7 +115,7 @@ add_library( VideoNative
         ${IO_PATH}/UDPSender.cpp
         ${IO_PATH}/FileReader.cpp
 
-        ${VIDEO_PATH}/Parser/H264Parser.cpp
+        ${VIDEO_PATH}/Parser/H26XParser.cpp
         ${VIDEO_PATH}/Parser/ParseRAW.cpp
         ${VIDEO_PATH}/Parser/ParseRTP.cpp
         ${VIDEO_PATH}/Decoder/LowLagDecoder.cpp

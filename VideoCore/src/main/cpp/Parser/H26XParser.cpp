@@ -1,7 +1,7 @@
 //
 // Created by Constantin on 24.01.2018.
 //
-#include "H264Parser.h"
+#include "H26XParser.h"
 #include <cstring>
 #include <android/log.h>
 #include <endian.h>
@@ -10,13 +10,13 @@
 #include <StringHelper.hpp>
 
 
-H264Parser::H264Parser(NALU_DATA_CALLBACK onNewNALU):
+H26XParser::H26XParser(NALU_DATA_CALLBACK onNewNALU):
         onNewNALU(std::move(onNewNALU)),
-        mParseRAW(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)),
-        mDecodeRTP(std::bind(&H264Parser::newNaluExtracted, this, std::placeholders::_1)){
+        mParseRAW(std::bind(&H26XParser::newNaluExtracted, this, std::placeholders::_1)),
+        mDecodeRTP(std::bind(&H26XParser::newNaluExtracted, this, std::placeholders::_1)){
 }
 
-void H264Parser::reset(){
+void H26XParser::reset(){
     mParseRAW.reset();
     mDecodeRTP.reset();
     nParsedNALUs=0;
@@ -26,35 +26,35 @@ void H264Parser::reset(){
     droppedPacketsSinceLastForwardedPacket=0;
 }
 
-void H264Parser::parse_raw_h264_stream(const uint8_t *data,const size_t data_length) {
+void H26XParser::parse_raw_h264_stream(const uint8_t *data, const size_t data_length) {
     mParseRAW.parseData(data,data_length);
 }
 
-void H264Parser::parse_raw_h265_stream(const uint8_t *data,const size_t data_length) {
+void H26XParser::parse_raw_h265_stream(const uint8_t *data, const size_t data_length) {
     mParseRAW.parseData(data,data_length,true);
 }
 
-void H264Parser::parse_rtp_h264_stream(const uint8_t *rtp_data,const size_t data_length) {
+void H26XParser::parse_rtp_h264_stream(const uint8_t *rtp_data, const size_t data_length) {
     mDecodeRTP.parseRTPH264toNALU(rtp_data, data_length);
 }
 
-void H264Parser::parse_rtp_h265_stream(const uint8_t *rtp_data,const size_t data_length) {
+void H26XParser::parse_rtp_h265_stream(const uint8_t *rtp_data, const size_t data_length) {
     mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
 }
 
-void H264Parser::parseDjiLiveVideoDataH264(const uint8_t *data,const size_t data_length) {
+void H26XParser::parseDjiLiveVideoDataH264(const uint8_t *data, const size_t data_length) {
     mParseRAW.parseDjiLiveVideoDataH264(data,data_length);
 }
 
-void H264Parser::parseJetsonRawSlicedH264(const uint8_t *data,const size_t data_length) {
+void H26XParser::parseJetsonRawSlicedH264(const uint8_t *data, const size_t data_length) {
     mParseRAW.parseJetsonRawSlicedH264(data,data_length);
 }
 
-void H264Parser::setLimitFPS(int maxFPS1) {
+void H26XParser::setLimitFPS(int maxFPS1) {
     this->maxFPS=maxFPS1;
 }
 
-void H264Parser::newNaluExtracted(const NALU& nalu) {
+void H26XParser::newNaluExtracted(const NALU& nalu) {
     //LOGD("H264Parser::newNaluExtracted");
     if(onNewNALU!= nullptr){
         onNewNALU(nalu);
@@ -72,7 +72,7 @@ void H264Parser::newNaluExtracted(const NALU& nalu) {
     }
 }
 
-void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
+void H26XParser::debugSequenceNumbers(const uint32_t seqNr) {
     sequenceNumbers.push_back(seqNr);
     if(sequenceNumbers.size()>32) {
         int nOutOufOrderBroken=0;
@@ -104,7 +104,7 @@ void H264Parser::debugSequenceNumbers(const uint32_t seqNr) {
     }
 }
 
-void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length) {
+void H26XParser::parseCustom(const uint8_t *data, const std::size_t data_length) {
     //
     avgUDPPacketSize.add(data_length);
     if(avgUDPPacketSize.getNSamples()>100){
@@ -138,7 +138,7 @@ void H264Parser::parseCustom(const uint8_t *data, const std::size_t data_length)
     }
 }
 
-void H264Parser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t data_len) {
+void H26XParser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t data_len) {
 
     mFECDecoder.add_block(data, data_len);
     //std::vector<uint8_t> obuf;

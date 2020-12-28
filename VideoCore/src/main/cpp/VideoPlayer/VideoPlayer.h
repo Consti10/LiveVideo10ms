@@ -14,7 +14,7 @@
 #include "../Experiment360/FFMpegVideoReceiver.h"
 #include "../Experiment360/FFMPEGFileWriter.h"
 #include "../Decoder/LowLagDecoder.h"
-#include "../Parser/H264Parser.h"
+#include "../Parser/H26XParser.h"
 
 class VideoPlayer{
 public:
@@ -50,7 +50,7 @@ private:
     JavaVM* javaVm=nullptr;
     TestEncodeDecodeRTP mTestEncodeDecodeRTP;
 public:
-    H264Parser mParser;
+    H26XParser mParser;
     LowLagDecoder mLowLagDecoder;
     std::unique_ptr<FFMpegVideoReceiver> mFFMpegVideoReceiver;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
