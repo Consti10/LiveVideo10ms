@@ -44,6 +44,11 @@ void mavlink_read_v2(UAVTelemetryData *td,OriginData *originData,const uint8_t *
                     td->BatteryPack_P= mavlink_msg_sys_status_get_battery_remaining(&msg);
                     break;
                 }
+                case MAVLINK_MSG_ID_BATTERY_STATUS:{
+                     mavlink_battery_status_t battery_status;
+                     mavlink_msg_battery_status_decode(&msg, &battery_status);
+                     td->BatteryPack_mAh=battery_status.current_consumed;
+                }break;
                 case MAVLINK_MSG_ID_VFR_HUD:{
                     td->SpeedGround_KPH = mavlink_msg_vfr_hud_get_groundspeed(&msg)*3.6f;
                     td->SpeedAir_KPH = mavlink_msg_vfr_hud_get_airspeed(&msg)*3.6f;
