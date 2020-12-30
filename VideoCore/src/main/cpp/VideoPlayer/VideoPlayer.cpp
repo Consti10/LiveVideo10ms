@@ -343,10 +343,5 @@ JNI_METHOD(void,nativeCallBack)
     }
 }
 
-JNI_METHOD(void , testLatency)
-(JNIEnv *env,jclass jclass1) {
-    test_latency({});
-    TEST_TIME_HELPER::test();
-}
 
 }

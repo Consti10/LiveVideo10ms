@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
         findViewById<View>(R.id.b_TestFEC).setOnClickListener {
             //TestFEC.nativeTestFec();
-            VideoPlayer.testLatency();
         }
     }
 
