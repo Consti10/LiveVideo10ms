@@ -215,9 +215,6 @@ std::string VideoPlayer::getInfoString()const{
     return ss.str();
 }
 
-// for openhd testing
-#include "test.cpp"
-
 
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
