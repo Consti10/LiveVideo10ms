@@ -18,3 +18,10 @@ gst-launch-1.0 filesrc location=TestVideos/x264/testVideo.h264 ! h264parse ! dec
 
 
 gst-launch-1.0 -v videotestsrc ! video/x-raw, framerate=1/1,width=640,height=480  ! x265enc speed-preset=superfast  bitrate=1000 tune=zerolatency ! video/x-h265, stream-format=byte-stream ! filesink location=testX.h265
+
+
+
+
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh264enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 ! video/x-h264, stream-format=byte-stream ! rtph264pay ! udpsink host=192.168.134.178 port=5600
+gst-launch-1.0 -v nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=1280, height=720, framerate=60/1' ! omxh265enc control-rate=2 bitrate=4000000 MeasureEncoderLatency=true iframeinterval=10 ! video/x-h265, stream-format=byte-stream ! rtph265pay ! udpsink host=192.168.134.178 port=5600
+
