@@ -41,7 +41,7 @@ dependencies {
     //firebase
     implementation 'com.google.firebase:firebase-core:18.0.0'
     implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
-    implementation('com.google.firebase:firebase-firestore:22.0.0')
+    implementation('com.google.firebase:firebase-firestore:22.0.1')
 
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
     implementation("androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion")
