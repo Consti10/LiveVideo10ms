@@ -101,7 +101,7 @@ void TelemetryReceiver::updateSettings(JNIEnv *env,jobject context) {
     //
     resetNReceivedTelemetryBytes();
     //std::memset (&uav_td, 0, sizeof(uav_td));
-    uav_td.Pitch_Deg=10; //else you cannot see the AH 3D Quad,since it is totally flat
+    uav_td.Pitch_Deg=-89; //else you cannot see the AH 3D Quad,since it is totally flat
     std::memset (&originData, 0, sizeof(originData));
     originData.Latitude_dDeg=0;
     originData.Longitude_dDeg=0;
