@@ -52,6 +52,7 @@ TelemetryReceiver::TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderF
             case GroundRecorderFPV::PACKET_TYPE_TELEMETRY_LTM:
                 T_Protocol=LTM;
                 this->onUAVTelemetryDataReceived(d,len);
+                MLOGD<<"LTM";
                 break;
             case GroundRecorderFPV::PACKET_TYPE_TELEMETRY_MAVLINK:
                 T_Protocol=MAVLINK;
@@ -101,7 +102,7 @@ void TelemetryReceiver::updateSettings(JNIEnv *env,jobject context) {
     //
     resetNReceivedTelemetryBytes();
     //std::memset (&uav_td, 0, sizeof(uav_td));
-    uav_td.Pitch_Deg=0; 
+    uav_td.Pitch_Deg=0;
     std::memset (&originData, 0, sizeof(originData));
     originData.Latitude_dDeg=0;
     originData.Longitude_dDeg=0;
@@ -825,9 +826,3 @@ JNI_METHOD(void, nativeIncrementOsdViewMode)
 }
 
 }
-
-
-
-
-
-

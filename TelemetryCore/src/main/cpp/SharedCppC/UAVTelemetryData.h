@@ -28,8 +28,8 @@ typedef struct {
     double Longitude_dDeg; //decimal degrees, Longitude of Aircraft
     double Latitude_dDeg; //decimal degrees Latitude of Aircraft
 
-    float Roll_Deg; //Roll of the aircraft, in degrees
-    float Pitch_Deg; //Pitch of the aircraft, in degrees
+    float Roll_Deg; //Roll of the aircraft, in degrees. positive is right side down
+    float Pitch_Deg; //Pitch of the aircraft, in degrees. positive is nose up
 
     float Heading_Deg; //Heading of the aircraft, in degrees
     float CourseOG_Deg; //course over ground (often reported by the compass) of the aircraft, in degrees
