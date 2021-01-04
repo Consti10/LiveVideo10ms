@@ -134,7 +134,7 @@ int ltm_check(UAVTelemetryData *td,OriginData *originData,const bool readAltitud
         td->validmsgsrx++;
 
     }else if (LTMcmd==LIGHTTELEMETRY_AFRAME)  {
-        td->Pitch_Deg = (int16_t)ltmread_u16(); //hmm for some reason this value seems to be inverted ?
+        td->Pitch_Deg = -(int16_t)ltmread_u16(); //hmm for some reason this value seems to be inverted ?
         td->Roll_Deg =  (int16_t)ltmread_u16();
         td->Heading_Deg = (float)((int16_t)ltmread_u16());
         if (td->Heading_Deg < 0 ) td->Heading_Deg = td->Heading_Deg + 360; //convert from -180/180 to 0/360Â°
