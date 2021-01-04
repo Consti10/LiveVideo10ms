@@ -52,7 +52,7 @@ TelemetryReceiver::TelemetryReceiver(JNIEnv* env,std::string DIR,GroundRecorderF
             case GroundRecorderFPV::PACKET_TYPE_TELEMETRY_LTM:
                 T_Protocol=LTM;
                 this->onUAVTelemetryDataReceived(d,len);
-                MLOGD<<"LTM";
+                //MLOGD<<"LTM";
                 break;
             case GroundRecorderFPV::PACKET_TYPE_TELEMETRY_MAVLINK:
                 T_Protocol=MAVLINK;
