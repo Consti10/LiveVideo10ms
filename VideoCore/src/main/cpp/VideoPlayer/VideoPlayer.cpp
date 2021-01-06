@@ -65,7 +65,7 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
 
 void VideoPlayer::onNewNALU(const NALU& nalu){
     //MLOGD("VideoNative::onNewNALU %d %s",(int)nalu.data_length,nalu.get_nal_name().c_str());
-    //nalu.debugX();
+    nalu.debug();
     //if(!nalu.IS_H265_PACKET){
     //     mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
     //}
@@ -75,6 +75,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
             //sps.increaseLatency();
             //sps.experiment();
             //sps.decreaseLatency();
+            //MLOGD<<"SPS"<<sps.asString();
             sps.addVUI();
             auto tmp=sps.asNALU();
             NALU nalu1(tmp.data(),tmp.size());

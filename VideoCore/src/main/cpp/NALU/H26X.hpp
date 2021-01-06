@@ -141,8 +141,32 @@ namespace H264{
         }
         void experiment(){
             //parsed.level_idc=40;
+            //parsed.profile_idc
         }
+        // The runcam webcam has:
+        // profile_idc=77
+        // level_idc=41
+        //
+        // The rpi has
+        // profile_idc=66
+        // level_idc=40
+
+        // https://www.iana.org/assignments/media-types/video/H264-SVC
+        //      The default level is indicated by the level_idc byte,
+        //      and, when profile_idc is equal to 66, 77, or 88 (the Baseline,
+        //      Main, or Extended profile) and level_idc is equal to 11,
+        //      additionally by bit 4 (constraint_set3_flag) of the profile-iop
+        //      byte.  When profile_idc is equal to 66, 77, or 88 (the
+        //      Baseline, Main, or Extended profile) and level_idc is equal to
+        //      11, and bit 4 (constraint_set3_flag) of the profile-iop byte is
+        //      equal to 1, the default level is Level 1b.
         void addVUI(){
+            //parsed.level_idc=40;
+            //parsed.constraint_set4_flag=true;
+            //parsed.constraint_set5_flag=true;
+            //parsed.log2_max_frame_num_minus4=12;
+            //parsed.log2_max_pic_order_cnt_lsb_minus4=12;
+
             parsed.vui_parameters_present_flag=1;
             parsed.vui.aspect_ratio_info_present_flag=0;
             parsed.vui.aspect_ratio_idc=0;
