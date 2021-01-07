@@ -115,12 +115,6 @@ private:
     static constexpr auto TIME_BETWEEN_LOGS=std::chrono::seconds(5);
     static constexpr int64_t BUFFER_TIMEOUT_US=35*1000; //40ms (a little bit more than 32 ms (==30 fps))
 private:
-    static constexpr uint8_t SPS_X264[31]{
-            0,0,0,1,103,66,192,40,217,0,120,2,39,229,192,90,128,128,128,160,0,0,125,32,0,29,76,17,227,6,73
-    };
-    static constexpr uint8_t SPS_X264_NO_VUI[15]{
-            0,0,0,1,103,66,192,40,217,0,120,2,39,229,64
-    };
     KeyFrameFinder mKeyFrameFinder;
     bool IS_H265= false;
 };
