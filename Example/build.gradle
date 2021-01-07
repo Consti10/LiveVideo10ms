@@ -30,6 +30,7 @@ android {
     //        storeFile file("C:\\Users\\geier\\Desktop\\FPV_VR\\YOther\\safety\\keystore.jks")
     //   }
     //}
+    // add the test files (assets) to the example (they are not included in VideoCore to save memory)
     sourceSets {
         main.assets.srcDirs += '../TestVideos'
     }
