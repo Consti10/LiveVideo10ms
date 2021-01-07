@@ -45,7 +45,7 @@ public class PlayTestVideosRepeated {
     //Dang, I cannot get the Spinner work with an Espresso test
     private void selectVideoFilename(final int selectedFile){
         final Context context=mActivityTestRule.getActivity();
-        final String filename= Objects.requireNonNull(MainActivity.Companion.ASSETS_TEST_VIDEO_FILE_NAMES(context))[selectedFile];
+        final String filename= Objects.requireNonNull(MainActivity.Companion.VIDEO_TEST_FILES_FOR_DB(context))[selectedFile];
         VideoSettings.setVS_ASSETS_FILENAME_TEST_ONLY(context,filename);
     }
 

@@ -50,7 +50,7 @@
         <item>x264/testVideo.h264</item>
         <item>rpi_cam/rpi.h264</item>
         <item>webcam/720p_usb.h264"</item>
-        <item>360/insta_interference.h264"</item>
+        <item>360/insta_webbn_2.h264</item>
     </string-array>
 
 </resources>

@@ -41,7 +41,7 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
     private var tvDataX264: TextView? = null
     private var tvDataInsta360: TextView? = null
 
-    private val DECODING_INFO: String ="DecodingInfo2";
+    private val DECODING_INFO: String ="DecodingInfo3";
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
