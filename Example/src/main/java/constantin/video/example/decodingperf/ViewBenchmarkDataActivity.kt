@@ -6,22 +6,22 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Pair
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jaredrummler.android.device.DeviceName
 import constantin.video.example.Helper
 import constantin.video.example.R
+import constantin.video.example.databinding.ActivityViewDataBinding
 import java.text.DecimalFormat
 import java.util.*
 
 
 @SuppressLint("SetTextI18n")
 class ViewBenchmarkDataActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityViewDataBinding
+
     private val TAG = this::class.java.simpleName
     //They become valid once the firebase request finished
     //private val deviceNames = ArrayList<Pair<String,String>>()
@@ -30,33 +30,27 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
 
     private val osVersions = ArrayList<List<String>>()
 
-    private var spinnerDeviceNames: Spinner? = null
-    private var spinnerOSVersions: Spinner? = null
-    private var context: Context? = null
+    private lateinit var context: Context
     //Avoid fetching the same data multiple times
     private var lastFetchedConfiguration = Pair("", "")
     internal val db = FirebaseFirestore.getInstance()
-
-    private var tvDataRpiCam: TextView? = null
-    private var tvDataX264: TextView? = null
-    private var tvDataInsta360: TextView? = null
 
     private val DECODING_INFO: String ="DecodingInfo3";
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_view_data)
+
+        //setContentView(R.layout.activity_view_data)
+        binding = ActivityViewDataBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         context = this
         //textView=findViewById(R.id.textView2);
         val device = Helper.getManufacturerAndDeviceName()
         val os = Helper.getBuildVersionRelease()
-        (findViewById<View>(R.id.textViewDevice) as TextView).text = "Device:$device"
-        (findViewById<View>(R.id.textViewOS) as TextView).text = "OS:$os"
-        spinnerDeviceNames = findViewById(R.id.spinner_device)
-        spinnerOSVersions = findViewById(R.id.spinner_os)
-        tvDataRpiCam = findViewById(R.id.tv_data_rpiCam)
-        tvDataX264 = findViewById(R.id.tv_data_x264)
-        tvDataInsta360 = findViewById(R.id.tv_data_insta360)
+
+        binding.textViewDevice.text = "Device:$device"
+        binding.textViewOS.text = "OS:$os"
 
         //This one is to populate the spinner with all tested device names / OS combos
         db.collection(DECODING_INFO).get().addOnCompleteListener(OnCompleteListener { task ->
@@ -89,9 +83,9 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
 
     private fun setupSpinner() {
         //The spinner with the device names does not change
-        val adapter1 = ArrayAdapter(context!!, android.R.layout.simple_spinner_item, deviceNamesSimple)
-        spinnerDeviceNames!!.adapter = adapter1
-        spinnerDeviceNames!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        val adapter1 = ArrayAdapter(context, android.R.layout.simple_spinner_item, deviceNamesSimple)
+        binding.spinnerDevice.adapter = adapter1
+        binding.spinnerDevice.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 setupSpinnerOSVersions(position)
                 //System.out.println("Selected device:"+deviceNames.get(position));
@@ -102,7 +96,7 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
         val thisDeviceName = Helper.getManufacturerAndDeviceName()
         if (deviceNames.indexOf(thisDeviceName) >= 0) {
             println("Yor device exists in the database")
-            spinnerDeviceNames!!.setSelection(deviceNames.indexOf(thisDeviceName))
+            binding.spinnerDevice.setSelection(deviceNames.indexOf(thisDeviceName))
         } else {
             println("Yor device does not exist in database$thisDeviceName")
         }
@@ -112,12 +106,12 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
         Log.d(TAG, "Selected Device:" + deviceNames[selectedDevice])
         //The Spinner with the OS versions changes depending on the selected device name
         val osVersionsForThisDevice = osVersions[selectedDevice]
-        val adapter2 = ArrayAdapter(context!!, android.R.layout.simple_spinner_item, osVersionsForThisDevice)
-        spinnerOSVersions!!.adapter = adapter2
-        spinnerOSVersions!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        val adapter2 = ArrayAdapter(context, android.R.layout.simple_spinner_item, osVersionsForThisDevice)
+        binding.spinnerOs.adapter = adapter2
+        binding.spinnerOs.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent2: AdapterView<*>, view2: View, position2: Int, id: Long) {
                 fetchDataForSelectedConfiguration(
-                        deviceNames[spinnerDeviceNames!!.selectedItemPosition],
+                        deviceNames[binding.spinnerDevice.selectedItemPosition],
                         osVersionsForThisDevice[position2]
                 )
             }
@@ -128,7 +122,7 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
         val thisOS = Helper.getBuildVersionRelease()
         if (osVersionsForThisDevice.indexOf(thisOS) >= 0) {
             println("Your OS version exists in the database")
-            spinnerDeviceNames!!.setSelection(deviceNames.indexOf(thisOS))
+            binding.spinnerDevice.setSelection(deviceNames.indexOf(thisOS))
         } else {
             println("Your OS version exists in the database$thisOS")
         }
@@ -142,9 +136,9 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
             Log.d(TAG, "Fetching data for:$selectedDevice:$selectedOS")
             lastFetchedConfiguration = Pair(selectedDevice, selectedOS)
             //Query data for all possible test files
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi_cam/rpi.h264", tvDataRpiCam)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "x264/testVideo.h264", tvDataX264)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "360/insta_webbn_2.h264", tvDataInsta360)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi_cam/rpi.h264", binding.tvDataRpiCam)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "x264/testVideo.h264",binding.tvDataX264)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "360/insta_webbn_2.h264",binding.tvDataInsta360)
         }
     }
 
