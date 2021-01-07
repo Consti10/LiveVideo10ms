@@ -42,4 +42,14 @@
         <item>360/testRoom1_1920Mono.mp4</item>
     </string-array>
 
+    <string-array name="video_test_files_for_db">
+        <item>jetson/h264/1/test.h264</item>
+        <item>jetson/h265/1/test.h265</item>
+        <item>runcam/runcam-h264.fpv</item>
+        <item>x264/testVideo.h264</item>
+        <item>rpi_cam/rpi.h264</item>
+        <item>webcam/720p_usb.h264"</item>
+        <item>360/insta_interference.h264"</item>
+    </string-array>
+
 </resources>
