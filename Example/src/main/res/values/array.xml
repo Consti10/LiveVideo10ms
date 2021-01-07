@@ -42,6 +42,7 @@
         <item>360/testRoom1_1920Mono.mp4</item>
     </string-array>
 
+    <!-- The test files that are written into the database -->
     <string-array name="video_test_files_for_db">
         <item>jetson/h264/1/test.h264</item>
         <item>jetson/h265/1/test.h265</item>

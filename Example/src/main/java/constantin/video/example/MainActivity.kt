@@ -97,7 +97,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {}
 
-
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -105,8 +104,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     public companion object {
-        fun ASSETS_TEST_VIDEO_FILE_NAMES(context: Context): Array<String?>? {
-            return context.resources.getStringArray(R.array.video_test_files)
+        fun VIDEO_TEST_FILES_FOR_DB(context: Context): Array<String?>? {
+            return context.resources.getStringArray(R.array.video_test_files_for_db)
         }
     }
 }
