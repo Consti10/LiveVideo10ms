@@ -215,7 +215,7 @@ namespace H264{
             return H264Stream::ppsAsString(parsed);
         }
     };
-
+    // this is the data for an h264 AUD unit
     static std::array<uint8_t,6> EXAMPLE_AUD={
             0,0,0,1,9,48
     };
