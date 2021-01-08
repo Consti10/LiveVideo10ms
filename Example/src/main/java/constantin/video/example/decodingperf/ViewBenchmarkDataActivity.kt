@@ -55,20 +55,7 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
 
         binding.textViewDevice.text = "Device:$device"
         binding.textViewOS.text = "OS:$os"
-        // add all the text views
-        for (i in 0..8) {
-            val textView = TextView(this)
-            textView.text="HELLO"
-            val textView2 = TextView(this)
-            textView2.text="HELLO"
-            val linearLayout = LinearLayout(this)
-            linearLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            linearLayout.addView(textView)
-            linearLayout.addView(textView2)
-            binding.tableLayout.addView(linearLayout);
-        }
-
-
+        
         //This one is to populate the spinner with all tested device names / OS combos
         db.collection(DECODING_INFO).get().addOnCompleteListener(OnCompleteListener { task ->
             if (task.isSuccessful) {
