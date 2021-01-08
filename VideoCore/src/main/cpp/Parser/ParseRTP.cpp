@@ -16,7 +16,7 @@ void RTPDecoder::reset(){
 bool RTPDecoder::validateRTPPacket(const rtp_header_t& rtp_header) {
     if(rtp_header.payload!=RTP_PAYLOAD_TYPE_H264_H265){
         MLOGE<<"Unsupported payload type "<<(int)rtp_header.payload;
-        return false;
+        //return false;
     }
     // Testing regarding sequence numbers.This stuff can be removed without issues
     const int seqNr=rtp_header.getSequence();
