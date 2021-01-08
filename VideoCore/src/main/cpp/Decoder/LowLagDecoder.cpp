@@ -93,8 +93,11 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     if(decoder.configured){
         feedDecoder(nalu);
         decodingInfo.nNALUSFeeded++;
+        // manually feeding AUDs doesn't seem to change anything for high latency streams
+        // Only for the x264 sw encoded example stream it might improve latency slightly
         //if(!nalu.IS_H265_PACKET && nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-        //    feedDecoder(NALU::createExampleH264_AUD());
+            //MLOGD<<"Feeding special AUD";
+            //feedDecoder(NALU::createExampleH264_AUD());
         //}
     }else{
         //Store sps,pps, vps(H265 only)
