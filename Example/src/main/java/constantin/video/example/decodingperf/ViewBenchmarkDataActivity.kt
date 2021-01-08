@@ -55,7 +55,7 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
 
         binding.textViewDevice.text = "Device:$device"
         binding.textViewOS.text = "OS:$os"
-        
+
         //This one is to populate the spinner with all tested device names / OS combos
         db.collection(DECODING_INFO).get().addOnCompleteListener(OnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -154,7 +154,6 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
         val tvData1 = TextView(this)
         val tvData2 = TextView(this)
         val tableRow = TableRow(this)
-        //linearLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         tableRow.addView(tvData1)
         tableRow.addView(tvData2)
         binding.tableLayout.addView(tableRow);
