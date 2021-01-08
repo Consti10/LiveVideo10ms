@@ -93,6 +93,9 @@ void LowLagDecoder::interpretNALU(const NALU& nalu){
     if(decoder.configured){
         feedDecoder(nalu);
         decodingInfo.nNALUSFeeded++;
+        //if(!nalu.IS_H265_PACKET && nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
+        //    feedDecoder(NALU::createExampleH264_AUD());
+        //}
     }else{
         //Store sps,pps, vps(H265 only)
         // As soon as enough data has been buffered to initialize the decoder,do so.
@@ -154,10 +157,11 @@ void LowLagDecoder::feedDecoder(const NALU& nalu){
         // it could also be that they have to be merged together, but for now just skip them
         return;
     }
-    // We do not need to feed AUDs (Access unit delimiter) to the decoder
-    if(nalu.isAUD()){
-        return;
-    }
+    // Hm, for some reason not feeding AUDs to the decoder increases latency for the x264/testVideo.h264 file
+    //if(nalu.isAUD()){
+    //    return;
+    //}
+
     const auto now=std::chrono::steady_clock::now();
     const auto deltaParsing=now-nalu.creationTime;
     while(true){

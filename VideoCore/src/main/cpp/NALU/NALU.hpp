@@ -172,7 +172,7 @@ public:
                 const auto sliceHeader=getSliceHeaderH264();
                 MLOGD<<"Slice header:"<<sliceHeader.asString();
             }
-            if(get_nal_unit_type()==NAL_UNIT_TYPE_SPS){
+            if(isSPS()){
                 auto sps=H264::SPS(getData(),getSize());
                 MLOGD<<"SPS:"<<sps.asString();
                 //MLOGD<<"Has vui"<<sps.parsed.vui_parameters_present_flag;
@@ -181,10 +181,12 @@ public:
 
                 //H264::testSPSConversion(getData(),getSize());
                 //RBSPHelper::test_unescape_escape(std::vector<uint8_t>(&getData()[5],&getData()[5]+getSize()-5));
-            }else if(get_nal_unit_type()==NAL_UNIT_TYPE_PPS){
+            }else if(isPPS()){
                 auto pps=H264::PPS(getData(),getSize());
                 MLOGD<<"PPS:"<<pps.asString();
                 MLOGD<<"XPPS"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
+            }else if(isAUD()){
+                MLOGD<<"AUD:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }
         }
     }
@@ -212,6 +214,10 @@ public:
         assert(getSize()>6);
         const H264::slice_header_t* ret1=static_cast<const H264::slice_header_t*>((const void*)&getDataWithoutPrefix()[1]);
         return *ret1;
+    }
+    //
+    static NALU createExampleH264_AUD(){
+        return NALU(H264::EXAMPLE_AUD.data(),H264::EXAMPLE_AUD.size());
     }
 };
 

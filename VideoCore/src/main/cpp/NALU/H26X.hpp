@@ -197,24 +197,28 @@ namespace H264{
 // --------------------------------------------- crude hacking --------------------------------------------
 
     class PPS{
-        public:
-            nal_unit_header_t nal_header;
-            pps_t parsed;
-        public:
-            // data buffer= NALU data with prefix
-            PPS(const uint8_t* nalu_data,size_t data_len){
-                memcpy(&nal_header,&nalu_data[4],1);
-                assert(nal_header.forbidden_zero_bit==0);
-                assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_PPS);
-                auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
-                BitStream b(rbsp_buf);
-                read_pic_parameter_set_rbsp(&parsed, b.bs_t());
-                read_rbsp_trailing_bits(b.bs_t());
-            }
-            std::string asString()const{
-                return H264Stream::ppsAsString(parsed);
-            }
-        };
+    public:
+        nal_unit_header_t nal_header;
+        pps_t parsed;
+    public:
+        // data buffer= NALU data with prefix
+        PPS(const uint8_t* nalu_data,size_t data_len){
+            memcpy(&nal_header,&nalu_data[4],1);
+            assert(nal_header.forbidden_zero_bit==0);
+            assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_PPS);
+            auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
+            BitStream b(rbsp_buf);
+            read_pic_parameter_set_rbsp(&parsed, b.bs_t());
+            read_rbsp_trailing_bits(b.bs_t());
+        }
+        std::string asString()const{
+            return H264Stream::ppsAsString(parsed);
+        }
+    };
+
+    static std::array<uint8_t,6> EXAMPLE_AUD={
+            0,0,0,1,9,48
+    };
 }
 
 namespace H265{
