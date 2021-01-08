@@ -24,5 +24,9 @@ public class GraphViewA extends AppCompatActivity {
         graph.addSeries(series);
 
         setContentView(graph);
+        String tmp="";
+        for(int i=tmp.length();i<10;i++){
+            tmp+="";
+        }
     }
 }

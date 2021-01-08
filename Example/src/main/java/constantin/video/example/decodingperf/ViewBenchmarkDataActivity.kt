@@ -3,6 +3,10 @@ package constantin.video.example.decodingperf
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.text.Layout
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AlignmentSpan
 import android.util.Log
 import android.util.Pair
 import android.view.View
@@ -12,7 +16,6 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jaredrummler.android.device.DeviceName
 import constantin.video.example.Helper
-import constantin.video.example.R
 import constantin.video.example.databinding.ActivityViewDataBinding
 import java.text.DecimalFormat
 import java.util.*
@@ -65,10 +68,10 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
                     //DeviceName.getDeviceName(Build.DEVICE!,)
                     //val deviceName = Pair(doc.id,doc.id)
                     //System.out.println(""+DeviceName.getDeviceName("","","""))
-                    val simpleDeviceName=DeviceName.getDeviceName(doc.getString(ID_BUILD_DEVICE),doc.getString(ID_BUILD_MODEL),doc.id)
+                    val simpleDeviceName = DeviceName.getDeviceName(doc.getString(ID_BUILD_DEVICE), doc.getString(ID_BUILD_MODEL), doc.id)
                     deviceNamesSimple.add(simpleDeviceName)
                     deviceNames.add(doc.id)
-                    val osVersionsForThisDevice : List<String> = doc.data!!.get(ID_OS_VERSIONS) as List<String>
+                    val osVersionsForThisDevice: List<String> = doc.data!!.get(ID_OS_VERSIONS) as List<String>
                     osVersions.add(osVersionsForThisDevice)
                 }
                 Log.d(TAG, "Devices:$deviceNames")
@@ -136,14 +139,14 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
             Log.d(TAG, "Fetching data for:$selectedDevice:$selectedOS")
             lastFetchedConfiguration = Pair(selectedDevice, selectedOS)
             //Query data for all possible test files
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi_cam/rpi.h264", binding.tvDataRpiCam)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "x264/testVideo.h264",binding.tvDataX264)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "360/insta_webbn_2.h264",binding.tvDataInsta360)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi_cam/rpi.h264", binding.tvData1)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "x264/testVideo.h264", binding.tvData2)
+            updateValuesInsideTextViews(selectedDevice, selectedOS, "360/insta_webbn_2.h264", binding.tvData3)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateValuesInsideTextViews(selectedDevice: String, selectedOS: String, testFileName: String, tvData: TextView?) {
+    private fun updateValuesInsideTextViews(selectedDevice: String, selectedOS: String, testFileName: String, tvData: TextView) {
         //db.collection("").whereEqualTo("",0).whereEqualTo("",1).
         db.collection(DECODING_INFO).document(selectedDevice).collection(selectedOS).
                 whereEqualTo("vs_assets_filename", testFileName).
@@ -157,14 +160,24 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
                         if (document != null) {
                             val testResultDecodingInfo = document.toObject(TestResultDecodingInfo::class.java)
                             val df = DecimalFormat("####.##")
-                            tvData!!.text = java.lang.Float.valueOf(df.format(testResultDecodingInfo!!.avgDecodingTime_ms)).toString() + "ms"
-                            Log.d(TAG,testResultDecodingInfo.toString())
+                            val tmp= java.lang.Float.valueOf(df.format(testResultDecodingInfo!!.avgDecodingTime_ms)).toString() + "ms"
+                            setTextLeftAndRight(tvData, testFileName, tmp)
+
+                            Log.d(TAG, testResultDecodingInfo.toString())
                         }
                     } else {
                         Log.d(TAG, "Error getting documents: ", task.exception)
                         tvData!!.text = "Error"
                     }
                 }.addOnFailureListener { tvData!!.text = "No data available" }
+    }
+
+    private fun setTextLeftAndRight(resultTextView: TextView, leftText: String, rightText: String){
+        val resultText: String = leftText + "\n" + rightText
+        val styledResultText = SpannableString(resultText)
+        styledResultText.setSpan(AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), leftText.length + 1, leftText.length + 1 + rightText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        resultTextView.text = styledResultText
+
     }
 
 
