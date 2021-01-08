@@ -165,13 +165,6 @@ public:
             }
             return;
         }else{
-            const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
-            //MLOGD<<lol->asString();
-            MLOGD<<get_nal_name();
-            if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-                const auto sliceHeader=getSliceHeaderH264();
-                MLOGD<<"Slice header:"<<sliceHeader.asString();
-            }
             if(isSPS()){
                 auto sps=H264::SPS(getData(),getSize());
                 MLOGD<<"SPS:"<<sps.asString();
@@ -187,6 +180,12 @@ public:
                 MLOGD<<"XPPS"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else if(isAUD()){
                 MLOGD<<"AUD:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
+            }else{
+                MLOGD<<get_nal_name();
+                if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
+                    const auto sliceHeader=getSliceHeaderH264();
+                    MLOGD<<"Slice header:"<<sliceHeader.asString();
+                }
             }
         }
     }
