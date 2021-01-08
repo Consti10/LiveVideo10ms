@@ -17,13 +17,16 @@ import constantin.video.core.IsConnected
 import constantin.video.core.TestFEC
 import constantin.video.core.player.VideoPlayer
 import constantin.video.core.player.VideoSettings
+import constantin.video.example.databinding.ActivityMainBinding
+import constantin.video.example.databinding.ActivityViewDataBinding
 import constantin.video.example.decodingperf.VideoActivityWithDatabase
 import constantin.video.example.decodingperf.ViewBenchmarkDataActivity
 import constantin.video.transmitter.AVideoTransmitter
 import constantin.video.transmitter.AVideoTransmitterSettings
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
-    private lateinit var spinnerVideoTestFileFromAssets: Spinner;
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var context: Context;
     private val permissionHelper= constantin.helper.RequestPermissionHelper(
             arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -33,64 +36,64 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     @SuppressLint("ApplySharedPref")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         permissionHelper.checkAndRequestPermissions(this)
         VideoSettings.initializePreferences(this, false)
         context = this
 
-        spinnerVideoTestFileFromAssets = findViewById<Spinner>(R.id.s_videoFileSelector)
         val adapter = ArrayAdapter.createFromResource(this,
                 R.array.video_test_files, android.R.layout.simple_spinner_item)
 
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerVideoTestFileFromAssets.adapter = adapter
+        binding.sVideoFileSelector.adapter = adapter
         //
-        val startVideoActivity = findViewById<Button>(R.id.b_startVideoActivity)
-        startVideoActivity.setOnClickListener {
-            val selectedTestFile = spinnerVideoTestFileFromAssets.getSelectedItem() as String
+
+        binding.bStartVideoActivity.setOnClickListener {
+            val selectedTestFile = binding.sVideoFileSelector.getSelectedItem() as String
             val preferences = getSharedPreferences("pref_video", Context.MODE_PRIVATE)
             preferences.edit().putString(getString(R.string.VS_ASSETS_FILENAME_TEST_ONLY), selectedTestFile).commit()
             val intentVideoActivity = Intent()
             intentVideoActivity.setClass(context, VideoActivityWithDatabase::class.java)
             startActivity(intentVideoActivity)
         }
-        val startSettingsActivity = findViewById<Button>(R.id.b_startSettingsActivity)
-        startSettingsActivity.setOnClickListener {
+        binding.bStartSettingsActivity.setOnClickListener {
             val intent = Intent()
             intent.setClass(context, AVideoSettings::class.java)
             intent.putExtra(AVideoSettings.EXTRA_KEY, true)
             startActivity(intent)
         }
-        findViewById<View>(R.id.b_startTethering).setOnClickListener { IsConnected.openUSBTetherSettings(context) }
-        findViewById<View>(R.id.b_startViewDatabase).setOnClickListener { startActivity(Intent().setClass(context, ViewBenchmarkDataActivity::class.java)) }
-        findViewById<View>(R.id.b_startColorFormatsTester).setOnClickListener { startActivity(Intent().setClass(context, AColorFormatTester::class.java)) }
-        findViewById<View>(R.id.b_startTelemetry).setOnClickListener { startActivity(Intent().setClass(context, ATelemetryExample::class.java)) }
-        findViewById<View>(R.id.b_startGraphView).setOnClickListener { startActivity(Intent().setClass(context, GraphViewA::class.java)) }
+        binding.bStartTelemetry.setOnClickListener { IsConnected.openUSBTetherSettings(context) }
+        binding.bStartViewDatabase.setOnClickListener { startActivity(Intent().setClass(context, ViewBenchmarkDataActivity::class.java)) }
+        binding.bStartColorFormatsTester.setOnClickListener { startActivity(Intent().setClass(context, AColorFormatTester::class.java)) }
+        binding.bStartTelemetry.setOnClickListener { startActivity(Intent().setClass(context, ATelemetryExample::class.java)) }
+        binding.bStartGraphView.setOnClickListener { startActivity(Intent().setClass(context, GraphViewA::class.java)) }
 
-        findViewById<View>(R.id.b_startTranscodeService).setOnClickListener {
+        binding.bStartTranscodeService.setOnClickListener {
             TranscodeService.startTranscoding(context, "");
         }
-        findViewById<View>(R.id.b_stopTranscodeService).setOnClickListener {
+        binding.bStopTranscodeService.setOnClickListener {
             TranscodeService.stopTranscoding(context);
         }
-        findViewById<View>(R.id.b_StartStreamingServer).setOnClickListener {
+        binding.bStartStreamingServer.setOnClickListener {
             val intent = Intent().setClass(context, AVideoTransmitter::class.java)
             startActivity(intent)
         }
-        findViewById<View>(R.id.b_StreamingServerSettings).setOnClickListener {
+        binding.bStreamingServerSettings.setOnClickListener {
             // User chose the "Settings" item, show the app settings UI...
             val i = Intent()
             i.setClass(this, AVideoTransmitterSettings::class.java)
             startActivity(i)
         }
-        findViewById<View>(R.id.b_TestFEC).setOnClickListener {
+        binding.bTestFEC.setOnClickListener {
             //TestFEC.nativeTestFec();
         }
     }
 
     override fun onResume() {
-        spinnerVideoTestFileFromAssets.isEnabled =
+        binding.sVideoFileSelector.isEnabled =
                 getSharedPreferences("pref_video", Context.MODE_PRIVATE).getInt(getString(R.string.VS_SOURCE), 0) == 2
         super.onResume()
     }

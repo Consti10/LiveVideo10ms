@@ -60,7 +60,9 @@
         android:id="@+id/table_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:stretchColumns="*">
+        android:stretchColumns="*"
+        android:divider="@color/colorPrimary"
+        android:showDividers="middle">
         <TableRow>
             <TextView
                 android:id="@+id/tv_data1"
