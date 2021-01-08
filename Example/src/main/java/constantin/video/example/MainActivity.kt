@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     public companion object {
-        fun VIDEO_TEST_FILES_FOR_DB(context: Context): Array<String?>? {
+        fun VIDEO_TEST_FILES_FOR_DB(context: Context): Array<String> {
             return context.resources.getStringArray(R.array.video_test_files_for_db)
         }
     }

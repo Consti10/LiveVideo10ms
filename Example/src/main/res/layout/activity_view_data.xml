@@ -57,34 +57,32 @@
         android:background="@android:color/background_light"/>
 
     <TableLayout
-        android:id="@+id/table_layout_results"
-        android:stretchColumns="*"
+        android:id="@+id/table_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:stretchColumns="*">
+        <TableRow>
+            <TextView
+                android:id="@+id/tv_data1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="HELLO"
+                android:layout_gravity="start">
+            </TextView>
+            <TextView
+                android:id="@+id/tv_data2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="HELLO2"
+                android:layout_gravity="end">
+            </TextView>
+        </TableRow>
 
-        <TextView
-            android:id="@+id/tv_data1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="">
-        </TextView>
-        <TextView
-            android:id="@+id/tv_data2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="">
-        </TextView>
-        <TextView
-            android:id="@+id/tv_data3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="">
-        </TextView>
 
     </TableLayout>
+
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

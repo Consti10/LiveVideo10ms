@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jaredrummler.android.device.DeviceName
 import constantin.video.example.Helper
+import constantin.video.example.MainActivity
 import constantin.video.example.databinding.ActivityViewDataBinding
 import java.text.DecimalFormat
 import java.util.*
@@ -54,6 +55,19 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
 
         binding.textViewDevice.text = "Device:$device"
         binding.textViewOS.text = "OS:$os"
+        // add all the text views
+        for (i in 0..8) {
+            val textView = TextView(this)
+            textView.text="HELLO"
+            val textView2 = TextView(this)
+            textView2.text="HELLO"
+            val linearLayout = LinearLayout(this)
+            linearLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            linearLayout.addView(textView)
+            linearLayout.addView(textView2)
+            binding.tableLayout.addView(linearLayout);
+        }
+
 
         //This one is to populate the spinner with all tested device names / OS combos
         db.collection(DECODING_INFO).get().addOnCompleteListener(OnCompleteListener { task ->
@@ -139,14 +153,27 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
             Log.d(TAG, "Fetching data for:$selectedDevice:$selectedOS")
             lastFetchedConfiguration = Pair(selectedDevice, selectedOS)
             //Query data for all possible test files
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "rpi_cam/rpi.h264", binding.tvData1)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "x264/testVideo.h264", binding.tvData2)
-            updateValuesInsideTextViews(selectedDevice, selectedOS, "360/insta_webbn_2.h264", binding.tvData3)
+            //binding.tvData1.text="";
+            //binding.tvData2.text="";
+            binding.tableLayout.removeAllViews();
+            for (i in 0..6) {
+                addEntryToTableLayout(selectedDevice, selectedOS, MainActivity.Companion.VIDEO_TEST_FILES_FOR_DB(context)[i]);
+            }
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateValuesInsideTextViews(selectedDevice: String, selectedOS: String, testFileName: String, tvData: TextView) {
+    private fun addEntryToTableLayout(selectedDevice: String, selectedOS: String, testFileName: String) {
+        val tvData1 = TextView(this)
+        val tvData2 = TextView(this)
+        val tableRow = TableRow(this)
+        //linearLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        tableRow.addView(tvData1)
+        tableRow.addView(tvData2)
+        binding.tableLayout.addView(tableRow);
+
+        tvData1.text=testFileName
+
         //db.collection("").whereEqualTo("",0).whereEqualTo("",1).
         db.collection(DECODING_INFO).document(selectedDevice).collection(selectedOS).
                 whereEqualTo("vs_assets_filename", testFileName).
@@ -161,15 +188,17 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
                             val testResultDecodingInfo = document.toObject(TestResultDecodingInfo::class.java)
                             val df = DecimalFormat("####.##")
                             val tmp= java.lang.Float.valueOf(df.format(testResultDecodingInfo!!.avgDecodingTime_ms)).toString() + "ms"
-                            setTextLeftAndRight(tvData, testFileName, tmp)
-
+                            // Note: Watch out for thread safety
+                            tvData2.text=tmp
                             Log.d(TAG, testResultDecodingInfo.toString())
                         }
                     } else {
                         Log.d(TAG, "Error getting documents: ", task.exception)
-                        tvData!!.text = "Error"
+                        tvData2.text = "Error"
                     }
-                }.addOnFailureListener { tvData!!.text = "No data available" }
+                }.addOnFailureListener {
+                    tvData2.text ="Error"
+                }
     }
 
     private fun setTextLeftAndRight(resultTextView: TextView, leftText: String, rightText: String){

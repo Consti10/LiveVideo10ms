@@ -3,6 +3,8 @@ package constantin.video.example;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -24,9 +26,8 @@ public class GraphViewA extends AppCompatActivity {
         graph.addSeries(series);
 
         setContentView(graph);
-        String tmp="";
-        for(int i=tmp.length();i<10;i++){
-            tmp+="";
-        }
+
     }
+
+
 }
