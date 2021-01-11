@@ -7,7 +7,7 @@
 
 // If the selected android api is smaller than the minimum for ATrace, I declare
 // dummy methods for ATrace such that the code compiles even tough the functionality is not available
-// To enable tracing, re-compile code with minapi 23 (minimum for proper logging with the android ndk)
+// To enable tracing, re-compile code with minapi 23 (minimum for proper tracing with the android ndk)
 // This can be usefull if you want to use tracing in your project when debugging but use a minapi lower than 23 for releases
 #if __ANDROID_API__ >= 23
 #include <android/trace.h>
