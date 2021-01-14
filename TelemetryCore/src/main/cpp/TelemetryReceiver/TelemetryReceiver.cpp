@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <jni.h>
 #include "../IDT.hpp"
-#include <PositionHelper.hpp>
 #include <StringHelper.hpp>
 #include <WFBBackwardsCompatibility.h>
 
@@ -405,7 +404,7 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
                 ret.value=L"No origin";
                 ret.metric=L"";
             }else{
-                int distanceM=(int)distance_between(uav_td.Latitude_dDeg,uav_td.Longitude_dDeg,originData.Latitude_dDeg,originData.Longitude_dDeg);
+                int distanceM=(int)TelemetryHelper::distance_between(uav_td.Latitude_dDeg,uav_td.Longitude_dDeg,originData.Latitude_dDeg,originData.Longitude_dDeg);
                 if(distanceM>1000){
                     ret.value= StringHelper::doubleToWString(distanceM / 1000.0, 5, 1);
                     ret.metric=L"km";
@@ -661,7 +660,7 @@ float TelemetryReceiver::getCourseOG_Deg() const {
 }
 
 float TelemetryReceiver::getHeadingHome_Deg() const {
-    return (float)course_to(uav_td.Latitude_dDeg,uav_td.Longitude_dDeg,originData.Latitude_dDeg,originData.Longitude_dDeg);
+    return (float)TelemetryHelper::course_to(uav_td.Latitude_dDeg,uav_td.Longitude_dDeg,originData.Latitude_dDeg,originData.Longitude_dDeg);
 }
 
 std::string TelemetryReceiver::getProtocolAsString() const {

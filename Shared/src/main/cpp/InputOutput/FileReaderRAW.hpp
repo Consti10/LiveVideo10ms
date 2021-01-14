@@ -26,7 +26,7 @@ namespace FileReaderRAW {
     typedef std::function<void(const uint8_t[], std::size_t)> RAW_DATA_CALLBACK;
 
     /**
-     * Open raw file and pass its data one by one in Chunks until @param receiving==false
+     * Open raw file and pass its data one by one in Chunks until @param shouldTerminate==true
      */
     static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
