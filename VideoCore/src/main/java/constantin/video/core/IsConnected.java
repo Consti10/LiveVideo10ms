@@ -1,6 +1,7 @@
 package constantin.video.core;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -102,12 +103,17 @@ public final class IsConnected {
     }
 
     public static void openUSBTetherSettings(final Context c){
-        final Intent intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
-        intent.setComponent(cn);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        c.startActivity(intent);
+        try{
+            final Intent intent = new Intent(Intent.ACTION_MAIN, null);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
+            intent.setComponent(cn);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            c.startActivity(intent);
+        }catch (ActivityNotFoundException e){
+            e.printStackTrace();
+            Toast.makeText(c,"USB Tethering is not available on this Phone",Toast.LENGTH_LONG).show();
+        }
     }
     
     public static void makeAlertDialogOpenTetherSettings(final Context c){
