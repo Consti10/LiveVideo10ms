@@ -29,11 +29,13 @@
         <item>jetson/h265/6/test.h265</item>
         <item>jetson/h265/7/test.h265</item>
 
+        <item>rpi_cam/old/rpi.h264</item>
+        <item>rpi_cam/1/test.h264</item>
+        <item>rpi_cam/2/test.h264</item>
+        
         <item>runcam/runcam-h264.fpv</item>
-
         <item>x265/testZ.h265</item>
         <item>x264/testVideo.h264</item>
-        <item>rpi_cam/rpi.h264</item>
         <item>webcam/720p_usb.h264"</item>
         <item>360/insta_interference.h264"</item>
         <item>360/insta_webbn_1_shortened.h264</item>
@@ -48,7 +50,7 @@
         <item>jetson/h265/1/test.h265</item>
         <item>runcam/runcam-h264.fpv</item>
         <item>x264/testVideo.h264</item>
-        <item>rpi_cam/rpi.h264</item>
+        <item>rpi_cam/old/rpi.h264</item>
         <item>webcam/720p_usb.h264"</item>
         <item>360/insta_webbn_2.h264</item>
     </string-array>
