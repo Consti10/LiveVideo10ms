@@ -184,7 +184,7 @@ public:
                 MLOGD<<get_nal_name();
                 if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
                     const auto sliceHeader=getSliceHeaderH264();
-                    MLOGD<<"Slice header:"<<sliceHeader.asString();
+                    MLOGD<<"Slice header("<<StringHelper::memorySizeReadable(getSize())<<"):"<<sliceHeader.asString();
                 }
             }
         }
