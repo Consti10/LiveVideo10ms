@@ -23,6 +23,7 @@ public class SimpleVideoActivity extends AppCompatActivity implements  IVideoPar
     private VideoPlayer videoPlayer;
     private TextView textViewStatistics;
     protected DecodingInfo mDecodingInfo;
+    int lastVideoW=0,lastVideoH=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,8 @@ public class SimpleVideoActivity extends AppCompatActivity implements  IVideoPar
 
     @Override
     public void onVideoRatioChanged(final int videoW,final int videoH) {
+        lastVideoW=videoW;
+        lastVideoH=videoH;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -73,7 +76,8 @@ public class SimpleVideoActivity extends AppCompatActivity implements  IVideoPar
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                textViewStatistics.setText(decodingInfo.toString(true));
+                final String text=decodingInfo.toString(true)+"WH:"+lastVideoW+"x"+lastVideoH+"\n";
+                textViewStatistics.setText(text);
             }
         });
     }
