@@ -1,0 +1,5 @@
+Test 1:
+gst-launch-1.0 rpicamsrc bitrate=5000000 preview=false ! video/x-h264, stream-format=byte-stream, profile=baseline, framerate=60/1, width=1280, height=720 ! filesink location=1/test.h264
+
+Test 2:
+gst-launch-1.0 rpicamsrc bitrate=5000000 preview=false ! video/x-h264, stream-format=byte-stream, profile=baseline, framerate=30/1, width=1920, height=1080 ! filesink location=2/test.h264
