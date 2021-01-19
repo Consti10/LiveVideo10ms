@@ -137,7 +137,8 @@ namespace H264{
             //parsed.pic_order_cnt_type=2;
             //parsed.log2_max_pic_order_cnt_lsb_minus4=4;
         }
-
+        // adding VUI might decrease latency for some streams:
+        // https://community.intel.com/t5/Media-Intel-oneAPI-Video/h-264-decoder-gives-two-frames-latency-while-decoding-a-stream/td-p/1099694
         void addVUI(){
             //parsed.level_idc=40;
             //parsed.constraint_set4_flag=true;
