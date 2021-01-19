@@ -180,6 +180,8 @@ public:
                 MLOGD<<"XPPS"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else if(isAUD()){
                 MLOGD<<"AUD:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
+            }else if(get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
+                MLOGD<<"SEI"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else{
                 MLOGD<<get_nal_name();
                 if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
@@ -217,6 +219,9 @@ public:
     //
     static NALU createExampleH264_AUD(){
         return NALU(H264::EXAMPLE_AUD.data(),H264::EXAMPLE_AUD.size());
+    }
+    static NALU createExampleH264_SEI(){
+        return NALU(H264::EXAMPLE_SEI.data(),H264::EXAMPLE_SEI.size());
     }
 };
 
