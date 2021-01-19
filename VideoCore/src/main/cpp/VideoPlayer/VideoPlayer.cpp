@@ -70,6 +70,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     //     mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
     //}
     if(VS_ENABLE_H264_SPS_VUI_FIX){
+        // This fix is only for h264
         if((!nalu.IS_H265_PACKET) && nalu.isSPS()){
             auto sps=H264::SPS(nalu.getData(),nalu.getSize());
             //sps.increaseLatency();
