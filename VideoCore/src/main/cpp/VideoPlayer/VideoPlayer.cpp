@@ -15,11 +15,11 @@
 
 VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
         mLowLagDecoder(env),
-    mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
-    mSettingsN(env,context,"pref_video",true),
-    GROUND_RECORDING_DIRECTORY(DIR),
-    mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
-    mFileReceiver(1024){
+        mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
+        mVideoSettings(env, context, "pref_video", true),
+        GROUND_RECORDING_DIRECTORY(DIR),
+        mGroundRecorderFPV(GROUND_RECORDING_DIRECTORY),
+        mFileReceiver(1024){
     env->GetJavaVM(&javaVm);
     //
     mLowLagDecoder.registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
@@ -94,12 +94,12 @@ void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
     //reset the parser so the statistics start again from 0
     mParser.reset();
     //set the jni object for settings
-    mSettingsN.replaceJNI(env);
+    mVideoSettings.replaceJNI(env);
     if(surface!=nullptr){
-        mLowLagDecoder.setOutputSurface(env,surface,mSettingsN);
+        mLowLagDecoder.setOutputSurface(env, surface, mVideoSettings);
         MLOGD<<"Start with surface";
     }else{
-        mLowLagDecoder.setOutputSurface(env, nullptr,mSettingsN);
+        mLowLagDecoder.setOutputSurface(env, nullptr, mVideoSettings);
         MLOGD<<"Set surface to null";
     }
 }
@@ -107,12 +107,12 @@ void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
 
 void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
     AAssetManager *assetManager=NDKHelper::getAssetManagerFromContext2(env,androidContext);
-    mSettingsN.replaceJNI(env);
+    mVideoSettings.replaceJNI(env);
     mParser.setLimitFPS(-1); //Default: Real time !
-    const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mSettingsN.getInt(IDV::VS_SOURCE));
-    const int VS_FILE_ONLY_LIMIT_FPS=mSettingsN.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS,60);
-    const bool VS_GroundRecording=mSettingsN.getBoolean(IDV::VS_GROUND_RECORDING);
-    VS_ENABLE_H264_SPS_VUI_FIX=mSettingsN.getBoolean(IDV::VS_ENABLE_H264_SPS_VUI_FIX);
+    const auto VS_SOURCE= static_cast<SOURCE_TYPE_OPTIONS>(mVideoSettings.getInt(IDV::VS_SOURCE));
+    const int VS_FILE_ONLY_LIMIT_FPS=mVideoSettings.getInt(IDV::VS_FILE_ONLY_LIMIT_FPS, 60);
+    const bool VS_GroundRecording=mVideoSettings.getBoolean(IDV::VS_GROUND_RECORDING);
+    VS_ENABLE_H264_SPS_VUI_FIX=mVideoSettings.getBoolean(IDV::VS_ENABLE_H264_SPS_VUI_FIX);
 
     //Add Ground recorder if enabled and needed
     if(VS_GroundRecording && VS_SOURCE!=FILE && VS_SOURCE != ASSETS){
@@ -130,8 +130,8 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
     //MLOGD("VS_SOURCE: %d",VS_SOURCE);
     switch (VS_SOURCE){
         case UDP:{
-            const int VS_PORT=mSettingsN.getInt(IDV::VS_PORT);
-            const int VS_PROTOCOL= mSettingsN.getInt(IDV::VS_PROTOCOL);
+            const int VS_PORT=mVideoSettings.getInt(IDV::VS_PORT);
+            const int VS_PROTOCOL= mVideoSettings.getInt(IDV::VS_PROTOCOL);
             const auto videoDataType=static_cast<VIDEO_DATA_TYPE>(VS_PROTOCOL);
             mUDPReceiver=std::make_unique<UDPReceiver>(javaVm,VS_PORT, "V_UDP_R", FPV_VR_PRIORITY::CPU_PRIORITY_UDPRECEIVER_VIDEO, [this,videoDataType](const uint8_t* data, size_t data_length) {
                 onNewVideoData(data,data_length,videoDataType);
@@ -141,8 +141,8 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
         case FILE:
         case ASSETS: {
             const bool useAsset=VS_SOURCE==ASSETS;
-            const std::string filename = useAsset ?  mSettingsN.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY,"testVideo.h264") :
-                    mSettingsN.getString(IDV::VS_PLAYBACK_FILENAME);
+            const std::string filename = useAsset ? mVideoSettings.getString(IDV::VS_ASSETS_FILENAME_TEST_ONLY, "testVideo.h264") :
+                                         mVideoSettings.getString(IDV::VS_PLAYBACK_FILENAME);
             if(!FileHelper::endsWith(filename, ".fpv")){
                 mParser.setLimitFPS(VS_FILE_ONLY_LIMIT_FPS);
             }
@@ -159,7 +159,7 @@ void VideoPlayer::start(JNIEnv *env,jobject androidContext) {
         break;
         case VIA_FFMPEG_URL:{
             MLOGD<<"Started with SOURCE=RTSP(FFMPEG)";
-            const std::string url=mSettingsN.getString(IDV::VS_FFMPEG_URL);
+            const std::string url=mVideoSettings.getString(IDV::VS_FFMPEG_URL);
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/capture1.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360_test.h264";
             //const std::string url="file:/storage/emulated/0/DCIM/FPV_VR/360.h264";

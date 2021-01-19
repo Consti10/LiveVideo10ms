@@ -44,7 +44,7 @@ private:
     //5 MB should be plenty !
     static constexpr const size_t WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
     //Retreive settings from shared preferences
-    SharedPreferences mSettingsN;
+    SharedPreferences mVideoSettings;
     enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
     const std::string GROUND_RECORDING_DIRECTORY;
     JavaVM* javaVm=nullptr;

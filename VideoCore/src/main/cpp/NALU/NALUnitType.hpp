@@ -7,7 +7,7 @@
 
 #include <h264_stream.h>
 
-// h264 types come from h264_stream ( #define since it is a c library)
+// h264 types come from h264_stream
 // h265 types are declared here
 // This is just a lot of boilerplate code so I put it into its own .hpp file
 namespace NALUnitType{
