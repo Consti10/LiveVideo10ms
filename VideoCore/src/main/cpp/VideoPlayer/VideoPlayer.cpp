@@ -84,6 +84,11 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
         }else{
             mLowLagDecoder.interpretNALU(nalu);
         }
+    /*}else if(true){
+        mLowLagDecoder.interpretNALU(nalu);
+        if(!nalu.IS_H265_PACKET && (nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR)){
+            mLowLagDecoder.interpretNALU(NALU::createExampleH264_AUD());
+        }*/
     }else{
         mLowLagDecoder.interpretNALU(nalu);
     }
