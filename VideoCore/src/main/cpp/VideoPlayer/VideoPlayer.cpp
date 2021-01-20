@@ -210,13 +210,13 @@ std::string VideoPlayer::getInfoString()const{
         ss << "Listening for video on port " << mUDPReceiver->getPort();
         ss << "\nReceived: " << mUDPReceiver->getNReceivedBytes() << "B"
            << " | parsed frames: "
-           << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKeyFrames;
+           << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKonfigurationFrames;
     }else if(mFFMpegVideoReceiver){
         ss << "Connecting to "<<mFFMpegVideoReceiver->m_url;
         ss << "\n"<<mFFMpegVideoReceiver->currentErrorMessage;
         ss <<"\nReceived: "<<mFFMpegVideoReceiver->currentlyReceivedVideoData<<" B"
                 << " | parsed frames: "
-                << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKeyFrames;
+                << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKonfigurationFrames;
     }else{
         ss << "Not receiving udp raw / rtp / rtsp";
     }

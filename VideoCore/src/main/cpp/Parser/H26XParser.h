@@ -52,7 +52,7 @@ public:
     void reset();
 public:
     long nParsedNALUs=0;
-    long nParsedKeyFrames=0;
+    long nParsedKonfigurationFrames=0;
     //For live video set to -1 (no fps limitation), else additional latency will be generated
     void setLimitFPS(int maxFPS);
 private:

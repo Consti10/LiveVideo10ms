@@ -20,7 +20,7 @@ void H26XParser::reset(){
     mParseRAW.reset();
     mDecodeRTP.reset();
     nParsedNALUs=0;
-    nParsedKeyFrames=0;
+    nParsedKonfigurationFrames=0;
     setLimitFPS(-1);
     lastForwardedSequenceNr=-1;
     droppedPacketsSinceLastForwardedPacket=0;
@@ -62,7 +62,7 @@ void H26XParser::newNaluExtracted(const NALU& nalu) {
     nParsedNALUs++;
     const bool sps_or_pps=nalu.isSPS() || nalu.isPPS();
     if(sps_or_pps){
-        nParsedKeyFrames++;
+        nParsedKonfigurationFrames++;
     }
     //sps or pps NALUs do not count as frames, as well as AUD
     //E.g. they won't create a frame on the output pipe)
