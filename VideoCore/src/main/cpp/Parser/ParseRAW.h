@@ -36,6 +36,8 @@ private:
     //
     std::array<uint8_t,NALU::NALU_MAXLEN> dji_data_buff;
     std::size_t dji_data_buff_size=0;
+    int nMergedNALUs=0;
+    std::chrono::steady_clock::time_point timePointFirstNALUToMerge;
     //
     // This time point is as 'early as possible' to debug the parsing time as accurately as possible.
     // E.g not the time when the 'ending' sequence was detected, but the first byte of this nalu was received / parsed

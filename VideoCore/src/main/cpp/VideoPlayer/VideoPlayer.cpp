@@ -42,8 +42,8 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
             mParser.parse_rtp_h264_stream(data,data_length);
             break;
         case VIDEO_DATA_TYPE::RAW_h264:
-            mParser.parse_raw_h264_stream(data,data_length);
-            //mParser.parseJetsonRawSlicedH264(data,data_length);
+            //mParser.parse_raw_h264_stream(data,data_length);
+            mParser.parseJetsonRawSlicedH264(data,data_length);
             break;
         case VIDEO_DATA_TYPE::RTP_H265:
             mParser.parse_rtp_h265_stream(data,data_length);

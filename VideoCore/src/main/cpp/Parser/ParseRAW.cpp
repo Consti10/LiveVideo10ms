@@ -147,7 +147,7 @@ void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_l
                         const size_t minNaluSize=NALU::getMinimumNaluSize(false);
                         if(naluLen>=minNaluSize){
                             NALU nalu(nalu_data,naluLen);
-                            MLOGD<<"ParseRawJ NALU type:"<<nalu.get_nal_name();
+                            //MLOGD<<"ParseRawJ NALU type:"<<nalu.get_nal_name();
                             if(nalu.isSPS() || nalu.isPPS()){
                                 cb(nalu);
                                 //dji_data_buff_size=0;
@@ -170,13 +170,20 @@ void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_l
 void ParseRAW::accumulateSlicedNALUsByAUD(const NALU& nalu){
     if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD) {
         if (dji_data_buff_size > 0) {
-            NALU nalu2(dji_data_buff, dji_data_buff_size);
+            NALU nalu2(dji_data_buff, dji_data_buff_size,nalu.IS_H265_PACKET,timePointFirstNALUToMerge);
             cb(nalu2);
             dji_data_buff_size = 0;
+            //cb(nalu);
+            //MLOGD<<"Merged "<<nMergedNALUs<<" nalus";
+            nMergedNALUs=0;
         }
     }else{
+        if(nMergedNALUs==0){
+            timePointFirstNALUToMerge=nalu.creationTime;
+        }
         memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
         dji_data_buff_size+=nalu.getSize();
+        nMergedNALUs++;
     }
 }
 
