@@ -8,7 +8,7 @@ Test 3:
 gst-launch-1.0 rpicamsrc bitrate=5000000 preview=false keyframe-interval=1 ! video/x-h264, stream-format=byte-stream, profile=baseline, framerate=60/1, width=1280, height=720 ! filesink location=3/test.h264
 
 Test 4:
-gst-launch-1.0 rpicamsrc bitrate=5000000 preview=false exposure-mode=1 horizontal-slices-per-frame=4 ! video/x-h264, stream-format=byte-stream, profile=baseline, framerate=60/1, width=1280, height=720 ! rtph264pay ! filesink location=4/test.h264
+gst-launch-1.0 rpicamsrc bitrate=5000000 preview=false exposure-mode=1 horizontal-slices-per-frame=4 ! video/x-h264, stream-format=byte-stream, profile=baseline, framerate=60/1, width=1280, height=720 ! filesink location=4/test.h264
 
 Test 5:
-gst-launch-1.0 rpicamsrc bitrate=5000000 preview=false exposure-mode=1 horizontal-slices-per-frame=8 ! video/x-h264, stream-format=byte-stream, profile=baseline, framerate=60/1, width=1280, height=720 ! rtph264pay ! filesink location=5/test.h264
+gst-launch-1.0 rpicamsrc bitrate=5000000 preview=false exposure-mode=1 horizontal-slices-per-frame=8 ! video/x-h264, stream-format=byte-stream, profile=baseline, framerate=60/1, width=1280, height=720 ! filesink location=5/test.h264
