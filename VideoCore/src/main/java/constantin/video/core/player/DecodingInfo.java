@@ -2,6 +2,7 @@ package constantin.video.core.player;
 
 import android.util.ArrayMap;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
@@ -41,8 +42,8 @@ public class DecodingInfo {
         this.nDecodedFrames=nDecodedFrames;
     }
 
-    public Map<String,Object> toMap(){
-        Map<String, Object> decodingInfo = new ArrayMap<>();
+    public LinkedHashMap<String,Object> toMap(){
+        LinkedHashMap<String, Object> decodingInfo = new LinkedHashMap<>();
         decodingInfo.put("avgTotalDecodingTime_ms", avgTotalDecodingTime_ms);
         decodingInfo.put("avgParsingTime_ms",avgParsingTime_ms);
         decodingInfo.put("avgWaitForInputBTime_ms",avgWaitForInputBTime_ms);
