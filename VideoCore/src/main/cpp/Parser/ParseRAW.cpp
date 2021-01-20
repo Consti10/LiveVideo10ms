@@ -212,22 +212,5 @@ void ParseRAW::accumulateSlicedNALUsByOther(const NALU& nalu){
         dji_data_buff_size = 0;
         nMergedNALUs=0;
     }
-
-    /*if(!(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR)){
-        return;
-    }
-    const auto sliceHeader=nalu.getSliceHeaderH264();
-    if(sliceHeader.slice_type==3){
-        if(dji_data_buff_size>0){
-            NALU nalu2(dji_data_buff,dji_data_buff_size);
-            cb(nalu2);
-            dji_data_buff_size=0;
-        }
-        memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
-        dji_data_buff_size+=nalu.getSize();
-    }else{
-        memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
-        dji_data_buff_size+=nalu.getSize();
-    }*/
 }
 
