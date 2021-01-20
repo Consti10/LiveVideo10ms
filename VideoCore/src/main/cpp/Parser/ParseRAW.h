@@ -23,7 +23,7 @@ public:
     // similar to above but for jetson (testing)
     void parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_length);
     void accumulateSlicedNALUsByAUD(const NALU& nalu);
-    void accumulateSlicedNALUsBySliceHeader(const NALU& nalu);
+    void accumulateSlicedNALUsByOther(const NALU& nalu);
     void reset();
 private:
     const NALU_DATA_CALLBACK cb;

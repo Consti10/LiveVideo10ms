@@ -153,7 +153,7 @@ void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_l
                                 //dji_data_buff_size=0;
                             }else{
                                 accumulateSlicedNALUsByAUD(nalu);
-                                //accumulateSlicedNALUsBySliceHeader(nalu);
+                                //accumulateSlicedNALUsByOther(nalu);
                             }
                         }
                     }
@@ -196,7 +196,7 @@ void ParseRAW::accumulateSlicedNALUsByAUD(const NALU& nalu){
     }
 }
 
-void ParseRAW::accumulateSlicedNALUsBySliceHeader(const NALU& nalu){
+void ParseRAW::accumulateSlicedNALUsByOther(const NALU& nalu){
     /*if(!(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR)){
         return;
     }
