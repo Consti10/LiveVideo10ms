@@ -185,8 +185,8 @@ public:
             }else{
                 MLOGD<<get_nal_name();
                 if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-                    const auto sliceHeader=getSliceHeaderH264();
-                    MLOGD<<"Slice header("<<StringHelper::memorySizeReadable(getSize())<<"):"<<sliceHeader.asString();
+                    auto tmp=H264::Slice(getData(),getSize());
+                    MLOGD<<"Slice header("<<StringHelper::memorySizeReadable(getSize())<<"):"<<tmp.asString();
                 }
             }
         }
@@ -208,13 +208,6 @@ public:
             const auto sps=H264::SPS(getData(),getSize());
             return sps.getWidthHeightPx();
         }
-    }
-     const H264::slice_header_t& getSliceHeaderH264()const{
-        assert(!IS_H265_PACKET);
-        assert(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR);
-        assert(getSize()>6);
-        const H264::slice_header_t* ret1=static_cast<const H264::slice_header_t*>((const void*)&getDataWithoutPrefix()[1]);
-        return *ret1;
     }
     //
     static NALU createExampleH264_AUD(){

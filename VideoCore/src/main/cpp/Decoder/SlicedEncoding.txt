@@ -1,0 +1,33 @@
+// Test file == jetson/h264/6/test.h264
+// With slicing, the jetson produces
+NAL_UNIT_TYPE_CODED_SLICE_IDR
+NAL_UNIT_TYPE_CODED_SLICE_IDR
+...
+AUD
+and so on.
+
+The first slice of type NAL_UNIT_TYPE_CODED_SLICE_IDR always has the following values:
+first_mb_in_slice:2 slice_type:3 pic_parameter_set_id:2 frame_num:0
+
+Tested with code:
+ if(lastFrameWasAUD){
+        if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR){
+            auto hdr=nalu.getSliceHeaderH264();
+            assert(hdr.first_mb_in_slice==2 && hdr.slice_type==3 && hdr.pic_parameter_set_id==2 && hdr.frame_num==0);
+        }
+    }
+    if(nalu.isAUD()){
+        lastFrameWasAUD=true;
+    }else{
+        lastFrameWasAUD=false;
+    }
+
+// Question is: How to know that there is a full frame (a frame we can feed to AMediaCodec) without waiting for the AUD ?
+// after the first slice, the following slices mostly have:
+first_mb_in_slice:0 slice_type:0 pic_parameter_set_id:0 frame_num:0
+There is always 8 of them before the AUD
+
+However, sometimes the following slices also come directly after:
+first_mb_in_slice:0 slice_type:0 pic_parameter_set_id:0 frame_num:2
+
+//Hmmm, i did not read these values properly I think (didn't use bs_read but re-interpreted the memory)

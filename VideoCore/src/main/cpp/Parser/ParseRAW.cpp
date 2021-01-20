@@ -181,7 +181,7 @@ void ParseRAW::accumulateSlicedNALUsByAUD(const NALU& nalu){
 }
 
 void ParseRAW::accumulateSlicedNALUsBySliceHeader(const NALU& nalu){
-    if(!(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR)){
+    /*if(!(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR)){
         return;
     }
     const auto sliceHeader=nalu.getSliceHeaderH264();
@@ -196,6 +196,6 @@ void ParseRAW::accumulateSlicedNALUsBySliceHeader(const NALU& nalu){
     }else{
         memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
         dji_data_buff_size+=nalu.getSize();
-    }
+    }*/
 }
 

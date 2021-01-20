@@ -64,6 +64,8 @@ public:
     FileReader mFileReceiver;
     GroundRecorderFPV mGroundRecorderFPV;
     bool VS_ENABLE_H264_SPS_VUI_FIX=false;
+
+    bool lastFrameWasAUD=false;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

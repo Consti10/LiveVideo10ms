@@ -53,6 +53,7 @@ namespace RBSPHelper{
 
 namespace H264{
     // reverse order due to architecture
+    // The nal unit header is not part of the rbsp-escaped bitstream and therefore can be read without unescaping anything
     typedef struct nal_unit_header{
         uint8_t nal_unit_type:5;
         uint8_t nal_ref_idc:2;
@@ -64,18 +65,6 @@ namespace H264{
         }
     }__attribute__ ((packed)) nal_unit_header_t;
     static_assert(sizeof(nal_unit_header_t)==1);
-    typedef struct slice_header{
-        uint8_t frame_num:2;
-        uint8_t pic_parameter_set_id:2;
-        uint8_t slice_type:2;
-        uint8_t first_mb_in_slice:2 ;
-        std::string asString()const{
-            std::stringstream ss;
-            ss<<"first_mb_in_slice:"<<(int)first_mb_in_slice<<" slice_type:"<<(int)slice_type<<" pic_parameter_set_id:"<<(int)pic_parameter_set_id<<" frame_num:"<<(int)frame_num;
-            return ss.str();
-        }
-    }__attribute__ ((packed)) slice_header_t;
-    static_assert(sizeof(slice_header_t)==1);
 
     // Parse raw NALU data into an sps struct (using the h264bitstream library)
     class SPS{
@@ -210,6 +199,55 @@ namespace H264{
             return H264Stream::ppsAsString(parsed);
         }
     };
+    class Slice{
+    public:
+        nal_unit_header_t nal_header;
+        slice_header_t parsed;
+    public:
+        // data buffer= NALU data with prefix
+        Slice(const uint8_t* nalu_data,size_t data_len){
+            memcpy(&nal_header,&nalu_data[4],1);
+            assert(nal_header.forbidden_zero_bit==0);
+            assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_CODED_SLICE_IDR || nal_header.nal_unit_type==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR);
+            auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
+            BitStream b(rbsp_buf);
+            // parsing
+            parsed.first_mb_in_slice=b.read_ue();
+            parsed.slice_type=b.read_ue();
+            parsed.pic_parameter_set_id=b.read_ue();
+            parsed.frame_num=b.read_ue();
+        }
+        std::string asString()const{
+            std::stringstream ss;
+            ss<<"[first_mb_in_slice="<<parsed.first_mb_in_slice<<",slice_type="<<parsed.slice_type<<",pic_parameter_set_id="<<parsed.pic_parameter_set_id<<"frame_num="<<parsed.frame_num<<"]";
+            return ss.str();
+        }
+    };
+
+    /*class SEI{
+    public:
+        nal_unit_header_t nal_header;
+        slice_header_t parsed;
+    public:
+        // data buffer= NALU data with prefix
+        Slice(const uint8_t* nalu_data,size_t data_len){
+            memcpy(&nal_header,&nalu_data[4],1);
+            assert(nal_header.forbidden_zero_bit==0);
+            assert(nal_header.nal_unit_type==NAL_UNIT_TYPE_CODED_SLICE_IDR || nal_header.nal_unit_type==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR);
+            auto rbsp_buf= RBSPHelper::unescapeRbsp(&nalu_data[5], data_len-5);
+            BitStream b(rbsp_buf);
+            // parsing
+            parsed.first_mb_in_slice=b.read_ue();
+            parsed.slice_type=b.read_ue();
+            parsed.pic_parameter_set_id=b.read_ue();
+            parsed.frame_num=b.read_ue();
+        }
+        std::string asString()const{
+            std::stringstream ss;
+            return ss.str();
+        }
+    };*/
+
     // this is the data for an h264 AUD unit
     static std::array<uint8_t,6> EXAMPLE_AUD={
             0,0,0,1,9,48

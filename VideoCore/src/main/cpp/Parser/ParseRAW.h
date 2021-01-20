@@ -18,7 +18,7 @@ public:
     ParseRAW(NALU_DATA_CALLBACK cb);
     // normally H264, otherwise H265 - both protocols use the [0,0,0,1] pattern as prefix
     void parseData(const uint8_t* data,const size_t data_length,const bool isH265=false);
-    // Special parsing method, where AUD determine the end of sliced data packets that cannot decoded individually
+    // Special parsing method, where AUD determine the end of sliced data packets that cannot be decoded individually
     void parseDjiLiveVideoDataH264(const uint8_t* data,const size_t data_length);
     // similar to above but for jetson (testing)
     void parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_length);
