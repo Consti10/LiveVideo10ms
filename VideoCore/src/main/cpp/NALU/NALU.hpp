@@ -170,18 +170,18 @@ public:
                 MLOGD<<"SPS:"<<sps.asString();
                 //MLOGD<<"Has vui"<<sps.parsed.vui_parameters_present_flag;
                 //MLOGD<<"SPS Latency:"<<H264Stream::latencyAffectingValues(&sps.parsed);
-                MLOGD<<"XSPS"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
+                MLOGD<<"SPSData:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
 
                 //H264::testSPSConversion(getData(),getSize());
                 //RBSPHelper::test_unescape_escape(std::vector<uint8_t>(&getData()[5],&getData()[5]+getSize()-5));
             }else if(isPPS()){
                 auto pps=H264::PPS(getData(),getSize());
                 MLOGD<<"PPS:"<<pps.asString();
-                MLOGD<<"XPPS"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
+                MLOGD<<"PPSData:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else if(isAUD()){
                 MLOGD<<"AUD:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else if(get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
-                MLOGD<<"SEI"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
+                MLOGD<<"SEIData:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else{
                 MLOGD<<get_nal_name();
                 if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){

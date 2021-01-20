@@ -78,12 +78,12 @@ public:
         AMediaFormat_setBuffer(format,"csd-0",sps.getData(),(size_t)sps.getSize());
         AMediaFormat_setBuffer(format,"csd-1",pps.getData(),(size_t)pps.getSize());
         MLOGD<<"Video WH:"<<videoWH[0]<<" H:"<<videoWH[1];
-        writeAndroidPerformanceParams(format);
         //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,5*1024*1024);
-        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
         //AVCProfileBaseline==1
         //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
         //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
+        writeAndroidPerformanceParams(format);
     }
     void h265_configureAMediaFormat(AMediaFormat* format){
         std::vector<uint8_t> buff={};
