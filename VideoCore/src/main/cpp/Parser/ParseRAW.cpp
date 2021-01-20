@@ -168,8 +168,17 @@ void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_l
 }
 
 void ParseRAW::accumulateSlicedNALUsByAUD(const NALU& nalu){
+    // Make sure we do not crash when AUDs were not received properly
+    if(nalu.getSize()+dji_data_buff_size>dji_data_buff.size()){
+        dji_data_buff_size=0;
+        return;
+    }
     if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD) {
         if (dji_data_buff_size > 0) {
+            // add the AUD,too:
+            memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
+            dji_data_buff_size+=nalu.getSize();
+            // and then forward them together as a single unit
             NALU nalu2(dji_data_buff, dji_data_buff_size,nalu.IS_H265_PACKET,timePointFirstNALUToMerge);
             cb(nalu2);
             dji_data_buff_size = 0;
