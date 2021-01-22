@@ -1,0 +1,1 @@
+gst-launch-1.0 -v v4l2src device=/dev/video2 ! video/x-h264,width=1280,height=720,framerate=30/1,stream-format=byte-stream,profile=baseline ! rtph264pay ! rtph264depay ! filesink location=1/test.h264
