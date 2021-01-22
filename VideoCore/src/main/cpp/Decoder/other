@@ -1,0 +1,8 @@
+#emulate corrupted nalus
+lol++;
+            if(lol % 5==0){
+                if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
+                    MLOGD<<"Garbaging data";
+                    std::memset(&((uint8_t*)buf)[10],0,20);
+                }
+            }
