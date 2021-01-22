@@ -1,0 +1,1 @@
+Contains generic c++ code that is used by other modules, too
