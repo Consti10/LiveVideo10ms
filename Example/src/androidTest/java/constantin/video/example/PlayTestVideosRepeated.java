@@ -17,6 +17,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 import constantin.video.core.player.DecodingInfo;
+import constantin.video.core.player.VideoPlayer;
 import constantin.video.core.player.VideoSettings;
 import constantin.video.example.decodingperf.VideoActivityWithDatabase;
 
@@ -73,7 +74,9 @@ public class PlayTestVideosRepeated {
         final String[] testFiles=MainActivity.Companion.VIDEO_TEST_FILES_FOR_DB((Context)mActivityTestRule.getActivity());
         for(final String filename:testFiles){
             if(filename.endsWith("h265")){
-                continue;
+                if(!VideoPlayer.supportsH265HW()){
+                    continue;
+                }
             }
             selectVideoFilename(filename);
             testPlayVideo();
