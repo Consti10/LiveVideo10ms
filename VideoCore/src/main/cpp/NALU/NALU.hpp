@@ -162,6 +162,8 @@ public:
                 }else{
                     MLOGD<<"VPS parse error";
                 }
+            }else{
+                MLOGD<<get_nal_name();
             }
             return;
         }else{
