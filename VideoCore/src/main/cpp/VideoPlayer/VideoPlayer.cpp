@@ -71,6 +71,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     //}
     if(VS_ENABLE_H264_SPS_VUI_FIX && nalu.isSPS()){
         if(nalu.IS_H265_PACKET){
+            // no fixups for H265 yet (TODO)
             mLowLagDecoder.interpretNALU(nalu);
         }else{
             auto sps=H264::SPS(nalu.getData(),nalu.getSize());
