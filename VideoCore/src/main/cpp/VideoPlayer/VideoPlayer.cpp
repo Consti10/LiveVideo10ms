@@ -69,9 +69,10 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
     //if(!nalu.IS_H265_PACKET){
     //     mTestEncodeDecodeRTP.testEncodeDecodeRTP(nalu);
     //}
-    if(VS_ENABLE_H264_SPS_VUI_FIX && !nalu.IS_H265_PACKET){
-        // This fix is only for h264
-        if(nalu.isSPS()){
+    if(VS_ENABLE_H264_SPS_VUI_FIX && nalu.isSPS()){
+        if(nalu.IS_H265_PACKET){
+            mLowLagDecoder.interpretNALU(nalu);
+        }else{
             auto sps=H264::SPS(nalu.getData(),nalu.getSize());
             //sps.increaseLatency();
             //sps.experiment();
@@ -82,8 +83,6 @@ void VideoPlayer::onNewNALU(const NALU& nalu){
             auto tmp=sps.asNALU();
             NALU nalu1(tmp.data(),tmp.size());
             mLowLagDecoder.interpretNALU(nalu1);
-        }else{
-            mLowLagDecoder.interpretNALU(nalu);
         }
     /*}else if(true){
         mLowLagDecoder.interpretNALU(nalu);
