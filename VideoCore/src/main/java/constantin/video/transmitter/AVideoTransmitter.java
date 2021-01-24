@@ -117,7 +117,7 @@ public class AVideoTransmitter extends AppCompatActivity{
                 }
             }
         });
-        //Create Decoder. We don't have to wait for anything here
+        //Create Encoder. We don't have to wait for anything here
         try {
             codec= MediaCodec.createEncoderByType("video/avc");
             final int W=AVideoTransmitterSettings.getVIDEO_TRANSMITTER_CAMERA_ENCODER_W_PX(this);
