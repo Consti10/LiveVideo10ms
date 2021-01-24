@@ -4,7 +4,6 @@ package constantin.video.example;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
@@ -21,7 +20,7 @@ import constantin.video.core.player.VideoSettings;
 import constantin.video.example.decodingperf.VideoActivityWithDatabase;
 
 public class PlayTestVideosRepeated {
-    private static final int WAIT_TIME_SHORT = 5*1000; //n seconds
+    private static final int WAIT_TIME = 5*1000; //n seconds
     private static final int N_ITERATIONS=1;
 
     @Rule
@@ -52,7 +51,7 @@ public class PlayTestVideosRepeated {
     private void testPlayVideo(){
         Intent i = new Intent();
         mVideoActivityTestRule.launchActivity(i);
-        try { Thread.sleep(WAIT_TIME_SHORT); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(WAIT_TIME); } catch (InterruptedException e) { e.printStackTrace(); }
         final DecodingInfo info= mVideoActivityTestRule.getActivity().getMDecodingInfo();
         validateDecodingInfo(info);
         mVideoActivityTestRule.finishActivity();
