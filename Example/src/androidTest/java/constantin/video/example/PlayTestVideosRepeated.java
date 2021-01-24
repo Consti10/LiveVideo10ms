@@ -11,6 +11,7 @@ import androidx.test.rule.GrantPermissionRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
@@ -20,8 +21,7 @@ import constantin.video.core.player.VideoSettings;
 import constantin.video.example.decodingperf.VideoActivityWithDatabase;
 
 public class PlayTestVideosRepeated {
-    private static final int WAIT_TIME = 5*1000; //n seconds
-    private static final int N_ITERATIONS=1;
+    private static final int WAIT_TIME = 8*1000; //n seconds
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -42,10 +42,9 @@ public class PlayTestVideosRepeated {
     }
 
     //Dang, I cannot get the Spinner work with an Espresso test
-    private void selectVideoFilename(final int selectedFile){
+    private void selectVideoFilename(final String selectedFile){
         final Context context=mActivityTestRule.getActivity();
-        final String filename= Objects.requireNonNull(MainActivity.Companion.VIDEO_TEST_FILES_FOR_DB(context))[selectedFile];
-        VideoSettings.setVS_ASSETS_FILENAME_TEST_ONLY(context,filename);
+        VideoSettings.setVS_ASSETS_FILENAME_TEST_ONLY(context,selectedFile);
     }
 
     private void testPlayVideo(){
@@ -69,12 +68,15 @@ public class PlayTestVideosRepeated {
     @Test
     public void playAllTestVideosTest() {
         writeVideoSource(VideoSettings.VS_SOURCE.ASSETS);
+        final int N_TEST_FILES=MainActivity.Companion.VIDEO_TEST_FILES_FOR_DB((Context)mActivityTestRule.getActivity()).length-1;
         //Alternating, play x264 test video ,rpi cam, webcam
-        for(int i=0;i<N_ITERATIONS;i++){
-            for(int j=0;j<7;j++){
-                selectVideoFilename(j);
-                testPlayVideo();
+        final String[] testFiles=MainActivity.Companion.VIDEO_TEST_FILES_FOR_DB((Context)mActivityTestRule.getActivity());
+        for(final String filename:testFiles){
+            if(filename.endsWith("h265")){
+                continue;
             }
+            selectVideoFilename(filename);
+            testPlayVideo();
         }
     }
 

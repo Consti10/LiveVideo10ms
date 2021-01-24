@@ -2,6 +2,8 @@ package constantin.video.core.player;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
@@ -10,6 +12,7 @@ import android.view.SurfaceHolder;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -199,6 +202,19 @@ public class VideoPlayer implements IVideoParamsChanged{
         if (Looper.myLooper() != Looper.getMainLooper()) {
             Log.w(TAG, "Player is accessed on the wrong thread.");
         }
+    }
+
+    public static boolean supportsH265HW(){
+        try {
+            MediaCodec codec= MediaCodec.createDecoderByType("video/hevc");
+            if(codec!=null){
+                return true;
+            }
+        } catch (IOException e) {
+            //e.printStackTrace();
+            return false;
+        }
+        return false;
     }
 
 }

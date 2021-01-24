@@ -39,7 +39,7 @@ class ViewBenchmarkDataActivity : AppCompatActivity() {
     private var lastFetchedConfiguration = Pair("", "")
     internal val db = FirebaseFirestore.getInstance()
 
-    private val DECODING_INFO: String ="DecodingInfo3";
+    private val DECODING_INFO: String ="DecodingInfo4";
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
