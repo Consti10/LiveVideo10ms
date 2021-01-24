@@ -35,7 +35,7 @@
         <item>rpi_cam/3/test.h264</item>
         <item>rpi_cam/4/test.h264</item>
         <item>rpi_cam/5/test.h264</item>
-
+        <item>webcam/zp_webcam.fpv</item>
         <item>runcam/runcam-h264.fpv</item>
         <item>x265/testZ.h265</item>
         <item>x264/testVideo.h264</item>
