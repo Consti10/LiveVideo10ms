@@ -18,8 +18,8 @@
 #include <AndroidLogger.hpp>
 #include <variant>
 #include <optional>
-#include <StringHelper.hpp>
 
+#include <StringHelper.hpp>
 #include "H26X.hpp"
 #include "NALUnitType.hpp"
 
@@ -151,7 +151,7 @@ public:
             if(isSPS()){
                 auto sps=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
                 if(sps!=absl::nullopt){
-                    MLOGD<<"SPS:"<<sps->getPicSizeInCtbsY()<<" NN:"<<sps->pic_width_in_luma_samples<<","<<sps->pic_height_in_luma_samples;
+                    MLOGD<<"SPS:"<<sps->dump();
                 }else{
                     MLOGD<<"SPS parse error";
                 }

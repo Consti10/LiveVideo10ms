@@ -6,7 +6,8 @@
 #include "h265_sps_parser.h"
 
 #include <stdio.h>
-
+#include <fstream>
+#include <sstream>
 #include <cstdint>
 #include <cmath>
 #include <vector>
@@ -696,4 +697,22 @@ uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
   return PicSizeInCtbsY;
 }
 
+std::string h265nal::H265SpsParser::SpsState::dump() const {
+  const auto TMP_FILE_NAME="/data/user/0/constantin.video.example/cache/";
+  auto fp=fopen(TMP_FILE_NAME,"rw");
+  assert(fp!= nullptr);
+  fdump(fp,0);
+  fseek (fp , 0 , SEEK_END);
+  auto size=ftell(fp);
+  std::string buffer(size, ' ');
+  fseek(fp,0,SEEK_SET);
+  fread(&buffer[0],1,size,fp);
+  fclose(fp);
+  return buffer;
+
+  std::ifstream ifstream(TMP_FILE_NAME);
+  std::stringstream ret;
+  ret<<ifstream.rdbuf();
+  return ret.str();
+}
 }  // namespace h265nal

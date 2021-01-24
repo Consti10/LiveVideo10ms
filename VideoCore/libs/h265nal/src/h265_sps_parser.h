@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include <vector>
+#include <string>
 
 #include "absl/types/optional.h"
 
@@ -29,6 +30,7 @@ class H265SpsParser {
     SpsState(const SpsState&) = default;
     ~SpsState() = default;
     void fdump(FILE* outfp, int indent_level) const;
+    std::string dump()const;
 
     uint32_t sps_video_parameter_set_id = 0;
     uint32_t sps_max_sub_layers_minus1 = 0;

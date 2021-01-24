@@ -35,6 +35,8 @@ public class VideoPlayer implements IVideoParamsChanged{
     public VideoPlayer(final AppCompatActivity parent){
         this.context=parent;
         nativeVideoPlayer= nativeInitialize(context,VideoSettings.getDirectoryToSaveDataTo());
+
+        //System.out.println("FD"+context.getCacheDir().getAbsolutePath());
     }
 
     public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged){
