@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <sstream>
 
 #include "rtc_base/bit_buffer.h"
 
@@ -87,5 +88,5 @@ bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer);
 int indent_level_incr(int indent_level);
 int indent_level_decr(int indent_level);
 void fdump_indent_level(FILE* outfp, int indent_level);
-
+void sdump_indent_level(std::stringstream& ss, int indent_level);
 }  // namespace h265nal
