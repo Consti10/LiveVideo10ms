@@ -697,9 +697,11 @@ uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
   return PicSizeInCtbsY;
 }
 
+#include <cstdio>
+
 std::string h265nal::H265SpsParser::SpsState::dump() const {
   const auto TMP_FILE_NAME="/data/user/0/constantin.video.example/cache/";
-  auto fp=fopen(TMP_FILE_NAME,"rw");
+  auto fp=fopen(TMP_FILE_NAME,"w+");
   assert(fp!= nullptr);
   fdump(fp,0);
   fseek (fp , 0 , SEEK_END);
