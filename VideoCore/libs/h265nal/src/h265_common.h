@@ -90,7 +90,7 @@ int indent_level_decr(int indent_level);
 
 #include <string>
 #include <sstream>
-static inline void xfprintf(std::stringstream& ss,const std::string fmt, ...) {
+static inline void XPrintf(std::stringstream& ss,const std::string fmt, ...) {
   int size = ((int)fmt.size()) * 2 + 50;   // Use a rubric appropriate for your code
   std::string str;
   va_list ap;
@@ -112,7 +112,7 @@ static inline void xfprintf(std::stringstream& ss,const std::string fmt, ...) {
   ss<<str;
 }
 
-static inline void xfprintf(FILE* fp,const char* fmt,...){
+static inline void XPrintf(FILE* fp,const char* fmt,...){
   va_list args;
   va_start(args, fmt);
   fprintf(fp,fmt,args);
