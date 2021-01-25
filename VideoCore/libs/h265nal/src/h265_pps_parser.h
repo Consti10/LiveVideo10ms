@@ -27,6 +27,11 @@ class H265PpsParser {
     PpsState(const PpsState&) = default;
     ~PpsState() = default;
     void fdump(XFILE outfp, int indent_level) const;
+    std::string dump()const{
+      std::stringstream ss;
+      fdump(ss,-1);
+      return ss.str();
+    }
 
     uint32_t pps_pic_parameter_set_id = 0;
     uint32_t pps_seq_parameter_set_id = 0;

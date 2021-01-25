@@ -27,6 +27,11 @@ class H265VpsParser {
     VpsState(const VpsState&) = default;
     ~VpsState() = default;
     void fdump(XFILE outfp, int indent_level) const;
+    std::string dump()const{
+      std::stringstream ss;
+      fdump(ss,-1);
+      return ss.str();
+    }
 
     uint32_t vps_video_parameter_set_id = 0;
     uint32_t vps_base_layer_internal_flag = 0;

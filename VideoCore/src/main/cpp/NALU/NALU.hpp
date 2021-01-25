@@ -25,6 +25,7 @@
 
 #include <h265_sps_parser.h>
 #include <h265_vps_parser.h>
+#include <h265_pps_parser.h>
 
 
 /**
@@ -151,16 +152,22 @@ public:
             if(isSPS()){
                 auto sps=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
                 if(sps!=absl::nullopt){
-                    //std::stringstream tmp;
-                    //sps->dump(tmp,-1);
                     MLOGD<<"SPS:"<<sps->dump();
                 }else{
                     MLOGD<<"SPS parse error";
                 }
-            }else if(isVPS()){
+            }else if(isPPS()){
+                auto pps=h265nal::H265PpsParser::ParsePps(&getData()[6],getSize()-6);
+                if(pps!=absl::nullopt){
+                    MLOGD<<"PPS:"<<pps->dump();
+                }else{
+                    MLOGD<<"PPS parse error";
+                }
+            }
+            else if(isVPS()){
                 auto vps=h265nal::H265VpsParser::ParseVps(&getData()[6],getSize()-6);
                 if(vps!=absl::nullopt){
-                    MLOGD<<"VPS:"<<vps->vps_num_units_in_tick;
+                    MLOGD<<"VPS:"<<vps->dump();
                 }else{
                     MLOGD<<"VPS parse error";
                 }

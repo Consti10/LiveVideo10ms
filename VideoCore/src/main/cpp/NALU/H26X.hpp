@@ -262,8 +262,6 @@ namespace H264{
 
 }
 
-#include "h265_common.h"
-
 namespace H265{
     typedef struct nal_unit_header{
         uint8_t forbidden_zero_bit:1;
@@ -272,14 +270,6 @@ namespace H265{
         uint8_t nuh_temporal_id_plus1:3;
     }__attribute__ ((packed)) nal_unit_header_t;
     static_assert(sizeof(nal_unit_header_t)==2);
-
-    // workaround for H265nal library logging:
-    static void Debug(){
-        std::stringstream ss;
-        //h265nal::string_format(ss,"LOL %i",1);
-        MLOGD<<"Test:"<<ss.str();
-
-    }
 
 }
 
