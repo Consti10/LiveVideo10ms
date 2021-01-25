@@ -220,6 +220,7 @@ public:
     static NALU createExampleH264_SEI(){
         return NALU(H264::EXAMPLE_SEI.data(),H264::EXAMPLE_SEI.size());
     }
+
 };
 
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;
