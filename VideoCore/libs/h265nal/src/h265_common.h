@@ -90,7 +90,7 @@ int indent_level_decr(int indent_level);
 
 #include <string>
 #include <sstream>
-static inline void string_format(std::stringstream ss,const std::string fmt, ...) {
+static inline void xfprintf(std::stringstream& ss,const std::string fmt, ...) {
   int size = ((int)fmt.size()) * 2 + 50;   // Use a rubric appropriate for your code
   std::string str;
   va_list ap;
@@ -101,7 +101,8 @@ static inline void string_format(std::stringstream ss,const std::string fmt, ...
     va_end(ap);
     if (n > -1 && n < size) {  // Everything worked
       str.resize(n);
-      return str;
+      ss<<str;
+      return;
     }
     if (n > -1)  // Needed size returned
       size = n + 1;   // For null char
@@ -109,6 +110,13 @@ static inline void string_format(std::stringstream ss,const std::string fmt, ...
       size *= 2;      // Guess at a larger size (OS specific)
   }
   ss<<str;
+}
+
+static inline void xfprintf(FILE* fp,const char* fmt,...){
+  va_list args;
+  va_start(args, fmt);
+  fprintf(fp,fmt,args);
+  va_end(args);
 }
 
 void fdump_indent_level(FILE* outfp, int indent_level);
