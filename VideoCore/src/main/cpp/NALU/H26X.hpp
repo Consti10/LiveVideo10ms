@@ -275,7 +275,7 @@ namespace H265{
     // workaround for H265nal library logging:
     static void Debug(){
         std::stringstream ss;
-        h265nal::string_format(ss,"LOL %i",1);
+        //h265nal::string_format(ss,"LOL %i",1);
         MLOGD<<"Test:"<<ss.str();
 
     }
