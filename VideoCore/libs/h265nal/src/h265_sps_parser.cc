@@ -404,7 +404,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   return OptionalSps(sps);
 }
 
-void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
+void H265SpsParser::SpsState::fdump(XFILE outfp, int indent_level) const {
   fprintf(outfp, "sps {");
   indent_level = indent_level_incr(indent_level);
 

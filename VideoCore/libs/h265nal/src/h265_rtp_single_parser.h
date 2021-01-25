@@ -25,7 +25,7 @@ class H265RtpSingleParser {
     RtpSingleState() = default;
     RtpSingleState(const RtpSingleState&) = default;
     ~RtpSingleState() = default;
-    void fdump(FILE* outfp, int indent_level) const;
+    void fdump(XFILE outfp, int indent_level) const;
 
     struct H265NalUnitHeaderParser::NalUnitHeaderState nal_unit_header;
     struct H265NalUnitPayloadParser::NalUnitPayloadState nal_unit_payload;

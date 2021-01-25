@@ -11,6 +11,7 @@
 #include "absl/types/optional.h"
 
 #include "rtc_base/bit_buffer.h"
+#include "h265_common.h"
 
 
 namespace h265nal {
@@ -25,7 +26,7 @@ class H265StRefPicSetParser {
     StRefPicSetState() = default;
     StRefPicSetState(const StRefPicSetState&) = default;
     ~StRefPicSetState() = default;
-    void fdump(FILE* outfp, int indent_level) const;
+    void fdump(XFILE outfp, int indent_level) const;
 
     // input parameters
     uint32_t stRpsIdx = 0;

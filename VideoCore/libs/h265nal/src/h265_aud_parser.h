@@ -11,6 +11,7 @@
 #include "absl/types/optional.h"
 
 #include "rtc_base/bit_buffer.h"
+#include "h265_common.h"
 
 namespace h265nal {
 
@@ -23,7 +24,7 @@ class H265AudParser {
     AudState() = default;
     AudState(const AudState&) = default;
     ~AudState() = default;
-    void fdump(FILE* outfp, int indent_level) const;
+    void fdump(XFILE outfp, int indent_level) const;
 
     uint32_t pic_type = 0;
   };

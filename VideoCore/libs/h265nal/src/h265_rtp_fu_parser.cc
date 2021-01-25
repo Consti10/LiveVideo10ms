@@ -81,7 +81,7 @@ absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
   return OptionalRtpFu(rtp_fu);
 }
 
-void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level) const {
+void H265RtpFuParser::RtpFuState::fdump(XFILE outfp, int indent_level) const {
   fprintf(outfp, "rtp_fu {");
   indent_level = indent_level_incr(indent_level);
 
