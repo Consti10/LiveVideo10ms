@@ -151,7 +151,9 @@ public:
             if(isSPS()){
                 auto sps=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
                 if(sps!=absl::nullopt){
-                    MLOGD<<"SPS:"<<sps->dump();
+                    //std::stringstream tmp;
+                    //sps->dump(tmp,-1);
+                    //MLOGD<<"SPS:"<<tmp.str();
                 }else{
                     MLOGD<<"SPS parse error";
                 }

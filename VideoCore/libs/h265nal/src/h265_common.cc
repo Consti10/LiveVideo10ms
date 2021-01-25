@@ -104,7 +104,7 @@ void fdump_indent_level(FILE* outfp, int indent_level) {
   fprintf(outfp, "%*s", 2 * indent_level, "");
 }
 
-void sdump_indent_level(std::stringstream& ss, int indent_level) {
+void fdump_indent_level(std::stringstream& ss, int indent_level) {
   if (indent_level == -1) {
     // no indent
      ss<<" ";
@@ -112,5 +112,6 @@ void sdump_indent_level(std::stringstream& ss, int indent_level) {
   }
   ss<<"\n";
 }
+
 
 }  // namespace h265nal

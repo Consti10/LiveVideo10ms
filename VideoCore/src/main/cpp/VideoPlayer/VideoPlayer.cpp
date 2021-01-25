@@ -32,6 +32,7 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context, const char* DIR) :
         this->latestDecodingInfo=info;
         latestDecodingInfoChanged=changed;
     });
+    H265::Debug();
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
