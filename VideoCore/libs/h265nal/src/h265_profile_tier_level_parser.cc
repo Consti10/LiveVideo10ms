@@ -278,7 +278,7 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) {
 }
 
 void H265ProfileInfoParser::ProfileInfoState::fdump(
-    FILE* outfp, int indent_level) const {
+        XFILE outfp, int indent_level) const {
   XPrintf(outfp, "profile_space: %i", profile_space);
   fdump_indent_level(outfp, indent_level);
   XPrintf(outfp, "tier_flag: %i", tier_flag);
@@ -341,7 +341,7 @@ void H265ProfileInfoParser::ProfileInfoState::fdump(
 }
 
 void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
-    FILE* outfp, int indent_level) const {
+        XFILE outfp, int indent_level) const {
   XPrintf(outfp, "profile_tier_level {");
   indent_level = indent_level_incr(indent_level);
 

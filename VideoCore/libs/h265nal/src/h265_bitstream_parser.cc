@@ -110,7 +110,7 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
 }
 
 void H265BitstreamParser::BitstreamState::fdump(
-    FILE* outfp, int indent_level) const {
+        XFILE outfp, int indent_level) const {
   for (const struct H265NalUnitParser::NalUnitState& nal_unit : nal_units) {
     nal_unit.fdump(outfp, indent_level, add_offset, add_length);
     XPrintf(outfp, "\n");

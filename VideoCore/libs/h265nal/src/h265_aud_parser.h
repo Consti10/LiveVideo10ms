@@ -24,7 +24,7 @@ class H265AudParser {
     AudState() = default;
     AudState(const AudState&) = default;
     ~AudState() = default;
-    void fdump(FILE* outfp, int indent_level) const;
+    void fdump(XFILE outfp, int indent_level) const;
 
     uint32_t pic_type = 0;
   };

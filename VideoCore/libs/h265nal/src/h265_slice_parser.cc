@@ -71,7 +71,7 @@ H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
 
 
 void H265SliceSegmentLayerParser::SliceSegmentLayerState::fdump(
-    FILE* outfp, int indent_level) const {
+    XFILE outfp, int indent_level) const {
   XPrintf(outfp, "slice_segment_layer {");
   indent_level = indent_level_incr(indent_level);
 
@@ -647,7 +647,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
 
 void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
-    FILE* outfp, int indent_level) const {
+    XFILE outfp, int indent_level) const {
   XPrintf(outfp, "slice_segment_header {");
   indent_level = indent_level_incr(indent_level);
 

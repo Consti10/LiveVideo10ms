@@ -141,7 +141,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
 }
 
 void H265StRefPicSetParser::StRefPicSetState::fdump(
-    FILE* outfp, int indent_level) const {
+    XFILE outfp, int indent_level) const {
   XPrintf(outfp, "st_ref_pic_set {");
   indent_level = indent_level_incr(indent_level);
 

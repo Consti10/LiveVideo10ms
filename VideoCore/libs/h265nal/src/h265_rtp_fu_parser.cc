@@ -86,7 +86,7 @@ void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level) const {
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  header.fdump(outfp, indent_level);
+  //header.fdump(outfp, indent_level);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "s_bit: %i", s_bit);
@@ -100,7 +100,7 @@ void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level) const {
   if (s_bit == 1) {
     // start of a fragmented NAL: dump payload
     fdump_indent_level(outfp, indent_level);
-    nal_unit_payload.fdump(outfp, fu_type, indent_level);
+    //nal_unit_payload.fdump(outfp, fu_type, indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);

@@ -342,7 +342,7 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   return OptionalPps(pps);
 }
 
-void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
+void H265PpsParser::PpsState::fdump(XFILE outfp, int indent_level) const {
   XPrintf(outfp, "pps {");
   indent_level = indent_level_incr(indent_level);
 

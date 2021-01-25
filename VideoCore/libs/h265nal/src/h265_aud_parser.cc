@@ -51,7 +51,7 @@ absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
   return OptionalAud(aud);
 }
 
-void H265AudParser::AudState::fdump(FILE* outfp, int indent_level) const {
+void H265AudParser::AudState::fdump(XFILE outfp, int indent_level) const {
   XPrintf(outfp, "aud {");
   indent_level = indent_level_incr(indent_level);
 

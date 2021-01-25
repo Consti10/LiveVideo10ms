@@ -153,7 +153,7 @@ public:
                 if(sps!=absl::nullopt){
                     //std::stringstream tmp;
                     //sps->dump(tmp,-1);
-                    //MLOGD<<"SPS:"<<tmp.str();
+                    MLOGD<<"SPS:"<<sps->dump();
                 }else{
                     MLOGD<<"SPS parse error";
                 }

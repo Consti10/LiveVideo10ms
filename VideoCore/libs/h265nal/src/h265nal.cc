@@ -241,7 +241,7 @@ int main(int argc, char **argv) {
   }
 
   int indent_level = (options->as_one_line) ? -1 : 0;
-  bitstream->fdump(outfp, indent_level);
+  //bitstream->fdump(outfp, indent_level);
 
   return 0;
 }

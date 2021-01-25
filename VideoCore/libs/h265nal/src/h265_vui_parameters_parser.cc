@@ -249,7 +249,7 @@ H265VuiParametersParser::ParseVuiParameters(
 }
 
 void H265VuiParametersParser::VuiParametersState::fdump(
-    FILE* outfp, int indent_level) const {
+    XFILE outfp, int indent_level) const {
   XPrintf(outfp, "vui_parameters {");
   indent_level = indent_level_incr(indent_level);
   fdump_indent_level(outfp, indent_level);

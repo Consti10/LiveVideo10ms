@@ -29,7 +29,12 @@ class H265SpsParser {
     SpsState() = default;
     SpsState(const SpsState&) = default;
     ~SpsState() = default;
-    void fdump(FILE* outfp, int indent_level) const;
+    void fdump(XFILE outfp, int indent_level) const;
+    std::string dump()const{
+      std::stringstream ss;
+      fdump(ss,-1);
+      return ss.str();
+    }
 
     uint32_t sps_video_parameter_set_id = 0;
     uint32_t sps_max_sub_layers_minus1 = 0;
