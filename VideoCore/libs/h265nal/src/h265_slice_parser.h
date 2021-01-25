@@ -33,7 +33,7 @@ class H265SliceSegmentHeaderParser {
     SliceSegmentHeaderState() = default;
     SliceSegmentHeaderState(const SliceSegmentHeaderState&) = default;
     ~SliceSegmentHeaderState() = default;
-    void fdump(XFILE outfp, int indent_level) const;
+    void fdump(FILE* outfp, int indent_level) const;
 
     // input parameters
     uint32_t nal_unit_type = 0;
@@ -137,7 +137,7 @@ class H265SliceSegmentLayerParser {
     SliceSegmentLayerState() = default;
     SliceSegmentLayerState(const SliceSegmentLayerState&) = default;
     ~SliceSegmentLayerState() = default;
-    void fdump(XFILE outfp, int indent_level) const;
+    void fdump(FILE* outfp, int indent_level) const;
 
     // input parameters
     uint32_t nal_unit_type = 0;

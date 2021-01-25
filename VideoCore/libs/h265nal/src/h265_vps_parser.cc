@@ -204,7 +204,7 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   return OptionalVps(vps);
 }
 
-void H265VpsParser::VpsState::fdump(XFILE outfp, int indent_level) const {
+void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
   XPrintf(outfp, "vps {");
   indent_level = indent_level_incr(indent_level);
 

@@ -28,7 +28,7 @@ class H265NalUnitHeaderParser {
     NalUnitHeaderState() = default;
     NalUnitHeaderState(const NalUnitHeaderState&) = default;
     ~NalUnitHeaderState() = default;
-    void fdump(XFILE outfp, int indent_level) const;
+    void fdump(FILE* outfp, int indent_level) const;
 
     uint32_t forbidden_zero_bit = 0;
     uint32_t nal_unit_type = 0;
@@ -53,7 +53,7 @@ class H265NalUnitPayloadParser {
     NalUnitPayloadState() = default;
     NalUnitPayloadState(const NalUnitPayloadState&) = default;
     ~NalUnitPayloadState() = default;
-    void fdump(XFILE outfp, int indent_level, uint32_t nal_unit_type) const;
+    void fdump(FILE* outfp, int indent_level, uint32_t nal_unit_type) const;
 
     struct H265VpsParser::VpsState vps;
     struct H265SpsParser::SpsState sps;
@@ -83,7 +83,7 @@ class H265NalUnitParser {
     NalUnitState() = default;
     NalUnitState(const NalUnitState&) = default;
     ~NalUnitState() = default;
-    void fdump(XFILE outfp, int indent_level, bool add_offset,
+    void fdump(FILE* outfp, int indent_level, bool add_offset,
                bool add_length) const;
 
     size_t offset;

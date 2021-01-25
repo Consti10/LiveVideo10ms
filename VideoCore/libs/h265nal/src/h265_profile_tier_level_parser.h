@@ -27,7 +27,7 @@ class H265ProfileInfoParser {
     ProfileInfoState() = default;
     ProfileInfoState(const ProfileInfoState&) = default;
     ~ProfileInfoState() = default;
-    void fdump(XFILE outfp, int indent_level) const;
+    void fdump(FILE* outfp, int indent_level) const;
 
     uint32_t profile_space = 0;
     uint32_t tier_flag = 0;
@@ -72,7 +72,7 @@ class H265ProfileTierLevelParser {
     ProfileTierLevelState() = default;
     ProfileTierLevelState(const ProfileTierLevelState&) = default;
     ~ProfileTierLevelState() = default;
-    void fdump(XFILE outfp, int indent_level) const;
+    void fdump(FILE* outfp, int indent_level) const;
 
     // input parameters
     bool profilePresentFlag;
