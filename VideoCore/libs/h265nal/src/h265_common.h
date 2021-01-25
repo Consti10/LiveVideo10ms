@@ -119,6 +119,8 @@ static inline void XPrintf(FILE* fp,const char* fmt,...){
   va_end(args);
 }
 
+using MY_DUMP_IMPL=FILE*;
+
 void fdump_indent_level(FILE* outfp, int indent_level);
 void fdump_indent_level(std::stringstream& ss, int indent_level);
 }  // namespace h265nal
