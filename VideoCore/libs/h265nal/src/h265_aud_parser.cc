@@ -52,15 +52,15 @@ absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
 }
 
 void H265AudParser::AudState::fdump(XFILE outfp, int indent_level) const {
-  fprintf(outfp, "aud {");
+  XPrintf(outfp, "aud {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pic_type: %i", pic_type);
+  XPrintf(outfp, "pic_type: %i", pic_type);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 }  // namespace h265nal

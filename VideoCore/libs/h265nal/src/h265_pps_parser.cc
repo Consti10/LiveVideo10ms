@@ -247,7 +247,7 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (pps.pps_scaling_list_data_present_flag) {
     // scaling_list_data()
     // TODO(chemag): add support for scaling_list_data()
-    fprintf(stderr, "error: unimplemented scaling_list_data() in pps\n");
+    XPrintf(stderr, "error: unimplemented scaling_list_data() in pps\n");
     return absl::nullopt;
   }
 
@@ -303,28 +303,28 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (pps.pps_range_extension_flag) {
     // pps_range_extension()
     // TODO(chemag): add support for pps_range_extension()
-    fprintf(stderr, "error: unimplemented pps_range_extension() in pps\n");
+    XPrintf(stderr, "error: unimplemented pps_range_extension() in pps\n");
     return absl::nullopt;
   }
 
   if (pps.pps_multilayer_extension_flag) {
     // pps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for pps_multilayer_extension()
-    fprintf(stderr, "error: unimplemented pps_multilayer_extension() in pps\n");
+    XPrintf(stderr, "error: unimplemented pps_multilayer_extension() in pps\n");
     return absl::nullopt;
   }
 
   if (pps.pps_3d_extension_flag) {
     // pps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for pps_3d_extension()
-    fprintf(stderr, "error: unimplemented pps_3d_extension() in pps\n");
+    XPrintf(stderr, "error: unimplemented pps_3d_extension() in pps\n");
     return absl::nullopt;
   }
 
   if (pps.pps_scc_extension_flag) {
     // pps_scc_extension()
     // TODO(chemag): add support for pps_scc_extension()
-    fprintf(stderr, "error: unimplemented pps_scc_extension() in pps\n");
+    XPrintf(stderr, "error: unimplemented pps_scc_extension() in pps\n");
     return absl::nullopt;
   }
 
@@ -343,217 +343,217 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 }
 
 void H265PpsParser::PpsState::fdump(XFILE outfp, int indent_level) const {
-  fprintf(outfp, "pps {");
+  XPrintf(outfp, "pps {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_pic_parameter_set_id: %i", pps_pic_parameter_set_id);
+  XPrintf(outfp, "pps_pic_parameter_set_id: %i", pps_pic_parameter_set_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_seq_parameter_set_id: %i", pps_seq_parameter_set_id);
+  XPrintf(outfp, "pps_seq_parameter_set_id: %i", pps_seq_parameter_set_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "dependent_slice_segments_enabled_flag: %i",
+  XPrintf(outfp, "dependent_slice_segments_enabled_flag: %i",
           dependent_slice_segments_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "output_flag_present_flag: %i", output_flag_present_flag);
+  XPrintf(outfp, "output_flag_present_flag: %i", output_flag_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "num_extra_slice_header_bits: %i",
+  XPrintf(outfp, "num_extra_slice_header_bits: %i",
           num_extra_slice_header_bits);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sign_data_hiding_enabled_flag: %i",
+  XPrintf(outfp, "sign_data_hiding_enabled_flag: %i",
           sign_data_hiding_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "cabac_init_present_flag: %i", cabac_init_present_flag);
+  XPrintf(outfp, "cabac_init_present_flag: %i", cabac_init_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "num_ref_idx_l0_default_active_minus1: %i",
+  XPrintf(outfp, "num_ref_idx_l0_default_active_minus1: %i",
           num_ref_idx_l0_default_active_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "num_ref_idx_l1_default_active_minus1: %i",
+  XPrintf(outfp, "num_ref_idx_l1_default_active_minus1: %i",
           num_ref_idx_l1_default_active_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "init_qp_minus26: %i", init_qp_minus26);
+  XPrintf(outfp, "init_qp_minus26: %i", init_qp_minus26);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "constrained_intra_pred_flag: %i",
+  XPrintf(outfp, "constrained_intra_pred_flag: %i",
           constrained_intra_pred_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "transform_skip_enabled_flag: %i",
+  XPrintf(outfp, "transform_skip_enabled_flag: %i",
           transform_skip_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "cu_qp_delta_enabled_flag: %i", cu_qp_delta_enabled_flag);
+  XPrintf(outfp, "cu_qp_delta_enabled_flag: %i", cu_qp_delta_enabled_flag);
 
   if (cu_qp_delta_enabled_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "cu_qp_delta_enabled_flag: %i", cu_qp_delta_enabled_flag);
+    XPrintf(outfp, "cu_qp_delta_enabled_flag: %i", cu_qp_delta_enabled_flag);
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_cb_qp_offset: %i", pps_cb_qp_offset);
+  XPrintf(outfp, "pps_cb_qp_offset: %i", pps_cb_qp_offset);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_cr_qp_offset: %i", pps_cr_qp_offset);
+  XPrintf(outfp, "pps_cr_qp_offset: %i", pps_cr_qp_offset);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_slice_chroma_qp_offsets_present_flag: %i",
+  XPrintf(outfp, "pps_slice_chroma_qp_offsets_present_flag: %i",
           pps_slice_chroma_qp_offsets_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "weighted_pred_flag: %i", weighted_pred_flag);
+  XPrintf(outfp, "weighted_pred_flag: %i", weighted_pred_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "weighted_bipred_flag: %i", weighted_bipred_flag);
+  XPrintf(outfp, "weighted_bipred_flag: %i", weighted_bipred_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "transquant_bypass_enabled_flag: %i",
+  XPrintf(outfp, "transquant_bypass_enabled_flag: %i",
           transquant_bypass_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "tiles_enabled_flag: %i", tiles_enabled_flag);
+  XPrintf(outfp, "tiles_enabled_flag: %i", tiles_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "entropy_coding_sync_enabled_flag: %i",
+  XPrintf(outfp, "entropy_coding_sync_enabled_flag: %i",
           entropy_coding_sync_enabled_flag);
 
   if (tiles_enabled_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "num_tile_columns_minus1: %i", num_tile_columns_minus1);
+    XPrintf(outfp, "num_tile_columns_minus1: %i", num_tile_columns_minus1);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "num_tile_rows_minus1: %i", num_tile_rows_minus1);
+    XPrintf(outfp, "num_tile_rows_minus1: %i", num_tile_rows_minus1);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "uniform_spacing_flag: %i", uniform_spacing_flag);
+    XPrintf(outfp, "uniform_spacing_flag: %i", uniform_spacing_flag);
 
 
     if (!uniform_spacing_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "column_width_minus1 {");
+      XPrintf(outfp, "column_width_minus1 {");
       for (const uint32_t& v : column_width_minus1) {
-        fprintf(outfp, " %i", v);
+        XPrintf(outfp, " %i", v);
       }
-      fprintf(outfp, " }");
+      XPrintf(outfp, " }");
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "row_height_minus1 {");
+      XPrintf(outfp, "row_height_minus1 {");
       for (const uint32_t& v : row_height_minus1) {
-        fprintf(outfp, " %i", v);
+        XPrintf(outfp, " %i", v);
       }
-      fprintf(outfp, " }");
+      XPrintf(outfp, " }");
     }
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "loop_filter_across_tiles_enabled_flag: %i",
+    XPrintf(outfp, "loop_filter_across_tiles_enabled_flag: %i",
             loop_filter_across_tiles_enabled_flag);
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_loop_filter_across_slices_enabled_flag: %i",
+  XPrintf(outfp, "pps_loop_filter_across_slices_enabled_flag: %i",
           pps_loop_filter_across_slices_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "deblocking_filter_control_present_flag: %i",
+  XPrintf(outfp, "deblocking_filter_control_present_flag: %i",
           deblocking_filter_control_present_flag);
 
   if (deblocking_filter_control_present_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "deblocking_filter_override_enabled_flag: %i",
+    XPrintf(outfp, "deblocking_filter_override_enabled_flag: %i",
           deblocking_filter_override_enabled_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pps_deblocking_filter_disabled_flag: %i",
+    XPrintf(outfp, "pps_deblocking_filter_disabled_flag: %i",
           pps_deblocking_filter_disabled_flag);
 
     if (!pps_deblocking_filter_disabled_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "pps_beta_offset_div2: %i", pps_beta_offset_div2);
+      XPrintf(outfp, "pps_beta_offset_div2: %i", pps_beta_offset_div2);
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "pps_tc_offset_div2: %i", pps_tc_offset_div2);
+      XPrintf(outfp, "pps_tc_offset_div2: %i", pps_tc_offset_div2);
     }
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_scaling_list_data_present_flag: %i",
+  XPrintf(outfp, "pps_scaling_list_data_present_flag: %i",
           pps_scaling_list_data_present_flag);
 
   if (pps_scaling_list_data_present_flag) {
     // scaling_list_data()
     // TODO(chemag): add support for scaling_list_data()
-    fprintf(stderr, "error: unimplemented scaling_list_data() in pps\n");
+    XPrintf(stderr, "error: unimplemented scaling_list_data() in pps\n");
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "lists_modification_present_flag: %i",
+  XPrintf(outfp, "lists_modification_present_flag: %i",
           lists_modification_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "log2_parallel_merge_level_minus2: %i",
+  XPrintf(outfp, "log2_parallel_merge_level_minus2: %i",
           log2_parallel_merge_level_minus2);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "slice_segment_header_extension_present_flag: %i",
+  XPrintf(outfp, "slice_segment_header_extension_present_flag: %i",
           slice_segment_header_extension_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_extension_present_flag: %i",
+  XPrintf(outfp, "pps_extension_present_flag: %i",
           pps_extension_present_flag);
 
   if (pps_extension_present_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pps_range_extension_flag: %i", pps_range_extension_flag);
+    XPrintf(outfp, "pps_range_extension_flag: %i", pps_range_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pps_multilayer_extension_flag: %i",
+    XPrintf(outfp, "pps_multilayer_extension_flag: %i",
             pps_multilayer_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pps_3d_extension_flag: %i", pps_3d_extension_flag);
+    XPrintf(outfp, "pps_3d_extension_flag: %i", pps_3d_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pps_scc_extension_flag: %i", pps_scc_extension_flag);
+    XPrintf(outfp, "pps_scc_extension_flag: %i", pps_scc_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pps_extension_4bits: %i", pps_extension_4bits);
+    XPrintf(outfp, "pps_extension_4bits: %i", pps_extension_4bits);
   }
 
   if (pps_range_extension_flag) {
     // pps_range_extension()
     // TODO(chemag): add support for pps_range_extension()
-    fprintf(stderr, "error: unimplemented pps_range_extension() in pps\n");
+    XPrintf(stderr, "error: unimplemented pps_range_extension() in pps\n");
   }
 
   if (pps_multilayer_extension_flag) {
     // pps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for pps_multilayer_extension()
-    fprintf(stderr, "error: unimplemented pps_multilayer_extension_flag() in "
+    XPrintf(stderr, "error: unimplemented pps_multilayer_extension_flag() in "
             "pps\n");
   }
 
   if (pps_3d_extension_flag) {
     // pps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for pps_3d_extension()
-    fprintf(stderr, "error: unimplemented pps_3d_extension_flag() in pps\n");
+    XPrintf(stderr, "error: unimplemented pps_3d_extension_flag() in pps\n");
   }
 
   if (pps_scc_extension_flag) {
     // pps_scc_extension()
     // TODO(chemag): add support for pps_scc_extension()
-    fprintf(stderr, "error: unimplemented pps_scc_extension_flag() in pps\n");
+    XPrintf(stderr, "error: unimplemented pps_scc_extension_flag() in pps\n");
   }
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 }  // namespace h265nal

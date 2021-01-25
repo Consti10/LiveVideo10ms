@@ -113,7 +113,7 @@ void H265BitstreamParser::BitstreamState::fdump(
     FILE* outfp, int indent_level) const {
   for (const struct H265NalUnitParser::NalUnitState& nal_unit : nal_units) {
     nal_unit.fdump(outfp, indent_level, add_offset, add_length);
-    fprintf(outfp, "\n");
+    XPrintf(outfp, "\n");
   }
 }
 

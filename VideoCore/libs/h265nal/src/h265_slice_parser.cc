@@ -72,7 +72,7 @@ H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
 
 void H265SliceSegmentLayerParser::SliceSegmentLayerState::fdump(
     FILE* outfp, int indent_level) const {
-  fprintf(outfp, "slice_segment_layer {");
+  XPrintf(outfp, "slice_segment_layer {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
@@ -83,7 +83,7 @@ void H265SliceSegmentLayerParser::SliceSegmentLayerState::fdump(
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 
@@ -648,51 +648,51 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
 void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
     FILE* outfp, int indent_level) const {
-  fprintf(outfp, "slice_segment_header {");
+  XPrintf(outfp, "slice_segment_header {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "first_slice_segment_in_pic_flag: %i",
+  XPrintf(outfp, "first_slice_segment_in_pic_flag: %i",
           first_slice_segment_in_pic_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "no_output_of_prior_pics_flag: %i",
+  XPrintf(outfp, "no_output_of_prior_pics_flag: %i",
           no_output_of_prior_pics_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "slice_pic_parameter_set_id: %i", slice_pic_parameter_set_id);
+  XPrintf(outfp, "slice_pic_parameter_set_id: %i", slice_pic_parameter_set_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "dependent_slice_segment_flag: %i",
+  XPrintf(outfp, "dependent_slice_segment_flag: %i",
           dependent_slice_segment_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "slice_segment_address: %i",
+  XPrintf(outfp, "slice_segment_address: %i",
           slice_segment_address);
 
   if (!dependent_slice_segment_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "slice_reserved_flag {");
+    XPrintf(outfp, "slice_reserved_flag {");
     for (const uint32_t& v : slice_reserved_flag) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "slice_type: %i", slice_type);
+    XPrintf(outfp, "slice_type: %i", slice_type);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pic_output_flag: %i", pic_output_flag);
+    XPrintf(outfp, "pic_output_flag: %i", pic_output_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "colour_plane_id: %i", colour_plane_id);
+    XPrintf(outfp, "colour_plane_id: %i", colour_plane_id);
 
     if (nal_unit_type != IDR_W_RADL && nal_unit_type != IDR_N_LP) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_pic_order_cnt_lsb: %i", slice_pic_order_cnt_lsb);
+      XPrintf(outfp, "slice_pic_order_cnt_lsb: %i", slice_pic_order_cnt_lsb);
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "short_term_ref_pic_set_sps_flag: %i",
+      XPrintf(outfp, "short_term_ref_pic_set_sps_flag: %i",
               short_term_ref_pic_set_sps_flag);
 
       if (!short_term_ref_pic_set_sps_flag) {
@@ -701,92 +701,92 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
 
       } else if (num_short_term_ref_pic_sets > 1) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "short_term_ref_pic_set_idx: %i",
+        XPrintf(outfp, "short_term_ref_pic_set_idx: %i",
                 short_term_ref_pic_set_idx);
       }
 
       if (long_term_ref_pics_present_flag) {
         if (num_long_term_ref_pics_sps > 0) {
           fdump_indent_level(outfp, indent_level);
-          fprintf(outfp, "num_long_term_sps: %i", num_long_term_sps);
+          XPrintf(outfp, "num_long_term_sps: %i", num_long_term_sps);
         }
 
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "num_long_term_pics: %i", num_long_term_pics);
+        XPrintf(outfp, "num_long_term_pics: %i", num_long_term_pics);
 
         for (uint32_t i = 0; i < num_long_term_sps + num_long_term_pics; i++) {
           if (i < num_long_term_sps) {
             if (num_long_term_ref_pics_sps > 1) {
               fdump_indent_level(outfp, indent_level);
-              fprintf(outfp, "lt_idx_sps {");
+              XPrintf(outfp, "lt_idx_sps {");
               for (const uint32_t& v : lt_idx_sps) {
-                fprintf(outfp, " %i", v);
+                XPrintf(outfp, " %i", v);
               }
-              fprintf(outfp, " }");
+              XPrintf(outfp, " }");
             }
 
           } else {
             fdump_indent_level(outfp, indent_level);
-            fprintf(outfp, "poc_lsb_lt {");
+            XPrintf(outfp, "poc_lsb_lt {");
             for (const uint32_t& v : poc_lsb_lt) {
-              fprintf(outfp, " %i", v);
+              XPrintf(outfp, " %i", v);
             }
-            fprintf(outfp, " }");
+            XPrintf(outfp, " }");
 
             fdump_indent_level(outfp, indent_level);
-            fprintf(outfp, "used_by_curr_pic_lt_flag {");
+            XPrintf(outfp, "used_by_curr_pic_lt_flag {");
             for (const uint32_t& v : used_by_curr_pic_lt_flag) {
-              fprintf(outfp, " %i", v);
+              XPrintf(outfp, " %i", v);
             }
-            fprintf(outfp, " }");
+            XPrintf(outfp, " }");
           }
 
           fdump_indent_level(outfp, indent_level);
-          fprintf(outfp, "delta_poc_msb_present_flag {");
+          XPrintf(outfp, "delta_poc_msb_present_flag {");
           for (const uint32_t& v : delta_poc_msb_present_flag) {
-            fprintf(outfp, " %i", v);
+            XPrintf(outfp, " %i", v);
           }
-          fprintf(outfp, " }");
+          XPrintf(outfp, " }");
 
           fdump_indent_level(outfp, indent_level);
-          fprintf(outfp, "delta_poc_msb_cycle_lt {");
+          XPrintf(outfp, "delta_poc_msb_cycle_lt {");
           for (const uint32_t& v : delta_poc_msb_cycle_lt) {
-            fprintf(outfp, " %i", v);
+            XPrintf(outfp, " %i", v);
           }
-          fprintf(outfp, " }");
+          XPrintf(outfp, " }");
         }
       }
 
       if (sps_temporal_mvp_enabled_flag) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "slice_temporal_mvp_enabled_flag: %i",
+        XPrintf(outfp, "slice_temporal_mvp_enabled_flag: %i",
                 slice_temporal_mvp_enabled_flag);
       }
     }
 
     if (sample_adaptive_offset_enabled_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_sao_luma_flag: %i", slice_sao_luma_flag);
+      XPrintf(outfp, "slice_sao_luma_flag: %i", slice_sao_luma_flag);
 
       if (ChromaArrayType != 0) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "slice_sao_chroma_flag: %i", slice_sao_chroma_flag);
+        XPrintf(outfp, "slice_sao_chroma_flag: %i", slice_sao_chroma_flag);
       }
     }
 
     if (slice_type == SliceType_P || slice_type == SliceType_B) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "num_ref_idx_active_override_flag: %i",
+      XPrintf(outfp, "num_ref_idx_active_override_flag: %i",
               num_ref_idx_active_override_flag);
 
       if (num_ref_idx_active_override_flag) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "num_ref_idx_l0_active_minus1: %i",
+        XPrintf(outfp, "num_ref_idx_l0_active_minus1: %i",
                 num_ref_idx_l0_active_minus1);
 
         if (slice_type == SliceType_B) {
           fdump_indent_level(outfp, indent_level);
-          fprintf(outfp, "num_ref_idx_l1_active_minus1: %i",
+          XPrintf(outfp, "num_ref_idx_l1_active_minus1: %i",
                   num_ref_idx_l1_active_minus1);
         }
       }
@@ -797,25 +797,25 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
 
       if (slice_type == SliceType_B) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "mvd_l1_zero_flag: %i", mvd_l1_zero_flag);
+        XPrintf(outfp, "mvd_l1_zero_flag: %i", mvd_l1_zero_flag);
       }
 
       if (cabac_init_present_flag) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "cabac_init_flag: %i", cabac_init_flag);
+        XPrintf(outfp, "cabac_init_flag: %i", cabac_init_flag);
       }
 
       if (slice_temporal_mvp_enabled_flag) {
         if (slice_type == SliceType_B) {
           fdump_indent_level(outfp, indent_level);
-          fprintf(outfp, "collocated_from_l0_flag: %i",
+          XPrintf(outfp, "collocated_from_l0_flag: %i",
                   collocated_from_l0_flag);
         }
 
         if ((collocated_from_l0_flag && num_ref_idx_l0_active_minus1 > 0) ||
             (!collocated_from_l0_flag && num_ref_idx_l1_active_minus1 > 0)) {
           fdump_indent_level(outfp, indent_level);
-          fprintf(outfp, "collocated_ref_idx: %i", collocated_ref_idx);
+          XPrintf(outfp, "collocated_ref_idx: %i", collocated_ref_idx);
         }
       }
 
@@ -825,60 +825,60 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
       }
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "five_minus_max_num_merge_cand: %i",
+      XPrintf(outfp, "five_minus_max_num_merge_cand: %i",
               five_minus_max_num_merge_cand);
 
       if (motion_vector_resolution_control_idc == 2) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "use_integer_mv_flag: %i", use_integer_mv_flag);
+        XPrintf(outfp, "use_integer_mv_flag: %i", use_integer_mv_flag);
       }
     }
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "slice_qp_delta: %i", slice_qp_delta);
+    XPrintf(outfp, "slice_qp_delta: %i", slice_qp_delta);
 
     if (pps_slice_chroma_qp_offsets_present_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_cb_qp_offset: %i", slice_cb_qp_offset);
+      XPrintf(outfp, "slice_cb_qp_offset: %i", slice_cb_qp_offset);
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_cr_qp_offset: %i", slice_cr_qp_offset);
+      XPrintf(outfp, "slice_cr_qp_offset: %i", slice_cr_qp_offset);
     }
 
     if (pps_slice_act_qp_offsets_present_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_act_y_qp_offset: %i", slice_act_y_qp_offset);
+      XPrintf(outfp, "slice_act_y_qp_offset: %i", slice_act_y_qp_offset);
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_act_cb_qp_offset: %i", slice_act_cb_qp_offset);
+      XPrintf(outfp, "slice_act_cb_qp_offset: %i", slice_act_cb_qp_offset);
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_act_cr_qp_offset: %i", slice_act_cr_qp_offset);
+      XPrintf(outfp, "slice_act_cr_qp_offset: %i", slice_act_cr_qp_offset);
     }
 
     if (chroma_qp_offset_list_enabled_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "cu_chroma_qp_offset_enabled_flag: %i",
+      XPrintf(outfp, "cu_chroma_qp_offset_enabled_flag: %i",
               cu_chroma_qp_offset_enabled_flag);
     }
 
     if (deblocking_filter_override_enabled_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "deblocking_filter_override_flag: %i",
+      XPrintf(outfp, "deblocking_filter_override_flag: %i",
               deblocking_filter_override_flag);
     }
 
     if (deblocking_filter_override_flag) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_deblocking_filter_disabled_flag: %i",
+      XPrintf(outfp, "slice_deblocking_filter_disabled_flag: %i",
               slice_deblocking_filter_disabled_flag);
 
       if (!slice_deblocking_filter_disabled_flag) {
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "slice_beta_offset_div2: %i", slice_beta_offset_div2);
+        XPrintf(outfp, "slice_beta_offset_div2: %i", slice_beta_offset_div2);
 
         fdump_indent_level(outfp, indent_level);
-        fprintf(outfp, "slice_tc_offset_div2: %i", slice_tc_offset_div2);
+        XPrintf(outfp, "slice_tc_offset_div2: %i", slice_tc_offset_div2);
       }
     }
 
@@ -886,46 +886,46 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
         (slice_sao_luma_flag || slice_sao_chroma_flag ||
         !slice_deblocking_filter_disabled_flag)) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "slice_loop_filter_across_slices_enabled_flag: %i",
+      XPrintf(outfp, "slice_loop_filter_across_slices_enabled_flag: %i",
               slice_loop_filter_across_slices_enabled_flag);
     }
   }
 
   if (tiles_enabled_flag || entropy_coding_sync_enabled_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "num_entry_point_offsets: %i", num_entry_point_offsets);
+    XPrintf(outfp, "num_entry_point_offsets: %i", num_entry_point_offsets);
 
     if (num_entry_point_offsets > 0) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "offset_len_minus1: %i", offset_len_minus1);
+      XPrintf(outfp, "offset_len_minus1: %i", offset_len_minus1);
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "entry_point_offset_minus1 {");
+      XPrintf(outfp, "entry_point_offset_minus1 {");
       for (const uint32_t& v : entry_point_offset_minus1) {
-        fprintf(outfp, " %i", v);
+        XPrintf(outfp, " %i", v);
       }
-      fprintf(outfp, " }");
+      XPrintf(outfp, " }");
     }
   }
 
   if (slice_segment_header_extension_present_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "slice_segment_header_extension_length: %i",
+    XPrintf(outfp, "slice_segment_header_extension_length: %i",
             slice_segment_header_extension_length);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "slice_segment_header_extension_data_byte {");
+    XPrintf(outfp, "slice_segment_header_extension_data_byte {");
     for (const uint32_t& v : slice_segment_header_extension_data_byte) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
   }
 
   // byte_alignment()
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 }  // namespace h265nal

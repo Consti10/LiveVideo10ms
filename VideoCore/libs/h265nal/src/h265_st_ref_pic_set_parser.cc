@@ -142,26 +142,26 @@ H265StRefPicSetParser::ParseStRefPicSet(
 
 void H265StRefPicSetParser::StRefPicSetState::fdump(
     FILE* outfp, int indent_level) const {
-  fprintf(outfp, "st_ref_pic_set {");
+  XPrintf(outfp, "st_ref_pic_set {");
   indent_level = indent_level_incr(indent_level);
 
   if (stRpsIdx != 0) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "inter_ref_pic_set_prediction_flag: %i",
+    XPrintf(outfp, "inter_ref_pic_set_prediction_flag: %i",
             inter_ref_pic_set_prediction_flag);
   }
 
   if (inter_ref_pic_set_prediction_flag) {
     if (stRpsIdx == num_short_term_ref_pic_sets) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "delta_idx_minus1: %i", delta_idx_minus1);
+      XPrintf(outfp, "delta_idx_minus1: %i", delta_idx_minus1);
     }
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "delta_rps_sign: %i", delta_rps_sign);
+    XPrintf(outfp, "delta_rps_sign: %i", delta_rps_sign);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "abs_delta_rps_minus1: %i", abs_delta_rps_minus1);
+    XPrintf(outfp, "abs_delta_rps_minus1: %i", abs_delta_rps_minus1);
 
 #if 0
     // TODO(chemag): add support for NumDeltaPocs
@@ -175,43 +175,43 @@ void H265StRefPicSetParser::StRefPicSetState::fdump(
 
   } else {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "num_negative_pics: %i", num_negative_pics);
+    XPrintf(outfp, "num_negative_pics: %i", num_negative_pics);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "num_positive_pics: %i", num_positive_pics);
+    XPrintf(outfp, "num_positive_pics: %i", num_positive_pics);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "delta_poc_s0_minus1 {");
+    XPrintf(outfp, "delta_poc_s0_minus1 {");
     for (const uint32_t& v : delta_poc_s0_minus1) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "used_by_curr_pic_s0_flag {");
+    XPrintf(outfp, "used_by_curr_pic_s0_flag {");
     for (const uint32_t& v : used_by_curr_pic_s0_flag) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "delta_poc_s1_minus1 {");
+    XPrintf(outfp, "delta_poc_s1_minus1 {");
     for (const uint32_t& v : delta_poc_s1_minus1) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "used_by_curr_pic_s1_flag {");
+    XPrintf(outfp, "used_by_curr_pic_s1_flag {");
     for (const uint32_t& v : used_by_curr_pic_s1_flag) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
   }
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 }  // namespace h265nal

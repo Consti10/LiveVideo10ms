@@ -283,19 +283,19 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
 
 void H265NalUnitParser::NalUnitState::fdump(
     FILE* outfp, int indent_level, bool add_offset, bool add_length) const {
-  fprintf(outfp, "nal_unit {");
+  XPrintf(outfp, "nal_unit {");
   indent_level = indent_level_incr(indent_level);
 
   // nal unit offset (starting at NAL unit header)
   if (add_offset) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "offset: 0x%08zx", offset);
+    XPrintf(outfp, "offset: 0x%08zx", offset);
   }
 
   // nal unit length (starting at NAL unit header)
   if (add_length) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "length: %zu", length);
+    XPrintf(outfp, "length: %zu", length);
   }
 
   // header
@@ -308,30 +308,30 @@ void H265NalUnitParser::NalUnitState::fdump(
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 void H265NalUnitHeaderParser::NalUnitHeaderState::fdump(
     FILE* outfp, int indent_level) const {
 
-  fprintf(outfp, "nal_unit_header {");
+  XPrintf(outfp, "nal_unit_header {");
   indent_level = indent_level_incr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "forbidden_zero_bit: %i", forbidden_zero_bit);
+  XPrintf(outfp, "forbidden_zero_bit: %i", forbidden_zero_bit);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "nal_unit_type: %i", nal_unit_type);
+  XPrintf(outfp, "nal_unit_type: %i", nal_unit_type);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "nuh_layer_id: %i", nuh_layer_id);
+  XPrintf(outfp, "nuh_layer_id: %i", nuh_layer_id);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "nuh_temporal_id_plus1: %i", nuh_temporal_id_plus1);
+  XPrintf(outfp, "nuh_temporal_id_plus1: %i", nuh_temporal_id_plus1);
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     FILE* outfp, int indent_level, uint32_t nal_unit_type) const {
-  fprintf(outfp, "nal_unit_payload {");
+  XPrintf(outfp, "nal_unit_payload {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
@@ -421,7 +421,7 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 }  // namespace h265nal

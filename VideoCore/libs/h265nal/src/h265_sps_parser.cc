@@ -216,7 +216,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (sps.sps_scaling_list_data_present_flag) {
       // scaling_list_data()
       // TODO(chemag): add support for scaling_list_data()
-      fprintf(stderr, "error: unimplemented scaling_list_data() in sps\n");
+      XPrintf(stderr, "error: unimplemented scaling_list_data() in sps\n");
       return absl::nullopt;
     }
   }
@@ -366,27 +366,27 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (sps.sps_range_extension_flag) {
     // sps_range_extension()
     // TODO(chemag): add support for sps_range_extension()
-    fprintf(stderr, "error: unimplemented sps_range_extension() in sps\n");
+    XPrintf(stderr, "error: unimplemented sps_range_extension() in sps\n");
     return absl::nullopt;
   }
   if (sps.sps_multilayer_extension_flag) {
     // sps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for sps_multilayer_extension()
-    fprintf(stderr, "error: unimplemented sps_multilayer_extension() in sps\n");
+    XPrintf(stderr, "error: unimplemented sps_multilayer_extension() in sps\n");
     return absl::nullopt;
   }
 
   if (sps.sps_3d_extension_flag) {
     // sps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for sps_3d_extension()
-    fprintf(stderr, "error: unimplemented sps_3d_extension() in sps\n");
+    XPrintf(stderr, "error: unimplemented sps_3d_extension() in sps\n");
     return absl::nullopt;
   }
 
   if (sps.sps_scc_extension_flag) {
     // sps_scc_extension()
     // TODO(chemag): add support for sps_scc_extension()
-    fprintf(stderr, "error: unimplemented sps_scc_extension() in sps\n");
+    XPrintf(stderr, "error: unimplemented sps_scc_extension() in sps\n");
     return absl::nullopt;
   }
 
@@ -405,166 +405,166 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 }
 
 void H265SpsParser::SpsState::fdump(XFILE outfp, int indent_level) const {
-  fprintf(outfp, "sps {");
+  XPrintf(outfp, "sps {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_video_parameter_set_id: %i", sps_video_parameter_set_id);
+  XPrintf(outfp, "sps_video_parameter_set_id: %i", sps_video_parameter_set_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_max_sub_layers_minus1: %i", sps_max_sub_layers_minus1);
+  XPrintf(outfp, "sps_max_sub_layers_minus1: %i", sps_max_sub_layers_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_temporal_id_nesting_flag: %i",
+  XPrintf(outfp, "sps_temporal_id_nesting_flag: %i",
           sps_temporal_id_nesting_flag);
 
   fdump_indent_level(outfp, indent_level);
   profile_tier_level.fdump(outfp, indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_seq_parameter_set_id: %i", sps_seq_parameter_set_id);
+  XPrintf(outfp, "sps_seq_parameter_set_id: %i", sps_seq_parameter_set_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "chroma_format_idc: %i", chroma_format_idc);
+  XPrintf(outfp, "chroma_format_idc: %i", chroma_format_idc);
 
   if (chroma_format_idc == 3) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "separate_colour_plane_flag: %i",
+    XPrintf(outfp, "separate_colour_plane_flag: %i",
             separate_colour_plane_flag);
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pic_width_in_luma_samples: %i", pic_width_in_luma_samples);
+  XPrintf(outfp, "pic_width_in_luma_samples: %i", pic_width_in_luma_samples);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pic_height_in_luma_samples: %i", pic_height_in_luma_samples);
+  XPrintf(outfp, "pic_height_in_luma_samples: %i", pic_height_in_luma_samples);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "conformance_window_flag: %i", conformance_window_flag);
+  XPrintf(outfp, "conformance_window_flag: %i", conformance_window_flag);
 
   if (conformance_window_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "conf_win_left_offset: %i", conf_win_left_offset);
+    XPrintf(outfp, "conf_win_left_offset: %i", conf_win_left_offset);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "conf_win_right_offset: %i", conf_win_right_offset);
+    XPrintf(outfp, "conf_win_right_offset: %i", conf_win_right_offset);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "conf_win_top_offset: %i", conf_win_top_offset);
+    XPrintf(outfp, "conf_win_top_offset: %i", conf_win_top_offset);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "conf_win_bottom_offset: %i", conf_win_bottom_offset);
+    XPrintf(outfp, "conf_win_bottom_offset: %i", conf_win_bottom_offset);
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "bit_depth_luma_minus8: %i", bit_depth_luma_minus8);
+  XPrintf(outfp, "bit_depth_luma_minus8: %i", bit_depth_luma_minus8);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "bit_depth_chroma_minus8: %i", bit_depth_chroma_minus8);
+  XPrintf(outfp, "bit_depth_chroma_minus8: %i", bit_depth_chroma_minus8);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "log2_max_pic_order_cnt_lsb_minus4: %i",
+  XPrintf(outfp, "log2_max_pic_order_cnt_lsb_minus4: %i",
           log2_max_pic_order_cnt_lsb_minus4);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_sub_layer_ordering_info_present_flag: %i",
+  XPrintf(outfp, "sps_sub_layer_ordering_info_present_flag: %i",
           sps_sub_layer_ordering_info_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_max_dec_pic_buffering_minus1 {");
+  XPrintf(outfp, "sps_max_dec_pic_buffering_minus1 {");
   for (const uint32_t& v : sps_max_dec_pic_buffering_minus1) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_max_num_reorder_pics {");
+  XPrintf(outfp, "sps_max_num_reorder_pics {");
   for (const uint32_t& v : sps_max_num_reorder_pics) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_max_latency_increase_plus1 {");
+  XPrintf(outfp, "sps_max_latency_increase_plus1 {");
   for (const uint32_t& v : sps_max_latency_increase_plus1) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "log2_min_luma_coding_block_size_minus3: %i",
+  XPrintf(outfp, "log2_min_luma_coding_block_size_minus3: %i",
           log2_min_luma_coding_block_size_minus3);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "log2_diff_max_min_luma_coding_block_size: %i",
+  XPrintf(outfp, "log2_diff_max_min_luma_coding_block_size: %i",
           log2_diff_max_min_luma_coding_block_size);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "log2_min_luma_transform_block_size_minus2: %i",
+  XPrintf(outfp, "log2_min_luma_transform_block_size_minus2: %i",
           log2_min_luma_transform_block_size_minus2);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "log2_diff_max_min_luma_transform_block_size: %i",
+  XPrintf(outfp, "log2_diff_max_min_luma_transform_block_size: %i",
           log2_diff_max_min_luma_transform_block_size);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "max_transform_hierarchy_depth_inter: %i",
+  XPrintf(outfp, "max_transform_hierarchy_depth_inter: %i",
           max_transform_hierarchy_depth_inter);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "max_transform_hierarchy_depth_intra: %i",
+  XPrintf(outfp, "max_transform_hierarchy_depth_intra: %i",
           max_transform_hierarchy_depth_intra);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "scaling_list_enabled_flag: %i",
+  XPrintf(outfp, "scaling_list_enabled_flag: %i",
           scaling_list_enabled_flag);
 
   if (scaling_list_enabled_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sps_scaling_list_data_present_flag: %i",
+    XPrintf(outfp, "sps_scaling_list_data_present_flag: %i",
             sps_scaling_list_data_present_flag);
 
     if (sps_scaling_list_data_present_flag) {
       // scaling_list_data()
       // TODO(chemag): add support for scaling_list_data()
-      fprintf(stderr, "error: unimplemented scaling_list_data() in sps\n");
+      XPrintf(stderr, "error: unimplemented scaling_list_data() in sps\n");
     }
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "amp_enabled_flag: %i", amp_enabled_flag);
+  XPrintf(outfp, "amp_enabled_flag: %i", amp_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sample_adaptive_offset_enabled_flag: %i",
+  XPrintf(outfp, "sample_adaptive_offset_enabled_flag: %i",
           sample_adaptive_offset_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pcm_enabled_flag: %i", pcm_enabled_flag);
+  XPrintf(outfp, "pcm_enabled_flag: %i", pcm_enabled_flag);
 
   if (pcm_enabled_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pcm_sample_bit_depth_luma_minus1: %i",
+    XPrintf(outfp, "pcm_sample_bit_depth_luma_minus1: %i",
             pcm_sample_bit_depth_luma_minus1);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pcm_sample_bit_depth_chroma_minus1: %i",
+    XPrintf(outfp, "pcm_sample_bit_depth_chroma_minus1: %i",
             pcm_sample_bit_depth_chroma_minus1);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "log2_min_pcm_luma_coding_block_size_minus3: %i",
+    XPrintf(outfp, "log2_min_pcm_luma_coding_block_size_minus3: %i",
             log2_min_pcm_luma_coding_block_size_minus3);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "log2_diff_max_min_pcm_luma_coding_block_size: %i",
+    XPrintf(outfp, "log2_diff_max_min_pcm_luma_coding_block_size: %i",
             log2_diff_max_min_pcm_luma_coding_block_size);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "pcm_loop_filter_disabled_flag: %i",
+    XPrintf(outfp, "pcm_loop_filter_disabled_flag: %i",
             pcm_loop_filter_disabled_flag);
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "num_short_term_ref_pic_sets: %i",
+  XPrintf(outfp, "num_short_term_ref_pic_sets: %i",
           num_short_term_ref_pic_sets);
 
   for (uint32_t i = 0; i < num_short_term_ref_pic_sets; i++) {
@@ -573,39 +573,39 @@ void H265SpsParser::SpsState::fdump(XFILE outfp, int indent_level) const {
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "long_term_ref_pics_present_flag: %i",
+  XPrintf(outfp, "long_term_ref_pics_present_flag: %i",
           long_term_ref_pics_present_flag);
 
   if (long_term_ref_pics_present_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "num_long_term_ref_pics_sps: %i",
+    XPrintf(outfp, "num_long_term_ref_pics_sps: %i",
             num_long_term_ref_pics_sps);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "lt_ref_pic_poc_lsb_sps {");
+    XPrintf(outfp, "lt_ref_pic_poc_lsb_sps {");
     for (const uint32_t& v : lt_ref_pic_poc_lsb_sps) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "used_by_curr_pic_lt_sps_flag {");
+    XPrintf(outfp, "used_by_curr_pic_lt_sps_flag {");
     for (const uint32_t& v : used_by_curr_pic_lt_sps_flag) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_temporal_mvp_enabled_flag: %i",
+  XPrintf(outfp, "sps_temporal_mvp_enabled_flag: %i",
           sps_temporal_mvp_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "strong_intra_smoothing_enabled_flag: %i",
+  XPrintf(outfp, "strong_intra_smoothing_enabled_flag: %i",
           strong_intra_smoothing_enabled_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vui_parameters_present_flag: %i",
+  XPrintf(outfp, "vui_parameters_present_flag: %i",
           vui_parameters_present_flag);
 
   fdump_indent_level(outfp, indent_level);
@@ -614,55 +614,55 @@ void H265SpsParser::SpsState::fdump(XFILE outfp, int indent_level) const {
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_extension_present_flag: %i",
+  XPrintf(outfp, "sps_extension_present_flag: %i",
           sps_extension_present_flag);
 
   if (sps_extension_present_flag) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sps_range_extension_flag: %i", sps_range_extension_flag);
+    XPrintf(outfp, "sps_range_extension_flag: %i", sps_range_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sps_multilayer_extension_flag: %i",
+    XPrintf(outfp, "sps_multilayer_extension_flag: %i",
             sps_multilayer_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sps_3d_extension_flag: %i", sps_3d_extension_flag);
+    XPrintf(outfp, "sps_3d_extension_flag: %i", sps_3d_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sps_scc_extension_flag: %i", sps_scc_extension_flag);
+    XPrintf(outfp, "sps_scc_extension_flag: %i", sps_scc_extension_flag);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sps_extension_4bits: %i", sps_extension_4bits);
+    XPrintf(outfp, "sps_extension_4bits: %i", sps_extension_4bits);
   }
 
   if (sps_range_extension_flag) {
     // sps_range_extension()
     // TODO(chemag): add support for sps_range_extension()
-    fprintf(stderr, "error: unimplemented sps_range_extension() in sps\n");
+    XPrintf(stderr, "error: unimplemented sps_range_extension() in sps\n");
   }
 
   if (sps_multilayer_extension_flag) {
     // sps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for sps_multilayer_extension()
-    fprintf(stderr, "error: unimplemented sps_multilayer_extension_flag() in "
+    XPrintf(stderr, "error: unimplemented sps_multilayer_extension_flag() in "
             "sps\n");
   }
 
   if (sps_3d_extension_flag) {
     // sps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for sps_3d_extension()
-    fprintf(stderr, "error: unimplemented sps_3d_extension_flag() in sps\n");
+    XPrintf(stderr, "error: unimplemented sps_3d_extension_flag() in sps\n");
   }
 
   if (sps_scc_extension_flag) {
     // sps_scc_extension()
     // TODO(chemag): add support for sps_scc_extension()
-    fprintf(stderr, "error: unimplemented sps_scc_extension_flag() in sps\n");
+    XPrintf(stderr, "error: unimplemented sps_scc_extension_flag() in sps\n");
   }
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {

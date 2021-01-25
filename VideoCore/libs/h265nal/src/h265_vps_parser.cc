@@ -181,7 +181,7 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
       }
       // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
       // TODO(chemag): add support for hrd_parameters()
-      fprintf(stderr, "error: unimplemented hrd_parameters in vps\n");
+      XPrintf(stderr, "error: unimplemented hrd_parameters in vps\n");
       return absl::nullopt;
     }
   }
@@ -205,129 +205,129 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
 }
 
 void H265VpsParser::VpsState::fdump(XFILE outfp, int indent_level) const {
-  fprintf(outfp, "vps {");
+  XPrintf(outfp, "vps {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_video_parameter_set_id: %i",
+  XPrintf(outfp, "vps_video_parameter_set_id: %i",
           vps_video_parameter_set_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_base_layer_internal_flag: %i",
+  XPrintf(outfp, "vps_base_layer_internal_flag: %i",
           vps_base_layer_internal_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_base_layer_available_flag: %i",
+  XPrintf(outfp, "vps_base_layer_available_flag: %i",
           vps_base_layer_available_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_max_layers_minus1: %i", vps_max_layers_minus1);
+  XPrintf(outfp, "vps_max_layers_minus1: %i", vps_max_layers_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_max_sub_layers_minus1: %i",
+  XPrintf(outfp, "vps_max_sub_layers_minus1: %i",
           vps_max_sub_layers_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_temporal_id_nesting_flag: %i",
+  XPrintf(outfp, "vps_temporal_id_nesting_flag: %i",
           vps_temporal_id_nesting_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_reserved_0xffff_16bits: 0x%04x",
+  XPrintf(outfp, "vps_reserved_0xffff_16bits: 0x%04x",
           vps_reserved_0xffff_16bits);
 
   fdump_indent_level(outfp, indent_level);
   profile_tier_level.fdump(outfp, indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_sub_layer_ordering_info_present_flag: %i",
+  XPrintf(outfp, "vps_sub_layer_ordering_info_present_flag: %i",
           vps_sub_layer_ordering_info_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_max_dec_pic_buffering_minus1 {");
+  XPrintf(outfp, "vps_max_dec_pic_buffering_minus1 {");
   for (const uint32_t& v : vps_max_dec_pic_buffering_minus1) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_max_num_reorder_pics {");
+  XPrintf(outfp, "vps_max_num_reorder_pics {");
   for (const uint32_t& v : vps_max_num_reorder_pics) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_max_latency_increase_plus1 {");
+  XPrintf(outfp, "vps_max_latency_increase_plus1 {");
   for (const uint32_t& v : vps_max_latency_increase_plus1) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_max_layer_id: %i", vps_max_layer_id);
+  XPrintf(outfp, "vps_max_layer_id: %i", vps_max_layer_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_num_layer_sets_minus1: %i",
+  XPrintf(outfp, "vps_num_layer_sets_minus1: %i",
           vps_num_layer_sets_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "layer_id_included_flag {");
+  XPrintf(outfp, "layer_id_included_flag {");
   for (const std::vector<uint32_t>& vv : layer_id_included_flag) {
-    fprintf(outfp, " {");
+    XPrintf(outfp, " {");
     for (const uint32_t& v : vv) {
-      fprintf(outfp, " %i", v);
+      XPrintf(outfp, " %i", v);
     }
-    fprintf(outfp, " }");
+    XPrintf(outfp, " }");
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_timing_info_present_flag: %i",
+  XPrintf(outfp, "vps_timing_info_present_flag: %i",
           vps_timing_info_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_num_units_in_tick: %i", vps_num_units_in_tick);
+  XPrintf(outfp, "vps_num_units_in_tick: %i", vps_num_units_in_tick);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_time_scale: %i", vps_time_scale);
+  XPrintf(outfp, "vps_time_scale: %i", vps_time_scale);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_poc_proportional_to_timing_flag: %i",
+  XPrintf(outfp, "vps_poc_proportional_to_timing_flag: %i",
           vps_poc_proportional_to_timing_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_num_ticks_poc_diff_one_minus1: %i",
+  XPrintf(outfp, "vps_num_ticks_poc_diff_one_minus1: %i",
           vps_num_ticks_poc_diff_one_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_num_hrd_parameters: %i", vps_num_hrd_parameters);
+  XPrintf(outfp, "vps_num_hrd_parameters: %i", vps_num_hrd_parameters);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "hrd_layer_set_idx {");
+  XPrintf(outfp, "hrd_layer_set_idx {");
   for (const uint32_t& v : hrd_layer_set_idx) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "cprms_present_flag {");
+  XPrintf(outfp, "cprms_present_flag {");
   for (const uint32_t& v : cprms_present_flag) {
-    fprintf(outfp, " %i", v);
+    XPrintf(outfp, " %i", v);
   }
-  fprintf(outfp, " }");
+  XPrintf(outfp, " }");
 
   // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
   // TODO(chemag): add support for hrd_parameters()
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_extension_flag: %i", vps_extension_flag);
+  XPrintf(outfp, "vps_extension_flag: %i", vps_extension_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_extension_data_flag: %i", vps_extension_data_flag);
+  XPrintf(outfp, "vps_extension_data_flag: %i", vps_extension_data_flag);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  XPrintf(outfp, "}");
 }
 
 }  // namespace h265nal
