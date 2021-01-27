@@ -129,4 +129,5 @@ public class VideoSettings {
             throw new RuntimeException("Cannot add file to contentProvider "+pathToFile);
         }
     }
+
 }
