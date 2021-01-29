@@ -62,12 +62,17 @@ public:
     // However,writing them has no negative affect on devices with older Android versions
     // Note that for example the low-latency key cannot fix any issues like the 'VUI' issue
     void writeAndroidPerformanceParams(AMediaFormat* format){
+        // I think: KEY_LOW_LATENCY is for decoder. But it doesn't really make a difference anyways
         static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
         AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
         // Lower values mean higher priority
         // Works on pixel 3 (look at output format description)
         static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
         AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
+        // set operating rate ? - doesn't make a difference
+        //static const auto AMEDIAFORMAT_KEY_OPERATING_RATE="operating-rate";
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_OPERATING_RATE,60);
+        //
     }
     void h264_configureAMediaFormat(AMediaFormat* format){
         const auto sps=getCSD0();

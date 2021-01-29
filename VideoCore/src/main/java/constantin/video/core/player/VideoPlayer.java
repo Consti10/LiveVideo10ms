@@ -3,7 +3,6 @@ package constantin.video.core.player;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
