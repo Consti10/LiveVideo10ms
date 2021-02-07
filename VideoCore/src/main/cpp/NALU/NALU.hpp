@@ -201,6 +201,8 @@ public:
                 }
             }
         }
+        //auto tmp=std::vector<uint8_t>(data,data+data_len);
+        //MLOGD<<StringHelper::vectorAsString(tmp)<<" "<<tmp.size();
     }
 
     //Returns video width and height if the NALU is an SPS
