@@ -128,7 +128,7 @@ public:
         //res = uvc_get_device_with_fd(ctx, &dev, pid, vid, NULL, fd, NULL, NULL);
         res = uvc_get_device_with_fd(ctx, &dev, vid, pid, nullptr, fd, busnum, devAddr);
         if (res < 0) {
-            uvc_perror(res, "uvc_find_device"); /* no devices found */
+            MLOGE<<"uvc_find_device"<<res; /* no devices found */
         } else {
             MLOGD<<"Device found";
             /* Try to open the device: requires exclusive access */
@@ -146,7 +146,8 @@ public:
                 /* Print out the result */
                 //uvc_print_stream_ctrl(&ctrl, stderr);
                 if (res < 0) {
-                    uvc_perror(res, "get_mode"); /* device doesn't provide a matching stream */
+                    MLOGE<<"get_mode"<<res;
+                    //uvc_perror(res, "get_mode"); /* device doesn't provide a matching stream */
                 } else {
                     processFramePrioritySet=false;
                     res = uvc_start_streaming(devh, &ctrl, UVCReceiverDecoder::callbackProcessFrame, this, 0);
