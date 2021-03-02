@@ -154,6 +154,7 @@ void LowLagDecoder::configureStartDecoder(){
     decoder.configured=true;
 }
 
+
 void LowLagDecoder::feedDecoder(const NALU& nalu){
     if(IS_H265 && (nalu.isSPS() || nalu.isPPS() || nalu.isVPS())){
         // looks like h265 doesn't like feeding sps/pps/vps during decoding

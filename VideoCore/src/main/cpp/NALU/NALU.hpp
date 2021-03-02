@@ -147,6 +147,13 @@ public:
     std::string dataAsString()const{
         return StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
     }
+    void debugSimple()const{
+        if(IS_H265_PACKET){
+            MLOGD<<"H265 Size(B): "<<getSize()<<" Type "<<get_nal_name();
+        }else{
+            MLOGD<<"H264 Size(B): "<<getSize()<<" Type "<<get_nal_name();
+        }
+    }
     void debug()const{
         if(IS_H265_PACKET){
             if(isSPS()){

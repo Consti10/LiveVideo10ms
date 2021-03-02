@@ -6,3 +6,30 @@ lol++;
                     std::memset(&((uint8_t*)buf)[10],0,20);
                 }
             }
+
+
+/*if(!nalu.IS_H265_PACKET && !(nalu.isSPS()||nalu.isPPS())){
+                lol++;
+                if(lol % 4==0){
+                    const auto sizeOfNALU=nalu.getSize();
+                    const std::size_t nBytesToGarbage=sizeOfNALU/8;
+                    MLOGD<<"Garbaging "<<(int)nBytesToGarbage;
+                    std::memset(((uint8_t*)buf+nBytesToGarbage),0,nBytesToGarbage);
+                }
+            }*/
+            if(!nalu.IS_H265_PACKET && nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR){
+                //lol++;
+                //if(lol % 4==0){
+                    const auto sizeOfNALU=nalu.getSize();
+                    const std::size_t nBytesToGarbage=sizeOfNALU/8;
+                    MLOGD<<"Garbaging "<<(int)nBytesToGarbage;
+                    std::memset(((uint8_t*)buf+nBytesToGarbage),0,nBytesToGarbage);
+                //}
+            }
+            /*if(!nalu.IS_H265_PACKET && nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR){
+                const auto sizeOfNALU=nalu.getSize();
+                const std::size_t nBytesToGarbage=sizeOfNALU/8;
+                MLOGD<<"Garbaging2 "<<(int)nBytesToGarbage;
+                std::memcpy((uint8_t*)buf+nBytesToGarbage,nalu.getData()+nBytesToGarbage*2,nalu.getSize()-nBytesToGarbage*3);
+                //std::memset(((uint8_t*)buf+nBytesToGarbage),0,nBytesToGarbage);
+            }*/
