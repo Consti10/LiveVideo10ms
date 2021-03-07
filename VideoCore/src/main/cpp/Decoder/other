@@ -33,3 +33,11 @@ lol++;
                 std::memcpy((uint8_t*)buf+nBytesToGarbage,nalu.getData()+nBytesToGarbage*2,nalu.getSize()-nBytesToGarbage*3);
                 //std::memset(((uint8_t*)buf+nBytesToGarbage),0,nBytesToGarbage);
             }*/
+
+
+if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
+        val++;
+        if(val % 5==0){
+            return;
+        }
+    }
