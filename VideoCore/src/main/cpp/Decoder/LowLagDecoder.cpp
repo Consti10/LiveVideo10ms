@@ -136,6 +136,8 @@ void LowLagDecoder::configureStartDecoder(){
         mKeyFrameFinder.h264_configureAMediaFormat(format);
     }
 
+    MLOGD << "Configuring decoder:" << AMediaFormat_toString(format);
+
     AMediaCodec_configure(decoder.codec,format, decoder.window, nullptr, 0);
     AMediaFormat_delete(format);
     format=AMediaCodec_getOutputFormat(decoder.codec);

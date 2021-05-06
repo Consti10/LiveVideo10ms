@@ -73,6 +73,10 @@ public:
         //static const auto AMEDIAFORMAT_KEY_OPERATING_RATE="operating-rate";
         //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_OPERATING_RATE,60);
         //
+        //AMEDIAFORMAT_KEY_LOW_LATENCY;
+        //AMEDIAFORMAT_KEY_LATENCY;
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_LATENCY,0);
+        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_OPERATING_RATE,0);
     }
     void h264_configureAMediaFormat(AMediaFormat* format){
         const auto sps=getCSD0();
