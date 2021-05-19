@@ -53,6 +53,8 @@
         <item>allwinner/1080p_30fps_2mb.h264</item>
         <item>allwinner/1080p_30fps_4mb.h264</item>
         <item>allwinner/1080p_30fps_4mb.h265</item>
+
+        <item>dji_fpv/out.h264</item>
     </string-array>
 
     <!-- The test files that are written into the database -->
