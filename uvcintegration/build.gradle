@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.Consti10'
 
 android {
@@ -9,8 +8,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
         externalNativeBuild {
             ndkBuild {
                 arguments "V_CORE_DIR=${project(':VideoCore').getProjectDir().getAbsolutePath().replace("\\", "/")}"
