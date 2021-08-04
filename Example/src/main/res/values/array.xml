@@ -72,7 +72,9 @@
         <item>webcam/720p_usb.h264"</item>
         <item>360/insta_webbn_2.h264</item>
 
-        <item>jetson/h265/1/test.h265</item>
+        <!--<item>jetson/h265/1/test.h265</item>-->
+
+        <item>dji_fpv/out.h264</item>
     </string-array>
 
 </resources>

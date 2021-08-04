@@ -23,7 +23,7 @@ public:
     void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType);
     /*
      * Set the surface the decoder can be configured with. When @param surface==nullptr
-     * It is quaranteed that the surface is not used by the decoder anymore when this call returns
+     * It is guaranteed that the surface is not used by the decoder anymore when this call returns
      */
     void setVideoSurface(JNIEnv* env, jobject surface);
     /*
