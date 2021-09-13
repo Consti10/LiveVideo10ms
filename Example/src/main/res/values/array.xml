@@ -54,6 +54,18 @@
         <item>allwinner/1080p_30fps_4mb.h264</item>
         <item>allwinner/1080p_30fps_4mb.h265</item>
 
+        <item>rv1126/rec_gop1_1080p90.h264</item>
+        <item>rv1126/rec_gop1_1080p90_poc2.h264</item>
+        <item>rv1126/rec_gop1_1080p90_poc2_second.h264</item>
+        <item>rv1126/rec_gop1_1080p90_poc2_mpp.h264</item>
+        <item>rv1126/t1.h264</item>
+        <item>rv1126/t1.h265</item>
+        <item>rv1126/t_x1.h264</item>
+        <item>rv1126/t_x2.h264</item>
+        <item>rv1126/t_x3.h264</item>
+        <item>rv1126/t_x4.h264</item>
+        <item>rv1126/t_x5.h264</item>
+
         <item>dji_fpv/out.h264</item>
     </string-array>
 
