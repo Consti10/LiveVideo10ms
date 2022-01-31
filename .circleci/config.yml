@@ -38,6 +38,7 @@ jobs:
       - run:
           name: Assemble release build
           command: |
+            sudo chmod +x ./gradlew
             ./gradlew assembleRelease
 
 # Invoke jobs via workflows
