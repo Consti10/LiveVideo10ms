@@ -24,7 +24,7 @@ allprojects {
         maven { url 'https://jitpack.io' }
     }
     ext {
-        minSdkVersion = 31
+        minSdkVersion = 21
         compileSdkVersion = 31
         targetSdkVersion = 31
         appcompatVersion = '1.4.1'
