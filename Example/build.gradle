@@ -39,14 +39,14 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     //firebase
-    implementation 'com.google.firebase:firebase-core:19.0.1'
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.1'
-    implementation('com.google.firebase:firebase-firestore:23.0.3')
+    implementation 'com.google.firebase:firebase-core:20.0.2'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.7'
+    implementation('com.google.firebase:firebase-firestore:24.0.1')
 
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
     implementation("androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion")
 
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
@@ -55,7 +55,7 @@ dependencies {
     implementation project(path: ':uvcintegration')
     implementation project(path: ':TelemetryCore')
 
-    implementation "androidx.core:core-ktx:1.6.0"
+    implementation "androidx.core:core-ktx:1.7.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation 'com.jaredrummler:android-device-names:2.0.0'

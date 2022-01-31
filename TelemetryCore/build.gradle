@@ -46,7 +46,7 @@ android {
 
 dependencies {
     //implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation('com.google.android.gms:play-services-location:18.0.0')
+    implementation('com.google.android.gms:play-services-location:19.0.1')
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
     implementation "androidx.preference:preference:$rootProject.androidxpreferenceVersion"
     implementation "com.github.Consti10:prefs-plus:$rootProject.myPrefsPlusVersion"
