@@ -2,6 +2,7 @@
 [![Release](https://jitpack.io/v/Consti10/LiveVideo10ms.svg)](https://jitpack.io/#Consti10/LiveVideo10ms)
 [![](https://jitci.com/gh/Consti10/LiveVideo10ms/svg)](https://jitci.com/gh/Consti10/LiveVideo10ms)
 ![android_build_windows_workflow](https://github.com/Consti10/LiveVideo10ms/actions/workflows/android.yml/badge.svg)
+[![Consti10](https://circleci.com/gthub/Consti10/LiveVideo10ms.svg?style=svg)](https://circleci.com/gh/circleci/circleci-docs)
 
 **Description** \
 Library for live video playback with ultra low latency (below 10ms) on android devices.
