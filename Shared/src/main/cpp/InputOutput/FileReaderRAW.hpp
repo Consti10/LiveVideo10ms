@@ -27,6 +27,7 @@ namespace FileReaderRAW {
 
     /**
      * Open raw file and pass its data one by one in Chunks until @param shouldTerminate==true
+     * If the end of the file is reached, go back to the beginning of the file
      */
     static void readRawFileInChunks(const std::string &FILENAME,const RAW_DATA_CALLBACK callback,const std::future<void>& shouldTerminate) {
         std::ifstream file(FILENAME.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
