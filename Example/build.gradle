@@ -39,8 +39,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     //firebase
-    implementation 'com.google.firebase:firebase-core:20.0.2'
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.7'
+    implementation 'com.google.firebase:firebase-core:20.1.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.8'
     implementation('com.google.firebase:firebase-firestore:24.0.1')
 
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
