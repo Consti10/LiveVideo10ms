@@ -29,7 +29,7 @@ class VideoActivityWithDatabase : SimpleVideoActivity(),SurfaceHolder.Callback {
 
     private var VS_SOURCE: Int = 0
     private var VS_ASSETS_FILENAME_TEST_ONLY: String? = ""
-    private val DECODING_INFO: String ="DecodingInfo4";
+    private val DECODING_INFO: String ="DecodingInfo5";
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

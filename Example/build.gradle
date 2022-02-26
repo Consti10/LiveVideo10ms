@@ -41,7 +41,9 @@ dependencies {
     //firebase
     implementation 'com.google.firebase:firebase-core:20.1.0'
     implementation 'com.google.firebase:firebase-crashlytics:18.2.8'
-    implementation('com.google.firebase:firebase-firestore:24.0.1')
+    // Consti10: seems to be bugged
+    //implementation('com.google.firebase:firebase-firestore:24.0.1')
+    implementation('com.google.firebase:firebase-firestore:24.0.0')
 
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
     implementation("androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion")
