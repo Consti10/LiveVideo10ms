@@ -41,15 +41,17 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    //prefab {
+    packagingOptions {
+        jniLibs {
+            excludes += ['**.so']
+        }
+    }
+//prefab {
     //    Helper {
     //        headers "src/main/cpp"
     //    }
     //}
     // https://github.com/google/prefab/issues/118
-    packagingOptions {
-        exclude("**.so")
-    }
 }
 
 dependencies {
