@@ -21,7 +21,7 @@ android {
         }
     }
     buildFeatures{
-        viewBinding=true
+        viewBinding true
     }
     // for firebase testing
     //signingConfigs {
@@ -39,11 +39,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     //firebase
-    implementation 'com.google.firebase:firebase-core:20.1.0'
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.8'
-    // Consti10: seems to be bugged
-    //implementation('com.google.firebase:firebase-firestore:24.0.1')
-    implementation('com.google.firebase:firebase-firestore:24.0.0')
+    implementation 'com.google.firebase:firebase-core:20.1.2'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
+    implementation('com.google.firebase:firebase-firestore:24.1.0')
 
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
     implementation("androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion")
