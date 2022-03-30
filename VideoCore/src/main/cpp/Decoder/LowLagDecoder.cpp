@@ -167,7 +167,6 @@ void LowLagDecoder::feedDecoder(const NALU& nalu){
     //if(nalu.isAUD()){
     //    return;
     //}
-
     const auto now=std::chrono::steady_clock::now();
     const auto deltaParsing=now-nalu.creationTime;
     while(true){
@@ -214,7 +213,7 @@ void LowLagDecoder::checkOutputLoop() {
     bool decoderSawEOS=false;
     bool decoderProducedUnknown=false;
     while(!decoderSawEOS && !decoderProducedUnknown) {
-        ssize_t index=AMediaCodec_dequeueOutputBuffer(decoder.codec,&info,BUFFER_TIMEOUT_US);
+        const ssize_t index=AMediaCodec_dequeueOutputBuffer(decoder.codec,&info,BUFFER_TIMEOUT_US);
         if (index >= 0) {
             const auto now=steady_clock::now();
             const int64_t nowNS=(int64_t)duration_cast<nanoseconds>(now.time_since_epoch()).count();
