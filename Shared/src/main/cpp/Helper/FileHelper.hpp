@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 //#include <filesystem>
+#include <cassert>
 
 namespace FileHelper{
     static std::string findUnusedFilename(std::string directory,std::string filetype) {

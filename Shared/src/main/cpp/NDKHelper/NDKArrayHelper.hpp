@@ -9,6 +9,7 @@
 #include <vector>
 #include <type_traits>
 #include <string>
+#include <cassert>
 
 //
 // The purpose of this namespace is to make it easier to transfer arrays of generic data types

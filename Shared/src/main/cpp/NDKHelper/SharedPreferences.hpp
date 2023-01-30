@@ -7,6 +7,7 @@
 
 #include <jni.h>
 #include <string>
+#include <cassert>
 
 ///Example reading values
 ///SharedPreferences sharedPref(env,context,"pref_telemetry");

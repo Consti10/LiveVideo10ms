@@ -8,6 +8,7 @@
 #include "android/log.h"
 #include <string.h>
 #include <sstream>
+#include <cassert>
 
 // remove any old c style definitions that might have slip trough some header files
 #ifdef LOGD
