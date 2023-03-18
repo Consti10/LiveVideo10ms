@@ -27,7 +27,6 @@
 #include <map>
 #include <list>
 #include <TimeHelper.hpp>
-#include <wifibroadcast/fec.hh>
 //
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -47,8 +46,6 @@ public:
     void parseDjiLiveVideoDataH264(const uint8_t* data,const size_t data_len);
     void parseJetsonRawSlicedH264(const uint8_t* data,const size_t data_len);
     //
-    void parseCustom(const uint8_t* data,const size_t data_len);
-    void parseCustomRTPinsideFEC(const uint8_t* data, const size_t data_len);
     void reset();
 public:
     long nParsedNALUs=0;
@@ -68,29 +65,6 @@ private:
     int maxFPS=0;
     //First time a NALU was succesfully decoded
     //std::chrono::steady_clock::time_point timeFirstNALUArrived=std::chrono::steady_clock::time_point(0);
-    // Custom stuff
-    std::vector<uint32_t> sequenceNumbers;
-    struct CustomUdpPacket{
-        uint32_t sequenceNumber;
-        const uint8_t* data;
-        size_t dataLength;
-    };
-    struct XPacket{
-        uint32_t sequenceNumber;
-        std::vector<uint8_t> data;
-    };
-    std::list<XPacket> bufferedPackets;
-    int lastForwardedSequenceNr=-1;
-    void debugSequenceNumbers(const uint32_t seqNr);
-    uint32_t debugLastSequenceNumber;
-    // To account for the rare case of restarting the tx I keep track of the n of dropped pack
-    int droppedPacketsSinceLastForwardedPacket=0;
-    //
-    AvgCalculatorSize avgUDPPacketSize;
-    //
-    FECDecoder mFECDecoder;
-    //
-    std::vector<std::size_t> receivedDataPacketsSize;
 };
 
 #endif //FPV_VR_PARSE2H264RAW_H

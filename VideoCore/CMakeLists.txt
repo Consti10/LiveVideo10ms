@@ -84,12 +84,6 @@ include_directories(${HELPER_PATH})
 include_directories(${IO_PATH})
 include_directories(${NDKHELPER_PATH})
 
-#######################################################
-########## Experimental-add the XFEC library ##########
-#######################################################
-include(${CMAKE_SOURCE_DIR}/src/main/cpp/XFEC/XFEC.cmake)
-###############
-
 #Webbn 360 stuff
 add_library( FFMpegVideoReceiver
         SHARED
@@ -131,7 +125,6 @@ target_link_libraries( VideoNative
         mediandk
         OpenMAXAL
         h264bitstream
-        XFEC_lib
         # XX
         avcodec-lib
         avformat-lib
@@ -154,6 +147,5 @@ target_link_libraries( VideoTransmitter
         ${log-lib}
         log
         android
-        XFEC_lib
         h264bitstream
         )
