@@ -7,12 +7,20 @@
 
 //https://github.com/Dash-Industry-Forum/Conformance-and-reference-source/blob/master/conformance/TSValidator/h264bitstream/h264_stream.h
 
-
+#include <cstring>
 #include <string>
 #include <chrono>
 #include <sstream>
 #include <array>
 #include <vector>
+#include <variant>
+#include <optional>
+#include <assert.h>
+#include <memory>
+
+#include "NALUnitType.hpp"
+
+// dependency could be easily removed again
 #include <h264_stream.h>
 #include <android/log.h>
 #include <AndroidLogger.hpp>
@@ -27,62 +35,49 @@
 #include <h265_vps_parser.h>
 #include <h265_pps_parser.h>
 
-
 /**
- * A NALU either contains H264 data (default) or H265 data
- * NOTE: Only when copy constructing a NALU it owns the data, else it only holds a data pointer (that might get overwritten by the parser if you hold onto a NALU)
- * Also, H264 and H265 is slightly different
+ * NOTE: NALU only takes a c-style data pointer - it does not do any memory management. Use NALUBuffer if you need to store a NALU.
+ * Since H264 and H265 are that similar, we use this class for both (make sure to not call methds only supported on h265 with a h264 nalu,though)
  * The constructor of the NALU does some really basic validation - make sure the parser never produces a NALU where this validation would fail
  */
 class NALU{
-private:
-    static uint8_t* makeOwnedCopy(const uint8_t* data,size_t data_len){
-        auto ret=new uint8_t[data_len];
-        memcpy(ret,data,data_len);
-        return ret;
-    }
 public:
+    NALU(const uint8_t* data1,size_t data_len1,const bool IS_H265_PACKET1=false,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
+            m_data(data1),m_data_len(data_len1),IS_H265_PACKET(IS_H265_PACKET1),creationTime{creationTime}
+    {
+        assert(hasValidPrefix());
+        assert(getSize()>=getMinimumNaluSize(IS_H265_PACKET1));
+        m_nalu_prefix_size=get_nalu_prefix_size();
+    }
+    ~NALU()= default;
     // test video white iceland: Max 1024*117. Video might not be decodable if its NALU buffers size exceed the limit
     // But a buffer size of 1MB accounts for 60fps video of up to 60MB/s or 480 Mbit/s. That should be plenty !
     static constexpr const auto NALU_MAXLEN=1024*1024;
     // Application should re-use NALU_BUFFER to avoid memory allocations
     using NALU_BUFFER=std::array<uint8_t,NALU_MAXLEN>;
-    // Copy constructor allocates new buffer for data (heavy)
-    NALU(const NALU& nalu):
-    ownedData(std::vector<uint8_t>(nalu.getData(),nalu.getData()+nalu.getSize())),
-    data(ownedData->data()),data_len(nalu.getSize()),creationTime(nalu.creationTime),IS_H265_PACKET(nalu.IS_H265_PACKET){
-        //MLOGD<<"NALU copy constructor";
-    }
-    // Default constructor does not allocate a new buffer,only stores some pointer (light)
-    NALU(const NALU_BUFFER& data1,const size_t data_length,const bool IS_H265_PACKET1=false,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data1.data()),data_len(data_length),creationTime{creationTime},IS_H265_PACKET(IS_H265_PACKET1){
-        // Validate correctness of NALU (make sure parser never forwards NALUs where this assertion fails)
-        assert(hasValidPrefix());
-        assert(getSize()>=getMinimumNaluSize(IS_H265_PACKET1));
-    };
-    // tmp
-    NALU(const uint8_t* data1,size_t data_len1,const bool IS_H265_PACKET1=false,const std::chrono::steady_clock::time_point creationTime=std::chrono::steady_clock::now()):
-            data(data1),data_len(data_len1),creationTime{creationTime},IS_H265_PACKET(IS_H265_PACKET1)
-    {
-        assert(hasValidPrefix());
-        assert(getSize()>=getMinimumNaluSize(IS_H265_PACKET1));
-    }
-    ~NALU()= default;
 private:
-    // With the default constructor a NALU does not own its memory. This saves us one memcpy. However, storing a NALU after the lifetime of the
-    // Non-owned memory expired is also needed in some places, so the copy-constructor creates a copy of the non-owned data and stores it in a optional buffer
-    // WARNING: Order is important here (Initializer list). Declare before data pointer
-    const std::optional<std::vector<uint8_t>> ownedData={};
-    const uint8_t* data;
-    const size_t data_len;
+    const uint8_t* m_data;
+    const size_t m_data_len;
+    int m_nalu_prefix_size;
 public:
     const bool IS_H265_PACKET;
     // creation time is used to measure latency
     const std::chrono::steady_clock::time_point creationTime;
 public:
     // returns true if starts with 0001, false otherwise
+    bool hasValidPrefixLong()const{
+        return m_data[0]==0 && m_data[1]==0 &&m_data[2]==0 &&m_data[3]==1;
+    }
+    // returns true if starts with 001 (short prefix), false otherwise
+    bool hasValidPrefixShort()const{
+        return m_data[0]==0 && m_data[1]==0 &&m_data[2]==1;
+    }
     bool hasValidPrefix()const{
-        return data[0]==0 && data[1]==0 &&data[2]==0 &&data[3]==1;
+        return hasValidPrefixLong() || hasValidPrefixShort();
+    }
+    int get_nalu_prefix_size()const{
+        if(hasValidPrefixLong())return 4;
+        return 3;
     }
     static std::size_t getMinimumNaluSize(const bool isH265){
         // 4 bytes prefix, 1 byte header for h264, 2 byte header for h265
@@ -91,70 +86,95 @@ public:
 public:
     // pointer to the NALU data with 0001 prefix
     const uint8_t* getData()const{
-        return data;
+        return m_data;
     }
     // size of the NALU data with 0001 prefix
-    const size_t getSize()const{
-        return data_len;
+    size_t getSize()const{
+        return m_data_len;
     }
     //pointer to the NALU data without 0001 prefix
     const uint8_t* getDataWithoutPrefix()const{
-        return &getData()[4];
+        return &getData()[m_nalu_prefix_size];
     }
     //size of the NALU data without 0001 prefix
-    const ssize_t getDataSizeWithoutPrefix()const{
-        return getSize()-4;
-    }
-    bool isSPS()const{
-        if(IS_H265_PACKET){
-            return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_SPS;
-        }
-        return (get_nal_unit_type() == NAL_UNIT_TYPE_SPS);
-    }
-    bool isPPS()const{
-        if(IS_H265_PACKET){
-            return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_PPS;
-        }
-        return (get_nal_unit_type() == NAL_UNIT_TYPE_PPS);
-    }
-    // VPS NALUs are only possible in H265
-    bool isVPS()const{
-        assert(IS_H265_PACKET);
-        return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_VPS;
-    }
-    bool isAUD()const{
-        if(IS_H265_PACKET){
-            return get_nal_unit_type()==NALUnitType::H265:: NAL_UNIT_ACCESS_UNIT_DELIMITER;
-        }
-        return (get_nal_unit_type() == NAL_UNIT_TYPE_AUD);
+    ssize_t getDataSizeWithoutPrefix()const{
+        return getSize()-m_nalu_prefix_size;
     }
     // return the nal unit type (quick)
-    int get_nal_unit_type()const{
-        if(IS_H265_PACKET){
-            return (getData()[4] & 0x7E)>>1;
-        }
-        const auto lol=(H264::nal_unit_header_t*)getDataWithoutPrefix();
-        assert(lol->nal_unit_type==(getData()[4]&0x1f));
-        return getData()[4]&0x1f;
-    }
-    std::string get_nal_name()const{
-        if(IS_H265_PACKET){
-            return NALUnitType::H265::unit_type_to_string(get_nal_unit_type());
-        }
-        return NALUnitType::H264::unit_type_to_string(get_nal_unit_type());
-    }
-    // For debugging, return the whole NALU data as a big string for logging
-    std::string dataAsString()const{
-        return StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
-    }
-    void debugSimple()const{
-        if(IS_H265_PACKET){
-            MLOGD<<"H265 Size(B): "<<getSize()<<" Type "<<get_nal_name();
-        }else{
-            MLOGD<<"H264 Size(B): "<<getSize()<<" Type "<<get_nal_name();
-        }
-    }
-    void debug()const{
+   int get_nal_unit_type()const{
+       if(IS_H265_PACKET){
+           return (getDataWithoutPrefix()[0] & 0x7E)>>1;
+       }
+       return getDataWithoutPrefix()[0]&0x1f;
+   }
+   std::string get_nal_unit_type_as_string()const{
+       if(IS_H265_PACKET){
+           return NALUnitType::H265::unit_type_to_string(get_nal_unit_type());
+       }
+       return NALUnitType::H264::unit_type_to_string(get_nal_unit_type());
+   }
+public:
+   bool isSPS()const{
+       if(IS_H265_PACKET){
+           return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_SPS;
+       }
+       return (get_nal_unit_type() == NALUnitType::H264::NAL_UNIT_TYPE_SPS);
+   }
+   bool isPPS()const{
+       if(IS_H265_PACKET){
+           return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_PPS;
+       }
+       return (get_nal_unit_type() == NALUnitType::H264::NAL_UNIT_TYPE_PPS);
+   }
+   // VPS NALUs are only possible in H265
+   bool isVPS()const{
+       assert(IS_H265_PACKET);
+       return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_VPS;
+   }
+   bool is_aud()const{
+       if(IS_H265_PACKET){
+           return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_ACCESS_UNIT_DELIMITER;
+       }
+       return (get_nal_unit_type() == NALUnitType::H264::NAL_UNIT_TYPE_AUD);
+   }
+   bool is_sei()const{
+       if(IS_H265_PACKET){
+           return get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_PREFIX_SEI || get_nal_unit_type()==NALUnitType::H265::NAL_UNIT_SUFFIX_SEI;
+       }
+       return (get_nal_unit_type() == NALUnitType::H264::NAL_UNIT_TYPE_SEI);
+   }
+   bool is_dps()const{
+       if(IS_H265_PACKET){
+           // doesn't exist in h265
+           return false;
+       }
+       return (get_nal_unit_type() == NALUnitType::H264::NAL_UNIT_TYPE_DPS);
+   }
+   bool is_config(){
+       return isSPS() || isPPS() || (IS_H265_PACKET && isVPS());
+   }
+   // keyframe / IDR frame
+   bool is_keyframe()const{
+       const auto nut=get_nal_unit_type();
+       if(IS_H265_PACKET){
+           return false;
+       }
+       if(nut==NALUnitType::H264::NAL_UNIT_TYPE_CODED_SLICE_IDR){
+           return true;
+       }
+       return false;
+   }
+   bool is_frame_but_not_keyframe()const{
+       const auto nut=get_nal_unit_type();
+       if(IS_H265_PACKET)return false;
+       return (nut==NALUnitType::H264::NAL_UNIT_TYPE_CODED_SLICE_NON_IDR);
+   }
+   // XXX -----------
+   // For debugging, return the whole NALU data as a big string for logging
+   std::string dataAsString()const{
+       return StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
+   }
+   void debug()const{
         if(IS_H265_PACKET){
             if(isSPS()){
                 auto sps=h265nal::H265SpsParser::ParseSps(&getData()[6],getSize()-6);
@@ -179,7 +199,7 @@ public:
                     MLOGD<<"VPS parse error";
                 }
             }else{
-                MLOGD<<get_nal_name();
+                MLOGD<<get_nal_unit_type_as_string();
             }
             return;
         }else{
@@ -196,12 +216,12 @@ public:
                 auto pps=H264::PPS(getData(),getSize());
                 MLOGD<<"PPS:"<<pps.asString();
                 MLOGD<<"PPSData:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
-            }else if(isAUD()){
+            }else if(is_aud()){
                 MLOGD<<"AUD:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else if(get_nal_unit_type()==NAL_UNIT_TYPE_SEI){
                 MLOGD<<"SEIData:"<<StringHelper::vectorAsString(std::vector<uint8_t>(getData(),getData()+getSize()));
             }else{
-                MLOGD<<get_nal_name();
+                MLOGD<<get_nal_unit_type_as_string();
                 if(get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_IDR || get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
                     auto tmp=H264::Slice(getData(),getSize());
                     MLOGD<<"Slice header("<<StringHelper::memorySizeReadable(getSize())<<"):"<<tmp.asString();
@@ -236,10 +256,32 @@ public:
     static NALU createExampleH264_SEI(){
         return NALU(H264::EXAMPLE_SEI.data(),H264::EXAMPLE_SEI.size());
     }
-
+   // XXX -----------
 };
-
 typedef std::function<void(const NALU& nalu)> NALU_DATA_CALLBACK;
 
+// Copies the nalu data into its own c++-style managed buffer.
+class NALUBuffer{
+public:
+    NALUBuffer(const uint8_t* data,int data_len,bool is_h265,std::chrono::steady_clock::time_point creation_time){
+        m_data=std::make_shared<std::vector<uint8_t>>(data,data+data_len);
+        m_nalu=std::make_unique<NALU>(m_data->data(),m_data->size(),is_h265,creation_time);
+    }
+    NALUBuffer(const NALU& nalu){
+        m_data=std::make_shared<std::vector<uint8_t>>(nalu.getData(),nalu.getData()+nalu.getSize());
+        m_nalu=std::make_unique<NALU>(m_data->data(),m_data->size(),nalu.IS_H265_PACKET,nalu.creationTime);
+    }
+    NALUBuffer(const NALUBuffer&)=delete;
+    NALUBuffer(const NALUBuffer&&)=delete;
+
+    const NALU& get_nal(){
+        return *m_nalu;
+    }
+private:
+    std::shared_ptr<std::vector<uint8_t>> m_data;
+    std::unique_ptr<NALU> m_nalu;
+};
 
 #endif //LIVE_VIDEO_10MS_ANDROID_NALU_H
+
+

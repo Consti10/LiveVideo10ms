@@ -54,7 +54,7 @@ void ParseRAW::parseData(const uint8_t* data,const size_t data_length,const bool
                         const size_t naluLen=nalu_data_position-4;
                         const size_t minNaluSize=NALU::getMinimumNaluSize(isH265);
                         if(naluLen>=minNaluSize){
-                            NALU nalu(nalu_data,naluLen,isH265);
+                            NALU nalu(nalu_data.data(),naluLen,isH265);
                             cb(nalu);
                         }
                     }
@@ -93,13 +93,13 @@ void ParseRAW::parseDjiLiveVideoDataH264(const uint8_t* data,const size_t data_l
                         const size_t naluLen=nalu_data_position-4;
                         const size_t minNaluSize=NALU::getMinimumNaluSize(false);
                         if(naluLen>=minNaluSize){
-                            NALU nalu(nalu_data,naluLen);
+                            NALU nalu(nalu_data.data(),naluLen);
                             if(nalu.isSPS() || nalu.isPPS()){
                                 cb(nalu);
                                 dji_data_buff_size=0;
                             }else if(nalu.get_nal_unit_type()==NAL_UNIT_TYPE_AUD){
                                 if(dji_data_buff_size>0){
-                                    NALU nalu2(dji_data_buff,dji_data_buff_size);
+                                    NALU nalu2(dji_data_buff.data(),dji_data_buff_size);
                                     cb(nalu2);
                                     dji_data_buff_size=0;
                                     // do not forget to also forward the AUD NALU
@@ -146,7 +146,7 @@ void ParseRAW::parseJetsonRawSlicedH264(const uint8_t* data, const size_t data_l
                         const size_t naluLen=nalu_data_position-4;
                         const size_t minNaluSize=NALU::getMinimumNaluSize(false);
                         if(naluLen>=minNaluSize){
-                            NALU nalu(nalu_data,naluLen);
+                            NALU nalu(nalu_data.data(),naluLen);
                             //MLOGD<<"ParseRawJ NALU type:"<<nalu.get_nal_name();
                             if(nalu.isSPS() || nalu.isPPS()){
                                 cb(nalu);
@@ -179,7 +179,7 @@ void ParseRAW::accumulateSlicedNALUsByAUD(const NALU& nalu){
             memcpy(&dji_data_buff[dji_data_buff_size],nalu.getData(),nalu.getSize());
             dji_data_buff_size+=nalu.getSize();
             // and then forward them together as a single unit
-            NALU nalu2(dji_data_buff, dji_data_buff_size,nalu.IS_H265_PACKET,timePointFirstNALUToMerge);
+            NALU nalu2(dji_data_buff.data(), dji_data_buff_size,nalu.IS_H265_PACKET,timePointFirstNALUToMerge);
             cb(nalu2);
             dji_data_buff_size = 0;
             //cb(nalu);
@@ -207,7 +207,7 @@ void ParseRAW::accumulateSlicedNALUsByOther(const NALU& nalu){
     nMergedNALUs++;
 
     if(nMergedNALUs==N_SLICES_PER_FRAME){
-        NALU nalu2(dji_data_buff, dji_data_buff_size,nalu.IS_H265_PACKET,timePointFirstNALUToMerge);
+        NALU nalu2(dji_data_buff.data(), dji_data_buff_size,nalu.IS_H265_PACKET,timePointFirstNALUToMerge);
         cb(nalu2);
         dji_data_buff_size = 0;
         nMergedNALUs=0;

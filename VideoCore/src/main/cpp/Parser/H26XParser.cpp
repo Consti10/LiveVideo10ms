@@ -70,7 +70,7 @@ void H26XParser::newNaluExtracted(const NALU& nalu) {
     }
     //sps or pps NALUs do not count as frames, as well as AUD
     //E.g. they won't create a frame on the output pipe)
-    const bool isNotARealFrame=nalu.IS_H265_PACKET ? (nalu.isSPS() || nalu.isPPS() || nalu.isVPS() || nalu.isAUD()) : (nalu.isSPS() || nalu.isPPS() || nalu.isAUD());
+    const bool isNotARealFrame=nalu.IS_H265_PACKET ? (nalu.isSPS() || nalu.isPPS() || nalu.isVPS() || nalu.is_aud()) : (nalu.isSPS() || nalu.isPPS() || nalu.is_aud());
     if(!(isNotARealFrame)){
         mFrameLimiter.limitFps(maxFPS);
     }

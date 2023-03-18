@@ -8,30 +8,35 @@
 #include "NALU.hpp"
 #include <vector>
 #include <AndroidLogger.hpp>
-#include <media/NdkMediaFormat.h>
 #include <memory>
 
 // Takes a continuous stream of NALUs and save SPS / PPS data
 // For later use
 class KeyFrameFinder{
 private:
-    std::unique_ptr<NALU> SPS;
-    std::unique_ptr<NALU> PPS;
+    std::unique_ptr<NALUBuffer> SPS=nullptr;
+    std::unique_ptr<NALUBuffer> PPS=nullptr;
     // VPS are only used in H265
-    std::unique_ptr<NALU> VPS;
+    std::unique_ptr<NALUBuffer> VPS=nullptr;
 public:
-    void saveIfKeyFrame(const NALU &nalu){
-        if(nalu.getSize()<=0)return;
+    bool saveIfKeyFrame(const NALU &nalu){
+        if(nalu.getSize()<=0)return false;
         if(nalu.isSPS()){
-            SPS=std::make_unique<NALU>(nalu);
+            SPS=std::make_unique<NALUBuffer>(nalu);
             //MLOGD<<"SPS found";
+            //MLOGD<<nalu.get_sps_as_string().c_str();
+            return true;
         }else if(nalu.isPPS()){
-            PPS=std::make_unique<NALU>(nalu);
+            PPS=std::make_unique<NALUBuffer>(nalu);
             //MLOGD<<"PPS found";
+            return true;
         }else if(nalu.IS_H265_PACKET && nalu.isVPS()){
-            VPS=std::make_unique<NALU>(nalu);
+            VPS=std::make_unique<NALUBuffer>(nalu);
             //MLOGD<<"VPS found";
+            return true;
         }
+        //qDebug()<<"not a keyframe"<<(int)nalu.getDataWithoutPrefix()[0];
+        return false;
     }
     // H264 needs sps and pps
     // H265 needs sps,pps and vps
@@ -43,11 +48,16 @@ public:
     }
     //SPS
     const NALU& getCSD0()const{
-        return *SPS;
+        assert(SPS);
+        return SPS->get_nal();
     }
-    //PPS
     const NALU& getCSD1()const{
-        return *PPS;
+        assert(PPS);
+        return PPS->get_nal();
+    }
+    const NALU& getVPS()const{
+        assert(VPS);
+        return VPS->get_nal();
     }
     static void appendNaluData(std::vector<uint8_t>& buff,const NALU& nalu){
         buff.insert(buff.begin(),nalu.getData(),nalu.getData()+nalu.getSize());
@@ -56,56 +66,6 @@ public:
         SPS=nullptr;
         PPS=nullptr;
         VPS=nullptr;
-    }
-public:
-    // Some of these params are only supported on the latest Android versions
-    // However,writing them has no negative affect on devices with older Android versions
-    // Note that for example the low-latency key cannot fix any issues like the 'VUI' issue
-    void writeAndroidPerformanceParams(AMediaFormat* format){
-        // I think: KEY_LOW_LATENCY is for decoder. But it doesn't really make a difference anyways
-        static const auto PARAMETER_KEY_LOW_LATENCY="low-latency";
-        AMediaFormat_setInt32(format,PARAMETER_KEY_LOW_LATENCY,1);
-        // Lower values mean higher priority
-        // Works on pixel 3 (look at output format description)
-        static const auto AMEDIAFORMAT_KEY_PRIORITY="priority";
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_PRIORITY,0);
-        // set operating rate ? - doesn't make a difference
-        //static const auto AMEDIAFORMAT_KEY_OPERATING_RATE="operating-rate";
-        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_OPERATING_RATE,60);
-        //
-        //AMEDIAFORMAT_KEY_LOW_LATENCY;
-        //AMEDIAFORMAT_KEY_LATENCY;
-        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_LATENCY,0);
-        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_OPERATING_RATE,0);
-    }
-    void h264_configureAMediaFormat(AMediaFormat* format){
-        const auto sps=getCSD0();
-        const auto pps=getCSD1();
-        const auto videoWH= sps.getVideoWidthHeightSPS();
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-        AMediaFormat_setBuffer(format,"csd-0",sps.getData(),(size_t)sps.getSize());
-        AMediaFormat_setBuffer(format,"csd-1",pps.getData(),(size_t)pps.getSize());
-        MLOGD<<"Video WH:"<<videoWH[0]<<" H:"<<videoWH[1];
-        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_BIT_RATE,5*1024*1024);
-        //AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_FRAME_RATE,60);
-        //AVCProfileBaseline==1
-        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PROFILE,1);
-        //AMediaFormat_setInt32(decoder.format,AMEDIAFORMAT_KEY_PRIORITY,0);
-        writeAndroidPerformanceParams(format);
-    }
-    void h265_configureAMediaFormat(AMediaFormat* format){
-        std::vector<uint8_t> buff={};
-        buff.reserve(SPS->getSize()+PPS->getSize()+VPS->getSize());
-        appendNaluData(buff,*VPS);
-        appendNaluData(buff,*SPS);
-        appendNaluData(buff,*PPS);
-        const auto videoWH= getCSD0().getVideoWidthHeightSPS();
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_WIDTH,videoWH[0]);
-        AMediaFormat_setInt32(format,AMEDIAFORMAT_KEY_HEIGHT,videoWH[1]);
-        AMediaFormat_setBuffer(format,"csd-0",buff.data(),buff.size());
-        MLOGD<<"Video WH:"<<videoWH[0]<<" H:"<<videoWH[1];
-        writeAndroidPerformanceParams(format);
     }
 };
 

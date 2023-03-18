@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <android/native_window_jni.h>
+#include "AndoroidMediaFormatHelper.h"
 
 using namespace std::chrono;
 
@@ -131,9 +132,9 @@ void LowLagDecoder::configureStartDecoder(){
     AMediaFormat* format=AMediaFormat_new();
     AMediaFormat_setString(format,AMEDIAFORMAT_KEY_MIME,MIME.c_str());
     if(IS_H265){
-        mKeyFrameFinder.h265_configureAMediaFormat(format);
+        h265_configureAMediaFormat(mKeyFrameFinder,format);
     }else{
-        mKeyFrameFinder.h264_configureAMediaFormat(format);
+        h264_configureAMediaFormat(mKeyFrameFinder,format);
     }
 
     MLOGD << "Configuring decoder:" << AMediaFormat_toString(format);
