@@ -118,6 +118,7 @@ add_library( VideoNative
         ${VIDEO_PATH}/Parser/H26XParser.cpp
         ${VIDEO_PATH}/Parser/ParseRAW.cpp
         ${VIDEO_PATH}/Parser/ParseRTP.cpp
+        ${VIDEO_PATH}/Parser/EncodeRtpTest.cpp
         ${VIDEO_PATH}/Decoder/LowLagDecoder.cpp
         ${VIDEO_PATH}/VideoPlayer/VideoPlayer.cpp
         )
@@ -145,6 +146,7 @@ add_library( VideoTransmitter
         SHARED
         ${DIR_VideoTelemetryShared}/InputOutput/UDPSender.cpp
         ${VIDEO_PATH}/Parser/ParseRTP.cpp
+        ${VIDEO_PATH}/Parser/EncodeRtpTest.cpp
         src/main/cpp/VideoTransmitter/VideoTransmitter.cpp
         )
 

@@ -23,6 +23,7 @@
 #include <UDPSender.h>
 #include <wifibroadcast/fec.hh>
 #include "../Parser/ParseRTP.h"
+#include "../Parser/EncodeRtpTest.h"
 #include <ATraceCompbat.hpp>
 
 

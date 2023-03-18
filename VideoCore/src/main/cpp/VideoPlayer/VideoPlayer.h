@@ -15,6 +15,7 @@
 #include "../Experiment360/FFMPEGFileWriter.h"
 #include "../Decoder/LowLagDecoder.h"
 #include "../Parser/H26XParser.h"
+#include "../Parser/EncodeRtpTest.h"
 
 class VideoPlayer{
 public:
