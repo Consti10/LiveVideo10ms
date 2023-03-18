@@ -139,9 +139,9 @@ public:
     }
     std::string get_nal_name()const{
         if(IS_H265_PACKET){
-            return NALUnitType::H265::unitTypeName(get_nal_unit_type());
+            return NALUnitType::H265::unit_type_to_string(get_nal_unit_type());
         }
-        return NALUnitType::H264::unitTypeName(get_nal_unit_type());
+        return NALUnitType::H264::unit_type_to_string(get_nal_unit_type());
     }
     // For debugging, return the whole NALU data as a big string for logging
     std::string dataAsString()const{

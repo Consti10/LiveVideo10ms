@@ -2,20 +2,45 @@
 // Created by consti10 on 11.11.20.
 //
 
+#include <string>
+
 #ifndef LIVEVIDEO10MS_NALUNITTYPE_H
 #define LIVEVIDEO10MS_NALUNITTYPE_H
-
-#include <h264_stream.h>
 
 // h264 types come from h264_stream
 // h265 types are declared here
 // This is just a lot of boilerplate code so I put it into its own .hpp file
 namespace NALUnitType{
+
     namespace H264{
-        static std::string unitTypeName(const int nal_unit_type){
+        enum {
+            //Table 7-1 NAL unit type codes
+            NAL_UNIT_TYPE_UNSPECIFIED                    =0,    // Unspecified
+            NAL_UNIT_TYPE_CODED_SLICE_NON_IDR            =1,    // Coded slice of a non-IDR picture
+            NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A   =2,    // Coded slice data partition A
+            NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_B   =3,    // Coded slice data partition B
+            NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_C   =4,    // Coded slice data partition C
+            NAL_UNIT_TYPE_CODED_SLICE_IDR                =5,    // Coded slice of an IDR picture
+            NAL_UNIT_TYPE_SEI                            =6,    // Supplemental enhancement information (SEI)
+            NAL_UNIT_TYPE_SPS                            =7,    // Sequence parameter set
+            NAL_UNIT_TYPE_PPS                            =8,    // Picture parameter set
+            NAL_UNIT_TYPE_AUD                            =9,    // Access unit delimiter
+            NAL_UNIT_TYPE_END_OF_SEQUENCE               =10,    // End of sequence
+            NAL_UNIT_TYPE_END_OF_STREAM                 =11,    // End of stream
+            NAL_UNIT_TYPE_FILLER                        =12,    // Filler data
+            NAL_UNIT_TYPE_SPS_EXT                       =13,    // Sequence parameter set extension
+            NAL_UNIT_TYPE_PREFIX_NAL                    =14,    // Prefix NAL unit
+            NAL_UNIT_TYPE_SUBSET_SPS                    =15,    // Subset Sequence parameter set
+            NAL_UNIT_TYPE_DPS                           =16,    // Depth Parameter Set
+            // 17..18    // Reserved
+            NAL_UNIT_TYPE_CODED_SLICE_AUX               =19,    // Coded slice of an auxiliary coded picture without partitioning
+            NAL_UNIT_TYPE_CODED_SLICE_SVC_EXTENSION     =20,    // Coded slice of SVC extension
+            // 20..23    // Reserved
+            // 24..31    // Unspecified
+        };
+        static std::string unit_type_to_string(const int nal_unit_type){
             std::string nal_unit_type_name;
-            switch (nal_unit_type)
-            {
+            switch (nal_unit_type){
                 case  NAL_UNIT_TYPE_UNSPECIFIED :                   nal_unit_type_name = "NAL_UNIT_TYPE_UNSPECIFIED"; break;//Unspecified
                 case  NAL_UNIT_TYPE_CODED_SLICE_NON_IDR :           nal_unit_type_name = "NAL_UNIT_TYPE_CODED_SLICE_NON_IDR"; break;//Coded slice of a non-IDR picture
                 case  NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A :  nal_unit_type_name = "NAL_UNIT_TYPE_CODED_SLICE_DATA_PARTITION_A"; break;//Coded slice data partition A
@@ -40,6 +65,7 @@ namespace NALUnitType{
             return nal_unit_type_name;
         };
     }
+
     namespace H265{
         enum NalUnitType {
             NAL_UNIT_CODED_SLICE_TRAIL_N = 0,
@@ -116,7 +142,7 @@ namespace NALUnitType{
             NAL_UNIT_UNSPECIFIED_63,
             NAL_UNIT_INVALID,
         };
-        static std::string unitTypeName(const int nal_unit_type){
+        static std::string unit_type_to_string(const int nal_unit_type){
             std::string nal_unit_type_name="Unimpl";
             switch (nal_unit_type){
                 case NalUnitType::NAL_UNIT_CODED_SLICE_TRAIL_N:
