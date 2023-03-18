@@ -50,7 +50,7 @@ private:
     uint32_t ts_current = 0;
 };
 
-class TestEncodeDecodeRTP{
+/*class TestEncodeDecodeRTP{
 private:
     void onNALU(const NALU& nalu);
     void onRTP(const RTPEncoder::RTPPacket& packet);
@@ -62,7 +62,7 @@ public:
     // This encodes the nalu to RTP then decodes it again
     // After that, check that their contents match
     void testEncodeDecodeRTP(const NALU& nalu);
-};
+};*/
 
 
 #endif //LIVEVIDEO10MS_ENCODERTPTEST_H

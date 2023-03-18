@@ -57,6 +57,7 @@ public:
     void setLimitFPS(int maxFPS);
 private:
     void newNaluExtracted(const NALU& nalu);
+    void onNewNaluDataExtracted(const std::chrono::steady_clock::time_point creation_time,const uint8_t* nalu_data,const int nalu_data_size);
     const NALU_DATA_CALLBACK onNewNALU;
     std::chrono::steady_clock::time_point lastFrameLimitFPS=std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point lastTimeOnNewNALUCalled=std::chrono::steady_clock::now();

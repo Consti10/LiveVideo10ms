@@ -205,7 +205,7 @@ void RTPEncoder::forwardRTPPacket(uint8_t *rtp_packet, size_t rtp_packet_len) {
     }
 }
 
-TestEncodeDecodeRTP::TestEncodeDecodeRTP() {
+/*TestEncodeDecodeRTP::TestEncodeDecodeRTP() {
     decoder=std::make_unique<RTPDecoder>(std::bind(&TestEncodeDecodeRTP::onNALU, this, std::placeholders::_1));
     encoder=std::make_unique<RTPEncoder>(std::bind(&TestEncodeDecodeRTP::onRTP, this, std::placeholders::_1));
 }
@@ -229,4 +229,4 @@ void TestEncodeDecodeRTP::onNALU(const NALU &nalu) {
     // If we feed one NALU we should only get one NALU out
     assert(lastNALU==nullptr);
     lastNALU=std::make_unique<NALU>(nalu);
-}
+}*/

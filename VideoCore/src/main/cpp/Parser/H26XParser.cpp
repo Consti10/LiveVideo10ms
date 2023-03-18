@@ -13,7 +13,7 @@
 H26XParser::H26XParser(NALU_DATA_CALLBACK onNewNALU):
         onNewNALU(std::move(onNewNALU)),
         mParseRAW(std::bind(&H26XParser::newNaluExtracted, this, std::placeholders::_1)),
-        mDecodeRTP(std::bind(&H26XParser::newNaluExtracted, this, std::placeholders::_1)){
+        mDecodeRTP(std::bind(&H26XParser::onNewNaluDataExtracted, this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3)){
 }
 
 void H26XParser::reset(){
@@ -52,6 +52,12 @@ void H26XParser::parseJetsonRawSlicedH264(const uint8_t *data, const size_t data
 
 void H26XParser::setLimitFPS(int maxFPS1) {
     this->maxFPS=maxFPS1;
+}
+
+void H26XParser::onNewNaluDataExtracted(const std::chrono::steady_clock::time_point creation_time,
+                                        const uint8_t *nalu_data, const int nalu_data_size) {
+    NALU nalu(nalu_data,nalu_data_size, false,creation_time);
+    newNaluExtracted(nalu);
 }
 
 void H26XParser::newNaluExtracted(const NALU& nalu) {
@@ -166,4 +172,5 @@ void H26XParser::parseCustomRTPinsideFEC(const uint8_t *data, const std::size_t 
         mDecodeRTP.parseRTPtoNALU(obuf.data(),obuf.size());
     }*/
 }
+
 
