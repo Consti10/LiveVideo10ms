@@ -52,10 +52,10 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
             mParser.parse_raw_h265_stream(data,data_length);
             break;
         case VIDEO_DATA_TYPE::CUSTOM:
-            mParser.parseCustom(data,data_length);
+            //mParser.parseCustom(data,data_length);
             break;
         case VIDEO_DATA_TYPE::CUSTOM2:
-            mParser.parseCustomRTPinsideFEC(data, data_length);
+            //mParser.parseCustomRTPinsideFEC(data, data_length);
             break;
         case VIDEO_DATA_TYPE::DJI:
             mParser.parseDjiLiveVideoDataH264(data,data_length);

@@ -22,8 +22,6 @@ void H26XParser::reset(){
     nParsedNALUs=0;
     nParsedKonfigurationFrames=0;
     setLimitFPS(-1);
-    lastForwardedSequenceNr=-1;
-    droppedPacketsSinceLastForwardedPacket=0;
 }
 
 void H26XParser::parse_raw_h264_stream(const uint8_t *data, const size_t data_length) {

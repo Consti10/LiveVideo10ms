@@ -21,7 +21,6 @@
 #include <arpa/inet.h>
 #include <StringHelper.hpp>
 #include <UDPSender.h>
-#include <wifibroadcast/fec.hh>
 #include "../Parser/ParseRTP.h"
 #include "../Parser/EncodeRtpTest.h"
 #include <ATraceCompbat.hpp>
@@ -58,11 +57,11 @@ private:
     AvgCalculator avgTimeBetweenVideoNALUS;
     std::chrono::steady_clock::time_point lastForwardedPacket{};
     //
-    FECBufferEncoder enc{1500,0.5f};
+    //FECBufferEncoder enc{1500,0.5f};
     //
     RTPEncoder mEncodeRTP;
     void newRTPPacket(const RTPEncoder::RTPPacket& packet);
-    FECDecoder mFECDecoder;
+    //FECDecoder mFECDecoder;
 };
 
 //Split data into smaller packets when exceeding UDP max packet size
@@ -133,7 +132,7 @@ void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
         tmp.push_back((uint8_t)i);
     }*/
     if(DO_FEC_WRAPPING){
-        ATrace_beginSection("VideoTransmitter::FECWrapping");
+       /* ATrace_beginSection("VideoTransmitter::FECWrapping");
         MLOGD<<"Wrapping rtp packet into FEC";
         assert(packet.data_len<=1024);
         std::vector<std::shared_ptr<FECBlock> > blks = enc.encode_buffer(packet.data,packet.data_len);
@@ -144,7 +143,7 @@ void VideoTransmitter::newRTPPacket(const RTPEncoder::RTPPacket& packet) {
             ATrace_beginSection("UDP::sendto");
             mUDPSender.mySendTo(blk->pkt_data(), blk->pkt_length());
             ATrace_endSection();
-        }
+        }*/
         //
     }else{
         // To emulate a higher bitstream rate (the receiver has to drop duplicates though)
