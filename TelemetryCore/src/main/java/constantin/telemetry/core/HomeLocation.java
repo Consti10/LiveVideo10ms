@@ -57,17 +57,21 @@ public class HomeLocation implements LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void resume(){
         if(!OSD_ORIGIN_POSITION_ANDROID)return;
-        LocationRequest mLocationRequest = new LocationRequest();
+        LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(500); // in ms
         mLocationRequest.setFastestInterval(500);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+        if(mFusedLocationClient!=null){
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     private void pause(){
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
-        mFusedLocationClient.flushLocations();
+        if(mFusedLocationClient!=null){
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+            mFusedLocationClient.flushLocations();
+        }
     }
 
     private void newLocation(@NonNull final Location location){
