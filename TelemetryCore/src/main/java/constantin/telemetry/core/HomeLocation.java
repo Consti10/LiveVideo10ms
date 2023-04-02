@@ -68,10 +68,10 @@ public class HomeLocation implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     private void pause(){
-        if(mFusedLocationClient!=null){
+        /*DAFUQif(mFusedLocationClient!=null){
             mFusedLocationClient.removeLocationUpdates(mLocationCallback);
             mFusedLocationClient.flushLocations();
-        }
+        }*/
     }
 
     private void newLocation(@NonNull final Location location){
