@@ -23,8 +23,8 @@ allprojects {
     }
     ext {
         minSdkVersion = 21
-        compileSdkVersion = 31
-        targetSdkVersion = 31
+        compileSdkVersion = 33
+        targetSdkVersion = 33
         appcompatVersion = '1.6.1'
         materialVersion = '1.9.0-beta01'
         constraintlayoutVersion='2.1.4'
