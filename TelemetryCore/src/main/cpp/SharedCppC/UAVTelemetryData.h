@@ -49,6 +49,8 @@ typedef struct {
     int DJI_linkQualityDown_P;
     float DJI_Gimbal_Attitude_Yaw_Degree;
 
+    float Distance_m; // Current distance reading of the rangefinder
+
 } UAVTelemetryData;
 
 

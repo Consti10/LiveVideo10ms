@@ -81,6 +81,10 @@ void mavlink_read_v2(UAVTelemetryData *td,OriginData *originData,const uint8_t *
                     }
                     break;
                 }
+                case MAVLINK_MSG_ID_DISTANCE_SENSOR:{
+                    td->Distance_m = mavlink_msg_distance_sensor_get_current_distance(&msg)/100.0f;
+                    break;
+                }
                 default:
                     //__android_log_print(ANDROID_LOG_DEBUG,"Message:","%d",msg.msgid);
                     break;
