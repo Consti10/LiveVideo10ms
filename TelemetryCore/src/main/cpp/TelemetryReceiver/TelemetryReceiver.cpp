@@ -347,6 +347,12 @@ MTelemetryValue TelemetryReceiver::getTelemetryValue(TelemetryValueIndex index) 
             ret.metric=L"m";
         }
             break;
+        case DISTANCE:{
+            ret.prefix=L"Range";
+            ret.value= StringHelper::doubleToWString(uav_td.Distance_m, 5, 2);
+            ret.metric=L"m";
+        }
+        break;
         case LONGITUDE:{
             ret.prefix=L"Lon";
             ret.prefixIcon=ICON_LONGITUDE;

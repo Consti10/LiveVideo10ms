@@ -150,6 +150,7 @@ public:
         EZWB_RSSI_ADAPTER3,
         //EZWB_RSSI_ADAPTER4,
         //EZWB_RSSI_ADAPTER5,
+        DISTANCE,
         XXX
     };
     MTelemetryValue getTelemetryValue(TelemetryValueIndex index) const ;
