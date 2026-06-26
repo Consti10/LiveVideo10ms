@@ -98,14 +98,22 @@ public class VideoSettings {
         }
     }
 
+    private static volatile String groundRecordingDirectory = null;
+
+    /** When set, ground recordings are saved under this directory instead of the default. */
+    public static void setGroundRecordingDirectory(final String directory) {
+        groundRecordingDirectory = directory;
+    }
+
     public static String getDirectoryToSaveDataTo(){
-        final String ret= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)+"/FPV_VR/";
+        final String ret = groundRecordingDirectory != null && !groundRecordingDirectory.isEmpty()
+                ? groundRecordingDirectory
+                : Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + "/FPV_VR/";
         File dir = new File(ret);
         if (!dir.exists()) {
-            final boolean mkdirs = dir.mkdirs();
-            //System.out.println("mkdirs res"+mkdirs);
+            dir.mkdirs();
         }
-        return ret;
+        return ret.endsWith("/") ? ret : ret + "/";
     }
 
     // Adds a .fpv file (created via the ndk file api) to the ContentResolver such that it is
